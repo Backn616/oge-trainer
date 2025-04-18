@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Тренажёр ОГЭ — Задание 4</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #ffffff;
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+    }
+    h1 {
+      color: #333;
+    }
+    .task-box {
+      background-color: #f1f1f1;
+      padding: 20px;
+      margin: 20px auto;
+      max-width: 600px;
+      border-radius: 8px;
+      font-size: 18px;
+    }
+    .buttons {
+      margin: 20px;
+    }
+    .record-btn, .stop-btn, .play-btn {
+      background-color: #0077cc;
+      color: white;
+      padding: 12px 24px;
+      margin: 10px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    .record-btn:hover, .stop-btn:hover, .play-btn:hover {
+      background-color: #005fa3;
+    }
+  </style>
+</head>
+<body>
+  <h1>📢 Задание ОГЭ — Чтение текста 4</h1>
+  <div class="task-box">
+    Прочитай следующий текст вслух:
+    <br><br>
+    <em>"Travel means going from one place to another. People travel to see new countries, visit family, or relax. It helps people learn about other cultures."</em>
+  </div>
+
+  <div class="buttons">
+    <button class="record-btn" onclick="startRecording()">🔴 Начать запись</button>
+    <button class="stop-btn" onclick="stopRecording()">⏹️ Остановить</button>
+    <button class="play-btn" onclick="playRecording()">▶️ Прослушать</button>
+  </div>
+
+  <audio id="audio" controls style="display: none; margin-top: 20px;"></audio>
+
+  <script>
+    let mediaRecorder;
+    let audioChunks = [];
+
+    async function startRecording() {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaRecorder = new MediaRecorder(stream);
+      audioChunks = [];
+
+      mediaRecorder.ondataavailable = e => {
+        audioChunks.push(e.data);
+      };
+
+      mediaRecorder.onstop = () => {
+        const audioBlob = new Blob(audioChunks);
+        const audioUrl = URL.createObjectURL(audioBlob);
+        const audio = document.getElementById("audio");
+        audio.src = audioUrl;
+        audio.style.display = "block";
+      };
+
+      mediaRecorder.start();
+    }
+
+    function stopRecording() {
+      if (mediaRecorder) {
+        mediaRecorder.stop();
+      }
+    }
+
+    function playRecording() {
+      const audio = document.getElementById("audio");
+      if (audio.src) {
+        audio.play();
+      }
+    }
+  </script>
+</body>
+</html>

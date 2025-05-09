@@ -31,29 +31,31 @@
     }
     .progress-container {
       width: 80%;
-      background-color: #eee;
-      border-radius: 10px;
-      overflow: hidden;
+      background-color: #ddd;
+      border-radius: 25px;
       margin: 20px auto;
       height: 20px;
+      position: relative;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,.2);
     }
     .progress-bar {
       height: 100%;
       width: 100%;
-      background-color: #0077cc;
+      background: linear-gradient(to right, #4facfe, #00f2fe);
       transition: width 1s linear;
+      border-radius: 25px 0 0 25px;
     }
     .reading-box {
       background-color: #ffffff;
-      padding: 25px;
+      padding: 30px;
       margin: 20px auto;
-      max-width: 700px;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      font-size: 18px;
+      max-width: 900px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      font-size: 22px;
       text-align: left;
       display: none;
-      line-height: 1.6;
+      line-height: 1.7;
     }
     .buttons {
       margin: 20px;
@@ -62,12 +64,12 @@
     .record-btn, .stop-btn, .play-btn, .download-btn, .finish-btn {
       background-color: #0077cc;
       color: white;
-      padding: 12px 24px;
+      padding: 14px 28px;
       margin: 10px;
       border: none;
       border-radius: 8px;
       cursor: pointer;
-      font-size: 16px;
+      font-size: 18px;
       text-decoration: none;
       display: inline-block;
     }
@@ -89,7 +91,12 @@
   <div class="reading-timer" id="reading-timer" style="display: none;">01:30</div>
 
   <div id="reading-box" class="reading-box">
-    Volunteering has become more popular among young people. It is a great way to help others and to learn new skills. Many students take part in local or international volunteering projects. They may work in hospitals, clean parks, or teach children. Volunteering gives young people a chance to understand different cultures and social problems. It also helps them to become more responsible and confident. Some universities even take volunteering experience into account during admission. Although volunteer...
+    Volunteering has become more popular among young people. It is a great way to help others and to learn new skills.
+    Many students take part in local or international volunteering projects. They may work in hospitals, clean parks, or teach children.
+    Volunteering gives young people a chance to understand different cultures and social problems.
+    It also helps them to become more responsible and confident.
+    Some universities even take volunteering experience into account during admission.
+    Although volunteers don’t get paid, they often say they receive something more important — the feeling of doing good for the world.
   </div>
 
   <div class="buttons" id="buttons">

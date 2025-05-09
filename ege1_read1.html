@@ -15,6 +15,11 @@
     h1 {
       color: #333;
     }
+    .countdown {
+      font-size: 48px;
+      color: #b30000;
+      margin-top: 50px;
+    }
     .task-box {
       background-color: #f1f1f1;
       padding: 20px;
@@ -22,9 +27,11 @@
       max-width: 700px;
       border-radius: 8px;
       font-size: 18px;
+      display: none;
     }
     .buttons {
       margin: 20px;
+      display: none;
     }
     .record-btn, .stop-btn, .play-btn, .download-btn {
       background-color: #0077cc;
@@ -43,13 +50,15 @@
 </head>
 <body>
   <h1>📖 ЕГЭ — Задание 1: Вариант 1</h1>
-  <div class="task-box">
+  <div class="countdown" id="countdown">5</div>
+
+  <div id="task-box" class="task-box">
     <em>
     Volunteering has become more popular among young people. It is a great way to help others and to learn new skills. Many students take part in local or international volunteering projects. They may work in hospitals, clean parks, or teach children. Volunteering gives young people a chance to understand different cultures and social problems. It also helps them to become more responsible and confident. Some universities even take volunteering experience into account during admission. Although volunteers don’t get paid, they often say they receive something more important — the feeling of doing good for the world.
     </em>
   </div>
 
-  <div class="buttons">
+  <div class="buttons" id="buttons">
     <button class="record-btn" onclick="startRecording()">🔴 Начать запись</button>
     <button class="stop-btn" onclick="stopRecording()">⏹️ Остановить</button>
     <button class="play-btn" onclick="playRecording()">▶️ Прослушать</button>
@@ -59,6 +68,24 @@
   <audio id="audio" controls style="display: none; margin-top: 20px;"></audio>
 
   <script>
+    // Обратный отсчёт
+    let count = 5;
+    const countdownEl = document.getElementById("countdown");
+    const taskBox = document.getElementById("task-box");
+    const buttonsBox = document.getElementById("buttons");
+
+    const timer = setInterval(() => {
+      count--;
+      countdownEl.textContent = count;
+      if (count === 0) {
+        clearInterval(timer);
+        countdownEl.style.display = "none";
+        taskBox.style.display = "block";
+        buttonsBox.style.display = "block";
+      }
+    }, 1000);
+
+    // Запись и скачивание
     let mediaRecorder;
     let audioChunks = [];
     let audioBlob;

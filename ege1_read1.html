@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Запись в sessionStorage</title>
+</head>
+<body>
+  <h1>🔴 Идёт запись...</h1>
+  <script>
+    let mediaRecorder;
+    let audioChunks = [];
+
+    async function initMic() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaRecorder = new MediaRecorder(stream);
+
+        mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+
+        mediaRecorder.onstop = () => {
+          const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            sessionStorage.setItem("ege1_audio_base64", reader.result);
+            window.location.href = "ege1_result.html";
+          };
+          reader.readAsDataURL(audioBlob); // base64
+        };
+
+        audioChunks = [];
+        mediaRecorder.start();
+        setTimeout(() => mediaRecorder.stop(), 5000);
+      } catch (err) {
+        alert("Ошибка доступа к микрофону: " + err.message);
+      }
+    }
+
+    window.onload = initMic;
+  </script>
+</body>
+</html>

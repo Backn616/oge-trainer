@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Прослушивание записи</title>
+</head>
+<body>
+  <h1>📢 Результат</h1>
+  <p>Ниже вы можете прослушать и сохранить вашу запись.</p>
+  <audio id="audio" controls style="width: 70%;"></audio><br>
+  <button onclick="downloadAudio()">⬇️ Скачать</button>
+
+  <script>
+    const audio = document.getElementById("audio");
+    const base64 = sessionStorage.getItem("ege1_audio_base64");
+    if (base64) {
+      audio.src = base64;
+    } else {
+      document.body.innerHTML += "<p style='color:red'>❌ Запись не найдена. Возможно, вы зашли напрямую.</p>";
+    }
+
+    function downloadAudio() {
+      if (!base64) return;
+      const a = document.createElement("a");
+      a.href = base64;
+      a.download = "recording_session.webm";
+      a.click();
+    }
+  </script>
+</body>
+</html>

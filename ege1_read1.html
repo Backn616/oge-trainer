@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ЕГЭ — Задание 1: Вариант 1</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #ffffff;
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+    }
+    h1 {
+      color: #333;
+    }
+    .instruction {
+      font-size: 22px;
+      max-width: 95%;
+      margin: 20px auto;
+      text-align: left;
+      background-color: #f9f9f9;
+      padding: 25px;
+      border-left: 6px solid #0077cc;
+    }
+    .countdown, .reading-timer {
+      font-size: 56px;
+      color: #b30000;
+      margin-top: 10px;
+    }
+    .progress-container {
+      width: 95%;
+      background-color: #eee;
+      border-radius: 25px;
+      margin: 20px auto;
+      height: 30px;
+      position: relative;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,.2);
+    }
+    .progress-bar {
+      height: 100%;
+      width: 100%;
+      background: linear-gradient(to right, #4facfe, #00f2fe);
+      transition: width 1s linear;
+      border-radius: 25px 0 0 25px;
+    }
+    .reading-box {
+      background-color: #ffffff;
+      padding: 40px;
+      margin: 30px auto;
+      width: 95%;
+      max-width: 1600px;
+      border: 1px solid #ccc;
+      border-radius: 12px;
+      font-size: 32px;
+      text-align: left;
+      display: none;
+      line-height: 1.9;
+    }
+    .buttons {
+      margin: 30px;
+      display: none;
+    }
+    .finish-btn {
+      background-color: #0077cc;
+      color: white;
+      padding: 16px 32px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 20px;
+      text-decoration: none;
+    }
+    .finish-btn:hover {
+      background-color: #005fa3;
+    }
+  </style>
+</head>
+<body>
+  <h1>📖 ЕГЭ — Задание 1: Вариант 1</h1>
+
+  <div class="instruction">
+    <strong>Task 1.</strong> Read the text aloud.
+  </div>
+
+  <div class="countdown" id="countdown">5</div>
+  <div class="progress-container"><div class="progress-bar" id="progress-bar"></div></div>
+
+  <div class="reading-timer" id="reading-timer" style="display: none;">01:30</div>
+
+  <div id="reading-box" class="reading-box">
+    Volunteering has become more popular among young people. It is a great way to help others and to learn new skills.
+    Many students take part in local or international volunteering projects. They may work in hospitals, clean parks, or teach children.
+    Volunteering gives young people a chance to understand different cultures and social problems.
+    It also helps them to become more responsible and confident.
+    Some universities even take volunteering experience into account during admission.
+    Although volunteers don’t get paid, they often say they receive something more important — the feeling of doing good for the world.
+  </div>
+
+  <div class="buttons" id="buttons">
+    <button class="finish-btn" onclick="endManually()">✅ Закончить задание</button>
+  </div>
+
+  <script>
+    let mediaRecorder = null;
+    let audioChunks = [];
+    let hasStopped = false;
+
+    const countdownEl = document.getElementById("countdown");
+    const readingTimerEl = document.getElementById("reading-timer");
+    const readingBox = document.getElementById("reading-box");
+    const buttonsBox = document.getElementById("buttons");
+    const progressBar = document.getElementById("progress-bar");
+
+    async function initMic() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaRecorder = new MediaRecorder(stream);
+
+        mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+
+        mediaRecorder.onstop = () => {
+          if (hasStopped) return;
+          hasStopped = true;
+          const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            sessionStorage.setItem("ege1_audio_base64", reader.result);
+            window.location.href = "ege1_result.html";
+          };
+          reader.readAsDataURL(audioBlob);
+        };
+
+        startCountdown();
+      } catch (err) {
+        alert("❌ Не удалось получить доступ к микрофону: " + err.message);
+        startCountdown(); // всё равно запускаем
+      }
+    }
+
+    function speakStart() {
+      const utterance = new SpeechSynthesisUtterance("Start reading");
+      utterance.lang = "en-US";
+      speechSynthesis.speak(utterance);
+    }
+
+    function startCountdown() {
+      let count = 5;
+      const timer = setInterval(() => {
+        countdownEl.textContent = count;
+        progressBar.style.width = ((count / 5) * 100) + "%";
+        count--;
+        if (count < 0) {
+          clearInterval(timer);
+          countdownEl.style.display = "none";
+          readingBox.style.display = "block";
+          buttonsBox.style.display = "block";
+          readingTimerEl.style.display = "block";
+          speakStart();
+          startReadingTimer();
+          if (mediaRecorder) {
+            audioChunks = [];
+            mediaRecorder.start();
+          }
+        }
+      }, 1000);
+    }
+
+    function startReadingTimer() {
+      let totalSeconds = 90;
+      const fullWidth = 100;
+      const barStep = fullWidth / totalSeconds;
+
+      const timer2 = setInterval(() => {
+        totalSeconds--;
+        const minutes = String(Math.floor(totalSeconds / 60)).padStart(2, '0');
+        const seconds = String(totalSeconds % 60).padStart(2, '0');
+        readingTimerEl.textContent = minutes + ":" + seconds;
+        progressBar.style.width = (barStep * totalSeconds) + "%";
+
+        if (totalSeconds <= 0) {
+          clearInterval(timer2);
+          if (mediaRecorder && mediaRecorder.state === "recording") {
+            mediaRecorder.stop();
+          } else {
+            window.location.href = "ege1_result.html";
+          }
+        }
+      }, 1000);
+    }
+
+    function endManually() {
+      if (mediaRecorder && mediaRecorder.state === "recording") {
+        mediaRecorder.stop(); // триггерит сохранение и переход
+      } else {
+        window.location.href = "ege1_result.html";
+      }
+    }
+
+    window.onload = initMic;
+  </script>
+</body>
+</html>

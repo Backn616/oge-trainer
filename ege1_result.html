@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Результат — Вариант 1</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f7f7f7;
+      margin: 0;
+      padding: 30px;
+      text-align: center;
+    }
+    h1 {
+      color: #0077cc;
+      font-size: 36px;
+      margin-bottom: 10px;
+    }
+    .status {
+      font-size: 24px;
+      color: green;
+      margin-bottom: 30px;
+    }
+    .reading-box {
+      background-color: #ffffff;
+      padding: 40px;
+      margin: 0 auto 40px;
+      max-width: 1600px;
+      width: 95%;
+      border: 1px solid #ccc;
+      border-radius: 12px;
+      font-size: 30px;
+      text-align: left;
+      line-height: 1.9;
+    }
+    .nav-button, .play-btn, .download-btn {
+      background-color: #0077cc;
+      color: white;
+      padding: 16px 32px;
+      margin: 12px;
+      border: none;
+      border-radius: 8px;
+      font-size: 20px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .nav-button:hover, .play-btn:hover, .download-btn:hover {
+      background-color: #005fa3;
+    }
+  </style>
+</head>
+<body>
+  <h1>Результат сохранён</h1>
+  <div class="status">✅ Вы успешно завершили задание. Вы можете прослушать или скачать запись ниже.</div>
+
+  <audio id="audio" controls style="margin-top: 20px;"></audio>
+  <br>
+  <button class="play-btn" onclick="playAudio()">▶️ Прослушать</button>
+  <button class="download-btn" onclick="downloadAudio()">⬇️ Скачать запись</button>
+
+  <div class="reading-box">
+    Volunteering has become more popular among young people. It is a great way to help others and to learn new skills.
+    Many students take part in local or international volunteering projects. They may work in hospitals, clean parks, or teach children.
+    Volunteering gives young people a chance to understand different cultures and social problems.
+    It also helps them to become more responsible and confident.
+    Some universities even take volunteering experience into account during admission.
+    Although volunteers don’t get paid, they often say they receive something more important — the feeling of doing good for the world.
+  </div>
+
+  <a href="ege1.html" class="nav-button">Перейти к выбору варианта</a>
+  <a href="ege_menu.html" class="nav-button">Перейти к выбору задания</a>
+  <a href="ege.html" class="nav-button">Перейти к выбору режима</a>
+  <a href="index.html" class="nav-button">Перейти на главную</a>
+
+  <script>
+    const audio = document.getElementById("audio");
+    const savedAudio = localStorage.getItem("ege1_audio");
+    if (savedAudio) {
+      audio.src = savedAudio;
+    }
+
+    function playAudio() {
+      if (audio.src) {
+        audio.play();
+      } else {
+        alert("Запись не найдена.");
+      }
+    }
+
+    function downloadAudio() {
+      if (!audio.src) {
+        alert("Запись не найдена.");
+        return;
+      }
+      const a = document.createElement("a");
+      a.href = audio.src;
+      a.download = "ege1_recording.webm";
+      a.click();
+    }
+  </script>
+</body>
+</html>

@@ -74,62 +74,43 @@
 <body>
 
   <h1>Task 2. Get ready to ask your question.</h1>
+
    <div class="question-block" id="questionBlock">
     <div class="question-text"><b>Question 2:</b> Ask a direct question about the following: <b>ticket price</b>.</div>
     <div class="image-block">
       <img src="2-2.png" alt="Take a Trip to the Stars!">
     </div>
     <div class="timer" id="questionTimer">20</div>
-    <div class="progress-container" id="progressContainer">
+    <div class="progress-container">
       <div class="progress-bar" id="progressBar"></div>
     </div>
     <button class="next-btn" id="nextBtn" onclick="window.location.href='ege2_read22_q3.html'">Следующий вопрос</button>
   </div>
 
   <script>
-    let countdownSeconds = 5;
-    const countdownEl = document.getElementById("countdown");
-    const questionBlock = document.getElementById("questionBlock");
-    const progressContainer = document.getElementById("progressContainer");
-    const progressBar = document.getElementById("progressBar");
-    const questionTimer = document.getElementById("questionTimer");
-    const nextBtn = document.getElementById("nextBtn");
-
-    const countdownInterval = setInterval(() => {
-      countdownSeconds--;
-      countdownEl.textContent = countdownSeconds;
-      if (countdownSeconds <= 0) {
-        clearInterval(countdownInterval);
-        countdownEl.style.display = "none";
-        questionBlock.style.display = "block";
-        progressContainer.style.display = "block";
-        speakQuestionNumber("Question two");
-        startProgressTimer();
-      }
-    }, 1000);
-
-    function startProgressTimer() {
-  let totalSeconds = 20;
-  const fullWidth = 100;
-  const step = fullWidth / totalSeconds;
-  const interval = setInterval(() => {
-    totalSeconds--;
-    questionTimer.textContent = totalSeconds;
-    progressBar.style.width = (totalSeconds / 20 * 100) + "%";
-    if (totalSeconds <= 0) {
-      clearInterval(interval);
-      window.location.href = 'ege2_read22_q3.html';  // автоматический переход
-    }
-  }, 1000);
-}
-
-    function speakQuestionNumber(text) {
+    function speak(text) {
       if ('speechSynthesis' in window) {
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.lang = "en-US";
         window.speechSynthesis.speak(utterance);
       }
     }
+
+    speak("Question two");
+
+    let totalSeconds = 20;
+    const questionTimer = document.getElementById("questionTimer");
+    const progressBar = document.getElementsByClassName("progress-bar")[0];
+
+    const interval = setInterval(() => {
+      totalSeconds--;
+      questionTimer.textContent = totalSeconds;
+      progressBar.style.width = (totalSeconds / 20 * 100) + "%";
+      if (totalSeconds <= 0) {
+        clearInterval(interval);
+        window.location.href = "ege2_read22_q3.html";
+      }
+    }, 1000);
   </script>
 
 </body>

@@ -16,13 +16,7 @@
       font-size: 28px;
       margin-bottom: 20px;
     }
-    .countdown {
-      font-size: 56px;
-      color: #b30000;
-      margin: 30px auto;
-    }
     .question-block {
-      display: none;
       margin-top: 30px;
     }
     .question-text {
@@ -73,9 +67,9 @@
 </head>
 <body>
 
-  <h1>Task 2. Get ready to ask your question.</h1>
+  <h1>Task 2. Question 2</h1>
 
-   <div class="question-block" id="questionBlock">
+  <div class="question-block" id="questionBlock">
     <div class="question-text"><b>Question 2:</b> Ask a direct question about the following: <b>ticket price</b>.</div>
     <div class="image-block">
       <img src="2-2.png" alt="Take a Trip to the Stars!">
@@ -84,11 +78,19 @@
     <div class="progress-container">
       <div class="progress-bar" id="progressBar"></div>
     </div>
-    <button class="next-btn" id="nextBtn" onclick="window.location.href='ege2_read22_q3.html'">Следующий вопрос</button>
+    <button class="next-btn" onclick="window.location.href='ege2_read22_q3.html'">Следующий вопрос</button>
   </div>
 
   <script>
-    function speak(text) {
+    const questionBlock = document.getElementById("questionBlock");
+    const progressBar = document.getElementById("progressBar");
+    const questionTimer = document.getElementById("questionTimer");
+
+    // Озвучить сразу
+    speakQuestionNumber("Question two");
+    startProgressTimer();
+
+    function speakQuestionNumber(text) {
       if ('speechSynthesis' in window) {
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.lang = "en-US";
@@ -96,21 +98,18 @@
       }
     }
 
-    speak("Question two");
-
-    let totalSeconds = 20;
-    const questionTimer = document.getElementById("questionTimer");
-    const progressBar = document.getElementsByClassName("progress-bar")[0];
-
-    const interval = setInterval(() => {
-      totalSeconds--;
-      questionTimer.textContent = totalSeconds;
-      progressBar.style.width = (totalSeconds / 20 * 100) + "%";
-      if (totalSeconds <= 0) {
-        clearInterval(interval);
-        window.location.href = "ege2_read22_q3.html";
-      }
-    }, 1000);
+    function startProgressTimer() {
+      let totalSeconds = 20;
+      const interval = setInterval(() => {
+        totalSeconds--;
+        questionTimer.textContent = totalSeconds;
+        progressBar.style.width = (totalSeconds / 20 * 100) + "%";
+        if (totalSeconds <= 0) {
+          clearInterval(interval);
+          window.location.href = "ege2_read22_q3.html";
+        }
+      }, 1000);
+    }
   </script>
 
 </body>

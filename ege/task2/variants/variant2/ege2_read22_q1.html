@@ -77,15 +77,15 @@
   <div class="countdown" id="countdown">5</div>
 
   <div class="question-block" id="questionBlock">
-    <div class="question-text"><b>Question 1:</b> Ask a direct question about the following: <b>minimum age</b>.</div>
+    <div class="question-text"><b>Question 1:</b> Ask a direct question about the following: <b>opening hours</b>.</div>
     <div class="image-block">
-      <img src="photo_club.png" alt="Join our photo club">
+      <img src="2-2.png" alt="Take a Trip to the Stars!">
     </div>
     <div class="timer" id="questionTimer">20</div>
     <div class="progress-container" id="progressContainer">
       <div class="progress-bar" id="progressBar"></div>
     </div>
-    <button class="next-btn" id="nextBtn" onclick="window.location.href='ege2_read2_q2.html'">Следующий вопрос</button>
+    <button class="next-btn" id="nextBtn" onclick="window.location.href='ege2_read22_q2.html'">Следующий вопрос</button>
   </div>
 
   <script>
@@ -120,11 +120,10 @@
     progressBar.style.width = (totalSeconds / 20 * 100) + "%";
     if (totalSeconds <= 0) {
       clearInterval(interval);
-      window.location.href = 'ege2_read2_q2.html';  // автоматический переход
+      window.location.href = 'ege2_read22_q2.html';  // автоматический переход
     }
   }, 1000);
 }
-
 
     function speakQuestionNumber(text) {
       if ('speechSynthesis' in window) {

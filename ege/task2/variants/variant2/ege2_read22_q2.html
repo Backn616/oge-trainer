@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Task 2 — Question 1</title>
+  <title>Task 2 — Question 2</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -77,15 +77,15 @@
   <div class="countdown" id="countdown">5</div>
 
   <div class="question-block" id="questionBlock">
-    <div class="question-text"><b>Question 1:</b> Ask a direct question about the following: <b>minimum age</b>.</div>
+    <div class="question-text"><b>Question 2:</b> Ask a direct question about the following: <b>ticket price</b>.</div>
     <div class="image-block">
-      <img src="photo_club.png" alt="Join our photo club">
+      <img src="2-2.png" alt="Take a Trip to the Stars!">
     </div>
     <div class="timer" id="questionTimer">20</div>
     <div class="progress-container" id="progressContainer">
       <div class="progress-bar" id="progressBar"></div>
     </div>
-    <button class="next-btn" id="nextBtn" onclick="window.location.href='ege2_read2_q2.html'">Следующий вопрос</button>
+    <button class="next-btn" id="nextBtn" onclick="window.location.href='ege2_read22_q3.html'">Следующий вопрос</button>
   </div>
 
   <script>
@@ -111,18 +111,19 @@
     }, 1000);
 
     function startProgressTimer() {
-      let totalSeconds = 20;
-      const fullWidth = 100;
-      const step = fullWidth / totalSeconds;
-      const interval = setInterval(() => {
-        totalSeconds--;
-        questionTimer.textContent = totalSeconds;
-        progressBar.style.width = (totalSeconds / 20 * 100) + "%";
-        if (totalSeconds <= 0) {
-          clearInterval(interval);
-        }
-      }, 1000);
+  let totalSeconds = 20;
+  const fullWidth = 100;
+  const step = fullWidth / totalSeconds;
+  const interval = setInterval(() => {
+    totalSeconds--;
+    questionTimer.textContent = totalSeconds;
+    progressBar.style.width = (totalSeconds / 20 * 100) + "%";
+    if (totalSeconds <= 0) {
+      clearInterval(interval);
+      window.location.href = 'ege2_read22_q3.html';  // автоматический переход
     }
+  }, 1000);
+}
 
     function speakQuestionNumber(text) {
       if ('speechSynthesis' in window) {

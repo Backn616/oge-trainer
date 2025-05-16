@@ -19,9 +19,12 @@
       max-width: 1600px;
       margin: 0 auto;
       text-align: left;
+      flex-wrap: wrap;
     }
     .task-left {
       flex: 1.5;
+      font-size: 20px;
+      line-height: 1.6;
     }
     .task-number {
       float: left;
@@ -36,24 +39,33 @@
       margin-right: 15px;
       font-weight: bold;
     }
-    .task-text {
-      overflow: hidden;
-      font-size: 20px;
-      line-height: 1.6;
-    }
     .task-text b {
       font-weight: bold;
     }
-    .image-block {
+
+    .ad-section {
       flex: 1;
-      text-align: right;
+      text-align: center;
+      min-width: 260px;
     }
-    .image-block img {
-      max-width: 100%;
-      max-height: 400px;
+    .ad-title {
+      font-size: 22px;
+      font-weight: bold;
+      margin-bottom: 12px;
+    }
+    .ad-img {
+      max-width: 250px;
+      width: 100%;
       height: auto;
       border: 1px solid #ccc;
+      border-radius: 8px;
+      margin-bottom: 12px;
     }
+    .ad-text {
+      font-size: 18px;
+      line-height: 1.4;
+    }
+
     .reading-timer {
       font-size: 56px;
       color: #b30000;
@@ -96,20 +108,22 @@
       <div class="task-number">2</div>
       <div class="task-text">
         <b>Task 2.</b> Study the advertisement.<br/>
-        You are considering joining the photo club and now you’d like to get more information.
+        You are considering joining the photo club and now you’d like to get more information.<br/>
         In 1.5 minutes you are to ask four direct questions to find out about the following:<br/><br/>
         1) location;<br/>
         2) activities offered;<br/>
         3) photo contests;<br/>
         4) membership fee.<br/><br/>
-        <b>You have 20 seconds to ask each question.</b><br/><br/>
-        <b>Join our photo club!</b><br/>
-        Learn to take stunning pictures and meet fellow photo lovers.<br/>
-        Exciting activities, contests, and masterclasses every month!
+        <b>You have 20 seconds to ask each question.</b>
       </div>
     </div>
-    <div class="image-block">
-      <img src="photo_club.png" alt="Join our photo club">
+    <div class="ad-section">
+      <div class="ad-title">Join our photo club!</div>
+      <img src="photo_club.png" alt="Photo Club" class="ad-img">
+      <div class="ad-text">
+        Learn to take stunning pictures and meet fellow photo lovers.<br>
+        Exciting activities, contests, and masterclasses every month!
+      </div>
     </div>
   </div>
 

@@ -74,7 +74,8 @@
 
   <script>
     const questions = [
-      "Do many teenagers in Russia have pets? What kind of pets are the most popular?",
+      "Do many teenagers in Russia have pets?",
+      "What kind of pets are the most popular?",
       "What are the main benefits of having a pet for a teenager?",
       "What difficulties can owning a pet bring?",
       "Would you prefer to have a dog or a cat? Why?",
@@ -90,18 +91,17 @@
     let currentQuestion = 0;
     let timerInterval;
 
-    function speak(text) {
+    function speak(text, callback = null) {
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = 'en-US';
+      if (callback) utterance.onend = callback;
       window.speechSynthesis.speak(utterance);
     }
 
     function playDing(callback = null) {
       const audio = new Audio("https://actions.google.com/sounds/v1/alarms/beep_short.ogg");
       audio.play();
-      if (callback) {
-        audio.onended = callback;
-      }
+      if (callback) audio.onended = callback;
     }
 
     function startCountdownAndQuestion() {
@@ -114,22 +114,24 @@
         if (count === 0) {
           clearInterval(countdownInterval);
           countdown.style.display = "none";
-          playDing(() => {
-            speak("Question " + (currentQuestion + 1));
-            setTimeout(() => {
-              playDing(() => {
-                speak(questions[currentQuestion]);
-                setTimeout(() => {
-                  playDing(() => {
-                    questionBlock.style.display = "block";
-                    startTimer();
-                  });
-                }, 1000);
-              });
-            }, 1000);
-          });
+          startQuestionSequence();
         }
       }, 1000);
+    }
+
+    function startQuestionSequence() {
+      playDing(() => {
+        speak("Question " + (currentQuestion + 1), () => {
+          playDing(() => {
+            speak(questions[currentQuestion], () => {
+              playDing(() => {
+                questionBlock.style.display = "block";
+                startTimer();
+              });
+            });
+          });
+        });
+      });
     }
 
     function startTimer() {
@@ -152,20 +154,7 @@
       currentQuestion++;
       if (currentQuestion < questions.length) {
         questionBlock.style.display = "none";
-        playDing(() => {
-          speak("Question " + (currentQuestion + 1));
-          setTimeout(() => {
-            playDing(() => {
-              speak(questions[currentQuestion]);
-              setTimeout(() => {
-                playDing(() => {
-                  questionBlock.style.display = "block";
-                  startTimer();
-                });
-              }, 1000);
-            });
-          }, 1000);
-        });
+        startQuestionSequence();
       } else {
         window.location.href = "ege3_result.html";
       }
@@ -178,8 +167,10 @@
 
     window.onload = () => {
       setTimeout(() => {
-        speak("Hello! It’s Teenagers Round the World Channel. Our guest today is a teenager from Russia and we are going to discuss teenagers and their attitude to pets. We’d like to know our guest’s point of view on this issue. Please answer five questions. So, let’s get started.");
-        setTimeout(startCountdownAndQuestion, 10000);
+        speak(
+          "Hello! It’s Teenagers Round the World Channel. Our guest today is a teenager from Russia and we are going to discuss teenagers and their attitude to pets. We’d like to know our guest’s point of view on this issue. Please answer five questions. So, let’s get started.",
+          () => setTimeout(startCountdownAndQuestion, 1000)
+        );
       }, 500);
     };
   </script>

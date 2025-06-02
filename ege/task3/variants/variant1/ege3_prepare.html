@@ -131,7 +131,7 @@
     function startQuestionSequence() {
       questionBlock.style.display = "none";
       playDing(() => {
-        questionNumber.textContent = "Question " + (currentQuestion + 1);
+        questionNumber.textContent = "Question " + (currentQuestion + 1); // перемещено раньше
         speak("Question " + (currentQuestion + 1), () => {
           playDing(() => {
             speak(questions[currentQuestion], () => {

@@ -96,9 +96,12 @@
       window.speechSynthesis.speak(utterance);
     }
 
-    function playDing() {
+    function playDing(callback = null) {
       const audio = new Audio("https://actions.google.com/sounds/v1/alarms/beep_short.ogg");
       audio.play();
+      if (callback) {
+        audio.onended = callback;
+      }
     }
 
     function startCountdownAndQuestion() {
@@ -111,13 +114,20 @@
         if (count === 0) {
           clearInterval(countdownInterval);
           countdown.style.display = "none";
-          playDing();
-          speak("Question " + (currentQuestion + 1));
-          setTimeout(() => {
-            playDing();
-            startTimer();
-          }, 1000);
-          questionBlock.style.display = "block";
+          playDing(() => {
+            speak("Question " + (currentQuestion + 1));
+            setTimeout(() => {
+              playDing(() => {
+                speak(questions[currentQuestion]);
+                setTimeout(() => {
+                  playDing(() => {
+                    questionBlock.style.display = "block";
+                    startTimer();
+                  });
+                }, 1000);
+              });
+            }, 1000);
+          });
         }
       }, 1000);
     }
@@ -133,8 +143,7 @@
         progressBar.style.width = (time / 20 * 100) + "%";
         if (time === 0) {
           clearInterval(timerInterval);
-          playDing();
-          nextQuestion();
+          playDing(() => nextQuestion());
         }
       }, 1000);
     }
@@ -142,27 +151,35 @@
     function nextQuestion() {
       currentQuestion++;
       if (currentQuestion < questions.length) {
-        playDing();
-        speak("Question " + (currentQuestion + 1));
-        setTimeout(() => {
-          playDing();
-          startTimer();
-        }, 1000);
+        questionBlock.style.display = "none";
+        playDing(() => {
+          speak("Question " + (currentQuestion + 1));
+          setTimeout(() => {
+            playDing(() => {
+              speak(questions[currentQuestion]);
+              setTimeout(() => {
+                playDing(() => {
+                  questionBlock.style.display = "block";
+                  startTimer();
+                });
+              }, 1000);
+            });
+          }, 1000);
+        });
       } else {
-        window.location.href = "ege3_result.html"; // заменить при необходимости
+        window.location.href = "ege3_result.html";
       }
     }
 
     nextBtn.addEventListener("click", () => {
       clearInterval(timerInterval);
-      playDing();
-      nextQuestion();
+      playDing(() => nextQuestion());
     });
 
     window.onload = () => {
       setTimeout(() => {
         speak("Hello! It’s Teenagers Round the World Channel. Our guest today is a teenager from Russia and we are going to discuss teenagers and their attitude to pets. We’d like to know our guest’s point of view on this issue. Please answer five questions. So, let’s get started.");
-        setTimeout(startCountdownAndQuestion, 9000); // пауза после вступления
+        setTimeout(startCountdownAndQuestion, 10000);
       }, 500);
     };
   </script>

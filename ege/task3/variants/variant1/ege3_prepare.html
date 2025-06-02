@@ -100,15 +100,15 @@
     function speak(text, callback = null) {
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = 'en-US';
-      utterance.pitch = 1.2;
+      utterance.pitch = 1.1;
       utterance.rate = 0.95;
       if (callback) utterance.onend = callback;
       window.speechSynthesis.speak(utterance);
     }
 
     function playDing(callback = null) {
-      const audio = new Audio("https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg");
-      audio.volume = 0.6;
+      const audio = new Audio("https://actions.google.com/sounds/v1/alarms/beep_short.ogg");
+      audio.volume = 0.4;
       audio.play();
       if (callback) audio.onended = callback;
     }

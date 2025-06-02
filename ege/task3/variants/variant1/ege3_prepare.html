@@ -131,17 +131,19 @@
     function startQuestionSequence() {
       questionBlock.style.display = "none";
       playDing(() => {
-        questionNumber.textContent = "Question " + (currentQuestion + 1); // перемещено раньше
-        speak("Question " + (currentQuestion + 1), () => {
-          playDing(() => {
-            speak(questions[currentQuestion], () => {
-              playDing(() => {
-                questionBlock.style.display = "block";
-                startTimer();
+        questionNumber.textContent = "Question " + (currentQuestion + 1); // появляется сразу
+        setTimeout(() => {
+          speak("Question " + (currentQuestion + 1), () => {
+            playDing(() => {
+              speak(questions[currentQuestion], () => {
+                playDing(() => {
+                  questionBlock.style.display = "block";
+                  startTimer();
+                });
               });
             });
           });
-        });
+        }, 100); // короткая задержка для синхронности
       });
     }
 

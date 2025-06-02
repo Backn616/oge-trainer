@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Task 3 — Variant 1</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #fff;
+      margin: 0;
+      padding: 40px;
+      text-align: center;
+    }
+    .intro, .question-block {
+      display: none;
+    }
+    .countdown {
+      font-size: 56px;
+      color: #b30000;
+      margin: 30px auto;
+    }
+    .question-text {
+      font-size: 24px;
+      margin-top: 20px;
+    }
+    .timer {
+      font-size: 40px;
+      color: #b30000;
+      margin-top: 20px;
+    }
+    .progress-container {
+      width: 90%;
+      background-color: #eee;
+      border-radius: 25px;
+      margin: 10px auto 30px;
+      height: 30px;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,.2);
+    }
+    .progress-bar {
+      height: 100%;
+      width: 100%;
+      background: linear-gradient(to right, #4facfe, #00f2fe);
+      transition: width 1s linear;
+      border-radius: 25px 0 0 25px;
+    }
+    .next-btn {
+      margin-top: 30px;
+      font-size: 20px;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      background-color: #0077cc;
+      color: white;
+      cursor: pointer;
+      display: inline-block;
+    }
+    .next-btn:hover {
+      background-color: #005fa3;
+    }
+  </style>
+</head>
+<body>
+  <h1>Task 3. Speaking</h1>
+  <div class="intro" id="intro">
+    <p>Hello! It’s Teenagers Round the World Channel. Our guest today is a teenager from Russia and we are going to discuss teenagers and their attitude to pets. We’d like to know our guest’s point of view on this issue. Please answer five questions. So, let’s get started.</p>
+  </div>
+
+  <div class="countdown" id="countdown"></div>
+
+  <div class="question-block" id="questionBlock">
+    <div class="question-text" id="questionText"></div>
+    <div class="timer" id="questionTimer">20</div>
+    <div class="progress-container">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+    <button class="next-btn" id="nextBtn">Следующий вопрос</button>
+  </div>
+
+  <script>
+    const questions = [
+      "Do many teenagers in Russia have pets? What kind of pets are the most popular?",
+      "What are the main benefits of having a pet for a teenager?",
+      "What difficulties can owning a pet bring?",
+      "Would you prefer to have a dog or a cat? Why?",
+      "Do you think having a pet teaches teenagers responsibility? Why or why not?"
+    ];
+
+    const intro = document.getElementById("intro");
+    const countdown = document.getElementById("countdown");
+    const questionBlock = document.getElementById("questionBlock");
+    const questionText = document.getElementById("questionText");
+    const questionTimer = document.getElementById("questionTimer");
+    const progressBar = document.getElementById("progressBar");
+    const nextBtn = document.getElementById("nextBtn");
+
+    let currentQuestion = 0;
+    let timerInterval;
+
+    function speak(text) {
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'en-US';
+      window.speechSynthesis.speak(utterance);
+    }
+
+    function showIntro() {
+      intro.style.display = "block";
+      setTimeout(() => {
+        speak(intro.innerText);
+        setTimeout(startCountdown, 1000);
+      }, 500);
+    }
+
+    function startCountdown() {
+      intro.style.display = "none";
+      let count = 5;
+      countdown.style.display = "block";
+      countdown.textContent = count;
+      const countdownInterval = setInterval(() => {
+        count--;
+        countdown.textContent = count;
+        if (count === 0) {
+          clearInterval(countdownInterval);
+          countdown.style.display = "none";
+          showQuestion();
+        }
+      }, 1000);
+    }
+
+    function showQuestion() {
+      questionText.textContent = "Question " + (currentQuestion + 1) + ": " + questions[currentQuestion];
+      speak("Question " + (currentQuestion + 1));
+      setTimeout(() => playDing(), 500);
+      questionBlock.style.display = "block";
+      startTimer();
+    }
+
+    function startTimer() {
+      let time = 20;
+      questionTimer.textContent = time;
+      progressBar.style.width = "100%";
+      clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        time--;
+        questionTimer.textContent = time;
+        progressBar.style.width = (time / 20 * 100) + "%";
+        if (time === 0) {
+          clearInterval(timerInterval);
+          playDing();
+          nextQuestion();
+        }
+      }, 1000);
+    }
+
+    function playDing() {
+      const audio = new Audio("https://actions.google.com/sounds/v1/alarms/beep_short.ogg");
+      audio.play();
+    }
+
+    function nextQuestion() {
+      currentQuestion++;
+      if (currentQuestion < questions.length) {
+        questionText.textContent = "Question " + (currentQuestion + 1) + ": " + questions[currentQuestion];
+        speak("Question " + (currentQuestion + 1));
+        setTimeout(() => playDing(), 500);
+        startTimer();
+      } else {
+        window.location.href = "ege3_result.html"; // замените при необходимости
+      }
+    }
+
+    nextBtn.addEventListener("click", () => {
+      clearInterval(timerInterval);
+      playDing();
+      nextQuestion();
+    });
+
+    window.onload = showIntro;
+  </script>
+</body>
+</html>

@@ -24,6 +24,10 @@
     .question-block {
       margin-top: 30px;
     }
+    .question-number {
+      font-size: 30px;
+      margin-bottom: 10px;
+    }
     .timer {
       font-size: 40px;
       color: #b30000;
@@ -65,6 +69,7 @@
   <div class="countdown" id="countdown"></div>
 
   <div class="question-block" id="questionBlock" style="display:none">
+    <div class="question-number" id="questionNumber"></div>
     <div class="timer" id="questionTimer">20</div>
     <div class="progress-container">
       <div class="progress-bar" id="progressBar"></div>
@@ -87,6 +92,7 @@
     const questionTimer = document.getElementById("questionTimer");
     const progressBar = document.getElementById("progressBar");
     const nextBtn = document.getElementById("nextBtn");
+    const questionNumber = document.getElementById("questionNumber");
 
     let currentQuestion = 0;
     let timerInterval;
@@ -94,12 +100,15 @@
     function speak(text, callback = null) {
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = 'en-US';
+      utterance.pitch = 1.2;
+      utterance.rate = 0.95;
       if (callback) utterance.onend = callback;
       window.speechSynthesis.speak(utterance);
     }
 
     function playDing(callback = null) {
-      const audio = new Audio("https://actions.google.com/sounds/v1/alarms/beep_short.ogg");
+      const audio = new Audio("https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg");
+      audio.volume = 0.6;
       audio.play();
       if (callback) audio.onended = callback;
     }
@@ -120,6 +129,7 @@
     }
 
     function startQuestionSequence() {
+      questionNumber.textContent = "Question " + (currentQuestion + 1);
       playDing(() => {
         speak("Question " + (currentQuestion + 1), () => {
           playDing(() => {

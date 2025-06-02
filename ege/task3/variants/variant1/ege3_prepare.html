@@ -128,21 +128,22 @@
       }, 1000);
     }
 
-    function startQuestionSequence() {
-      questionNumber.textContent = "Question " + (currentQuestion + 1);
+function startQuestionSequence() {
+  questionNumber.textContent = ""; // сброс перед показом
+  playDing(() => {
+    questionNumber.textContent = "Question " + (currentQuestion + 1); // показываем сразу
+    speak("Question " + (currentQuestion + 1), () => {
       playDing(() => {
-        speak("Question " + (currentQuestion + 1), () => {
+        speak(questions[currentQuestion], () => {
           playDing(() => {
-            speak(questions[currentQuestion], () => {
-              playDing(() => {
-                questionBlock.style.display = "block";
-                startTimer();
-              });
-            });
+            questionBlock.style.display = "block";
+            startTimer();
           });
         });
       });
-    }
+    });
+  });
+}
 
     function startTimer() {
       let time = 20;

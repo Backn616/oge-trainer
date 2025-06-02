@@ -130,20 +130,18 @@
 
     function startQuestionSequence() {
       questionBlock.style.display = "none";
+      questionNumber.textContent = "Question " + (currentQuestion + 1); // показать до озвучки
       playDing(() => {
-        questionNumber.textContent = "Question " + (currentQuestion + 1); // появляется сразу
-        setTimeout(() => {
-          speak("Question " + (currentQuestion + 1), () => {
-            playDing(() => {
-              speak(questions[currentQuestion], () => {
-                playDing(() => {
-                  questionBlock.style.display = "block";
-                  startTimer();
-                });
+        speak("Question " + (currentQuestion + 1), () => {
+          playDing(() => {
+            speak(questions[currentQuestion], () => {
+              playDing(() => {
+                questionBlock.style.display = "block";
+                startTimer();
               });
             });
           });
-        }, 100); // короткая задержка для синхронности
+        });
       });
     }
 

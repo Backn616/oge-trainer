@@ -1,82 +1,17 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Task 3 — Variant 1</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #fff;
-      margin: 0;
-      padding: 40px;
-      text-align: center;
-    }
-    h1 {
-      font-size: 28px;
-      margin-bottom: 20px;
-    }
-    .countdown {
-      font-size: 56px;
-      color: #b30000;
-      margin: 30px auto;
-    }
-    /* Блок, в котором выводится надпись "Question X" */
-    .question-label {
-      font-size: 30px;
-      margin: 30px 0;
-      display: none; /* по умолчанию скрыт */
-    }
-    .question-block {
-      margin-top: 30px;
-      display: none; /* скрываем весь блок с таймером, прогрессом и кнопкой, пока не надо */
-    }
-    .timer {
-      font-size: 40px;
-      color: #b30000;
-      margin-top: 20px;
-      /* дисплей будем включать динамически */
-    }
-    .progress-container {
-      width: 90%;
-      background-color: #eee;
-      border-radius: 25px;
-      margin: 10px auto 30px;
-      height: 30px;
-      box-shadow: inset 0 1px 3px rgba(0,0,0,.2);
-      /* дисплей включаем динамически */
-    }
-    .progress-bar {
-      height: 100%;
-      width: 100%;
-      background: linear-gradient(to right, #4facfe, #00f2fe);
-      transition: width 1s linear;
-      border-radius: 25px 0 0 25px;
-    }
-    .next-btn {
-      margin-top: 30px;
-      font-size: 20px;
-      padding: 12px 24px;
-      border: none;
-      border-radius: 8px;
-      background-color: #0077cc;
-      color: white;
-      cursor: pointer;
-      display: none; /* включим, когда нужно */
-    }
-    .next-btn:hover {
-      background-color: #005fa3;
-    }
+    /* …ваши стили (те же, что и в примере)… */
   </style>
 </head>
 <body>
   <h1>Task 3. Speaking</h1>
   <div class="countdown" id="countdown"></div>
-
-  <!-- Метка "Question X" -->
   <div class="question-label" id="questionLabel"></div>
-
-  <!-- Блок с таймером, прогресс-баром и кнопкой -->
   <div class="question-block" id="questionBlock">
     <div class="timer" id="questionTimer">20</div>
     <div class="progress-container" id="progressContainer">
@@ -85,6 +20,7 @@
     <button class="next-btn" id="nextBtn">Следующий вопрос</button>
   </div>
 
+  <!-- Здесь вставьте весь JavaScript из примера -->
   <script>
     const questions = [
       "Do many teenagers in Russia have pets?",
@@ -96,14 +32,16 @@
     ];
 
     const countdown = document.getElementById("countdown");
-    const questionLabel = document.getElementById("questionLabel");       // метка "Question X"
-    const questionBlock = document.getElementById("questionBlock");       // блок с таймером, прогрессом, кнопкой
+    const questionLabel = document.getElementById("questionLabel");
+    const questionBlock = document.getElementById("questionBlock");
     const questionTimer = document.getElementById("questionTimer");
     const progressContainer = document.getElementById("progressContainer");
     const progressBar = document.getElementById("progressBar");
     const nextBtn = document.getElementById("nextBtn");
 
     let currentQuestion = 0;
+    let timeLeft = 20;
+    let questionStartedAt = 0;
     let timerInterval;
 
     function speak(text, callback = null) {
@@ -122,6 +60,83 @@
       if (callback) audio.onended = callback;
     }
 
+    function saveState() {
+      localStorage.setItem("currentQuestion", currentQuestion);
+      localStorage.setItem("timeLeft", timeLeft);
+      localStorage.setItem("questionStartedAt", questionStartedAt);
+    }
+
+    window.addEventListener("beforeunload", () => {
+      if (questionStartedAt) {
+        saveState();
+      }
+    });
+
+    function startTimer(resumed = false) {
+      if (!resumed) {
+        timeLeft = 20;
+        questionStartedAt = Date.now();
+        saveState();
+      } else {
+        questionStartedAt = Date.now() - ((20 - timeLeft) * 1000);
+        saveState();
+      }
+
+      questionTimer.textContent = timeLeft;
+      progressBar.style.width = (timeLeft / 20 * 100) + "%";
+
+      clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        questionTimer.textContent = timeLeft;
+        progressBar.style.width = (timeLeft / 20 * 100) + "%";
+        saveState();
+
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          localStorage.removeItem("questionStartedAt");
+          localStorage.removeItem("timeLeft");
+          localStorage.removeItem("currentQuestion");
+          playDing(() => nextQuestion());
+        }
+      }, 1000);
+    }
+
+    function showQuestionDirectly(resumed = false) {
+      questionLabel.textContent = "Question " + (currentQuestion + 1);
+      questionLabel.style.display = "block";
+
+      questionBlock.style.display = "block";
+      questionTimer.style.display = "block";
+      progressContainer.style.display = "block";
+      nextBtn.style.display = "inline-block";
+
+      startTimer(resumed);
+    }
+
+    window.onload = () => {
+      const savedQ = localStorage.getItem("currentQuestion");
+      const savedStart = localStorage.getItem("questionStartedAt");
+      const savedTime = localStorage.getItem("timeLeft");
+
+      if (savedQ !== null && savedStart !== null && savedTime !== null) {
+        currentQuestion = +savedQ;
+        const elapsed = Math.floor((Date.now() - (+savedStart)) / 1000);
+        let resumedTime = +savedTime - elapsed;
+        if (resumedTime < 0) resumedTime = 0;
+        timeLeft = resumedTime;
+
+        showQuestionDirectly(true);
+      } else {
+        setTimeout(() => {
+          speak(
+            "Hello! It’s Teenagers Round the World Channel. Our guest today is a teenager from Russia and we are going to discuss teenagers and their attitude to pets. We’d like to know our guest’s point of view on this issue. Please answer five questions. So, let’s get started.",
+            () => setTimeout(startCountdownAndQuestion, 1000)
+          );
+        }, 500);
+      }
+    };
+
     function startCountdownAndQuestion() {
       let count = 5;
       countdown.style.display = "block";
@@ -138,37 +153,30 @@
     }
 
     function startQuestionSequence() {
-      // Сначала скрываем всё
+      localStorage.removeItem("questionStartedAt");
+      localStorage.removeItem("timeLeft");
+      localStorage.removeItem("currentQuestion");
+
       questionBlock.style.display = "none";
       questionTimer.style.display = "none";
       progressContainer.style.display = "none";
       nextBtn.style.display = "none";
       questionLabel.style.display = "none";
 
-      // Первый "динь" перед "Question X"
       playDing(() => {
-        // Устанавливаем и показываем "Question X"
         questionLabel.textContent = "Question " + (currentQuestion + 1);
         questionLabel.style.display = "block";
 
-        // Синхронно говорим "Question X"
         speak("Question " + (currentQuestion + 1), () => {
-          // После окончания озвучки "Question X" — опять "динь"
           playDing(() => {
-            // НЕ скрываем questionLabel здесь! Он остаётся видимым весь следующий этап.
-
-            // Произносим сам текст вопроса
             speak(questions[currentQuestion], () => {
-              // После окончания озвучки вопроса — ещё один "динь"
               playDing(() => {
-                // Показываем таймер, прогресс-бар и кнопку, но не скрываем метку
                 questionBlock.style.display = "block";
                 questionTimer.style.display = "block";
                 progressContainer.style.display = "block";
                 nextBtn.style.display = "inline-block";
 
-                // Запускаем обратный отсчёт
-                startTimer();
+                startTimer(false);
               });
             });
           });
@@ -176,50 +184,30 @@
       });
     }
 
-    function startTimer() {
-      let time = 20;
-      questionTimer.textContent = time;
-      progressBar.style.width = "100%";
-      clearInterval(timerInterval);
-      timerInterval = setInterval(() => {
-        time--;
-        questionTimer.textContent = time;
-        progressBar.style.width = (time / 20 * 100) + "%";
-        if (time === 0) {
-          clearInterval(timerInterval);
-          playDing(() => nextQuestion());
-        }
-      }, 1000);
-    }
-
     function nextQuestion() {
-      // Сначала сбрасываем таймер и скрываем всё, чтобы при следующей итерации отрисовался новый label
       clearInterval(timerInterval);
       questionLabel.style.display = "none";
       questionBlock.style.display = "none";
+
+      localStorage.removeItem("questionStartedAt");
+      localStorage.removeItem("timeLeft");
+      localStorage.removeItem("currentQuestion");
 
       currentQuestion++;
       if (currentQuestion < questions.length) {
         startQuestionSequence();
       } else {
-        // Если это был последний вопрос, переходим на итоговую страницу
         window.location.href = "ege3_result.html";
       }
     }
 
     nextBtn.addEventListener("click", () => {
       clearInterval(timerInterval);
+      localStorage.removeItem("questionStartedAt");
+      localStorage.removeItem("timeLeft");
+      localStorage.removeItem("currentQuestion");
       playDing(() => nextQuestion());
     });
-
-    window.onload = () => {
-      setTimeout(() => {
-        speak(
-          "Hello! It’s Teenagers Round the World Channel. Our guest today is a teenager from Russia and we are going to discuss teenagers and their attitude to pets. We’d like to know our guest’s point of view on this issue. Please answer five questions. So, let’s get started.",
-          () => setTimeout(startCountdownAndQuestion, 1000)
-        );
-      }, 500);
-    };
   </script>
 </body>
 </html>

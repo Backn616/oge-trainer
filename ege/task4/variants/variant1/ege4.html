@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Task 4 — Variant 1</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #fff;
+      margin: 0;
+      padding: 40px;
+      text-align: center;
+    }
+    h1 {
+      font-size: 28px;
+      margin-bottom: 20px;
+    }
+    .countdown {
+      font-size: 56px;
+      color: #b30000;
+      margin: 30px auto;
+    }
+    .instruction {
+      font-size: 20px;
+      margin-top: 30px;
+    }
+    .photos {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      margin-top: 30px;
+    }
+    .photos img {
+      width: 300px;
+      height: auto;
+      border: 2px solid #ccc;
+      border-radius: 10px;
+    }
+    .speak-now {
+      font-size: 26px;
+      font-weight: bold;
+      color: green;
+      display: none;
+      margin-top: 40px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Task 4 — Variant 1</h1>
+
+  <div class="instruction">
+    <p>Imagine that you and your friend are doing a school project “Spending holidays: in the city or in the countryside”. You have found some illustrations and want to share the news. Leave a voice message to your friend. In 2.5 minutes be ready to:</p>
+    <ul style="text-align:left; max-width: 600px; margin: 0 auto;">
+      <li>explain the choice of the illustrations for the project by briefly describing them and noting the differences;</li>
+      <li>mention the advantages (1–2) of spending holidays in the city and in the countryside;</li>
+      <li>mention the disadvantages (1–2) of each type of holiday;</li>
+      <li>express your opinion on the subject of the project – which way of spending holidays presented in the pictures you prefer and why.</li>
+    </ul>
+    <p>You will speak for not more than 3 minutes (12–15 sentences). You have to talk continuously.</p>
+  </div>
+
+  <div class="countdown" id="countdown">5</div>
+
+  <div class="photos">
+    <img src="photo1_city.png" alt="City holiday scene">
+    <img src="photo2_countryside.png" alt="Countryside holiday scene">
+  </div>
+
+  <div class="speak-now" id="speakNow">Start speaking now...</div>
+
+  <script>
+    let count = 5;
+    const countdownEl = document.getElementById('countdown');
+    const speakNowEl = document.getElementById('speakNow');
+
+    const countdown = setInterval(() => {
+      count--;
+      if (count > 0) {
+        countdownEl.textContent = count;
+      } else {
+        clearInterval(countdown);
+        countdownEl.style.display = 'none';
+        speakNowEl.style.display = 'block';
+      }
+    }, 1000);
+  </script>
+</body>
+</html>

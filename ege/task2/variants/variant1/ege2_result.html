@@ -101,17 +101,16 @@
     🎉 Поздравляем! Ваш тест закончен. Вы можете прослушать запись внизу страницы.
   </div>
 
-  <!-- ВЕРХНИЕ КНОПКИ -->
+  <div class="audio-controls">
+    <audio id="audio" controls></audio><br>
+    <button class="download-btn" onclick="downloadAudio()">⬇️ Скачать запись</button>
+  </div>
+
   <div class="nav-container">
     <a href="../ege2.html" class="nav-button">Перейти к выбору варианта</a>
     <a href="../../../ege.html" class="nav-button">Перейти к выбору задания</a>
     <a href="../../../ege_menu.html" class="nav-button">Перейти к выбору режима</a>
     <a href="/oge-trainer/index.html" class="nav-button">Перейти на главную</a>
-  </div>
-
-  <div class="audio-controls">
-    <audio id="audio" controls></audio><br>
-    <button class="download-btn" onclick="downloadAudio()">⬇️ Скачать запись</button>
   </div>
 
   <div class="main-content">
@@ -134,15 +133,7 @@
       </div>
     </div>
   </div>
-
-  <!-- НИЖНИЕ КНОПКИ -->
-  <div class="nav-container">
-    <a href="ege2.html" class="nav-button">К выбору варианта</a>
-    <a href="ege_menu.html" class="nav-button">К выбору задания</a>
-    <a href="ege.html" class="nav-button">К выбору режима</a>
-    <a href="index.html" class="nav-button">На главную</a>
-  </div>
-
+  
   <script>
     const audio = document.getElementById("audio");
     const base64 = sessionStorage.getItem("ege2_audio_base64"); // Исправлено для Task 2

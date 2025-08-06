@@ -28,13 +28,18 @@
     .photos {
       display: flex;
       justify-content: center;
+      align-items: flex-start;
       gap: 30px;
       margin-top: 30px;
+      flex-wrap: wrap;
     }
     .photos img {
-      max-width: 100%;
+      width: 45%;
+      max-width: 400px;
       height: auto;
+      object-fit: cover;
       border: 1px solid #ccc;
+      border-radius: 6px;
     }
     .countdown {
       font-size: 40px;

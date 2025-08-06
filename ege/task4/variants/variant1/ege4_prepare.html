@@ -17,7 +17,7 @@
       border-left: 5px solid #0078d7;
       padding: 20px 30px 10px 30px;
       margin-bottom: 30px;
-      font-size: 20px;
+      font-size: 18px;
       max-width: 100%;
       box-sizing: border-box;
     }
@@ -74,7 +74,7 @@
     .images img {
       max-width: 100%;
       height: auto;
-      width: 44%;
+      width: 38%;
       border-radius: 6px;
     }
 
@@ -126,7 +126,7 @@
     </div>
   </div>
 
-  <div class="timer" id="timer">02:00</div>
+  <div class="timer" id="timer">03:00</div>
   <div class="progress-container">
     <div class="progress-bar" id="progressBar"></div>
   </div>
@@ -137,7 +137,7 @@
   </div>
 
   <div style="text-align: center; margin-bottom: 30px;">
-    <button class="button" onclick="window.location.href='ege4_1.html'">Перейти к выполнению</button>
+    <button class="button" onclick="window.location.href='ege4-1.html'">Перейти к выполнению</button>
   </div>
 
   <div class="speak-now">Start speaking now...</div>
@@ -149,15 +149,19 @@
     let totalTime = 180;
     let timeLeft = totalTime;
 
-    const timerInterval = setInterval(() => {
-      timeLeft--;
+    function updateTimer() {
       const minutes = String(Math.floor(timeLeft / 60)).padStart(2, '0');
       const seconds = String(timeLeft % 60).padStart(2, '0');
       timerEl.textContent = `${minutes}:${seconds}`;
-
       const progressPercent = (timeLeft / totalTime) * 100;
       progressBar.style.width = `${progressPercent}%`;
+    }
 
+    updateTimer();
+
+    const timerInterval = setInterval(() => {
+      timeLeft--;
+      updateTimer();
       if (timeLeft <= 0) {
         clearInterval(timerInterval);
         timerEl.textContent = "Time is up";

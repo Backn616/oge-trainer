@@ -112,7 +112,7 @@
     </div>
   </div>
 
-  <div class="timer" id="timer">02:00</div>
+  <div class="timer" id="timer">02:30</div>
   <div class="progress-container">
     <div class="progress-bar" id="progressBar"></div>
   </div>
@@ -128,24 +128,58 @@
     const timerEl = document.getElementById("timer");
     const progressBar = document.getElementById("progressBar");
 
-    let totalTime = 180;
+    const totalTime = 150; // 2.5 minutes
     let timeLeft = totalTime;
 
-    const timerInterval = setInterval(() => {
-      timeLeft--;
-      const minutes = String(Math.floor(timeLeft / 60)).padStart(2, '0');
-      const seconds = String(timeLeft % 60).padStart(2, '0');
-      timerEl.textContent = `${minutes}:${seconds}`;
+    let mediaRecorder = null;
+    let audioChunks = [];
 
-      const progressPercent = (timeLeft / totalTime) * 100;
-      progressBar.style.width = `${progressPercent}%`;
+    async function startRecording() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaRecorder = new MediaRecorder(stream);
+        mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
 
-      if (timeLeft <= 0) {
-        clearInterval(timerInterval);
-        timerEl.textContent = "Time is up";
-        progressBar.style.width = "0%";
+        mediaRecorder.onstop = () => {
+          const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            sessionStorage.setItem("ege4_audio_base64", reader.result);
+            window.location.href = "ege4_result.html";
+          };
+          reader.readAsDataURL(audioBlob);
+        };
+
+        audioChunks = [];
+        mediaRecorder.start();
+
+        startTimer();
+      } catch (err) {
+        alert("❌ Не удалось получить доступ к микрофону: " + err.message);
+        startTimer(); // всё равно запускаем таймер
       }
-    }, 1000);
+    }
+
+    function startTimer() {
+      const interval = setInterval(() => {
+        timeLeft--;
+        const minutes = String(Math.floor(timeLeft / 60)).padStart(2, '0');
+        const seconds = String(timeLeft % 60).padStart(2, '0');
+        timerEl.textContent = `${minutes}:${seconds}`;
+        progressBar.style.width = `${(timeLeft / totalTime) * 100}%`;
+
+        if (timeLeft <= 0) {
+          clearInterval(interval);
+          if (mediaRecorder && mediaRecorder.state === "recording") {
+            mediaRecorder.stop();
+          } else {
+            window.location.href = "ege4_result.html";
+          }
+        }
+      }, 1000);
+    }
+
+    window.onload = startRecording;
   </script>
 
 </body>

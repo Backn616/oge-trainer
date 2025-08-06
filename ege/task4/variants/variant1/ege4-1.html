@@ -17,7 +17,7 @@
       border-left: 5px solid #0078d7;
       padding: 20px 30px 10px 30px;
       margin-bottom: 30px;
-      font-size: 22px;
+      font-size: 20px;
       max-width: 100%;
       box-sizing: border-box;
     }
@@ -38,21 +38,6 @@
     .task-container .instruction {
       font-weight: bold;
       margin-top: 15px;
-    }
-
-    .images {
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      gap: 30px;
-      margin-bottom: 30px;
-    }
-
-    .images img {
-      max-width: 100%;
-      height: auto;
-      width: 40%;
-      border-radius: 6px;
     }
 
     .timer {
@@ -76,6 +61,21 @@
       width: 100%;
       background: linear-gradient(to right, #0066ff, #00cfff);
       transition: width 1s linear;
+    }
+
+    .images {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      gap: 30px;
+      margin-bottom: 30px;
+    }
+
+    .images img {
+      max-width: 100%;
+      height: auto;
+      width: 44%;
+      border-radius: 6px;
     }
 
     .speak-now {
@@ -112,15 +112,14 @@
     </div>
   </div>
 
-  <div class="images">
-    <img src="photo1_city.png" alt="City holidays">
-    <img src="photo2_countryside.png" alt="Countryside holidays">
-  </div>
-
-  <!-- Таймер и прогресс-бар -->
   <div class="timer" id="timer">02:00</div>
   <div class="progress-container">
     <div class="progress-bar" id="progressBar"></div>
+  </div>
+
+  <div class="images">
+    <img src="photo1_city.png" alt="City holidays">
+    <img src="photo2_countryside.png" alt="Countryside holidays">
   </div>
 
   <div class="speak-now">Start speaking now...</div>
@@ -129,7 +128,7 @@
     const timerEl = document.getElementById("timer");
     const progressBar = document.getElementById("progressBar");
 
-    let totalTime = 120; // 2 minutes
+    let totalTime = 120;
     let timeLeft = totalTime;
 
     const timerInterval = setInterval(() => {

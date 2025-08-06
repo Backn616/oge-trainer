@@ -8,38 +8,44 @@
     body {
       font-family: Arial, sans-serif;
       margin: 0;
-      background: white;
+      padding: 0;
+      background: #fff;
     }
-    .task-block {
-      background-color: #f3f3f3;
-      border-left: 6px solid #007acc;
-      padding: 24px 32px;
-      font-size: 17px;
-    }
-    .task-block b {
-      font-size: 18px;
-    }
-    ul {
-      padding-left: 18px;
-      margin-top: 16px;
-      margin-bottom: 16px;
-    }
-    .task-block p {
-      font-weight: bold;
-      margin-top: 20px;
-    }
-    .photos {
-      display: flex;
-      gap: 20px;
-      padding: 24px 32px;
-    }
-    .photos img {
+    .task-container {
+      background: #f1f1f1;
+      padding: 20px 40px;
+      box-sizing: border-box;
+      border-left: 6px solid #0077c2;
       max-width: 100%;
+    }
+    .task-container p {
+      font-size: 16px;
+      line-height: 1.5;
+      margin: 0 0 10px;
+    }
+    .task-container ul {
+      font-size: 16px;
+      line-height: 1.5;
+      padding-left: 20px;
+      margin: 10px 0 20px;
+    }
+    .task-container b {
+      font-weight: bold;
+    }
+    .gallery {
+      display: flex;
+      justify-content: flex-start;
+      gap: 30px;
+      padding: 20px 40px;
+      box-sizing: border-box;
+    }
+    .gallery img {
+      width: 45%;
       height: auto;
       border-radius: 4px;
     }
-    .speak-now {
-      padding-left: 32px;
+    .start {
+      padding-left: 40px;
       font-size: 18px;
       font-weight: bold;
       color: green;
@@ -49,26 +55,23 @@
 </head>
 <body>
 
-  <div class="task-block">
-    <b>4 Task. Imagine that you and your friend are doing a school project “Spending holidays: in the city or in the countryside”.</b>
-    You have found some photos to illustrate it but for technical reasons you cannot send them now.
-    Leave a voice message to your friend explaining your choice of the photos and sharing some ideas about the project.
-    In 2.5 minutes be ready to:
+  <div class="task-container">
+    <p><b>4 Task. Imagine that you and your friend are doing a school project “Spending holidays: in the city or in the countryside”.</b> You have found some photos to illustrate it but for technical reasons you cannot send them now. Leave a voice message to your friend explaining your choice of the photos and sharing some ideas about the project. In 2.5 minutes be ready to:</p>
     <ul>
       <li>explain the choice of the illustrations for the project by briefly describing them and noting the differences;</li>
       <li>mention the advantages (1–2) of the two ways of spending holidays;</li>
       <li>mention the disadvantages (1–2) of the two ways;</li>
       <li>express your opinion on the subject of the project – which way of spending holidays presented in the pictures you would prefer and why.</li>
     </ul>
-    <p>You will speak for not more than 3 minutes (12–15 sentences). You have to talk continuously.</p>
+    <p><b>You will speak for not more than 3 minutes (12–15 sentences). You have to talk continuously.</b></p>
   </div>
 
-  <div class="photos">
-    <img src="photo1_city.png" alt="City holidays photo" width="450">
-    <img src="photo2_countryside.png" alt="Countryside holidays photo" width="450">
+  <div class="gallery">
+    <img src="city.png" alt="City" />
+    <img src="countryside.png" alt="Countryside" />
   </div>
 
-  <div class="speak-now">Start speaking now...</div>
+  <p class="start">Start speaking now...</p>
 
 </body>
 </html>

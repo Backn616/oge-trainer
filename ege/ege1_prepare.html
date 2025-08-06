@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Подготовка</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #fff;
+      text-align: center;
+      padding: 40px;
+      margin: 0;
+    }
+    .instruction-box {
+      max-width: 1600px;
+      width: 95%;
+      margin: 0 auto 30px;
+      font-size: 22px;
+      line-height: 1.6;
+      text-align: left;
+      border: 2px solid #0077cc;
+      padding: 25px;
+      border-radius: 12px;
+      background-color: #f9f9f9;
+    }
+    .text-box {
+      max-width: 1600px;
+      width: 95%;
+      margin: 0 auto 30px;
+      font-size: 32px;
+      line-height: 1.9;
+      text-align: left;
+      border: 1px solid #ccc;
+      padding: 40px;
+      border-radius: 12px;
+      background-color: #ffffff;
+    }
+    .button {
+      font-size: 20px;
+      padding: 16px 32px;
+      background-color: #0077cc;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .button:hover {
+      background-color: #005fa3;
+    }
+    .progress-container {
+      width: 90%;
+      max-width: 900px;
+      background-color: #eee;
+      border-radius: 20px;
+      margin: 30px auto 20px;
+      height: 30px;
+      position: relative;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,.2);
+    }
+    .progress-bar {
+      height: 100%;
+      width: 100%;
+      background: linear-gradient(to right, #4facfe, #00f2fe);
+      transition: width 1s linear;
+      border-radius: 20px 0 0 20px;
+    }
+    .timer {
+      font-size: 28px;
+      margin-bottom: 10px;
+      color: #b30000;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="instruction-box">
+    <p><strong>Task 1.</strong> Imagine that you are preparing a project with your friend. You have found some interesting material for the presentation and you want to read this text to your friend. You have 1.5 minutes to read the text silently, then be ready to read it out loud. You will not have more than 1.5 minutes to read it.</p>
+  </div>
+
+  <div class="text-box">
+    Bioluminescence is the ability of certain living organisms to produce light. 
+    This fascinating phenomenon can be observed in various species of deep-sea fish, jellyfish, fireflies, and even some fungi. 
+    The light is usually blue or green, which travels best through water. These organisms use light for different reasons. 
+    Some attract mates or prey, while others use it to confuse predators. For example, the anglerfish has a glowing lure to draw in its victims in the dark ocean depths.
+    Scientists believe that studying bioluminescence can help develop new medical and technological solutions.
+    Special proteins from glowing jellyfish are already used in genetic research. Bioluminescence is not only beautiful — it is a powerful tool of survival and discovery.
+  </div>
+
+  <div class="timer" id="timer">01:30</div>
+  <div class="progress-container">
+    <div class="progress-bar" id="progress-bar"></div>
+  </div>
+
+  <button id="nextButton" class="button" onclick="window.location.href='ege1_read1.html'">Перейти к выполнению</button>
+
+  <script>
+    let totalSeconds = 90;
+    const timerEl = document.getElementById("timer");
+    const progressBar = document.getElementById("progress-bar");
+    const nextButton = document.getElementById("nextButton");
+
+    function updateTimer() {
+      const minutes = String(Math.floor(totalSeconds / 60)).padStart(2, '0');
+      const seconds = String(totalSeconds % 60).padStart(2, '0');
+      timerEl.textContent = `${minutes}:${seconds}`;
+      progressBar.style.width = (totalSeconds / 90 * 100) + "%";
+    }
+
+    const interval = setInterval(() => {
+      totalSeconds--;
+      updateTimer();
+      if (totalSeconds <= 0) {
+        clearInterval(interval);
+        window.location.href = "ege1_read1.html";
+      }
+    }, 1000);
+
+    // возможность нажать раньше вручную
+    setTimeout(() => {
+      nextButton.style.display = "inline-block";
+    }, 10000);
+
+    updateTimer();
+  </script>
+</body>
+</html>

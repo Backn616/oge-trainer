@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Task 4 — Variant 1</title>
   <style>
     body {
@@ -10,63 +10,66 @@
       background: #fff;
       margin: 0;
       padding: 40px;
-      text-align: center;
+      max-width: 1000px;
+      margin: 0 auto;
     }
-    h1 {
-      font-size: 28px;
-      margin-bottom: 20px;
+    .task-block {
+      background-color: #f3f3f3;
+      border-left: 6px solid #007acc;
+      padding: 20px;
+      margin-bottom: 30px;
     }
-    .countdown {
-      font-size: 56px;
-      color: #b30000;
-      margin: 30px auto;
+    .task-block h2 {
+      margin-top: 0;
     }
-    .instruction {
-      font-size: 20px;
-      margin-top: 30px;
+    ul {
+      margin-top: 0;
     }
     .photos {
       display: flex;
       justify-content: center;
-      gap: 40px;
+      gap: 30px;
       margin-top: 30px;
     }
     .photos img {
-      width: 300px;
+      max-width: 100%;
       height: auto;
-      border: 2px solid #ccc;
-      border-radius: 10px;
+      border: 1px solid #ccc;
+    }
+    .countdown {
+      font-size: 40px;
+      color: #b30000;
+      text-align: center;
+      margin-top: 40px;
     }
     .speak-now {
-      font-size: 26px;
+      text-align: center;
+      font-size: 24px;
       font-weight: bold;
       color: green;
       display: none;
-      margin-top: 40px;
+      margin-top: 20px;
     }
   </style>
 </head>
 <body>
-  <h1>Task 4 — Variant 1</h1>
-
-  <div class="instruction">
-    <p>Imagine that you and your friend are doing a school project “Spending holidays: in the city or in the countryside”. You have found some illustrations and want to share the news. Leave a voice message to your friend. In 2.5 minutes be ready to:</p>
-    <ul style="text-align:left; max-width: 600px; margin: 0 auto;">
+  <div class="task-block">
+    <h2>4 Task. Imagine that you and your friend are doing a school project “Spending holidays: in the city or in the countryside”. You have found some photos to illustrate it but for technical reasons you cannot send them now. Leave a voice message to your friend explaining your choice of the photos and sharing some ideas about the project. In 2.5 minutes be ready to:</h2>
+    <ul>
       <li>explain the choice of the illustrations for the project by briefly describing them and noting the differences;</li>
-      <li>mention the advantages (1–2) of spending holidays in the city and in the countryside;</li>
-      <li>mention the disadvantages (1–2) of each type of holiday;</li>
-      <li>express your opinion on the subject of the project – which way of spending holidays presented in the pictures you prefer and why.</li>
+      <li>mention the advantages (1–2) of the two ways of spending holidays;</li>
+      <li>mention the disadvantages (1–2) of the two ways;</li>
+      <li>express your opinion on the subject of the project – which way of spending holidays presented in the pictures you would prefer and why.</li>
     </ul>
-    <p>You will speak for not more than 3 minutes (12–15 sentences). You have to talk continuously.</p>
+    <p><strong>You will speak for not more than 3 minutes (12–15 sentences). You have to talk continuously.</strong></p>
+  </div>
+
+  <div class="photos">
+    <img src="photo1_city.jpg" alt="City holiday scene">
+    <img src="photo2_countryside.jpg" alt="Countryside holiday scene">
   </div>
 
   <div class="countdown" id="countdown">5</div>
-
-  <div class="photos">
-  <img src="photo1_city.jpg" alt="City holiday scene">
-  <img src="photo2_countryside.jpg" alt="Countryside holiday scene">
-</div>
-
   <div class="speak-now" id="speakNow">Start speaking now...</div>
 
   <script>

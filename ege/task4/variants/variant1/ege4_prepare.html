@@ -17,7 +17,7 @@
       border-left: 5px solid #0078d7;
       padding: 20px 30px 10px 30px;
       margin-bottom: 30px;
-      font-size: 19px;
+      font-size: 18px;
       max-width: 100%;
       box-sizing: border-box;
     }
@@ -146,27 +146,28 @@
     const timerEl = document.getElementById("timer");
     const progressBar = document.getElementById("progressBar");
 
-    let totalTime = 150;
-    let timeLeft = totalTime;
+    const totalTime = 150000; // 2.5 minutes in milliseconds
+    const endTime = Date.now() + totalTime;
 
     function updateTimer() {
-      const minutes = String(Math.floor(timeLeft / 60)).padStart(2, '0');
-      const seconds = String(timeLeft % 60).padStart(2, '0');
+      const now = Date.now();
+      const timeLeft = Math.max(0, endTime - now);
+
+      const minutes = String(Math.floor(timeLeft / 60000)).padStart(2, '0');
+      const seconds = String(Math.floor((timeLeft % 60000) / 1000)).padStart(2, '0');
       timerEl.textContent = `${minutes}:${seconds}`;
+
       const progressPercent = (timeLeft / totalTime) * 100;
       progressBar.style.width = `${progressPercent}%`;
-    }
 
-    updateTimer();
-
-    const timerInterval = setInterval(() => {
-      timeLeft--;
-      updateTimer();
       if (timeLeft <= 0) {
         clearInterval(timerInterval);
         window.location.href = "ege4_1.html";
       }
-    }, 1000);
+    }
+
+    updateTimer();
+    const timerInterval = setInterval(updateTimer, 500);
   </script>
 
 </body>

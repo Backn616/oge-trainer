@@ -2,76 +2,68 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Task 4 — Variant 1</title>
   <style>
     body {
       font-family: Arial, sans-serif;
+      background: #fff;
       margin: 0;
       padding: 0;
-      background: #fff;
     }
-    .task-container {
-      background: #f1f1f1;
-      padding: 20px 40px;
+    .container {
+      width: 100%;
+      padding: 30px;
       box-sizing: border-box;
-      border-left: 6px solid #0077c2;
-      max-width: 100%;
     }
-    .task-container p {
-      font-size: 16px;
-      line-height: 1.5;
-      margin: 0 0 10px;
+    .instruction-box {
+      background: #f3f3f3;
+      padding: 20px;
+      border-left: 5px solid #009fe3;
+      font-size: 18px;
+      line-height: 1.6;
     }
-    .task-container ul {
-      font-size: 16px;
-      line-height: 1.5;
-      padding-left: 20px;
-      margin: 10px 0 20px;
+    .instruction-box b {
+      font-size: 19px;
     }
-    .task-container b {
-      font-weight: bold;
-    }
-    .gallery {
+    .photos {
       display: flex;
       justify-content: flex-start;
-      gap: 30px;
-      padding: 20px 40px;
-      box-sizing: border-box;
+      padding: 20px 0 0 30px;
+      gap: 40px;
     }
-    .gallery img {
-      width: 45%;
+    .photos img {
+      width: 450px;
       height: auto;
-      border-radius: 4px;
+      border-radius: 6px;
     }
-    .start {
-      padding-left: 40px;
-      font-size: 18px;
-      font-weight: bold;
+    .speak-now {
+      font-size: 20px;
       color: green;
-      margin-top: 10px;
+      font-weight: bold;
+      text-align: left;
+      padding-left: 30px;
+      margin-top: 20px;
     }
   </style>
 </head>
 <body>
-
-  <div class="task-container">
-    <p><b>4 Task. Imagine that you and your friend are doing a school project “Spending holidays: in the city or in the countryside”.</b> You have found some photos to illustrate it but for technical reasons you cannot send them now. Leave a voice message to your friend explaining your choice of the photos and sharing some ideas about the project. In 2.5 minutes be ready to:</p>
-    <ul>
-      <li>explain the choice of the illustrations for the project by briefly describing them and noting the differences;</li>
-      <li>mention the advantages (1–2) of the two ways of spending holidays;</li>
-      <li>mention the disadvantages (1–2) of the two ways;</li>
-      <li>express your opinion on the subject of the project – which way of spending holidays presented in the pictures you would prefer and why.</li>
-    </ul>
-    <p><b>You will speak for not more than 3 minutes (12–15 sentences). You have to talk continuously.</b></p>
+  <div class="container">
+    <div class="instruction-box">
+      <b>4 Task. Imagine that you and your friend are doing a school project “Spending holidays: in the city or in the countryside”.</b>
+      You have found some photos to illustrate it but for technical reasons you cannot send them now. Leave a voice message to your friend explaining your choice of the photos and sharing some ideas about the project. In 2.5 minutes be ready to:
+      <ul>
+        <li>explain the choice of the illustrations for the project by briefly describing them and noting the differences;</li>
+        <li>mention the advantages (1–2) of the two ways of spending holidays;</li>
+        <li>mention the disadvantages (1–2) of the two ways;</li>
+        <li>express your opinion on the subject of the project – which way of spending holidays presented in the pictures you would prefer and why.</li>
+      </ul>
+      <b>You will speak for not more than 3 minutes (12–15 sentences). You have to talk continuously.</b>
+    </div>
+    <div class="photos">
+      <img src="photo1_city.png" alt="City view">
+      <img src="photo2_countryside.png" alt="Countryside view">
+    </div>
+    <div class="speak-now">Start speaking now...</div>
   </div>
-
-  <div class="gallery">
-    <img src="city.png" alt="City" />
-    <img src="countryside.png" alt="Countryside" />
-  </div>
-
-  <p class="start">Start speaking now...</p>
-
 </body>
 </html>

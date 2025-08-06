@@ -60,7 +60,7 @@
       height: 100%;
       width: 100%;
       background: linear-gradient(to right, #0066ff, #00cfff);
-      transition: width 1s linear;
+      transition: width 0.5s linear;
     }
 
     .images {
@@ -128,8 +128,8 @@
     const timerEl = document.getElementById("timer");
     const progressBar = document.getElementById("progressBar");
 
-    const totalTime = 150; // 2.5 minutes
-    let timeLeft = totalTime;
+    const totalDuration = 150000; // 2.5 minutes in ms
+    const endTime = Date.now() + totalDuration;
 
     let mediaRecorder = null;
     let audioChunks = [];
@@ -152,21 +152,22 @@
 
         audioChunks = [];
         mediaRecorder.start();
-
-        startTimer();
+        startAccurateTimer();
       } catch (err) {
         alert("❌ Не удалось получить доступ к микрофону: " + err.message);
-        startTimer(); // всё равно запускаем таймер
+        startAccurateTimer();
       }
     }
 
-    function startTimer() {
+    function startAccurateTimer() {
       const interval = setInterval(() => {
-        timeLeft--;
-        const minutes = String(Math.floor(timeLeft / 60)).padStart(2, '0');
-        const seconds = String(timeLeft % 60).padStart(2, '0');
+        const now = Date.now();
+        const timeLeft = Math.max(0, endTime - now);
+
+        const minutes = String(Math.floor(timeLeft / 60000)).padStart(2, '0');
+        const seconds = String(Math.floor((timeLeft % 60000) / 1000)).padStart(2, '0');
         timerEl.textContent = `${minutes}:${seconds}`;
-        progressBar.style.width = `${(timeLeft / totalTime) * 100}%`;
+        progressBar.style.width = `${(timeLeft / totalDuration) * 100}%`;
 
         if (timeLeft <= 0) {
           clearInterval(interval);
@@ -176,7 +177,7 @@
             window.location.href = "ege4_result.html";
           }
         }
-      }, 1000);
+      }, 500);
     }
 
     window.onload = startRecording;

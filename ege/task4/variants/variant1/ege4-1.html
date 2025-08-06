@@ -6,64 +6,94 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #fff;
       margin: 0;
-      padding: 0;
+      padding: 40px 30px;
+      background: #fff;
     }
-    .container {
-      width: 100%;
-      padding: 30px;
+
+    .task-container {
+      background: #f3f3f3;
+      border-left: 5px solid #0078d7;
+      padding: 20px 30px 10px 30px;
+      margin-bottom: 30px;
+      font-size: 18px;
+      max-width: 100%;
       box-sizing: border-box;
     }
-    .instruction-box {
-      background: #f3f3f3;
-      padding: 20px;
-      border-left: 5px solid #009fe3;
-      font-size: 18px;
-      line-height: 1.6;
+
+    .task-container b {
+      font-weight: 700;
     }
-    .instruction-box b {
-      font-size: 19px;
+
+    .task-container ul {
+      margin-top: 15px;
+      margin-bottom: 20px;
     }
-    .photos {
+
+    .task-container li {
+      margin-bottom: 10px;
+    }
+
+    .task-container .instruction {
+      font-weight: bold;
+      margin-top: 15px;
+    }
+
+    .images {
       display: flex;
-      justify-content: flex-start;
-      padding: 20px 0 0 30px;
-      gap: 40px;
+      justify-content: center;
+      align-items: flex-start;
+      gap: 30px;
+      margin-bottom: 30px;
     }
-    .photos img {
-      width: 450px;
+
+    .images img {
+      max-width: 100%;
       height: auto;
+      width: 48%;
       border-radius: 6px;
     }
+
     .speak-now {
-      font-size: 20px;
-      color: green;
+      text-align: center;
       font-weight: bold;
-      text-align: left;
-      padding-left: 30px;
-      margin-top: 20px;
+      font-size: 18px;
+      color: green;
+    }
+
+    @media (max-width: 800px) {
+      .images {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .images img {
+        width: 100%;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="instruction-box">
-      <b>4 Task. Imagine that you and your friend are doing a school project “Spending holidays: in the city or in the countryside”.</b>
-      You have found some photos to illustrate it but for technical reasons you cannot send them now. Leave a voice message to your friend explaining your choice of the photos and sharing some ideas about the project. In 2.5 minutes be ready to:
-      <ul>
-        <li>explain the choice of the illustrations for the project by briefly describing them and noting the differences;</li>
-        <li>mention the advantages (1–2) of the two ways of spending holidays;</li>
-        <li>mention the disadvantages (1–2) of the two ways;</li>
-        <li>express your opinion on the subject of the project – which way of spending holidays presented in the pictures you would prefer and why.</li>
-      </ul>
-      <b>You will speak for not more than 3 minutes (12–15 sentences). You have to talk continuously.</b>
+
+  <div class="task-container">
+    <b>4 Task. Imagine that you and your friend are doing a school project “Spending holidays: in the city or in the countryside”.</b> You have found some photos to illustrate it but for technical reasons you cannot send them now. Leave a voice message to your friend explaining your choice of the photos and sharing some ideas about the project. In 2.5 minutes be ready to:
+    <ul>
+      <li>explain the choice of the illustrations for the project by briefly describing them and noting the differences;</li>
+      <li>mention the advantages (1–2) of the two ways of spending holidays;</li>
+      <li>mention the disadvantages (1–2) of the two ways;</li>
+      <li>express your opinion on the subject of the project – which way of spending holidays presented in the pictures you would prefer and why.</li>
+    </ul>
+    <div class="instruction">
+      You will speak for not more than 3 minutes (12–15 sentences). You have to talk continuously.
     </div>
-    <div class="photos">
-      <img src="photo1_city.png" alt="City view">
-      <img src="photo2_countryside.png" alt="Countryside view">
-    </div>
-    <div class="speak-now">Start speaking now...</div>
   </div>
+
+  <div class="images">
+    <img src="photo1_city.png" alt="City holidays">
+    <img src="photo2_countryside.png" alt="Countryside holidays">
+  </div>
+
+  <div class="speak-now">Start speaking now...</div>
+
 </body>
 </html>

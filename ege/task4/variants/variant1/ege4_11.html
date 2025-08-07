@@ -8,7 +8,7 @@
     body {
       font-family: 'Roboto', sans-serif;
       margin: 0;
-      padding: 30px 30px 60px;
+      padding: 30px 30px 80px;
       background: #fff;
       text-align: center;
     }
@@ -41,10 +41,10 @@
     }
 
     .timer {
-      font-size: 38px;
+      font-size: 56px;
       color: #b30000;
-      margin-bottom: 10px;
-      transition: font-size 0.3s ease;
+      margin: 30px 0;
+      font-weight: bold;
     }
 
     .images {
@@ -85,9 +85,10 @@
       bottom: 0;
       left: 0;
       width: 100%;
-      height: 24px;
+      height: 32px;
       background: #eee;
       z-index: 9999;
+      display: none; /* <--- Показываем только после старта задания */
     }
 
     #progressBarFixed {
@@ -100,12 +101,12 @@
 
     .progress-time {
       position: absolute;
-      right: 10px;
+      right: 14px;
       top: 50%;
       transform: translateY(-50%);
       color: white;
       font-weight: bold;
-      font-size: 16px;
+      font-size: 20px;
       font-family: 'Roboto', sans-serif;
       user-select: none;
     }
@@ -157,6 +158,7 @@
     const timerEl = document.getElementById("timer");
     const progressBarFixed = document.getElementById("progressBarFixed");
     const progressTime = document.getElementById("progressTime");
+    const progressContainerFixed = document.getElementById("progressContainerFixed");
     const imageContainer = document.getElementById("imageContainer");
     const endBtn = document.getElementById("endBtn");
     const taskContainer = document.getElementById("taskContainer");
@@ -198,8 +200,6 @@
     function startCountdown() {
       const cdInterval = setInterval(() => {
         timerEl.textContent = countdown;
-        progressBarFixed.style.width = ((countdown / 3) * 100) + "%";
-        progressTime.textContent = countdown > 0 ? `00:0${countdown}` : "00:00";
         countdown--;
         if (countdown < 0) {
           clearInterval(cdInterval);
@@ -209,9 +209,10 @@
     }
 
     function startTask() {
-      timerEl.style.fontSize = "28px";
+      // Показываем элементы задания
+      timerEl.style.display = "none";
+      progressContainerFixed.style.display = "block";
 
-      timerEl.textContent = formatTime(totalTime);
       progressTime.textContent = formatTime(totalTime);
       imageContainer.style.display = "flex";
       taskContainer.style.display = "block";
@@ -223,7 +224,6 @@
       interval = setInterval(() => {
         const timeElapsed = Math.floor((Date.now() - startTime) / 1000);
         const timeLeft = totalTime - timeElapsed;
-        timerEl.textContent = formatTime(timeLeft);
         progressTime.textContent = formatTime(timeLeft);
         progressBarFixed.style.width = `${(timeLeft / totalTime) * 100}%`;
 

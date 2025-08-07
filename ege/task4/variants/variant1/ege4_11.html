@@ -8,7 +8,7 @@
     body {
       font-family: 'Roboto', sans-serif;
       margin: 0;
-      padding: 30px 30px; /* чуть меньше отступ сверху */
+      padding: 30px 30px 60px;
       background: #fff;
       text-align: center;
     }
@@ -17,7 +17,7 @@
       background: #f3f3f3;
       border-left: 5px solid #0078d7;
       padding: 20px 30px 10px 30px;
-      margin-bottom: 15px; /* было 30px */
+      margin-bottom: 15px;
       font-size: 20px;
       max-width: 100%;
       box-sizing: border-box;
@@ -43,25 +43,8 @@
     .timer {
       font-size: 38px;
       color: #b30000;
-      margin-bottom: 10px; /* было 20px */
+      margin-bottom: 10px;
       transition: font-size 0.3s ease;
-    }
-
-    .progress-container {
-      width: 95%;
-      height: 20px;
-      background: #eee;
-      border-radius: 10px;
-      overflow: hidden;
-      margin: 0 auto 15px; /* было 30px */
-      transition: height 0.3s ease;
-    }
-
-    .progress-bar {
-      height: 100%;
-      width: 100%;
-      background: linear-gradient(to right, #0066ff, #00cfff);
-      transition: width 0.5s linear;
     }
 
     .images {
@@ -69,7 +52,7 @@
       justify-content: center;
       align-items: flex-start;
       gap: 30px;
-      margin-bottom: 20px; /* было 30px */
+      margin-bottom: 20px;
       display: none;
     }
 
@@ -82,7 +65,7 @@
 
     .end-button {
       display: none;
-      margin: 20px auto 0; /* было 40px */
+      margin: 20px auto 0;
       padding: 16px 32px;
       font-size: 20px;
       background-color: #0077cc;
@@ -94,6 +77,37 @@
 
     .end-button:hover {
       background-color: #005fa3;
+    }
+
+    /* 🟦 Фиксированный прогресс-бар с таймером внутри */
+    #progressContainerFixed {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 24px;
+      background: #eee;
+      z-index: 9999;
+    }
+
+    #progressBarFixed {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(to right, #0066ff, #00cfff);
+      position: relative;
+      transition: width 0.5s linear;
+    }
+
+    .progress-time {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: white;
+      font-weight: bold;
+      font-size: 16px;
+      font-family: 'Roboto', sans-serif;
+      user-select: none;
     }
 
     @media (max-width: 800px) {
@@ -124,9 +138,6 @@
   </div>
 
   <div class="timer" id="timer">3</div>
-  <div class="progress-container" id="progressContainer">
-    <div class="progress-bar" id="progressBar"></div>
-  </div>
 
   <div class="images" id="imageContainer">
     <img src="photo1_city.png" alt="City holidays">
@@ -135,10 +146,17 @@
 
   <button class="end-button" id="endBtn" onclick="endManually()">✅ Закончить</button>
 
+  <!-- ⬇️ Прогресс-бар с цифрами внутри -->
+  <div id="progressContainerFixed">
+    <div id="progressBarFixed">
+      <span id="progressTime" class="progress-time">03:00</span>
+    </div>
+  </div>
+
   <script>
     const timerEl = document.getElementById("timer");
-    const progressBar = document.getElementById("progressBar");
-    const progressContainer = document.getElementById("progressContainer");
+    const progressBarFixed = document.getElementById("progressBarFixed");
+    const progressTime = document.getElementById("progressTime");
     const imageContainer = document.getElementById("imageContainer");
     const endBtn = document.getElementById("endBtn");
     const taskContainer = document.getElementById("taskContainer");
@@ -180,7 +198,8 @@
     function startCountdown() {
       const cdInterval = setInterval(() => {
         timerEl.textContent = countdown;
-        progressBar.style.width = ((countdown / 3) * 100) + "%";
+        progressBarFixed.style.width = ((countdown / 3) * 100) + "%";
+        progressTime.textContent = countdown > 0 ? `00:0${countdown}` : "00:00";
         countdown--;
         if (countdown < 0) {
           clearInterval(cdInterval);
@@ -191,9 +210,9 @@
 
     function startTask() {
       timerEl.style.fontSize = "28px";
-      progressContainer.style.height = "10px";
 
       timerEl.textContent = formatTime(totalTime);
+      progressTime.textContent = formatTime(totalTime);
       imageContainer.style.display = "flex";
       taskContainer.style.display = "block";
       endBtn.style.display = "inline-block";
@@ -205,7 +224,9 @@
         const timeElapsed = Math.floor((Date.now() - startTime) / 1000);
         const timeLeft = totalTime - timeElapsed;
         timerEl.textContent = formatTime(timeLeft);
-        progressBar.style.width = `${(timeLeft / totalTime) * 100}%`;
+        progressTime.textContent = formatTime(timeLeft);
+        progressBarFixed.style.width = `${(timeLeft / totalTime) * 100}%`;
+
         if (timeLeft <= 0) {
           clearInterval(interval);
           if (mediaRecorder && mediaRecorder.state === "recording") {

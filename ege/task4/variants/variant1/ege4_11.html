@@ -26,10 +26,6 @@
       line-height: 1.7;
     }
 
-    .task-container b {
-      font-weight: 700;
-    }
-
     .task-container ul {
       margin-top: 15px;
       margin-bottom: 20px;
@@ -39,24 +35,26 @@
       margin-bottom: 10px;
     }
 
-    .task-container .instruction {
+    .instruction {
       font-weight: bold;
       margin-top: 15px;
     }
 
     .timer {
-      font-size: 28px; /* уменьшено */
+      font-size: 38px;
       color: #b30000;
       margin-bottom: 20px;
+      transition: font-size 0.3s ease;
     }
 
     .progress-container {
       width: 95%;
-      height: 10px; /* уменьшено */
+      height: 20px;
       background: #eee;
       border-radius: 10px;
       overflow: hidden;
       margin: 0 auto 30px;
+      transition: height 0.3s ease;
     }
 
     .progress-bar {
@@ -78,7 +76,7 @@
     .images img {
       max-width: 100%;
       height: auto;
-      width: 44%; /* как в result.html */
+      width: 44%;
       border-radius: 6px;
     }
 
@@ -125,8 +123,8 @@
     </div>
   </div>
 
-  <div class="timer" id="timer">5</div>
-  <div class="progress-container">
+  <div class="timer" id="timer">3</div>
+  <div class="progress-container" id="progressContainer">
     <div class="progress-bar" id="progressBar"></div>
   </div>
 
@@ -140,11 +138,12 @@
   <script>
     const timerEl = document.getElementById("timer");
     const progressBar = document.getElementById("progressBar");
+    const progressContainer = document.getElementById("progressContainer");
     const imageContainer = document.getElementById("imageContainer");
     const endBtn = document.getElementById("endBtn");
     const taskContainer = document.getElementById("taskContainer");
 
-    let countdown = 5;
+    let countdown = 3;
     let totalTime = 180;
     let startTime;
     let interval;
@@ -181,7 +180,7 @@
     function startCountdown() {
       const cdInterval = setInterval(() => {
         timerEl.textContent = countdown;
-        progressBar.style.width = ((countdown / 5) * 100) + "%";
+        progressBar.style.width = ((countdown / 3) * 100) + "%";
         countdown--;
         if (countdown < 0) {
           clearInterval(cdInterval);
@@ -191,6 +190,10 @@
     }
 
     function startTask() {
+      // Изменяем стили после отсчёта
+      timerEl.style.fontSize = "28px";
+      progressContainer.style.height = "10px";
+
       timerEl.textContent = formatTime(totalTime);
       imageContainer.style.display = "flex";
       taskContainer.style.display = "block";

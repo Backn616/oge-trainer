@@ -22,6 +22,7 @@
       max-width: 100%;
       box-sizing: border-box;
       text-align: left;
+      display: none;
     }
 
     .task-container b {
@@ -43,7 +44,7 @@
     }
 
     .timer {
-      font-size: 56px;
+      font-size: 42px;
       color: #b30000;
       margin-bottom: 20px;
     }
@@ -70,6 +71,7 @@
       align-items: flex-start;
       gap: 30px;
       margin-bottom: 30px;
+      display: none;
     }
 
     .images img {
@@ -109,8 +111,8 @@
 </head>
 <body>
 
-  <div class="task-container">
-    <b>4 Task. Imagine that you and your friend are doing a school project “Spending holidays: in the city or in the countryside”.</b> You have found some photos to illustrate it but for technical reasons you cannot send them now. Leave a voice message to your friend explaining your choice of the photos and sharing some ideas about the project. In 2.5 minutes be ready to:
+  <div class="task-container" id="taskContainer">
+    <b>4 Task. Imagine that you and your friend are doing a school project “Spending holidays: in the city or in the countryside”.</b> You have found some photos to illustrate it but for technical reasons you cannot send them now. Leave a voice message to your friend explaining your choice of the photos and sharing some ideas about the project. In 3 minutes be ready to:
     <ul>
       <li>explain the choice of the illustrations for the project by briefly describing them and noting the differences;</li>
       <li>mention the advantages (1–2) of the two ways of spending holidays;</li>
@@ -127,7 +129,7 @@
     <div class="progress-bar" id="progressBar"></div>
   </div>
 
-  <div class="images" id="imageContainer" style="display: none">
+  <div class="images" id="imageContainer">
     <img src="photo1_city.png" alt="City holidays">
     <img src="photo2_countryside.png" alt="Countryside holidays">
   </div>
@@ -139,9 +141,10 @@
     const progressBar = document.getElementById("progressBar");
     const imageContainer = document.getElementById("imageContainer");
     const endBtn = document.getElementById("endBtn");
+    const taskContainer = document.getElementById("taskContainer");
 
     let countdown = 5;
-    let totalTime = 150;
+    let totalTime = 180;
     let startTime;
     let interval;
 
@@ -189,6 +192,7 @@
     function startTask() {
       timerEl.textContent = formatTime(totalTime);
       imageContainer.style.display = "flex";
+      taskContainer.style.display = "block";
       endBtn.style.display = "inline-block";
       startTime = Date.now();
       audioChunks = [];

@@ -1,51 +1,56 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
   <title>Результат — Задание 4</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
   <style>
     body {
       font-family: 'Roboto', sans-serif;
-      background-color: #f7f7f7;
+      background-color: #fff;
       margin: 0;
-      padding: 30px;
-      text-align: center;
+      padding: 40px 30px;
     }
+
     h1 {
       color: #0077cc;
       font-size: 36px;
       margin-bottom: 10px;
+      text-align: center;
     }
+
     .status {
       font-size: 24px;
       color: green;
+      text-align: center;
       margin-bottom: 30px;
     }
+
     .task-container {
-      background-color: #ffffff;
-      padding: 30px;
-      margin: 0 auto 40px;
+      background: #f3f3f3;
+      border-left: 5px solid #0078d7;
+      padding: 20px 30px 10px 30px;
+      margin: 0 auto 30px;
+      font-size: 18px;
       max-width: 1600px;
-      width: 95%;
-      border: 1px solid #ccc;
-      border-radius: 12px;
-      font-size: 20px;
-      text-align: left;
+      box-sizing: border-box;
       line-height: 1.7;
     }
+
     .task-container ul {
       margin-top: 15px;
       margin-bottom: 20px;
     }
+
     .task-container li {
       margin-bottom: 10px;
     }
-    .task-container .instruction {
+
+    .instruction {
       font-weight: bold;
       margin-top: 15px;
     }
+
     .images {
       display: flex;
       justify-content: center;
@@ -53,12 +58,14 @@
       gap: 30px;
       margin: 30px 0;
     }
+
     .images img {
       max-width: 100%;
       height: auto;
-      width: 44%;
+      width: 38%;
       border-radius: 6px;
     }
+
     .nav-button, .play-btn, .download-btn {
       background-color: #0077cc;
       color: white;
@@ -71,27 +78,45 @@
       text-decoration: none;
       display: inline-block;
     }
+
     .nav-button:hover, .play-btn:hover, .download-btn:hover {
       background-color: #005fa3;
     }
+
     audio {
       margin: 20px 0;
       width: 80%;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    @media (max-width: 800px) {
+      .images {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .images img {
+        width: 100%;
+      }
     }
   </style>
 </head>
 <body>
+
   <h1>Результат сохранён</h1>
   <div class="status">✅ Вы успешно завершили задание. Вы можете прослушать или скачать запись ниже.</div>
 
   <audio id="audio" controls></audio>
-  <br>
-  <button class="play-btn" onclick="playAudio()">▶️ Прослушать</button>
-  <button class="download-btn" onclick="downloadAudio()">⬇️ Скачать запись</button>
+  <div style="text-align: center;">
+    <button class="play-btn" onclick="playAudio()">▶️ Прослушать</button>
+    <button class="download-btn" onclick="downloadAudio()">⬇️ Скачать запись</button>
+  </div>
 
   <div class="task-container">
     <b>4 Task. Imagine that you and your friend are doing a school project “Spending holidays: in the city or in the countryside”.</b>
-    <p>You have found some photos to illustrate it but for technical reasons you cannot send them now. Leave a voice message to your friend explaining your choice of the photos and sharing some ideas about the project. In 3 minutes be ready to:</p>
+    <p>You have found some photos to illustrate it but for technical reasons you cannot send them now. Leave a voice message to your friend explaining your choice of the photos and sharing some ideas about the project. In 2.5 minutes be ready to:</p>
     <ul>
       <li>explain the choice of the illustrations for the project by briefly describing them and noting the differences;</li>
       <li>mention the advantages (1–2) of the two ways of spending holidays;</li>
@@ -108,10 +133,12 @@
     <img src="photo2_countryside.png" alt="Countryside holidays">
   </div>
 
-  <a href="../ege4.html" class="nav-button">Перейти к выбору варианта</a>
-  <a href="../../../ege.html" class="nav-button">Перейти к выбору задания</a>
-  <a href="../../../ege_menu.html" class="nav-button">Перейти к выбору режима</a>
-  <a href="/oge-trainer/index.html" class="nav-button">Перейти на главную</a>
+  <div style="text-align: center;">
+    <a href="../ege4.html" class="nav-button">Перейти к выбору варианта</a>
+    <a href="../../../ege.html" class="nav-button">Перейти к выбору задания</a>
+    <a href="../../../ege_menu.html" class="nav-button">Перейти к выбору режима</a>
+    <a href="/oge-trainer/index.html" class="nav-button">Перейти на главную</a>
+  </div>
 
   <script>
     const audio = document.getElementById("audio");
@@ -119,7 +146,7 @@
     if (base64) {
       audio.src = base64;
     } else {
-      document.body.innerHTML += "<p style='color:red'>❌ Запись не найдена.</p>";
+      document.body.innerHTML += "<p style='color:red; text-align:center;'>❌ Запись не найдена.</p>";
     }
 
     function playAudio() {
@@ -141,5 +168,6 @@
       a.click();
     }
   </script>
+
 </body>
 </html>

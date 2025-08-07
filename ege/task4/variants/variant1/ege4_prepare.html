@@ -35,13 +35,6 @@
       margin-top: 15px;
     }
 
-    .timer {
-      font-size: 36px;
-      color: red;
-      text-align: center;
-      margin-bottom: 30px;
-    }
-
     .images {
       display: flex;
       justify-content: center;
@@ -53,7 +46,7 @@
     .images img {
       max-width: 100%;
       height: auto;
-      width: 33%;
+      width: 38%; /* вернули старый размер */
       border-radius: 6px;
     }
 
@@ -78,7 +71,7 @@
       background-color: #005fa3;
     }
 
-    /* Новый прогресс-бар */
+    /* Новый прогресс-бар снизу */
     #progressContainerFixed {
       position: fixed;
       bottom: 0;
@@ -137,8 +130,6 @@
     </div>
   </div>
 
-  <div class="timer" id="timer">02:30</div>
-
   <div class="images">
     <img src="photo1_city.png" alt="City holidays">
     <img src="photo2_countryside.png" alt="Countryside holidays">
@@ -150,7 +141,7 @@
 
   <div class="speak-now">Start speaking now...</div>
 
-  <!-- Новый прогресс-бар снизу -->
+  <!-- Новый фиксированный прогресс-бар -->
   <div id="progressContainerFixed">
     <div id="progressBarFixed">
       <span id="progressTime" class="progress-time">02:30</span>
@@ -158,11 +149,10 @@
   </div>
 
   <script>
-    const timerEl = document.getElementById("timer");
     const progressBar = document.getElementById("progressBarFixed");
     const progressTime = document.getElementById("progressTime");
 
-    const totalTime = 150000; // 2.5 минуты в миллисекундах
+    const totalTime = 150000; // 2.5 минуты
     const endTime = Date.now() + totalTime;
 
     function updateTimer() {
@@ -173,9 +163,7 @@
       const seconds = String(Math.floor((timeLeft % 60000) / 1000)).padStart(2, '0');
       const formatted = `${minutes}:${seconds}`;
 
-      timerEl.textContent = formatted;
       progressTime.textContent = formatted;
-
       const progressPercent = (timeLeft / totalTime) * 100;
       progressBar.style.width = `${progressPercent}%`;
 

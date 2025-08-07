@@ -10,6 +10,7 @@
       margin: 0;
       padding: 40px 30px;
       background: #fff;
+      text-align: center;
     }
 
     .task-container {
@@ -20,6 +21,7 @@
       font-size: 20px;
       max-width: 100%;
       box-sizing: border-box;
+      text-align: left;
     }
 
     .task-container b {
@@ -41,19 +43,18 @@
     }
 
     .timer {
-      font-size: 36px;
-      color: red;
-      text-align: center;
+      font-size: 56px;
+      color: #b30000;
       margin-bottom: 20px;
     }
 
     .progress-container {
-      width: 100%;
+      width: 95%;
       height: 20px;
       background: #eee;
       border-radius: 10px;
       overflow: hidden;
-      margin-bottom: 30px;
+      margin: 0 auto 30px;
     }
 
     .progress-bar {
@@ -78,11 +79,20 @@
       border-radius: 6px;
     }
 
-    .speak-now {
-      text-align: center;
-      font-weight: bold;
-      font-size: 18px;
-      color: green;
+    .end-button {
+      display: none;
+      margin: 40px auto 0;
+      padding: 16px 32px;
+      font-size: 20px;
+      background-color: #0077cc;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .end-button:hover {
+      background-color: #005fa3;
     }
 
     @media (max-width: 800px) {
@@ -112,35 +122,42 @@
     </div>
   </div>
 
-  <div class="timer" id="timer">02:30</div>
+  <div class="timer" id="timer">5</div>
   <div class="progress-container">
     <div class="progress-bar" id="progressBar"></div>
   </div>
 
-  <div class="images">
+  <div class="images" id="imageContainer" style="display: none">
     <img src="photo1_city.png" alt="City holidays">
     <img src="photo2_countryside.png" alt="Countryside holidays">
   </div>
 
-  <div class="speak-now">Start speaking now...</div>
+  <button class="end-button" id="endBtn" onclick="endManually()">✅ Закончить</button>
 
   <script>
     const timerEl = document.getElementById("timer");
     const progressBar = document.getElementById("progressBar");
+    const imageContainer = document.getElementById("imageContainer");
+    const endBtn = document.getElementById("endBtn");
 
-    const totalDuration = 150000; // 2.5 minutes in ms
-    const endTime = Date.now() + totalDuration;
+    let countdown = 5;
+    let totalTime = 150;
+    let startTime;
+    let interval;
 
     let mediaRecorder = null;
     let audioChunks = [];
+    let hasStopped = false;
 
-    async function startRecording() {
+    async function initMic() {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
         mediaRecorder = new MediaRecorder(stream);
-        mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
 
+        mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
         mediaRecorder.onstop = () => {
+          if (hasStopped) return;
+          hasStopped = true;
           const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
           const reader = new FileReader();
           reader.onloadend = () => {
@@ -150,25 +167,38 @@
           reader.readAsDataURL(audioBlob);
         };
 
-        audioChunks = [];
-        mediaRecorder.start();
-        startAccurateTimer();
+        startCountdown();
       } catch (err) {
         alert("❌ Не удалось получить доступ к микрофону: " + err.message);
-        startAccurateTimer();
+        startCountdown();
       }
     }
 
-    function startAccurateTimer() {
-      const interval = setInterval(() => {
-        const now = Date.now();
-        const timeLeft = Math.max(0, endTime - now);
+    function startCountdown() {
+      const cdInterval = setInterval(() => {
+        timerEl.textContent = countdown;
+        progressBar.style.width = ((countdown / 5) * 100) + "%";
+        countdown--;
+        if (countdown < 0) {
+          clearInterval(cdInterval);
+          startTask();
+        }
+      }, 1000);
+    }
 
-        const minutes = String(Math.floor(timeLeft / 60000)).padStart(2, '0');
-        const seconds = String(Math.floor((timeLeft % 60000) / 1000)).padStart(2, '0');
-        timerEl.textContent = `${minutes}:${seconds}`;
-        progressBar.style.width = `${(timeLeft / totalDuration) * 100}%`;
+    function startTask() {
+      timerEl.textContent = formatTime(totalTime);
+      imageContainer.style.display = "flex";
+      endBtn.style.display = "inline-block";
+      startTime = Date.now();
+      audioChunks = [];
+      if (mediaRecorder) mediaRecorder.start();
 
+      interval = setInterval(() => {
+        const timeElapsed = Math.floor((Date.now() - startTime) / 1000);
+        const timeLeft = totalTime - timeElapsed;
+        timerEl.textContent = formatTime(timeLeft);
+        progressBar.style.width = `${(timeLeft / totalTime) * 100}%`;
         if (timeLeft <= 0) {
           clearInterval(interval);
           if (mediaRecorder && mediaRecorder.state === "recording") {
@@ -180,8 +210,21 @@
       }, 500);
     }
 
-    window.onload = startRecording;
-  </script>
+    function formatTime(seconds) {
+      const min = String(Math.floor(seconds / 60)).padStart(2, '0');
+      const sec = String(seconds % 60).padStart(2, '0');
+      return `${min}:${sec}`;
+    }
 
+    function endManually() {
+      if (mediaRecorder && mediaRecorder.state === "recording") {
+        mediaRecorder.stop();
+      } else {
+        window.location.href = "ege4_result.html";
+      }
+    }
+
+    window.onload = initMic;
+  </script>
 </body>
 </html>

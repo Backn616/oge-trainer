@@ -8,7 +8,7 @@
     body {
       font-family: 'Roboto', sans-serif;
       margin: 0;
-      padding: 40px 30px;
+      padding: 30px 30px; /* чуть меньше отступ сверху */
       background: #fff;
       text-align: center;
     }
@@ -17,7 +17,7 @@
       background: #f3f3f3;
       border-left: 5px solid #0078d7;
       padding: 20px 30px 10px 30px;
-      margin-bottom: 30px;
+      margin-bottom: 15px; /* было 30px */
       font-size: 20px;
       max-width: 100%;
       box-sizing: border-box;
@@ -27,23 +27,23 @@
     }
 
     .task-container ul {
-      margin-top: 15px;
-      margin-bottom: 20px;
+      margin-top: 10px;
+      margin-bottom: 15px;
     }
 
     .task-container li {
-      margin-bottom: 10px;
+      margin-bottom: 8px;
     }
 
     .instruction {
       font-weight: bold;
-      margin-top: 15px;
+      margin-top: 10px;
     }
 
     .timer {
       font-size: 38px;
       color: #b30000;
-      margin-bottom: 20px;
+      margin-bottom: 10px; /* было 20px */
       transition: font-size 0.3s ease;
     }
 
@@ -53,7 +53,7 @@
       background: #eee;
       border-radius: 10px;
       overflow: hidden;
-      margin: 0 auto 30px;
+      margin: 0 auto 15px; /* было 30px */
       transition: height 0.3s ease;
     }
 
@@ -69,7 +69,7 @@
       justify-content: center;
       align-items: flex-start;
       gap: 30px;
-      margin-bottom: 30px;
+      margin-bottom: 20px; /* было 30px */
       display: none;
     }
 
@@ -82,7 +82,7 @@
 
     .end-button {
       display: none;
-      margin: 40px auto 0;
+      margin: 20px auto 0; /* было 40px */
       padding: 16px 32px;
       font-size: 20px;
       background-color: #0077cc;
@@ -190,7 +190,6 @@
     }
 
     function startTask() {
-      // Изменяем стили после отсчёта
       timerEl.style.fontSize = "28px";
       progressContainer.style.height = "10px";
 

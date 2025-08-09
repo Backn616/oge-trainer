@@ -185,7 +185,7 @@
           const reader = new FileReader();
           reader.onloadend = () => {
             sessionStorage.setItem("ege4_audio_base64", reader.result);
-            window.location.href = "ege4_result.html";
+            window.location.href = "ege4_var1_4_result.html";
           };
           reader.readAsDataURL(audioBlob);
         };
@@ -232,7 +232,7 @@
           if (mediaRecorder && mediaRecorder.state === "recording") {
             mediaRecorder.stop();
           } else {
-            window.location.href = "ege4_result.html";
+            window.location.href = "ege4_var1_4_result.html";
           }
         }
       }, 500);
@@ -248,7 +248,7 @@
       if (mediaRecorder && mediaRecorder.state === "recording") {
         mediaRecorder.stop();
       } else {
-        window.location.href = "ege4_result.html";
+        window.location.href = "ege4_var1_4_result.html";
       }
     }
 

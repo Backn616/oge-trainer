@@ -5,6 +5,7 @@
   <title>Task 4 — Preparation</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
+    /* Светлая тема по умолчанию */
     :root {
       --bg: #f7f9ff;
       --card: #ffffff;
@@ -16,6 +17,8 @@
       --success: #25c26e;
       --shadow: 0 10px 25px rgba(17,24,39,.08);
     }
+
+    /* Тёмная тема */
     .dark {
       --bg: #0b1020;
       --card: rgba(255,255,255,0.08);
@@ -30,28 +33,38 @@
 
     body {
       margin: 0;
-      font-family: Inter, sans-serif;
+      font-family: Inter, system-ui, Segoe UI, Roboto, Arial, sans-serif;
       color: var(--text);
-      background: var(--bg);
-      padding: 30px 40px 80px;
+      background: radial-gradient(1200px 600px at 70% -10%, #29417a40, transparent),
+                  radial-gradient(900px 500px at -10% 10%, #344b9340, transparent),
+                  var(--bg);
+      padding: 30px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
     }
 
     .task-container {
       background: var(--card);
-      border-left: 5px solid var(--primary);
-      padding: 20px 30px;
-      margin-bottom: 30px;
-      font-size: 18px;
+      border-radius: 16px;
+      padding: 26px 30px;
       box-shadow: var(--shadow);
-      border-radius: 12px;
+      border: 1px solid #ffffff1f;
+      font-size: 18px;
+      line-height: 1.6;
     }
+
     .task-container ul {
       margin-top: 15px;
       margin-bottom: 20px;
     }
+
     .task-container li {
       margin-bottom: 10px;
     }
+
     .task-container .instruction {
       font-weight: bold;
       margin-top: 15px;
@@ -60,29 +73,20 @@
     .images {
       display: flex;
       justify-content: center;
-      align-items: flex-start;
       gap: 30px;
-      margin-bottom: 30px;
-      flex-wrap: wrap;
+      margin: 30px 0;
     }
+
     .images img {
-      flex: 1 1 45%;
-      max-width: 45%;
+      max-width: 100%;
       height: auto;
+      width: 45%;
       border-radius: 12px;
       box-shadow: var(--shadow);
     }
 
-    @media (max-width: 800px) {
-      .images {
-        flex-direction: column;
-      }
-      .images img {
-        max-width: 100%;
-      }
-    }
-
-    .button {
+    .btn {
+      display: inline-block;
       font-size: 20px;
       padding: 16px 32px;
       background: linear-gradient(135deg, var(--primary), var(--primary-600));
@@ -90,13 +94,17 @@
       border: none;
       border-radius: 12px;
       cursor: pointer;
-      box-shadow: 0 6px 18px rgba(0,0,0,.25);
-      transition: transform 0.06s ease;
+      font-weight: 600;
+      text-decoration: none;
+      box-shadow: 0 10px 22px rgba(43,108,255,.3);
+      transition: transform .06s ease, box-shadow .2s ease;
     }
-    .button:hover {
+
+    .btn:hover {
       transform: scale(1.05);
     }
 
+    /* Прогресс-бар */
     #progressContainerFixed {
       position: fixed;
       bottom: 0;
@@ -106,16 +114,15 @@
       background: #eee;
       z-index: 9999;
     }
-    .dark #progressContainerFixed {
-      background: #222;
-    }
+
     #progressBarFixed {
       height: 100%;
       width: 0%;
-      background: linear-gradient(to right, var(--primary), var(--primary-600));
+      background: linear-gradient(to right, #0066ff, #00cfff);
       position: relative;
       transition: width 0.5s linear;
     }
+
     .progress-time {
       position: absolute;
       right: 14px;
@@ -126,33 +133,45 @@
       font-size: 20px;
       user-select: none;
     }
+
+    @media (max-width: 800px) {
+      .images {
+        flex-direction: column;
+        align-items: center;
+      }
+      .images img {
+        width: 100%;
+      }
+    }
   </style>
 </head>
 <body>
+  <div class="container">
+    <div class="task-container">
+      <b>4 Task. Imagine that you and your friend are doing a school project “Spending holidays: in the city or in the countryside”.</b>
+      <p>You have found some photos to illustrate it but for technical reasons you cannot send them now. Leave a voice message to your friend explaining your choice of the photos and sharing some ideas about the project. In 2.5 minutes be ready to:</p>
+      <ul>
+        <li>explain the choice of the illustrations for the project by briefly describing them and noting the differences;</li>
+        <li>mention the advantages (1–2) of the two ways of spending holidays;</li>
+        <li>mention the disadvantages (1–2) of the two ways;</li>
+        <li>express your opinion on the subject of the project – which way of spending holidays presented in the pictures you would prefer and why.</li>
+      </ul>
+      <div class="instruction">
+        You will speak for not more than 3 minutes (12–15 sentences). You have to talk continuously.
+      </div>
+    </div>
 
-  <div class="task-container">
-    <b>4 Task. Imagine that you and your friend are doing a school project “Spending holidays: in the city or in the countryside”.</b>
-    <p>You have found some photos to illustrate it but for technical reasons you cannot send them now. Leave a voice message to your friend explaining your choice of the photos and sharing some ideas about the project. In 2.5 minutes be ready to:</p>
-    <ul>
-      <li>explain the choice of the illustrations for the project by briefly describing them and noting the differences;</li>
-      <li>mention the advantages (1–2) of the two ways of spending holidays;</li>
-      <li>mention the disadvantages (1–2) of the two ways;</li>
-      <li>express your opinion on the subject of the project – which way of spending holidays presented in the pictures you would prefer and why.</li>
-    </ul>
-    <div class="instruction">
-      You will speak for not more than 3 minutes (12–15 sentences). You have to talk continuously.
+    <div class="images">
+      <img src="photo1_city.png" alt="City holidays">
+      <img src="photo2_countryside.png" alt="Countryside holidays">
+    </div>
+
+    <div style="text-align: center; margin-bottom: 50px;">
+      <a class="btn" href="ege4_var1_2_mic.html">Перейти к выполнению</a>
     </div>
   </div>
 
-  <div class="images">
-    <img src="photo1_city.png" alt="City holidays">
-    <img src="photo2_countryside.png" alt="Countryside holidays">
-  </div>
-
-  <div style="text-align: center; margin-bottom: 30px;">
-    <button class="button" onclick="window.location.href='ege4_var1_2_mic.html'">Перейти к выполнению</button>
-  </div>
-
+  <!-- Прогресс-бар -->
   <div id="progressContainerFixed">
     <div id="progressBarFixed">
       <span id="progressTime" class="progress-time">02:30</span>
@@ -163,15 +182,17 @@
     const progressBar = document.getElementById("progressBarFixed");
     const progressTime = document.getElementById("progressTime");
 
-    const totalTime = 150000;
+    const totalTime = 150000; // 2.5 минуты
     const endTime = Date.now() + totalTime;
 
     function updateTimer() {
       const now = Date.now();
       const timeLeft = Math.max(0, endTime - now);
+
       const minutes = String(Math.floor(timeLeft / 60000)).padStart(2, '0');
       const seconds = String(Math.floor((timeLeft % 60000) / 1000)).padStart(2, '0');
       progressTime.textContent = `${minutes}:${seconds}`;
+
       progressBar.style.width = `${(timeLeft / totalTime) * 100}%`;
 
       if (timeLeft <= 0) {
@@ -183,6 +204,5 @@
     updateTimer();
     const timerInterval = setInterval(updateTimer, 500);
   </script>
-
 </body>
 </html>

@@ -145,7 +145,6 @@
     footer{padding:26px 0 10px; color:var(--muted); font-size:13px; text-align:center}
     .back{border:1px dashed #ffffff28; padding:10px 14px; border-radius:10px}
 
-    /* Чуть компактнее на узких экранах */
     @media (max-width: 520px){
       :root { --grid-gap: 20px; --btn-fs: 18px; }
     }
@@ -154,7 +153,7 @@
 <body>
   <div class="wrap">
     <header>
-      <a class="brand back-to-menu" href="#" aria-label="Назад к списку заданий">
+      <a class="brand back-to-menu" href="#">
         <div class="logo">A</div>
         <div>
           <div class="brand-title">Онлайн-тренажёр «Говорение»</div>
@@ -163,7 +162,7 @@
       </a>
       <div style="display:flex; gap:10px; align-items:center">
         <a class="back back-to-menu" href="#">← К выбору задания</a>
-        <button class="theme-toggle" id="themeBtn" aria-label="Переключить тему">🌓 Тема</button>
+        <button class="theme-toggle" id="themeBtn">🌓 Тема</button>
       </div>
     </header>
 
@@ -173,7 +172,7 @@
         <p class="sub">Прочитайте предложенный текст вслух. Выберите вариант ниже.</p>
 
         <div class="frame">
-          <nav id="variants" class="grid" aria-label="Варианты задания 1"></nav>
+          <nav id="variants" class="grid"></nav>
 
           <div class="pager">
             <button id="prevBtn" class="pager-btn">← Назад</button>
@@ -184,9 +183,7 @@
       </section>
     </main>
 
-    <footer>
-      © 2025 — Демо-версия тренажёра ЕГЭ.
-    </footer>
+    <footer>© 2025 — Демо-версия тренажёра ЕГЭ.</footer>
   </div>
 
   <script>
@@ -206,7 +203,7 @@
       });
     })();
 
-    // База /.../ege/ (для корректного возврата в меню)
+    // База /.../ege/
     function getEgeBase() {
       const parts = location.pathname.split('/');
       const i = parts.indexOf('ege');
@@ -214,20 +211,13 @@
     }
     const EGE_BASE = getEgeBase();
 
-    // Назад к меню
     document.querySelectorAll('.back-to-menu').forEach(a => {
       a.href = EGE_BASE + 'ege_menu.html';
     });
 
-    // ====== ПАГИНАЦИЯ + РЕНДЕР ======
-    const TOTAL_VARIANTS = 60;  // общее число вариантов (можешь менять)
-    const PAGE_SIZE      = 15;  // на страницу, как в Задании 4
-
-    // Рабочие ссылки (остальные — "в разработке")
-    const LINKS = {
-      1: 'ege\task1\variants\variant1\ege1_var1_1_prepare.html',
-      2: 'variant2/ege2_prepare.html'
-    };
+    // ====== ПАГИНАЦИЯ ======
+    const TOTAL_VARIANTS = 60;
+    const PAGE_SIZE      = 15;
 
     const variantsEl = document.getElementById('variants');
     const prevBtn    = document.getElementById('prevBtn');
@@ -235,7 +225,7 @@
     const pagerInfo  = document.getElementById('pagerInfo');
 
     let currentPage = 1;
-    const totalPages = Math.max(1, Math.ceil(TOTAL_VARIANTS / PAGE_SIZE));
+    const totalPages = Math.ceil(TOTAL_VARIANTS / PAGE_SIZE);
 
     function renderPage(page){
       currentPage = Math.min(Math.max(1, page), totalPages);
@@ -248,14 +238,18 @@
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'variant';
-        btn.dataset.variant = String(n);
         btn.textContent = `Вариант ${n}`;
         btn.addEventListener('click', () => {
-          if (LINKS[n]) {
-            window.location.assign(LINKS[n]);
-          } else {
-            alert(`Вариант ${n} в разработке`);
-          }
+          const url = `${EGE_BASE}task1/variants/variant${n}/ege1_var${n}_1_prepare.html`;
+          fetch(url, { method: 'HEAD' })
+            .then(r => {
+              if (r.ok) {
+                window.location.assign(url);
+              } else {
+                alert(`Вариант ${n} в разработке`);
+              }
+            })
+            .catch(() => alert(`Вариант ${n} в разработке`));
         });
         frag.appendChild(btn);
       }

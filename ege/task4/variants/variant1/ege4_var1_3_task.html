@@ -5,7 +5,6 @@
   <title>Task 4 — Variant 1</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
 
-  <!-- Анти-мигание темы -->
   <script>
     (function(){
       try{
@@ -16,7 +15,6 @@
   </script>
 
   <style>
-    /* Светлая тема */
     :root {
       --bg: #f7f9ff;
       --card: #ffffff;
@@ -29,7 +27,6 @@
       --danger: #b30000;
       --shadow: 0 10px 25px rgba(17,24,39,.08);
     }
-    /* Тёмная тема */
     .dark {
       --bg: #0b1020;
       --card: rgba(255,255,255,0.08);
@@ -54,7 +51,6 @@
       text-align: center;
     }
 
-    /* Кнопка переключения темы */
     .theme-toggle {
       position: fixed; top:16px; right:16px; z-index:10000;
       border:1px solid #ffffff22; background:transparent; color:var(--text);
@@ -82,11 +78,21 @@
     .task-container li { margin-bottom:8px; }
     .instruction { font-weight:700; margin-top:10px; }
 
+    /* Новый стиль обратного отсчёта */
     .timer {
-      font-size: 56px;
+      font-size: 90px;
       color: var(--danger);
-      margin: 30px 0;
       font-weight: 700;
+      margin-top: 150px;
+      animation: fadeIn 0.4s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.8); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .countdown-hidden {
+      opacity: 0;
+      transition: opacity 0.3s ease;
     }
 
     .images {
@@ -143,8 +149,7 @@
   </style>
 </head>
 <body>
-  <!-- Кнопка темы -->
-  <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
+  <button id="themeBtn" class="theme-toggle">🌓 Тема</button>
 
   <div class="wrap">
     <div class="task-container" id="taskContainer">
@@ -178,7 +183,7 @@
   </div>
 
   <script>
-    // Переключение темы
+    // Тема
     (function(){
       const btn = document.getElementById('themeBtn');
       const key = 'pref-theme';
@@ -233,19 +238,25 @@
       }
     }
 
+    // Новый отсчёт
     function startCountdown() {
+      timerEl.style.display = "block";
+      timerEl.textContent = countdown;
       const cdInterval = setInterval(() => {
-        timerEl.textContent = countdown;
         countdown--;
-        if (countdown < 0) {
+        if (countdown >= 0) {
+          timerEl.textContent = countdown;
+          timerEl.classList.remove("countdown-hidden");
+          setTimeout(() => timerEl.classList.add("countdown-hidden"), 700);
+        } else {
           clearInterval(cdInterval);
+          timerEl.style.display = "none";
           startTask();
         }
       }, 1000);
     }
 
     function startTask() {
-      timerEl.style.display = "none";
       progressContainerFixed.style.display = "block";
       imageContainer.style.display = "flex";
       taskContainer.style.display = "block";

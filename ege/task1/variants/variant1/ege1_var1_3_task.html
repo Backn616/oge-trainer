@@ -2,94 +2,155 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>ЕГЭ — Задание 1: Вариант 1</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Подготовка — с отсчётом</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <script>
+    (function () {
+      try {
+        const saved = localStorage.getItem('pref-theme') || 'light';
+        if (saved === 'dark') document.documentElement.classList.add('dark');
+      } catch (_) {}
+    })();
+  </script>
+
   <style>
+    :root {
+      --bg: #f7f9ff;
+      --text: #0b1020;
+      --muted:#5a6475;
+      --card:#ffffff;
+      --primary:#2b6cff;
+      --primary-600:#1f58d9;
+      --shadow: 0 10px 25px rgba(17,24,39,.08);
+      --panel-bg:#f9f9f9;
+      --panel-border:#0077cc;
+    }
+    .dark {
+      --bg:#0b1020;
+      --text:#eaf0ff;
+      --muted:#b9c2d3;
+      --card:rgba(255,255,255,.08);
+      --primary:#6aa3ff;
+      --primary-600:#4b8dff;
+      --shadow: 0 10px 35px rgba(0,0,0,.35);
+      --panel-bg:rgba(255,255,255,.08);
+      --panel-border:#4b8dff;
+    }
+
     body {
-      font-family: Arial, sans-serif;
-      background-color: #ffffff;
+      font-family: Inter, sans-serif;
       margin: 0;
-      padding: 20px;
+      padding: 40px 20px 80px;
+      color: var(--text);
       text-align: center;
+      background:
+        radial-gradient(1200px 600px at 70% -10%, #29417a40, transparent),
+        radial-gradient(900px 500px at -10% 10%, #344b9340, transparent),
+        var(--bg);
     }
-    h1 {
-      color: #333;
+
+    .theme-toggle {
+      position: fixed; top:16px; right:16px; z-index:1000;
+      border:1px solid #ffffff22; background:transparent; color:var(--text);
+      padding:10px 14px; border-radius:10px; cursor:pointer; backdrop-filter: blur(6px);
+      transition: transform .08s ease, filter .2s ease;
     }
-    .instruction {
-      font-size: 22px;
-      max-width: 95%;
-      margin: 20px auto;
-      text-align: left;
-      background-color: #f9f9f9;
-      padding: 25px;
-      border-left: 6px solid #0077cc;
-    }
-    .countdown, .reading-timer {
-      font-size: 56px;
-      color: #b30000;
-      margin-top: 10px;
-    }
-    .progress-container {
-      width: 95%;
-      background-color: #eee;
-      border-radius: 25px;
-      margin: 20px auto;
-      height: 30px;
-      position: relative;
-      box-shadow: inset 0 1px 3px rgba(0,0,0,.2);
-    }
-    .progress-bar {
-      height: 100%;
-      width: 100%;
-      background: linear-gradient(to right, #4facfe, #00f2fe);
-      transition: width 1s linear;
-      border-radius: 25px 0 0 25px;
-    }
-    .reading-box {
-      background-color: #ffffff;
-      padding: 40px;
-      margin: 30px auto;
-      width: 95%;
+    .theme-toggle:hover { transform: translateY(-1px); filter: brightness(1.03); }
+
+    .instruction-box {
       max-width: 1600px;
-      border: 1px solid #ccc;
-      border-radius: 12px;
-      font-size: 32px;
+      width: 95%;
+      margin: 0 auto 30px;
+      font-size: 22px;
+      line-height: 1.6;
       text-align: left;
+      border: 2px solid var(--panel-border);
+      padding: 25px;
+      border-radius: 12px;
+      background-color: var(--panel-bg);
+      box-shadow: var(--shadow);
       display: none;
+    }
+
+    .text-box {
+      max-width: 1600px;
+      width: 95%;
+      margin: 0 auto 30px;
+      font-size: 32px;
       line-height: 1.9;
-    }
-    .buttons {
-      margin: 30px;
+      text-align: left;
+      border: 1px solid #ccc;
+      padding: 40px;
+      border-radius: 12px;
+      background-color: var(--card);
+      box-shadow: var(--shadow);
       display: none;
     }
-    .finish-btn {
-      background-color: #0077cc;
-      color: white;
-      padding: 16px 32px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
+
+    .button {
       font-size: 20px;
-      text-decoration: none;
+      padding: 16px 32px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-600));
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: 0 10px 22px rgba(43,108,255,.28);
+      transition: transform .06s ease, filter .2s ease;
+      display: none;
     }
-    .finish-btn:hover {
-      background-color: #005fa3;
+    .button:hover { transform: translateY(-1px); filter: brightness(1.03); }
+
+    #progressContainerFixed {
+      position: fixed;
+      bottom: 0; left: 0; width: 100%; height: 32px;
+      background: #eee;
+      z-index: 9999;
+      display: none;
+    }
+    .dark #progressContainerFixed { background: #222; }
+
+    #progressBarFixed {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(to right, #0066ff, #00cfff);
+      position: relative;
+      transition: width 0.5s linear;
+    }
+    .progress-time {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: white;
+      font-weight: 700;
+      font-size: 20px;
+      user-select: none;
+      text-shadow: 0 1px 2px rgba(0,0,0,.35);
+    }
+
+    .countdown {
+      font-size: 72px;
+      font-weight: bold;
+      margin-top: 100px;
+      color: var(--primary);
     }
   </style>
 </head>
 <body>
-  <h1>📖 ЕГЭ — Задание 1: Вариант 1</h1>
 
-  <div class="instruction">
-    <strong>Task 1.</strong> Read the text aloud.
+  <button id="themeBtn" class="theme-toggle">🌓 Тема</button>
+
+  <div id="countdown" class="countdown">3</div>
+
+  <div id="instruction" class="instruction-box">
+    <p><strong>Task 1.</strong> Imagine that you are preparing a project with your friend. You have found some interesting material for the presentation and you want to read this text to your friend. You have 1.5 minutes to read the text silently, then be ready to read it out loud. You will not have more than 1.5 minutes to read it.</p>
   </div>
 
-  <div class="countdown" id="countdown">5</div>
-  <div class="progress-container"><div class="progress-bar" id="progress-bar"></div></div>
-
-  <div class="reading-timer" id="reading-timer" style="display: none;">01:30</div>
-
-  <div id="reading-box" class="reading-box">
+  <div id="text" class="text-box">
     Bioluminescence is the ability of certain living organisms to produce light. 
     This fascinating phenomenon can be observed in various species of deep-sea fish, jellyfish, fireflies, and even some fungi. 
     The light is usually blue or green, which travels best through water. These organisms use light for different reasons. 
@@ -98,107 +159,84 @@
     Special proteins from glowing jellyfish are already used in genetic research. Bioluminescence is not only beautiful — it is a powerful tool of survival and discovery.
   </div>
 
-  <div class="buttons" id="buttons">
-    <button class="finish-btn" onclick="endManually()">✅ Закончить задание</button>
+  <button id="endBtn" class="button" onclick="endTask()">✅ Закончить</button>
+
+  <div id="progressContainerFixed">
+    <div id="progressBarFixed">
+      <span id="progressTime" class="progress-time">01:30</span>
+    </div>
   </div>
 
   <script>
-    let mediaRecorder = null;
-    let audioChunks = [];
-    let hasStopped = false;
-
-    const countdownEl = document.getElementById("countdown");
-    const readingTimerEl = document.getElementById("reading-timer");
-    const readingBox = document.getElementById("reading-box");
-    const buttonsBox = document.getElementById("buttons");
-    const progressBar = document.getElementById("progress-bar");
-
-    async function initMic() {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        mediaRecorder = new MediaRecorder(stream);
-
-        mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
-
-        mediaRecorder.onstop = () => {
-          if (hasStopped) return;
-          hasStopped = true;
-          const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-          const reader = new FileReader();
-          reader.onloadend = () => {
-            sessionStorage.setItem("ege1_audio_base64", reader.result);
-            window.location.href = "ege1_result.html";
-          };
-          reader.readAsDataURL(audioBlob);
-        };
-
-        startCountdown();
-      } catch (err) {
-        alert("❌ Не удалось получить доступ к микрофону: " + err.message);
-        startCountdown(); // всё равно запускаем
+    // Тема
+    (function(){
+      const btn = document.getElementById('themeBtn');
+      const key = 'pref-theme';
+      const root = document.documentElement;
+      function apply(mode){
+        root.classList.toggle('dark', mode === 'dark');
+        localStorage.setItem(key, mode);
       }
-    }
+      apply(localStorage.getItem(key) || 'light');
+      btn.addEventListener('click', () => {
+        const curr = localStorage.getItem(key) || 'light';
+        apply(curr === 'dark' ? 'light' : 'dark');
+      });
+    })();
 
-    function speakStart() {
-      const utterance = new SpeechSynthesisUtterance("Start reading");
-      utterance.lang = "en-US";
-      speechSynthesis.speak(utterance);
-    }
+    const cdEl = document.getElementById('countdown');
+    const instr = document.getElementById('instruction');
+    const textBox = document.getElementById('text');
+    const endBtn = document.getElementById('endBtn');
+    const progressContainer = document.getElementById('progressContainerFixed');
+    const progressBar = document.getElementById('progressBarFixed');
+    const progressTime = document.getElementById('progressTime');
 
-    function startCountdown() {
-      let count = 5;
-      const timer = setInterval(() => {
-        countdownEl.textContent = count;
-        progressBar.style.width = ((count / 5) * 100) + "%";
-        count--;
-        if (count < 0) {
-          clearInterval(timer);
-          countdownEl.style.display = "none";
-          readingBox.style.display = "block";
-          buttonsBox.style.display = "block";
-          readingTimerEl.style.display = "block";
-          speakStart();
-          startReadingTimer();
-          if (mediaRecorder) {
-            audioChunks = [];
-            mediaRecorder.start();
-          }
+    let countdown = 3;
+    let totalTime = 90; // секунд
+
+    function startCountdown(){
+      const cdInterval = setInterval(()=>{
+        cdEl.textContent = countdown;
+        countdown--;
+        if(countdown < 0){
+          clearInterval(cdInterval);
+          startTask();
         }
-      }, 1000);
+      },1000);
     }
 
-    function startReadingTimer() {
-      let totalSeconds = 90;
-      const fullWidth = 100;
-      const barStep = fullWidth / totalSeconds;
+    function startTask(){
+      cdEl.style.display = 'none';
+      instr.style.display = 'block';
+      textBox.style.display = 'block';
+      endBtn.style.display = 'inline-block';
+      progressContainer.style.display = 'block';
 
-      const timer2 = setInterval(() => {
-        totalSeconds--;
-        const minutes = String(Math.floor(totalSeconds / 60)).padStart(2, '0');
-        const seconds = String(totalSeconds % 60).padStart(2, '0');
-        readingTimerEl.textContent = minutes + ":" + seconds;
-        progressBar.style.width = (barStep * totalSeconds) + "%";
-
-        if (totalSeconds <= 0) {
-          clearInterval(timer2);
-          if (mediaRecorder && mediaRecorder.state === "recording") {
-            mediaRecorder.stop();
-          } else {
-            window.location.href = "ege1_result.html";
-          }
+      let timeLeft = totalTime;
+      progressTime.textContent = formatTime(timeLeft);
+      const timerInterval = setInterval(()=>{
+        timeLeft--;
+        progressTime.textContent = formatTime(timeLeft);
+        progressBar.style.width = `${(timeLeft/totalTime)*100}%`;
+        if(timeLeft <= 0){
+          clearInterval(timerInterval);
+          endTask();
         }
-      }, 1000);
+      },1000);
     }
 
-    function endManually() {
-      if (mediaRecorder && mediaRecorder.state === "recording") {
-        mediaRecorder.stop(); // триггерит сохранение и переход
-      } else {
-        window.location.href = "ege1_result.html";
-      }
+    function formatTime(sec){
+      const m = String(Math.floor(sec/60)).padStart(2,'0');
+      const s = String(sec%60).padStart(2,'0');
+      return `${m}:${s}`;
     }
 
-    window.onload = initMic;
+    function endTask(){
+      window.location.href = 'ege1_var1_4_result.html';
+    }
+
+    window.onload = startCountdown;
   </script>
 </body>
 </html>

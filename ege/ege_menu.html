@@ -7,11 +7,50 @@
   <meta name="description" content="Меню тренажёра устной части ЕГЭ по английскому: задания 1–4, таймер, запись голоса." />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <!-- Анти-мигание темы: читаем pref-theme и ставим .dark максимально рано -->
+  <script>
+    (function () {
+      try {
+        const saved = localStorage.getItem('pref-theme') || 'light';
+        if (saved === 'dark') document.documentElement.classList.add('dark');
+      } catch (_) {}
+    })();
+  </script>
+
   <style>
+    /* Светлая тема по умолчанию (как на index) */
     :root{
-      --bg: #0b1020;
-      --card: rgba(255,255,255,0.08);
-      --text: #eaf0ff;
+      --bg:#f7f9ff;
+      --card:#ffffff;
+      --text:#0b1020;
+      --muted:#5a6475;
+      --primary:#2b6cff;
+      --primary-600:#1f58d9;
+      --ring:#bfd3ff;
+      --success:#25c26e;
+      --shadow: 0 10px 25px rgba(17,24,39,.08);
+
+      /* Кнопки — «чуть светлее» синего */
+      --btn-1:#6d95ff;
+      --btn-2:#4f7dff;
+      --btn-text:#ffffff;
+
+      /* Базовые размеры */
+      --btn-fs:20px;
+      --btn-pad-y:18px;
+      --btn-pad-x:26px;
+      --btn-minh:56px;
+      --btn-radius:14px;
+      --grid-gap:28px;          /* было 24 → чуть больше расстояния */
+      --btn-scale:1;            /* масштаб по умолчанию */
+    }
+
+    /* Тёмная тема — через класс .dark (единый стиль на всех страницах) */
+    .dark{
+      --bg:#0b1020;
+      --card:rgba(255,255,255,.08);
+      --text:#eaf0ff;
       --muted:#b9c2d3;
       --primary:#6aa3ff;
       --primary-600:#4b8dff;
@@ -19,40 +58,21 @@
       --success:#5ee397;
       --shadow: 0 10px 35px rgba(0,0,0,.35);
 
-      /* Кнопки: синий, светлее главной */
       --btn-1:#aecdff;
       --btn-2:#86b8ff;
       --btn-text:#ffffff;
-
-      /* Базовые размеры кнопок (до масштабирования) */
-      --btn-fs: 20px;
-      --btn-pad-y: 18px;
-      --btn-pad-x: 26px;
-      --btn-minh: 56px;
-      --btn-radius: 14px;
-      --grid-gap: 24px;
-
-      /* Масштаб по умолчанию */
-      --btn-scale: 1;
     }
-    @media (prefers-color-scheme: light){
-      :root{
-        --bg:#f7f9ff; --card:#ffffff; --text:#0b1020; --muted:#5a6475;
-        --primary:#2b6cff; --primary-600:#1f58d9; --ring:#bfd3ff; --success:#25c26e;
-        --shadow: 0 10px 25px rgba(17,24,39,.08);
 
-        --btn-1:#6d95ff; --btn-2:#4f7dff; --btn-text:#ffffff;
-      }
-    }
     *{box-sizing:border-box}
     html,body{height:100%}
     body{
       margin:0;
       font-family:Inter, system-ui, Segoe UI, Roboto, Arial, sans-serif;
       color:var(--text);
-      background: radial-gradient(1200px 600px at 70% -10%, #29417a40, transparent),
-                  radial-gradient(900px 500px at -10% 10%, #344b9340, transparent),
-                  var(--bg);
+      background:
+        radial-gradient(1200px 600px at 70% -10%, #29417a40, transparent),
+        radial-gradient(900px 500px at -10% 10%, #344b9340, transparent),
+        var(--bg);
     }
     a{color:inherit; text-decoration:none}
     .wrap{max-width:1040px; margin:0 auto; padding:24px}
@@ -68,39 +88,40 @@
     .badge{font-size:12px; color:var(--muted)}
     .theme-toggle{
       border:1px solid #ffffff22; background:transparent; color:var(--text);
-      padding:10px 14px; border-radius:10px; cursor:pointer;
-      transition: transform .08s ease;
+      padding:10px 14px; border-radius:10px; cursor:pointer; transition: transform .08s ease;
     }
     .theme-toggle:active{transform: scale(.98)}
 
     main{padding:40px 0 24px}
     .card{
-      background:var(--card); border:1px solid #ffffff1f; border-radius:20px; padding:32px; box-shadow:var(--shadow);
+      background:var(--card); border:1px solid #ffffff1f; border-radius:22px; /* было 20px → рамка чуть крупнее */
+      padding:36px; /* было 32px */
+      box-shadow:var(--shadow);
       backdrop-filter: blur(10px);
     }
-    .h1{font-size: clamp(26px, 5vw, 36px); line-height:1.15; margin:0 0 10px;}
-    .sub{color:var(--muted); font-size:16px; margin:0 0 18px}
+    .h1{font-size: clamp(26px, 5vw, 36px); line-height:1.15; margin:0 0 12px;}
+    .sub{color:var(--muted); font-size:16px; margin:0 0 20px}
 
     /* Рамочка вокруг кнопок + масштаб */
     .button-frame{
-      --btn-scale: 1.3;                 /* десктоп/таб */
-      border: 1px solid #ffffff22;      /* мягче */
-      border-radius: 18px;
-      padding: calc(16px * var(--btn-scale));
-      background: #ffffff06;            /* менее «коробочно» */
+      --btn-scale: 1.35;              /* было 1.3 → чуть больше */
+      border: 1px solid #ffffff22;
+      border-radius: 20px;            /* было 18px */
+      padding: calc(18px * var(--btn-scale));  /* было 16px */
+      background: #ffffff06;
       backdrop-filter: blur(6px);
-      margin-top: 10px;
+      margin-top: 12px;
     }
 
     .grid{
       display:grid;
       grid-template-columns: repeat(2, minmax(260px,1fr));
-      gap: calc(var(--grid-gap) * var(--btn-scale));
+      gap: calc(var(--grid-gap) * var(--btn-scale)); /* больше воздуха между кнопками */
     }
 
     @media (max-width:700px){
       .grid{grid-template-columns:1fr}
-      .button-frame{ --btn-scale: 1.2; } /* авто-уменьшение на мобиле */
+      .button-frame{ --btn-scale: 1.22; } /* ровно «чуть меньше» на мобиле */
     }
 
     .btn{
@@ -122,7 +143,7 @@
     .btn:active{transform: translateY(0)}
     .btn:focus-visible{box-shadow:0 0 0 4px var(--ring)}
 
-    footer{padding:24px 0 10px; color:var(--muted); font-size:13px; text-align:center}
+    footer{padding:26px 0 10px; color:var(--muted); font-size:13px; text-align:center}
     .back{border:1px dashed #ffffff28; padding:10px 14px; border-radius:10px}
   </style>
 </head>
@@ -169,16 +190,19 @@
     (function(){
       const btn = document.getElementById('themeBtn');
       const key = 'pref-theme';
-      const apply = (mode) => {
-        if(mode==='dark'){ document.documentElement.style.colorScheme='dark'; }
-        if(mode==='light'){ document.documentElement.style.colorScheme='light'; }
+      const root = document.documentElement;
+
+      function apply(mode){
+        root.classList.toggle('dark', mode === 'dark');
         localStorage.setItem(key, mode);
-      };
-      const saved = localStorage.getItem(key);
-      if(saved){ apply(saved); }
+      }
+
+      // Инициализация по сохранённому значению (или светлая, если нет ключа)
+      apply(localStorage.getItem(key) || 'light');
+
       btn.addEventListener('click', () => {
-        const curr = localStorage.getItem(key) || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark':'light');
-        apply(curr==='dark'?'light':'dark');
+        const curr = localStorage.getItem(key) || 'light';
+        apply(curr === 'dark' ? 'light' : 'dark');
       });
     })();
   </script>

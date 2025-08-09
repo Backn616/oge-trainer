@@ -5,7 +5,7 @@
   <title>Task 4 — Preparation</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
 
-  <!-- Анти-мигание темы: ставим класс .dark на <html> до рендера -->
+  <!-- Анти-мигание темы -->
   <script>
     (function(){
       try{
@@ -16,7 +16,7 @@
   </script>
 
   <style>
-    /* Светлая тема по умолчанию */
+    /* Светлая тема */
     :root{
       --bg: #f7f9ff;
       --card: #ffffff;
@@ -46,7 +46,6 @@
       margin: 0;
       padding: 40px 30px 80px;
       color: var(--text);
-      /* фирменный фон с градиентами */
       background:
         radial-gradient(1200px 600px at 70% -10%, #29417a40, transparent),
         radial-gradient(900px 500px at -10% 10%, #344b9340, transparent),
@@ -60,30 +59,22 @@
       width: 100%;
     }
 
+    /* Стиль под task */
     .task-container {
       background: var(--card);
       border-left: 5px solid var(--primary);
       padding: 20px 30px 10px 30px;
       margin-bottom: 30px;
-      font-size: 18px;
+      font-size: 20px;
+      line-height: 1.7;
+      text-align: left;
       box-sizing: border-box;
       box-shadow: var(--shadow);
-      border-radius: 8px;
+      border-radius: 12px;
     }
-
-    .task-container ul {
-      margin-top: 15px;
-      margin-bottom: 20px;
-    }
-
-    .task-container li {
-      margin-bottom: 10px;
-    }
-
-    .task-container .instruction {
-      font-weight: bold;
-      margin-top: 15px;
-    }
+    .task-container ul { margin:10px 0 15px 20px; }
+    .task-container li { margin-bottom:8px; }
+    .task-container .instruction { font-weight:700; margin-top:10px; }
 
     .images {
       display: flex;
@@ -92,20 +83,12 @@
       gap: 30px;
       margin-bottom: 30px;
     }
-
     .images img {
       max-width: 100%;
       height: auto;
       width: 48%;
-      border-radius: 6px;
+      border-radius: 12px;
       box-shadow: var(--shadow);
-    }
-
-    .speak-now {
-      text-align: center;
-      font-weight: bold;
-      font-size: 18px;
-      color: green;
     }
 
     .button {
@@ -114,14 +97,14 @@
       background: linear-gradient(135deg, var(--primary), var(--primary-600));
       color: #fff;
       border: none;
-      border-radius: 8px;
+      border-radius: 12px;
       cursor: pointer;
       box-shadow: 0 10px 22px rgba(43,108,255,.3);
       transition: transform .06s ease, box-shadow .2s ease, filter .2s ease;
     }
     .button:hover { transform: scale(1.05); filter: brightness(1.03); }
 
-    /* Прогресс-бар снизу */
+    /* Прогресс-бар */
     #progressContainerFixed {
       position: fixed;
       bottom: 0; left: 0; width: 100%; height: 32px;
@@ -129,7 +112,6 @@
       z-index: 9999;
     }
     .dark #progressContainerFixed { background:#222; }
-
     #progressBarFixed {
       height: 100%;
       width: 0%;
@@ -137,7 +119,6 @@
       position: relative;
       transition: width 0.5s linear;
     }
-
     .progress-time {
       position: absolute;
       right: 14px;
@@ -155,7 +136,7 @@
       .images img { width: 100%; }
     }
 
-    /* Переключатель темы — как на главной (справа сверху) */
+    /* Переключатель темы */
     .theme-toggle{
       position: fixed; top:16px; right:16px; z-index:10000;
       border:1px solid #ffffff22; background:transparent; color:var(--text);
@@ -172,7 +153,7 @@
   <div class="content-wrapper">
     <div class="task-container">
       <b>4 Task. Imagine that you and your friend are doing a school project “Spending holidays: in the city or in the countryside”.</b>
-      <p>You have found some photos to illustrate it but for technical reasons you cannot send them now. Leave a voice message to your friend explaining your choice of the photos and sharing some ideas about the project. In 2.5 minutes be ready to:</p>
+      You have found some photos to illustrate it but for technical reasons you cannot send them now. Leave a voice message to your friend explaining your choice of the photos and sharing some ideas about the project. In 2.5 minutes be ready to:
       <ul>
         <li>explain the choice of the illustrations for the project by briefly describing them and noting the differences;</li>
         <li>mention the advantages (1–2) of the two ways of spending holidays;</li>
@@ -204,44 +185,34 @@
     // Таймер
     const progressBar = document.getElementById("progressBarFixed");
     const progressTime = document.getElementById("progressTime");
-
     const totalTime = 150000; // 2.5 минуты
     const endTime = Date.now() + totalTime;
 
     function updateTimer() {
       const now = Date.now();
       const timeLeft = Math.max(0, endTime - now);
-
       const minutes = String(Math.floor(timeLeft / 60000)).padStart(2, '0');
       const seconds = String(Math.floor((timeLeft % 60000) / 1000)).padStart(2, '0');
-      const formatted = `${minutes}:${seconds}`;
-
-      progressTime.textContent = formatted;
-      const progressPercent = (timeLeft / totalTime) * 100;
-      progressBar.style.width = `${progressPercent}%`;
-
+      progressTime.textContent = `${minutes}:${seconds}`;
+      progressBar.style.width = `${(timeLeft / totalTime) * 100}%`;
       if (timeLeft <= 0) {
         clearInterval(timerInterval);
         window.location.href = "ege4_var1_2_mic.html";
       }
     }
-
     updateTimer();
     const timerInterval = setInterval(updateTimer, 500);
 
-    // Переключатель темы (как на главной)
+    // Переключатель темы
     (function(){
       const btn = document.getElementById('themeBtn');
       const key = 'pref-theme';
       const root = document.documentElement;
-
       function apply(mode){
         root.classList.toggle('dark', mode === 'dark');
         localStorage.setItem(key, mode);
       }
-
       apply(localStorage.getItem(key) || 'light');
-
       btn.addEventListener('click', () => {
         const curr = localStorage.getItem(key) || 'light';
         apply(curr === 'dark' ? 'light' : 'dark');

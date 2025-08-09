@@ -4,53 +4,135 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Предупреждение</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <!-- Анти-мигание темы -->
+  <script>
+    (function(){
+      try{
+        const saved = localStorage.getItem('pref-theme') || 'light';
+        if(saved === 'dark') document.documentElement.classList.add('dark');
+      }catch(_){}
+    })();
+  </script>
+
   <style>
+    /* Светлая тема */
+    :root{
+      --bg: #f7f9ff;
+      --card: #ffffff;
+      --text: #0b1020;
+      --primary: #2b6cff;
+      --primary-600: #1f58d9;
+      --danger: #b30000;
+      --shadow: 0 10px 25px rgba(17,24,39,0.08);
+    }
+    /* Тёмная тема */
+    .dark{
+      --bg: #0b1020;
+      --card: rgba(255,255,255,0.08);
+      --text: #eaf0ff;
+      --primary: #6aa3ff;
+      --primary-600: #4b8dff;
+      --danger: #ff6b6b;
+      --shadow: 0 10px 35px rgba(0,0,0,.35);
+    }
+
     body {
-      font-family: Arial, sans-serif;
-      background-color: #fffdf4;
+      font-family: 'Inter', system-ui, sans-serif;
       margin: 0;
-      padding: 40px;
-      text-align: center;
+      padding: 40px 20px;
+      background:
+        radial-gradient(1200px 600px at 70% -10%, #29417a40, transparent),
+        radial-gradient(900px 500px at -10% 10%, #344b9340, transparent),
+        var(--bg);
+      color: var(--text);
       display: flex;
-      flex-direction: column;
       justify-content: center;
       align-items: center;
-      height: 100vh;
+      min-height: 100vh;
+    }
+    .card {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 40px;
+      max-width: 800px;
+      width: 100%;
+      box-shadow: var(--shadow);
+      text-align: center;
     }
     h1 {
-      font-size: 28px;
-      color: #b30000;
+      font-size: 32px;
+      color: var(--danger);
       margin-bottom: 20px;
     }
     p {
       font-size: 20px;
-      max-width: 700px;
       line-height: 1.6;
+      margin-bottom: 40px;
     }
     .button {
-      margin-top: 40px;
-      background-color: #0077cc;
+      display: inline-block;
+      padding: 16px 32px;
+      font-size: 20px;
+      font-weight: 600;
       color: white;
-      padding: 15px 30px;
-      font-size: 18px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-600));
       border: none;
-      border-radius: 8px;
+      border-radius: 12px;
       cursor: pointer;
       text-decoration: none;
+      box-shadow: 0 10px 22px rgba(43, 108, 255, 0.3);
+      transition: transform 0.06s ease, box-shadow 0.2s ease;
     }
     .button:hover {
-      background-color: #005fa3;
+      transform: scale(1.05);
     }
+
+    /* Переключатель темы */
+    .theme-toggle{
+      position: fixed; top:16px; right:16px; z-index:10000;
+      border:1px solid #ffffff22; background:transparent; color:var(--text);
+      padding:10px 14px; border-radius:10px; cursor:pointer; backdrop-filter: blur(6px);
+      transition: transform .08s ease, filter .2s ease;
+    }
+    .theme-toggle:hover{ transform: translateY(-1px); filter: brightness(1.03); }
   </style>
 </head>
 <body>
-  <h1>Внимание</h1>
-  <p>
-    На следующем этапе тренажёр попытается получить доступ к микрофону.<br><br>
-    У Вас появится запрос на использование сайтом микрофона.<br><br>
-    Если вы планируете использовать функцию записи, пожалуйста,<br>
-    <strong>разрешите сайту использовать микрофон</strong>.
-  </p>
-  <a href="ege1_read1.html" class="button">ОК</a>
+  <!-- Тумблер темы -->
+  <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
+
+  <div class="card">
+    <h1>Внимание</h1>
+    <p>
+      На следующем этапе тренажёр попытается получить доступ к микрофону.<br><br>
+      У вас появится запрос на использование микрофона браузером.<br><br>
+      Если вы готовы выполнить устную часть задания 4, пожалуйста,<br>
+      <strong>разрешите сайту использовать микрофон</strong>, чтобы начать запись ответа.
+    </p>
+    <a href="ege1_var1_3_task.html" class="button">ОК</a>
+  </div>
+
+  <script>
+    // Переключатель темы
+    (function(){
+      const btn = document.getElementById('themeBtn');
+      const key = 'pref-theme';
+      const root = document.documentElement;
+
+      function apply(mode){
+        root.classList.toggle('dark', mode === 'dark');
+        localStorage.setItem(key, mode);
+      }
+
+      apply(localStorage.getItem(key) || 'light');
+
+      btn.addEventListener('click', () => {
+        const curr = localStorage.getItem(key) || 'light';
+        apply(curr === 'dark' ? 'light' : 'dark');
+      });
+    })();
+  </script>
 </body>
 </html>

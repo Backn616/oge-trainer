@@ -18,6 +18,11 @@
       --ring:#a9c6ff;
       --success:#5ee397;
       --shadow: 0 10px 35px rgba(0,0,0,.35);
+
+      /* Цвета кнопок как в MENU */
+      --btn-1:#aecdff;
+      --btn-2:#86b8ff;
+      --btn-text:#ffffff;
     }
     @media (prefers-color-scheme: light){
       :root{
@@ -30,6 +35,10 @@
         --ring:#bfd3ff;
         --success:#25c26e;
         --shadow: 0 10px 25px rgba(17,24,39,.08);
+
+        --btn-1:#6d95ff;
+        --btn-2:#4f7dff;
+        --btn-text:#ffffff;
       }
     }
     *{box-sizing:border-box}
@@ -77,24 +86,23 @@
       display:flex; flex-wrap:wrap; gap:12px; margin-top:10px
     }
     .btn{
-      display:inline-flex; align-items:center; gap:10px; text-decoration:none;
+      display:inline-flex; align-items:center; justify-content:center; gap:10px;
       font-size: 20px;
-      padding:18px 26px; border-radius:12px; border:1px solid transparent; font-weight:600;
-      transition: transform .06s ease, box-shadow .2s ease, border-color .2s ease, background .2s ease;
-      outline: none;
-      animation: pulse 1.5s infinite;
+      font-weight:600;
+      padding:18px 26px;
+      min-height: 56px;
+      border-radius: 14px;
+      border:1px solid rgba(255,255,255,.18);
+      outline:none;
+      background: linear-gradient(135deg, var(--btn-1), var(--btn-2));
+      color:var(--btn-text);
+      text-shadow: 0 1px 0 rgba(0,0,0,.15);
+      box-shadow: 0 12px 24px rgba(75, 141, 255, .28);
+      transition: transform .06s ease, box-shadow .2s ease, filter .2s ease;
     }
-    .btn:focus-visible{box-shadow:0 0 0 4px var(--ring)}
-    .btn-primary{
-      background: linear-gradient(135deg, var(--primary), var(--primary-600));
-      color:white; box-shadow: 0 10px 22px rgba(43,108,255,.3);
-    }
-    .btn-primary:hover{transform: scale(1.05)}
-    @keyframes pulse {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.08); }
-      100% { transform: scale(1); }
-    }
+    .btn:hover {transform: translateY(-2px); filter: brightness(1.03)}
+    .btn:active {transform: translateY(0)}
+    .btn:focus-visible {box-shadow:0 0 0 4px var(--ring)}
     .note{
       margin-top:16px; font-size:13px; color:var(--muted)
     }
@@ -128,10 +136,10 @@
           <h1 class="h1">Подготовь устную часть <span style="white-space:nowrap">ОГЭ и ЕГЭ</span> уверенно</h1>
           <p class="sub">Тренируй ответы с таймером, мини-подсказками и записью голоса. Основано на демо-материалах ФИПИ.</p>
           <div class="cta">
-            <a href="./oge/oge_menu.html" class="btn btn-primary" aria-label="Перейти к тренажёру ОГЭ">
+            <a href="./oge/oge_menu.html" class="btn" aria-label="Перейти к тренажёру ОГЭ">
               🎒 Перейти к ОГЭ
             </a>
-            <a href="./ege/ege_menu.html" class="btn btn-primary" aria-label="Перейти к тренажёру ЕГЭ">
+            <a href="./ege/ege_menu.html" class="btn" aria-label="Перейти к тренажёру ЕГЭ">
               🎓 Перейти к ЕГЭ
             </a>
           </div>

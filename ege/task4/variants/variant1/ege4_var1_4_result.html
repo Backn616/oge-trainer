@@ -4,170 +4,211 @@
   <meta charset="UTF-8" />
   <title>Результат — Задание 4</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+
+  <!-- Анти-мигание темы -->
+  <script>
+    (function(){
+      try{
+        const saved = localStorage.getItem('pref-theme') || 'light';
+        if(saved === 'dark') document.documentElement.classList.add('dark');
+      }catch(_){}
+    })();
+  </script>
+
   <style>
+    /* Светлая тема */
+    :root{
+      --bg: #f7f9ff;
+      --card: #ffffff;
+      --text: #0b1020;
+      --muted: #5a6475;
+      --primary: #2b6cff;
+      --primary-600: #1f58d9;
+      --shadow: 0 10px 25px rgba(17,24,39,.08);
+    }
+    /* Тёмная тема */
+    .dark{
+      --bg: #0b1020;
+      --card: rgba(255,255,255,0.08);
+      --text: #eaf0ff;
+      --muted: #b9c2d3;
+      --primary: #6aa3ff;
+      --primary-600: #4b8dff;
+      --shadow: 0 10px 35px rgba(0,0,0,.35);
+    }
+
     body {
       font-family: 'Roboto', sans-serif;
-      background-color: #fff;
       margin: 0;
-      padding: 40px 30px;
+      padding: 40px 30px 56px;
+      color: var(--text);
+      background:
+        radial-gradient(1200px 600px at 70% -10%, #29417a40, transparent),
+        radial-gradient(900px 500px at -10% 10%, #344b9340, transparent),
+        var(--bg);
     }
+
+    /* Переключатель темы */
+    .theme-toggle{
+      position: fixed; top:16px; right:16px; z-index:10000;
+      border:1px solid #ffffff22; background:transparent; color:var(--text);
+      padding:10px 14px; border-radius:10px; cursor:pointer; backdrop-filter: blur(6px);
+      transition: transform .08s ease, filter .2s ease;
+    }
+    .theme-toggle:hover{ transform: translateY(-1px); filter: brightness(1.03); }
+
+    .wrap{ max-width:1500px; margin:0 auto; }
 
     h1 {
-      color: #0077cc;
+      color: var(--primary);
       font-size: 36px;
-      margin-bottom: 10px;
+      margin: 12px 0 6px;
       text-align: center;
+      text-shadow: none;
     }
-
     .status {
-      font-size: 24px;
-      color: green;
+      font-size: 22px;
+      color: #1f7a2e;
       text-align: center;
-      margin-bottom: 30px;
+      margin: 10px 0 26px;
     }
+    .dark .status{ color:#5ee397; }
 
-    .task-container {
-      background: #f3f3f3;
-      border-left: 5px solid #0078d7;
+    /* Карточка задания — как на task */
+    .task-container{
+      background: var(--card);
+      border-left: 5px solid var(--primary);
       padding: 20px 30px 10px 30px;
       margin: 0 auto 30px;
-      font-size: 18px;
-      max-width: 1600px;
-      box-sizing: border-box;
-      line-height: 1.7;
-    }
-
-    .task-container ul {
-      margin-top: 15px;
-      margin-bottom: 20px;
-    }
-
-    .task-container li {
-      margin-bottom: 10px;
-    }
-
-    .instruction {
-      font-weight: bold;
-      margin-top: 15px;
-    }
-
-    .images {
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      gap: 30px;
-      margin: 30px 0;
-    }
-
-    .images img {
-      max-width: 100%;
-      height: auto;
-      width: 38%;
-      border-radius: 6px;
-    }
-
-    .nav-button, .play-btn, .download-btn {
-      background-color: #0077cc;
-      color: white;
-      padding: 16px 32px;
-      margin: 12px;
-      border: none;
-      border-radius: 8px;
       font-size: 20px;
-      cursor: pointer;
-      text-decoration: none;
-      display: inline-block;
+      line-height: 1.7;
+      text-align: left;
+      box-sizing: border-box;
+      box-shadow: var(--shadow);
+      border-radius: 12px;
+    }
+    .task-container ul{ margin:10px 0 15px 20px; }
+    .task-container li{ margin-bottom:8px; }
+    .instruction{ font-weight:700; margin-top:10px; }
+
+    .images{
+      display:flex; justify-content:center; align-items:flex-start;
+      gap:30px; margin:30px 0;
+    }
+    .images img{
+      max-width:100%; height:auto; width:48%;
+      border-radius:12px; box-shadow: var(--shadow);
     }
 
-    .nav-button:hover, .play-btn:hover, .download-btn:hover {
-      background-color: #005fa3;
+    /* Кнопки — как на task/prepare */
+    .btn{
+      display:inline-block;
+      padding:16px 32px;
+      font-size:20px; font-weight:600;
+      color:#fff; text-decoration:none; cursor:pointer;
+      border:none; border-radius:12px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-600));
+      box-shadow: 0 10px 22px rgba(43,108,255,.3);
+      transition: transform .06s ease, filter .2s ease, box-shadow .2s ease;
+      margin: 12px;
     }
+    .btn:hover{ transform: scale(1.05); filter: brightness(1.03); }
 
-    audio {
-      margin: 20px 0;
-      width: 80%;
+    audio{
+      margin: 20px auto;
+      width: min(900px, 90%);
       display: block;
-      margin-left: auto;
-      margin-right: auto;
     }
 
-    @media (max-width: 800px) {
-      .images {
-        flex-direction: column;
-        align-items: center;
-      }
-
-      .images img {
-        width: 100%;
-      }
+    @media (max-width: 800px){
+      .images{ flex-direction: column; align-items: center; }
+      .images img{ width:100%; }
     }
   </style>
 </head>
 <body>
+  <!-- Тумблер темы -->
+  <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
 
-  <h1>Результат сохранён</h1>
-  <div class="status">✅ Вы успешно завершили задание. Вы можете прослушать или скачать запись ниже.</div>
+  <div class="wrap">
+    <h1>Результат сохранён</h1>
+    <div class="status">✅ Вы успешно завершили задание. Вы можете прослушать или скачать запись ниже.</div>
 
-  <audio id="audio" controls></audio>
-  <div style="text-align: center;">
-    <button class="play-btn" onclick="playAudio()">▶️ Прослушать</button>
-    <button class="download-btn" onclick="downloadAudio()">⬇️ Скачать запись</button>
-  </div>
+    <audio id="audio" controls></audio>
 
-  <div class="task-container">
-    <b>4 Task. Imagine that you and your friend are doing a school project “Spending holidays: in the city or in the countryside”.</b>
-    <p>You have found some photos to illustrate it but for technical reasons you cannot send them now. Leave a voice message to your friend explaining your choice of the photos and sharing some ideas about the project. In 2.5 minutes be ready to:</p>
-    <ul>
-      <li>explain the choice of the illustrations for the project by briefly describing them and noting the differences;</li>
-      <li>mention the advantages (1–2) of the two ways of spending holidays;</li>
-      <li>mention the disadvantages (1–2) of the two ways;</li>
-      <li>express your opinion on the subject of the project – which way of spending holidays presented in the pictures you would prefer and why.</li>
-    </ul>
-    <div class="instruction">
-      You will speak for not more than 3 minutes (12–15 sentences). You have to talk continuously.
+    <div style="text-align:center;">
+      <button class="btn" onclick="playAudio()">▶️ Прослушать</button>
+      <button class="btn" onclick="downloadAudio()">⬇️ Скачать запись</button>
+    </div>
+
+    <div class="task-container">
+      <b>4 Task. Imagine that you and your friend are doing a school project “Spending holidays: in the city or in the countryside”.</b>
+      <p>You have found some photos to illustrate it but for technical reasons you cannot send them now. Leave a voice message to your friend explaining your choice of the photos and sharing some ideas about the project. In 2.5 minutes be ready to:</p>
+      <ul>
+        <li>explain the choice of the illustrations for the project by briefly describing them and noting the differences;</li>
+        <li>mention the advantages (1–2) of the two ways of spending holidays;</li>
+        <li>mention the disadvantages (1–2) of the two ways;</li>
+        <li>express your opinion on the subject of the project – which way of spending holidays presented in the pictures you would prefer and why.</li>
+      </ul>
+      <div class="instruction">
+        You will speak for not more than 3 minutes (12–15 sentences). You have to talk continuously.
+      </div>
+    </div>
+
+    <div class="images">
+      <img src="photo1_city.png" alt="City holidays">
+      <img src="photo2_countryside.png" alt="Countryside holidays">
+    </div>
+
+    <div style="text-align:center;">
+      <a href="../ege4.html" class="btn">Перейти к выбору варианта</a>
+      <a href="../../../ege.html" class="btn">Перейти к выбору режима</a>
+      <a href="../../../ege_menu.html" class="btn">Перейти к выбору задания</a>
+      <a href="/oge-trainer/index.html" class="btn">Перейти на главную</a>
     </div>
   </div>
 
-  <div class="images">
-    <img src="photo1_city.png" alt="City holidays">
-    <img src="photo2_countryside.png" alt="Countryside holidays">
-  </div>
-
-  <div style="text-align: center;">
-    <a href="../ege4.html" class="nav-button">Перейти к выбору варианта</a>
-    <a href="../../../ege.html" class="nav-button">Перейти к выбору режима</a> 
-    <a href="../../../ege_menu.html" class="nav-button">Перейти к выбору задания</a>
-    <a href="/oge-trainer/index.html" class="nav-button">Перейти на главную</a>
-  </div>
-
   <script>
+    // Аудио из sessionStorage
     const audio = document.getElementById("audio");
     const base64 = sessionStorage.getItem("ege4_audio_base64");
     if (base64) {
       audio.src = base64;
     } else {
-      document.body.innerHTML += "<p style='color:red; text-align:center;'>❌ Запись не найдена.</p>";
+      document.body.insertAdjacentHTML(
+        "beforeend",
+        "<p style='color:#b30000; text-align:center; margin-top:10px;'>❌ Запись не найдена.</p>"
+      );
     }
 
     function playAudio() {
-      if (audio.src) {
-        audio.play();
-      } else {
-        alert("Запись не найдена.");
-      }
+      if (audio.src) audio.play();
+      else alert("Запись не найдена.");
     }
 
     function downloadAudio() {
-      if (!base64) {
-        alert("Запись не найдена.");
-        return;
-      }
+      if (!base64) { alert("Запись не найдена."); return; }
       const a = document.createElement("a");
       a.href = base64;
       a.download = "ege4_recording.webm";
       a.click();
     }
-  </script>
 
+    // Переключатель темы
+    (function(){
+      const btn = document.getElementById('themeBtn');
+      const key = 'pref-theme';
+      const root = document.documentElement;
+      function apply(mode){
+        root.classList.toggle('dark', mode === 'dark');
+        localStorage.setItem(key, mode);
+      }
+      apply(localStorage.getItem(key) || 'light');
+      btn.addEventListener('click', () => {
+        const curr = localStorage.getItem(key) || 'light';
+        apply(curr === 'dark' ? 'light' : 'dark');
+      });
+    })();
+  </script>
 </body>
 </html>

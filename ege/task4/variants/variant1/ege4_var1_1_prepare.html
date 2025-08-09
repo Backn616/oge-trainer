@@ -2,144 +2,198 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Task 4 — Preparation</title>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <!-- Анти-мигание темы -->
+  <script>
+    (function () {
+      try {
+        const saved = localStorage.getItem('pref-theme') || 'light';
+        if (saved === 'dark') document.documentElement.classList.add('dark');
+      } catch (_) {}
+    })();
+  </script>
+
   <style>
-    body {
-      font-family: 'Roboto', sans-serif;
-      margin: 0;
-      padding: 40px 30px 80px;
-      background: #fff;
+    /* Светлая тема по умолчанию */
+    :root{
+      --bg:#f7f9ff;
+      --card:#ffffff;
+      --text:#0b1020;
+      --muted:#5a6475;
+      --primary:#2b6cff;
+      --primary-600:#1f58d9;
+      --ring:#bfd3ff;
+      --success:#25c26e;
+      --shadow: 0 10px 25px rgba(17,24,39,.08);
+
+      --btn-1: var(--primary);
+      --btn-2: var(--primary-600);
+      --btn-text:#ffffff;
+      --radius-xl:20px;
+    }
+    /* Тёмная тема */
+    .dark{
+      --bg:#0b1020;
+      --card:rgba(255,255,255,.08);
+      --text:#eaf0ff;
+      --muted:#b9c2d3;
+      --primary:#6aa3ff;
+      --primary-600:#4b8dff;
+      --ring:#a9c6ff;
+      --success:#5ee397;
+      --shadow: 0 10px 35px rgba(0,0,0,.35);
     }
 
-    .task-container {
-      background: #f3f3f3;
-      border-left: 5px solid #0078d7;
-      padding: 20px 30px 10px 30px;
-      margin-bottom: 30px;
-      font-size: 18px;
-      box-sizing: border-box;
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:Inter, system-ui, Segoe UI, Roboto, Arial, sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(1200px 600px at 70% -10%, #29417a40, transparent),
+        radial-gradient(900px 500px at -10% 10%, #344b9340, transparent),
+        var(--bg);
+      padding-bottom:48px; /* место под фиксированный прогресс-бар */
+    }
+    .wrap{max-width:1040px; margin:0 auto; padding:24px}
+
+    header{display:flex; justify-content:space-between; align-items:center; gap:16px; padding:8px 0;}
+    .brand{display:flex; align-items:center; gap:12px; text-decoration:none; color:inherit}
+    .logo{
+      width:42px; height:42px; border-radius:12px;
+      background: linear-gradient(135deg, var(--primary), #9bd0ff);
+      box-shadow: 0 6px 18px rgba(0,0,0,.25), inset 0 0 12px #ffffff33;
+      display:grid; place-items:center; color:#001133; font-weight:800;
+    }
+    .brand-title{font-weight:700}
+    .badge{font-size:12px; color:var(--muted)}
+    .theme-toggle{
+      border:1px solid #ffffff22; background:transparent; color:var(--text);
+      padding:10px 14px; border-radius:10px; cursor:pointer; transition:transform .08s ease;
+    }
+    .theme-toggle:active{transform:scale(.98)}
+
+    main{padding:24px 0 8px}
+    .card{
+      background:var(--card);
+      border:1px solid #ffffff1f;
+      border-radius: var(--radius-xl);
+      padding:24px;
+      box-shadow:var(--shadow);
+      backdrop-filter: blur(10px);
     }
 
-    .task-container ul {
-      margin-top: 15px;
-      margin-bottom: 20px;
+    /* Блок с заданием: текст оставлен как есть */
+    .task-container{
+      background:transparent; /* карточка уже есть */
+      border-left:5px solid var(--primary);
+      padding: 0 0 0 18px;
+      margin:0;
+      font-size:18px;
+    }
+    .task-container ul{margin:15px 0 20px 20px}
+    .task-container li{margin-bottom:10px}
+    .task-container .instruction{font-weight:700; margin-top:15px}
+
+    /* Изображения: 2 колонки на ПК, 1 колонка на мобиле */
+    .images{
+      display:grid;
+      grid-template-columns: repeat(2, minmax(0,1fr)); /* приоритет ПК */
+      gap:24px;
+      margin-top:20px;
+    }
+    .images img{
+      width:100%;
+      height:auto;
+      border-radius:12px;
+      display:block;
+    }
+    @media (max-width:800px){
+      .images{grid-template-columns:1fr}
     }
 
-    .task-container li {
-      margin-bottom: 10px;
+    /* Кнопка перехода */
+    .actions{display:flex; justify-content:center; margin-top:22px}
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center; gap:10px;
+      font-weight:700; font-size:18px;
+      padding:16px 24px;
+      border-radius:12px; border:1px solid transparent; cursor:pointer;
+      background: linear-gradient(135deg, var(--btn-1), var(--btn-2));
+      color: var(--btn-text);
+      box-shadow: 0 12px 24px rgba(75,141,255,.28);
+      text-decoration:none;
+      transition: transform .06s ease, filter .2s ease;
     }
+    .btn:hover{ transform: translateY(-2px); filter: brightness(1.03) }
+    .btn:focus-visible{ outline:none; box-shadow:0 0 0 4px var(--ring) }
 
-    .task-container .instruction {
-      font-weight: bold;
-      margin-top: 15px;
+    /* Фиксированный прогресс-бар внизу */
+    #progressContainerFixed{
+      position:fixed; left:0; right:0; bottom:0; height:36px; z-index:9999;
+      background: #ffffff33; /* легкий фон поверхности */
+      backdrop-filter: blur(6px);
     }
-
-    .images {
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      gap: 30px;
-      margin-bottom: 30px;
+    #progressBarFixed{
+      height:100%; width:0%;
+      background: linear-gradient(90deg, var(--primary), var(--primary-600));
+      position:relative; transition: width .5s linear;
     }
-
-    .images img {
-      max-width: 100%;
-      height: auto;
-      width: 38%; /* вернули старый размер */
-      border-radius: 6px;
-    }
-
-    .speak-now {
-      text-align: center;
-      font-weight: bold;
-      font-size: 18px;
-      color: green;
-    }
-
-    .button {
-      font-size: 20px;
-      padding: 16px 32px;
-      background-color: #0077cc;
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-
-    .button:hover {
-      background-color: #005fa3;
-    }
-
-    /* Новый прогресс-бар снизу */
-    #progressContainerFixed {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      height: 32px;
-      background: #eee;
-      z-index: 9999;
-    }
-
-    #progressBarFixed {
-      height: 100%;
-      width: 0%;
-      background: linear-gradient(to right, #0066ff, #00cfff);
-      position: relative;
-      transition: width 0.5s linear;
-    }
-
-    .progress-time {
-      position: absolute;
-      right: 14px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: white;
-      font-weight: bold;
-      font-size: 20px;
-      font-family: 'Roboto', sans-serif;
-      user-select: none;
-    }
-
-    @media (max-width: 800px) {
-      .images {
-        flex-direction: column;
-        align-items: center;
-      }
-
-      .images img {
-        width: 100%;
-      }
+    .progress-time{
+      position:absolute; right:14px; top:50%; transform:translateY(-50%);
+      color:#fff; font-weight:700; font-size:18px; user-select:none;
+      text-shadow:0 1px 2px rgba(0,0,0,.35);
     }
   </style>
 </head>
 <body>
+  <div class="wrap">
+    <header>
+      <a class="brand" href="#" onclick="goBack(event)" aria-label="Назад">
+        <div class="logo">A</div>
+        <div>
+          <div class="brand-title">Онлайн-тренажёр «Говорение»</div>
+          <div class="badge">ЕГЭ · task 4 · preparation</div>
+        </div>
+      </a>
+      <button class="theme-toggle" id="themeBtn" aria-label="Переключить тему">🌓 Тема</button>
+    </header>
 
-  <div class="task-container">
-    <b>4 Task. Imagine that you and your friend are doing a school project “Spending holidays: in the city or in the countryside”.</b>
-    <p>You have found some photos to illustrate it but for technical reasons you cannot send them now. Leave a voice message to your friend explaining your choice of the photos and sharing some ideas about the project. In 2.5 minutes be ready to:</p>
-    <ul>
-      <li>explain the choice of the illustrations for the project by briefly describing them and noting the differences;</li>
-      <li>mention the advantages (1–2) of the two ways of spending holidays;</li>
-      <li>mention the disadvantages (1–2) of the two ways;</li>
-      <li>express your opinion on the subject of the project – which way of spending holidays presented in the pictures you would prefer and why.</li>
-    </ul>
-    <div class="instruction">
-      You will speak for not more than 3 minutes (12–15 sentences). You have to talk continuously.
-    </div>
+    <main>
+      <section class="card">
+        <!-- СОДЕРЖАНИЕ ОСТАВЛЕНО БЕЗ ИЗМЕНЕНИЙ -->
+        <div class="task-container">
+          <b>4 Task. Imagine that you and your friend are doing a school project “Spending holidays: in the city or in the countryside”.</b>
+          <p>You have found some photos to illustrate it but for technical reasons you cannot send them now. Leave a voice message to your friend explaining your choice of the photos and sharing some ideas about the project. In 2.5 minutes be ready to:</p>
+          <ul>
+            <li>explain the choice of the illustrations for the project by briefly describing them and noting the differences;</li>
+            <li>mention the advantages (1–2) of the two ways of spending holidays;</li>
+            <li>mention the disadvantages (1–2) of the two ways;</li>
+            <li>express your opinion on the subject of the project – which way of spending holidays presented in the pictures you would prefer and why.</li>
+          </ul>
+          <div class="instruction">
+            You will speak for not more than 3 minutes (12–15 sentences). You have to talk continuously.
+          </div>
+        </div>
+
+        <div class="images">
+          <img src="photo1_city.png" alt="City holidays">
+          <img src="photo2_countryside.png" alt="Countryside holidays">
+        </div>
+
+        <div class="actions">
+          <a class="btn" href="ege4_var1_2_mic.html">Перейти к выполнению</a>
+        </div>
+      </section>
+    </main>
   </div>
 
-  <div class="images">
-    <img src="photo1_city.png" alt="City holidays">
-    <img src="photo2_countryside.png" alt="Countryside holidays">
-  </div>
-
-  <div style="text-align: center; margin-bottom: 30px;">
-    <button class="button" onclick="window.location.href='ege4_var1_2_mic.html'">Перейти к выполнению</button>
-  </div>
-
-  <!-- Новый фиксированный прогресс-бар -->
+  <!-- Фиксированный прогресс-бар -->
   <div id="progressContainerFixed">
     <div id="progressBarFixed">
       <span id="progressTime" class="progress-time">02:30</span>
@@ -147,33 +201,57 @@
   </div>
 
   <script>
-    const progressBar = document.getElementById("progressBarFixed");
-    const progressTime = document.getElementById("progressTime");
-
-    const totalTime = 150000; // 2.5 минуты
-    const endTime = Date.now() + totalTime;
-
-    function updateTimer() {
-      const now = Date.now();
-      const timeLeft = Math.max(0, endTime - now);
-
-      const minutes = String(Math.floor(timeLeft / 60000)).padStart(2, '0');
-      const seconds = String(Math.floor((timeLeft % 60000) / 1000)).padStart(2, '0');
-      const formatted = `${minutes}:${seconds}`;
-
-      progressTime.textContent = formatted;
-      const progressPercent = (timeLeft / totalTime) * 100;
-      progressBar.style.width = `${progressPercent}%`;
-
-      if (timeLeft <= 0) {
-        clearInterval(timerInterval);
-        window.location.href = "ege4_var1_2_mic.html";
+    // Переключатель темы
+    (function(){
+      const btn = document.getElementById('themeBtn');
+      const key = 'pref-theme';
+      const root = document.documentElement;
+      function apply(mode){
+        root.classList.toggle('dark', mode === 'dark');
+        localStorage.setItem(key, mode);
       }
+      apply(localStorage.getItem(key) || 'light');
+      btn.addEventListener('click', () => {
+        const curr = localStorage.getItem(key) || 'light';
+        apply(curr === 'dark' ? 'light' : 'dark');
+      });
+    })();
+
+    // Таймер 2:30 и автопереход
+    (function(){
+      const progressBar = document.getElementById("progressBarFixed");
+      const progressTime = document.getElementById("progressTime");
+      const totalTime = 150000; // 2.5 минуты
+      const endTime = Date.now() + totalTime;
+
+      function updateTimer() {
+        const now = Date.now();
+        const timeLeft = Math.max(0, endTime - now);
+
+        const minutes = String(Math.floor(timeLeft / 60000)).padStart(2, '0');
+        const seconds = String(Math.floor((timeLeft % 60000) / 1000)).padStart(2, '0');
+        progressTime.textContent = `${minutes}:${seconds}`;
+
+        const progressPercent = (timeLeft / totalTime) * 100;
+        progressBar.style.width = `${progressPercent}%`;
+
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          window.location.href = "ege4_var1_2_mic.html";
+        }
+      }
+      updateTimer();
+      const timerInterval = setInterval(updateTimer, 500);
+    })();
+
+    // Назад (к меню задания 4) — аккуратно от /.../ege/
+    function goBack(e){
+      e.preventDefault();
+      const parts = location.pathname.split('/');
+      const i = parts.indexOf('ege');
+      const base = i !== -1 ? parts.slice(0, i + 1).join('/') + '/' : '/ege/';
+      window.location.assign(base + 'ege_menu.html');
     }
-
-    updateTimer();
-    const timerInterval = setInterval(updateTimer, 500);
   </script>
-
 </body>
 </html>

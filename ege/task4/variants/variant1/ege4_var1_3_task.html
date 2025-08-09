@@ -4,150 +4,173 @@
   <meta charset="UTF-8" />
   <title>Task 4 — Variant 1</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+
+  <!-- Анти-мигание темы -->
+  <script>
+    (function(){
+      try{
+        const saved = localStorage.getItem('pref-theme') || 'light';
+        if(saved === 'dark') document.documentElement.classList.add('dark');
+      }catch(_){}
+    })();
+  </script>
+
   <style>
+    /* Светлая тема */
+    :root {
+      --bg: #f7f9ff;
+      --card: #ffffff;
+      --text: #0b1020;
+      --muted: #5a6475;
+      --primary: #2b6cff;
+      --primary-600: #1f58d9;
+      --ring: #bfd3ff;
+      --success: #25c26e;
+      --danger: #b30000;
+      --shadow: 0 10px 25px rgba(17,24,39,.08);
+    }
+    /* Тёмная тема */
+    .dark {
+      --bg: #0b1020;
+      --card: rgba(255,255,255,0.08);
+      --text: #eaf0ff;
+      --muted: #a0aabd;
+      --primary: #6aa3ff;
+      --primary-600: #4b8dff;
+      --ring: #3b4b66;
+      --success: #25c26e;
+      --danger: #ff6b6b;
+      --shadow: 0 10px 35px rgba(0,0,0,.35);
+    }
+
     body {
       font-family: 'Roboto', sans-serif;
-      margin: 0;
-      padding: 30px 30px 80px;
-      background: #fff;
+      margin:0;
+      padding: 40px 30px 80px;
+      color: var(--text);
+      background: radial-gradient(1200px 600px at 70% -10%, #29417a40, transparent),
+                  radial-gradient(900px 500px at -10% 10%, #344b9340, transparent),
+                  var(--bg);
       text-align: center;
     }
 
+    /* Кнопка переключения темы */
+    .theme-toggle {
+      position: fixed; top:16px; right:16px; z-index:10000;
+      border:1px solid #ffffff22; background:transparent; color:var(--text);
+      padding:10px 14px; border-radius:10px; cursor:pointer; backdrop-filter: blur(6px);
+      transition: transform .08s ease, filter .2s ease;
+    }
+    .theme-toggle:hover { transform: translateY(-1px); filter: brightness(1.03); }
+
+    .wrap { max-width:1500px; margin:0 auto; }
+
     .task-container {
-      background: #f3f3f3;
-      border-left: 5px solid #0078d7;
+      background: var(--card);
+      border-left: 5px solid var(--primary);
       padding: 20px 30px 10px 30px;
-      margin-bottom: 15px;
+      margin: 0 auto 20px;
       font-size: 20px;
-      max-width: 100%;
-      box-sizing: border-box;
-      text-align: left;
-      display: none;
       line-height: 1.7;
+      text-align: left;
+      box-sizing: border-box;
+      box-shadow: var(--shadow);
+      border-radius: 12px;
+      display: none;
     }
-
-    .task-container ul {
-      margin-top: 10px;
-      margin-bottom: 15px;
-    }
-
-    .task-container li {
-      margin-bottom: 8px;
-    }
-
-    .instruction {
-      font-weight: bold;
-      margin-top: 10px;
-    }
+    .task-container ul { margin:10px 0 15px 20px; }
+    .task-container li { margin-bottom:8px; }
+    .instruction { font-weight:700; margin-top:10px; }
 
     .timer {
       font-size: 56px;
-      color: #b30000;
+      color: var(--danger);
       margin: 30px 0;
-      font-weight: bold;
+      font-weight: 700;
     }
 
     .images {
-      display: flex;
+      display: none;
       justify-content: center;
       align-items: flex-start;
       gap: 30px;
       margin-bottom: 20px;
-      display: none;
     }
-
     .images img {
-      max-width: 100%;
-      height: auto;
-      width: 38%;
-      border-radius: 6px;
+      max-width:100%;
+      height:auto;
+      width:48%;
+      border-radius:12px;
+      box-shadow: var(--shadow);
     }
 
     .end-button {
-      display: none;
+      display:none;
       margin: 20px auto 0;
       padding: 16px 32px;
       font-size: 20px;
-      background-color: #0077cc;
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
+      font-weight:600;
+      background: linear-gradient(135deg, var(--primary), var(--primary-600));
+      color:#fff;
+      border:none;
+      border-radius:12px;
+      cursor:pointer;
+      box-shadow: 0 10px 22px rgba(43,108,255,.3);
+      transition: transform .06s ease, box-shadow .2s ease;
     }
+    .end-button:hover { transform: scale(1.05); }
 
-    .end-button:hover {
-      background-color: #005fa3;
-    }
-
-    /* 🟦 Фиксированный прогресс-бар с таймером внутри */
     #progressContainerFixed {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      height: 32px;
-      background: #eee;
-      z-index: 9999;
-      display: none; /* <--- Показываем только после старта задания */
+      position: fixed; bottom:0; left:0; width:100%; height:32px;
+      background:#eee; z-index:9999; display:none;
     }
+    .dark #progressContainerFixed { background: #222; }
 
     #progressBarFixed {
-      height: 100%;
-      width: 0%;
+      height:100%; width:0%;
       background: linear-gradient(to right, #0066ff, #00cfff);
-      position: relative;
-      transition: width 0.5s linear;
+      position:relative; transition: width .5s linear;
     }
-
     .progress-time {
-      position: absolute;
-      right: 14px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: white;
-      font-weight: bold;
-      font-size: 20px;
-      font-family: 'Roboto', sans-serif;
-      user-select: none;
+      position:absolute; right:14px; top:50%; transform:translateY(-50%);
+      color:#fff; font-weight:700; font-size:20px; user-select:none;
     }
 
-    @media (max-width: 800px) {
-      .images {
-        flex-direction: column;
-        align-items: center;
-      }
-
-      .images img {
-        width: 100%;
-      }
+    @media (max-width: 800px){
+      .images{ flex-direction: column; align-items: center; }
+      .images img{ width:100%; }
     }
   </style>
 </head>
 <body>
+  <!-- Кнопка темы -->
+  <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
 
-  <div class="task-container" id="taskContainer">
-    <b>4 Task. Imagine that you and your friend are doing a school project “Spending holidays: in the city or in the countryside”.</b> You have found some photos to illustrate it but for technical reasons you cannot send them now. Leave a voice message to your friend explaining your choice of the photos and sharing some ideas about the project. In 3 minutes be ready to:
-    <ul>
-      <li>explain the choice of the illustrations for the project by briefly describing them and noting the differences;</li>
-      <li>mention the advantages (1–2) of the two ways of spending holidays;</li>
-      <li>mention the disadvantages (1–2) of the two ways;</li>
-      <li>express your opinion on the subject of the project – which way of spending holidays presented in the pictures you would prefer and why.</li>
-    </ul>
-    <div class="instruction">
-      You will speak for not more than 3 minutes (12–15 sentences). You have to talk continuously.
+  <div class="wrap">
+    <div class="task-container" id="taskContainer">
+      <b>4 Task. Imagine that you and your friend are doing a school project “Spending holidays: in the city or in the countryside”.</b>
+      You have found some photos to illustrate it but for technical reasons you cannot send them now. Leave a voice message to your friend explaining your choice of the photos and sharing some ideas about the project. In 3 minutes be ready to:
+      <ul>
+        <li>explain the choice of the illustrations for the project by briefly describing them and noting the differences;</li>
+        <li>mention the advantages (1–2) of the two ways of spending holidays;</li>
+        <li>mention the disadvantages (1–2) of the two ways;</li>
+        <li>express your opinion on the subject of the project – which way of spending holidays presented in the pictures you would prefer and why.</li>
+      </ul>
+      <div class="instruction">
+        You will speak for not more than 3 minutes (12–15 sentences). You have to talk continuously.
+      </div>
     </div>
+
+    <div class="timer" id="timer">3</div>
+
+    <div class="images" id="imageContainer">
+      <img src="photo1_city.png" alt="City holidays">
+      <img src="photo2_countryside.png" alt="Countryside holidays">
+    </div>
+
+    <button class="end-button" id="endBtn" onclick="endManually()">✅ Закончить</button>
   </div>
 
-  <div class="timer" id="timer">3</div>
-
-  <div class="images" id="imageContainer">
-    <img src="photo1_city.png" alt="City holidays">
-    <img src="photo2_countryside.png" alt="Countryside holidays">
-  </div>
-
-  <button class="end-button" id="endBtn" onclick="endManually()">✅ Закончить</button>
-
-  <!-- ⬇️ Прогресс-бар с цифрами внутри -->
   <div id="progressContainerFixed">
     <div id="progressBarFixed">
       <span id="progressTime" class="progress-time">03:00</span>
@@ -155,6 +178,22 @@
   </div>
 
   <script>
+    // Переключение темы
+    (function(){
+      const btn = document.getElementById('themeBtn');
+      const key = 'pref-theme';
+      const root = document.documentElement;
+      function apply(mode){
+        root.classList.toggle('dark', mode === 'dark');
+        localStorage.setItem(key, mode);
+      }
+      apply(localStorage.getItem(key) || 'light');
+      btn.addEventListener('click', () => {
+        const curr = localStorage.getItem(key) || 'light';
+        apply(curr === 'dark' ? 'light' : 'dark');
+      });
+    })();
+
     const timerEl = document.getElementById("timer");
     const progressBarFixed = document.getElementById("progressBarFixed");
     const progressTime = document.getElementById("progressTime");
@@ -167,7 +206,6 @@
     let totalTime = 180;
     let startTime;
     let interval;
-
     let mediaRecorder = null;
     let audioChunks = [];
     let hasStopped = false;
@@ -176,7 +214,6 @@
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
         mediaRecorder = new MediaRecorder(stream);
-
         mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
         mediaRecorder.onstop = () => {
           if (hasStopped) return;
@@ -189,7 +226,6 @@
           };
           reader.readAsDataURL(audioBlob);
         };
-
         startCountdown();
       } catch (err) {
         alert("❌ Не удалось получить доступ к микрофону: " + err.message);
@@ -209,14 +245,13 @@
     }
 
     function startTask() {
-      // Показываем элементы задания
       timerEl.style.display = "none";
       progressContainerFixed.style.display = "block";
-
-      progressTime.textContent = formatTime(totalTime);
       imageContainer.style.display = "flex";
       taskContainer.style.display = "block";
       endBtn.style.display = "inline-block";
+
+      progressTime.textContent = formatTime(totalTime);
       startTime = Date.now();
       audioChunks = [];
       if (mediaRecorder) mediaRecorder.start();
@@ -226,7 +261,6 @@
         const timeLeft = totalTime - timeElapsed;
         progressTime.textContent = formatTime(timeLeft);
         progressBarFixed.style.width = `${(timeLeft / totalTime) * 100}%`;
-
         if (timeLeft <= 0) {
           clearInterval(interval);
           if (mediaRecorder && mediaRecorder.state === "recording") {

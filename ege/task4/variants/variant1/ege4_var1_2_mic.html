@@ -4,53 +4,69 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Предупреждение</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background-color: #fffdf4;
+      font-family: 'Inter', system-ui, sans-serif;
       margin: 0;
-      padding: 40px;
-      text-align: center;
+      padding: 40px 20px;
+      background: radial-gradient(1200px 600px at 70% -10%, #29417a40, transparent),
+                  radial-gradient(900px 500px at -10% 10%, #344b9340, transparent),
+                  #f7f9ff;
+      color: #0b1020;
       display: flex;
-      flex-direction: column;
       justify-content: center;
       align-items: center;
-      height: 100vh;
+      min-height: 100vh;
+    }
+    .card {
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 40px;
+      max-width: 800px;
+      width: 100%;
+      box-shadow: 0 10px 25px rgba(17, 24, 39, 0.08);
+      text-align: center;
     }
     h1 {
-      font-size: 28px;
+      font-size: 32px;
       color: #b30000;
       margin-bottom: 20px;
     }
     p {
       font-size: 20px;
-      max-width: 700px;
       line-height: 1.6;
+      margin-bottom: 40px;
     }
     .button {
-      margin-top: 40px;
-      background-color: #0077cc;
+      display: inline-block;
+      padding: 16px 32px;
+      font-size: 20px;
+      font-weight: 600;
       color: white;
-      padding: 15px 30px;
-      font-size: 18px;
+      background: linear-gradient(135deg, #2b6cff, #1f58d9);
       border: none;
-      border-radius: 8px;
+      border-radius: 12px;
       cursor: pointer;
       text-decoration: none;
+      box-shadow: 0 10px 22px rgba(43, 108, 255, 0.3);
+      transition: transform 0.06s ease, box-shadow 0.2s ease;
     }
     .button:hover {
-      background-color: #005fa3;
+      transform: scale(1.05);
     }
   </style>
 </head>
 <body>
-  <h1>Внимание</h1>
-  <p>
-    На следующем этапе тренажёр попытается получить доступ к микрофону.<br><br>
-    У вас появится запрос на использование микрофона браузером.<br><br>
-    Если вы готовы выполнить устную часть задания 4, пожалуйста,<br>
-    <strong>разрешите сайту использовать микрофон</strong>, чтобы начать запись ответа.
-  </p>
-  <a href="ege4_var1_3_task.html" class="button">ОК</a>
+  <div class="card">
+    <h1>Внимание</h1>
+    <p>
+      На следующем этапе тренажёр попытается получить доступ к микрофону.<br><br>
+      У вас появится запрос на использование микрофона браузером.<br><br>
+      Если вы готовы выполнить устную часть задания 4, пожалуйста,<br>
+      <strong>разрешите сайту использовать микрофон</strong>, чтобы начать запись ответа.
+    </p>
+    <a href="ege4_var1_3_task.html" class="button">ОК</a>
+  </div>
 </body>
 </html>

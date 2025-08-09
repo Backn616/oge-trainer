@@ -1,68 +1,135 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Результат — Вариант 1</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <script>
+    (function () {
+      try {
+        const saved = localStorage.getItem('pref-theme') || 'light';
+        if (saved === 'dark') document.documentElement.classList.add('dark');
+      } catch (_) {}
+    })();
+  </script>
+
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f7f7f7;
-      margin: 0;
-      padding: 30px;
-      text-align: center;
+    :root {
+      --bg: #f7f9ff;
+      --text: #0b1020;
+      --card: #ffffff;
+      --primary: #2b6cff;
+      --primary-600: #1f58d9;
+      --shadow: 0 10px 25px rgba(17,24,39,.08);
+      --panel-bg: #f9f9f9;
+      --panel-border: #0077cc;
     }
+    .dark {
+      --bg: #0b1020;
+      --text: #eaf0ff;
+      --card: rgba(255,255,255,.08);
+      --primary: #6aa3ff;
+      --primary-600: #4b8dff;
+      --shadow: 0 10px 35px rgba(0,0,0,.35);
+      --panel-bg: rgba(255,255,255,.08);
+      --panel-border: #4b8dff;
+    }
+
+    body {
+      font-family: Inter, sans-serif;
+      margin: 0;
+      padding: 40px 20px 80px;
+      color: var(--text);
+      text-align: center;
+      background:
+        radial-gradient(1200px 600px at 70% -10%, #29417a40, transparent),
+        radial-gradient(900px 500px at -10% 10%, #344b9340, transparent),
+        var(--bg);
+    }
+
+    .theme-toggle {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      z-index: 1000;
+      border: 1px solid #ffffff22;
+      background: transparent;
+      color: var(--text);
+      padding: 10px 14px;
+      border-radius: 10px;
+      cursor: pointer;
+      backdrop-filter: blur(6px);
+      transition: transform .08s ease, filter .2s ease;
+    }
+    .theme-toggle:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.03);
+    }
+
     h1 {
-      color: #0077cc;
       font-size: 36px;
       margin-bottom: 10px;
+      color: var(--primary);
     }
     .status {
       font-size: 24px;
       color: green;
       margin-bottom: 30px;
     }
+
     .reading-box {
-      background-color: #ffffff;
+      background-color: var(--card);
       padding: 40px;
       margin: 0 auto 40px;
       max-width: 1600px;
       width: 95%;
-      border: 1px solid #ccc;
+      border: 2px solid var(--panel-border);
       border-radius: 12px;
       font-size: 30px;
       text-align: left;
       line-height: 1.9;
+      box-shadow: var(--shadow);
     }
-    .nav-button, .play-btn, .download-btn {
-      background-color: #0077cc;
-      color: white;
-      padding: 16px 32px;
-      margin: 12px;
-      border: none;
-      border-radius: 8px;
-      font-size: 20px;
-      cursor: pointer;
-      text-decoration: none;
-      display: inline-block;
-    }
-    .nav-button:hover, .play-btn:hover, .download-btn:hover {
-      background-color: #005fa3;
-    }
+
     audio {
       margin: 20px 0;
       width: 80%;
     }
+
+    .btn {
+      font-size: 20px;
+      padding: 16px 32px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-600));
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: 0 10px 22px rgba(43,108,255,.28);
+      transition: transform .06s ease, filter .2s ease;
+      margin: 8px;
+      display: inline-block;
+      text-decoration: none;
+    }
+    .btn:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.03);
+    }
   </style>
 </head>
 <body>
+
+  <button id="themeBtn" class="theme-toggle">🌓 Тема</button>
+
   <h1>Результат сохранён</h1>
   <div class="status">✅ Вы успешно завершили задание. Вы можете прослушать или скачать запись ниже.</div>
 
   <audio id="audio" controls></audio>
   <br>
-  <button class="play-btn" onclick="playAudio()">▶️ Прослушать</button>
-  <button class="download-btn" onclick="downloadAudio()">⬇️ Скачать запись</button>
+  <button class="btn" onclick="playAudio()">▶️ Прослушать</button>
+  <button class="btn" onclick="downloadAudio()">⬇️ Скачать запись</button>
 
   <div class="reading-box">
     Bioluminescence is the ability of certain living organisms to produce light. 
@@ -73,12 +140,28 @@
     Special proteins from glowing jellyfish are already used in genetic research. Bioluminescence is not only beautiful — it is a powerful tool of survival and discovery.
   </div>
 
-  <a href="../ege1.html" class="nav-button">Перейти к выбору варианта</a>
-  <a href="../../../ege.html" class="nav-button">Перейти к выбору задания</a>
-  <a href="../../../ege_menu.html" class="nav-button">Перейти к выбору режима</a>
-  <a href="/oge-trainer/index.html" class="nav-button">Перейти на главную</a>
+  <a href="../ege1.html" class="btn">Перейти к выбору варианта</a>
+  <a href="../../../ege.html" class="btn">Перейти к выбору задания</a>
+  <a href="../../../ege_menu.html" class="btn">Перейти к выбору режима</a>
+  <a href="/oge-trainer/index.html" class="btn">Перейти на главную</a>
 
   <script>
+    // Тема
+    (function(){
+      const btn = document.getElementById('themeBtn');
+      const key = 'pref-theme';
+      const root = document.documentElement;
+      function apply(mode){
+        root.classList.toggle('dark', mode === 'dark');
+        localStorage.setItem(key, mode);
+      }
+      apply(localStorage.getItem(key) || 'light');
+      btn.addEventListener('click', () => {
+        const curr = localStorage.getItem(key) || 'light';
+        apply(curr === 'dark' ? 'light' : 'dark');
+      });
+    })();
+
     const audio = document.getElementById("audio");
     const base64 = sessionStorage.getItem("ege1_audio_base64");
     if (base64) {

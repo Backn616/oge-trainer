@@ -1,48 +1,186 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>ЕГЭ — Выбор задания</title>
+  <meta name="description" content="Меню тренажёра устной части ЕГЭ по английскому: задания 1–4, таймер, запись голоса." />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f0f0f0;
-      margin: 0;
-      padding: 0;
-      text-align: center;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
+    :root{
+      --bg: #0b1020;
+      --card: rgba(255,255,255,0.08);
+      --text: #eaf0ff;
+      --muted:#b9c2d3;
+      --primary:#6aa3ff;
+      --primary-600:#4b8dff;
+      --ring:#a9c6ff;
+      --success:#5ee397;
+      --shadow: 0 10px 35px rgba(0,0,0,.35);
+
+      /* Кнопки: синий, светлее главной */
+      --btn-1:#aecdff;
+      --btn-2:#86b8ff;
+      --btn-text:#ffffff;
+
+      /* Базовые размеры кнопок (до масштабирования) */
+      --btn-fs: 20px;
+      --btn-pad-y: 18px;
+      --btn-pad-x: 26px;
+      --btn-minh: 56px;
+      --btn-radius: 14px;
+      --grid-gap: 24px;
+
+      /* Масштаб по умолчанию */
+      --btn-scale: 1;
     }
-    h1 {
-      font-size: 28px;
-      margin-bottom: 20px;
+    @media (prefers-color-scheme: light){
+      :root{
+        --bg:#f7f9ff; --card:#ffffff; --text:#0b1020; --muted:#5a6475;
+        --primary:#2b6cff; --primary-600:#1f58d9; --ring:#bfd3ff; --success:#25c26e;
+        --shadow: 0 10px 25px rgba(17,24,39,.08);
+
+        --btn-1:#6d95ff; --btn-2:#4f7dff; --btn-text:#ffffff;
+      }
     }
-    .button {
-      background-color: #0077cc;
-      color: white;
-      padding: 15px 30px;
-      margin: 10px;
-      font-size: 18px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      text-decoration: none;
-      display: inline-block;
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:Inter, system-ui, Segoe UI, Roboto, Arial, sans-serif;
+      color:var(--text);
+      background: radial-gradient(1200px 600px at 70% -10%, #29417a40, transparent),
+                  radial-gradient(900px 500px at -10% 10%, #344b9340, transparent),
+                  var(--bg);
     }
-    .button:hover {
-      background-color: #005fa3;
+    a{color:inherit; text-decoration:none}
+    .wrap{max-width:1040px; margin:0 auto; padding:24px}
+    header{display:flex; justify-content:space-between; align-items:center; gap:16px; padding:8px 0;}
+    .brand{display:flex; align-items:center; gap:12px}
+    .logo{
+      width:42px; height:42px; border-radius:12px;
+      background: linear-gradient(135deg, var(--primary), #9bd0ff);
+      box-shadow: 0 6px 18px rgba(0,0,0,.25), inset 0 0 12px #ffffff33;
+      display:grid; place-items:center; color:#001133; font-weight:800;
     }
+    .brand-title{font-weight:700; letter-spacing:.2px}
+    .badge{font-size:12px; color:var(--muted)}
+    .theme-toggle{
+      border:1px solid #ffffff22; background:transparent; color:var(--text);
+      padding:10px 14px; border-radius:10px; cursor:pointer;
+      transition: transform .08s ease;
+    }
+    .theme-toggle:active{transform: scale(.98)}
+
+    main{padding:40px 0 24px}
+    .card{
+      background:var(--card); border:1px solid #ffffff1f; border-radius:20px; padding:32px; box-shadow:var(--shadow);
+      backdrop-filter: blur(10px);
+    }
+    .h1{font-size: clamp(26px, 5vw, 36px); line-height:1.15; margin:0 0 10px;}
+    .sub{color:var(--muted); font-size:16px; margin:0 0 18px}
+
+    /* Рамочка вокруг кнопок + масштаб */
+    .button-frame{
+      --btn-scale: 1.3;                 /* десктоп/таб */
+      border: 1px solid #ffffff22;      /* мягче */
+      border-radius: 18px;
+      padding: calc(16px * var(--btn-scale));
+      background: #ffffff06;            /* менее «коробочно» */
+      backdrop-filter: blur(6px);
+      margin-top: 10px;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(2, minmax(260px,1fr));
+      gap: calc(var(--grid-gap) * var(--btn-scale));
+    }
+
+    @media (max-width:700px){
+      .grid{grid-template-columns:1fr}
+      .button-frame{ --btn-scale: 1.2; } /* авто-уменьшение на мобиле */
+    }
+
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center; gap:10px;
+      font-size: calc(var(--btn-fs) * var(--btn-scale));
+      font-weight:600;
+      padding: calc(var(--btn-pad-y) * var(--btn-scale)) calc(var(--btn-pad-x) * var(--btn-scale));
+      min-height: calc(var(--btn-minh) * var(--btn-scale));
+      border-radius: calc(var(--btn-radius) * var(--btn-scale));
+      border:1px solid rgba(255,255,255,.18);
+      outline:none;
+      background: linear-gradient(135deg, var(--btn-1), var(--btn-2));
+      color:var(--btn-text);
+      text-shadow: 0 1px 0 rgba(0,0,0,.15);
+      box-shadow: 0 12px 24px rgba(75, 141, 255, .28);
+      transition: transform .06s ease, box-shadow .2s ease, filter .2s ease;
+    }
+    .btn:hover{transform: translateY(-2px); filter: brightness(1.03)}
+    .btn:active{transform: translateY(0)}
+    .btn:focus-visible{box-shadow:0 0 0 4px var(--ring)}
+
+    footer{padding:24px 0 10px; color:var(--muted); font-size:13px; text-align:center}
+    .back{border:1px dashed #ffffff28; padding:10px 14px; border-radius:10px}
   </style>
 </head>
 <body>
-  <h1>📘 Выберите задание ЕГЭ</h1>
-  <a href="task1/variants/ege1.html" class="button">Задание 1</a>
-  <a href="task2/variants/ege2.html" class="button">Задание 2</a>
-  <a href="task3/variants/ege3.html" class="button">Задание 3</a>
-  <a href="task4/variants/ege4.html" class="button">Задание 4</a>
+  <div class="wrap">
+    <header>
+      <a class="brand" href="../index.html" aria-label="На главную">
+        <div class="logo">A</div>
+        <div>
+          <div class="brand-title">Онлайн-тренажёр «Говорение»</div>
+          <div class="badge">ЕГЭ по английскому</div>
+        </div>
+      </a>
+      <div style="display:flex; gap:10px; align-items:center">
+        <a class="back" href="../index.html">← На главную</a>
+        <button class="theme-toggle" id="themeBtn" aria-label="Переключить тему">🌓 Тема</button>
+      </div>
+    </header>
+
+    <main>
+      <section class="card">
+        <h1 class="h1">ЕГЭ — выбери задание</h1>
+        <p class="sub">Тренируй каждое задание отдельно. Хронометраж и логика как на реальном экзамене.</p>
+
+        <div class="button-frame">
+          <nav class="grid" aria-label="Список заданий ЕГЭ">
+            <a class="btn" href="task1/variants/ege1.html">📄 Задание 1</a>
+            <a class="btn" href="task2/variants/ege2.html">🎧 Задание 2</a>
+            <a class="btn" href="task3/variants/ege3.html">🗣 Задание 3</a>
+            <a class="btn" href="task4/variants/ege4.html">📷 Задание 4</a>
+          </nav>
+        </div>
+
+        <p class="sub" style="margin-top:16px">Нужен режим «Экзамен целиком»? Вернись на главную и запусти общий сценарий.</p>
+      </section>
+    </main>
+
+    <footer>
+      <div>© 2025 — Демо-версия тренажёра ЕГЭ.</div>
+    </footer>
+  </div>
+
+  <script>
+    (function(){
+      const btn = document.getElementById('themeBtn');
+      const key = 'pref-theme';
+      const apply = (mode) => {
+        if(mode==='dark'){ document.documentElement.style.colorScheme='dark'; }
+        if(mode==='light'){ document.documentElement.style.colorScheme='light'; }
+        localStorage.setItem(key, mode);
+      };
+      const saved = localStorage.getItem(key);
+      if(saved){ apply(saved); }
+      btn.addEventListener('click', () => {
+        const curr = localStorage.getItem(key) || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark':'light');
+        apply(curr==='dark'?'light':'dark');
+      });
+    })();
+  </script>
 </body>
 </html>

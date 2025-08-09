@@ -197,6 +197,12 @@
 
     function startCountdown(){
       const cdInterval = setInterval(()=>{
+        if (countdown > 1) {
+          cdEl.style.color = "#2b6cff"; // синий
+        } else {
+          cdEl.style.color = "#b30000"; // красный
+        }
+
         cdEl.textContent = countdown;
         countdown--;
         if(countdown < 0){

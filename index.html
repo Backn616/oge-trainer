@@ -1,52 +1,197 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Тренажёр Говорения ОГЭ / ЕГЭ</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Тренажёр Говорения ОГЭ/ЕГЭ — демо</title>
+  <meta name="description" content="Онлайн-тренажёр устной части ОГЭ и ЕГЭ по английскому: таймер, подсказки, запись голоса, задания ФИПИ." />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f9f9f9;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      text-align: center;
+    :root{
+      --bg: #0b1020;
+      --card: rgba(255,255,255,0.08);
+      --text: #eaf0ff;
+      --muted:#b9c2d3;
+      --primary:#6aa3ff;
+      --primary-600:#4b8dff;
+      --ring:#a9c6ff;
+      --success:#5ee397;
+      --shadow: 0 10px 35px rgba(0,0,0,.35);
     }
-    h1 {
-      font-size: 32px;
-      margin-bottom: 10px;
+    @media (prefers-color-scheme: light){
+      :root{
+        --bg:#f7f9ff;
+        --card:#ffffff;
+        --text:#0b1020;
+        --muted:#5a6475;
+        --primary:#2b6cff;
+        --primary-600:#1f58d9;
+        --ring:#bfd3ff;
+        --success:#25c26e;
+        --shadow: 0 10px 25px rgba(17,24,39,.08);
+      }
     }
-    p {
-      font-size: 18px;
-      margin-bottom: 30px;
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; font-family:Inter, system-ui, Segoe UI, Roboto, Arial, sans-serif;
+      color:var(--text); background: radial-gradient(1200px 600px at 70% -10%, #29417a40, transparent),
+                         radial-gradient(900px 500px at -10% 10%, #344b9340, transparent),
+                         var(--bg);
     }
-    .button {
-      background-color: #0077cc;
-      color: white;
-      padding: 15px 30px;
-      margin: 10px;
-      font-size: 18px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      text-decoration: none;
-      display: inline-block;
+    a{color:inherit}
+    .wrap{max-width:1040px; margin:0 auto; padding:24px}
+    header{
+      display:flex; justify-content:space-between; align-items:center; gap:16px; padding:8px 0;
     }
-    .button:hover {
-      background-color: #005fa3;
+    .brand{display:flex; align-items:center; gap:12px; text-decoration:none}
+    .logo{
+      width:42px; height:42px; border-radius:12px;
+      background: linear-gradient(135deg, var(--primary), #9bd0ff);
+      box-shadow: 0 6px 18px rgba(0,0,0,.25), inset 0 0 12px #ffffff33;
+      display:grid; place-items:center; color:#001133; font-weight:800;
     }
+    .brand-title{font-weight:700; letter-spacing:.2px}
+    .badge{font-size:12px; color:var(--muted)}
+    .theme-toggle{
+      border:1px solid #ffffff22; background:transparent; color:var(--text);
+      padding:10px 14px; border-radius:10px; cursor:pointer;
+      transition: transform .08s ease;
+    }
+    .theme-toggle:active{transform: scale(.98)}
+    main{padding:40px 0 24px}
+    .hero{
+      display:grid; grid-template-columns: 1.1fr .9fr; gap:28px; align-items:center;
+    }
+    @media (max-width:880px){ .hero{grid-template-columns:1fr} }
+    .card{
+      background:var(--card); border:1px solid #ffffff1f; border-radius:20px; padding:26px; box-shadow:var(--shadow);
+      backdrop-filter: blur(10px);
+    }
+    .h1{
+      font-size: clamp(28px, 5vw, 40px); line-height:1.15; margin:0 0 12px;
+    }
+    .sub{color:var(--muted); font-size:16px; margin:0 0 22px}
+    .cta{
+      display:flex; flex-wrap:wrap; gap:12px; margin-top:10px
+    }
+    .btn{
+      display:inline-flex; align-items:center; gap:10px; text-decoration:none;
+      font-size: 20px;
+      padding:18px 26px; border-radius:12px; border:1px solid transparent; font-weight:600;
+      transition: transform .06s ease, box-shadow .2s ease, border-color .2s ease, background .2s ease;
+      outline: none;
+      animation: pulse 1.5s infinite;
+    }
+    .btn:focus-visible{box-shadow:0 0 0 4px var(--ring)}
+    .btn-primary{
+      background: linear-gradient(135deg, var(--primary), var(--primary-600));
+      color:white; box-shadow: 0 10px 22px rgba(43,108,255,.3);
+    }
+    .btn-primary:hover{transform: scale(1.05)}
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.08); }
+      100% { transform: scale(1); }
+    }
+    .note{
+      margin-top:16px; font-size:13px; color:var(--muted)
+    }
+    .right-card{
+      display:grid; align-content:center; gap:14px; text-align:left;
+    }
+    .tile{
+      display:flex; align-items:center; gap:12px; padding:12px; border-radius:14px;
+      border:1px dashed #ffffff28; background:#ffffff0b
+    }
+    .dot{width:10px; height:10px; border-radius:50%; background: var(--success); box-shadow:0 0 0 4px #25c26e22}
+    footer{padding:30px 0 10px; color:var(--muted); font-size:13px; text-align:center}
   </style>
 </head>
 <body>
-  <h1>🎓 Онлайн-тренажёр "Говорение"</h1>
-  <p>Подготовься к устной части ОГЭ и ЕГЭ по английскому языку</p>
-  <a href="oge_menu.html" class="button">Перейти к ОГЭ</a>
-  <a href="ege/ege.html" class="button">Перейти к ЕГЭ</a>
-  <p style="margin-top: 50px; font-size: 14px; color: gray;">Сайт в разработке. Демо-версия.</p>
+  <div class="wrap">
+    <header>
+      <a class="brand" href="#">
+        <div class="logo">A</div>
+        <div>
+          <div class="brand-title">Онлайн-тренажёр «Говорение»</div>
+          <div class="badge">ОГЭ / ЕГЭ по английскому</div>
+        </div>
+      </a>
+      <button class="theme-toggle" id="themeBtn" aria-label="Переключить тему">🌓 Тема</button>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="card">
+          <h1 class="h1">Подготовь устную часть <span style="white-space:nowrap">ОГЭ и ЕГЭ</span> уверенно</h1>
+          <p class="sub">Тренируй ответы с таймером, мини-подсказками и записью голоса. Основано на демо-материалах ФИПИ.</p>
+          <div class="cta">
+            <a href="oge_menu.html" class="btn btn-primary" aria-label="Перейти к тренажёру ОГЭ">
+              🎒 Перейти к ОГЭ
+            </a>
+            <a href="ege_menu.htmll" class="btn btn-primary" aria-label="Перейти к тренажёру ЕГЭ">
+              🎓 Перейти к ЕГЭ
+            </a>
+          </div>
+        </div>
+
+        <div class="right-card">
+          <div class="tile">
+            <div class="dot"></div>
+            <div>
+              <strong>Быстрый старт</strong><br>
+              Открой раздел и начни говорить — без регистрации.
+            </div>
+          </div>
+          <div class="tile">
+            <div style="font-size:20px">⏱</div>
+            <div>
+              <strong>Таймер экзамена</strong><br>
+              Реалистичный хронометраж заданий устной части, как на реальном экзамене.
+            </div>
+          </div>
+          <div class="tile">
+            <div style="font-size:20px">🎙</div>
+            <div>
+              <strong>Запись ответа</strong><br>
+              Записывай и переслушивай, чтобы отслеживать прогресс, дикцию и темп.
+            </div>
+          </div>
+          <div class="tile">
+            <div style="font-size:20px">🧩</div>
+            <div>
+              <strong>Задания в стиле ФИПИ</strong><br>
+              Карточки «Вопросы/Интервью/Фото», удобные планы ответов и критерии.
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div>© 2025 — Проект в разработке. Демо-версия.</div>
+      <div style="margin-top:6px">Есть идея или нашли баг? Напишите нам: <a href="mailto:hello@example.com">hello@example.com</a></div>
+    </footer>
+  </div>
+
+  <script>
+    (function(){
+      const btn = document.getElementById('themeBtn');
+      const key = 'pref-theme';
+      const apply = (mode) => {
+        if(mode==='dark'){ document.documentElement.style.colorScheme='dark'; }
+        if(mode==='light'){ document.documentElement.style.colorScheme='light'; }
+        localStorage.setItem(key, mode);
+      };
+      const saved = localStorage.getItem(key);
+      if(saved){ apply(saved); }
+      btn.addEventListener('click', () => {
+        const curr = localStorage.getItem(key) || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark':'light');
+        apply(curr==='dark'?'light':'dark');
+      });
+    })();
+  </script>
 </body>
 </html>

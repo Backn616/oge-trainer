@@ -39,7 +39,6 @@
       --danger: #ff6b6b;
       --shadow: 0 10px 35px rgba(0,0,0,.35);
     }
-
     body {
       font-family: 'Roboto', sans-serif;
       margin:0;
@@ -50,7 +49,6 @@
                   var(--bg);
       text-align: center;
     }
-
     .theme-toggle {
       position: fixed; top:16px; right:16px; z-index:10000;
       border:1px solid #ffffff22; background:transparent; color:var(--text);
@@ -58,9 +56,7 @@
       transition: transform .08s ease, filter .2s ease;
     }
     .theme-toggle:hover { transform: translateY(-1px); filter: brightness(1.03); }
-
     .wrap { max-width:1500px; margin:0 auto; }
-
     .task-container {
       background: var(--card);
       border-left: 5px solid var(--primary);
@@ -69,32 +65,16 @@
       font-size: 20px;
       line-height: 1.7;
       text-align: left;
-      box-sizing: border-box;
       box-shadow: var(--shadow);
       border-radius: 12px;
       display: none;
     }
-    .task-container ul { margin:10px 0 15px 20px; }
-    .task-container li { margin-bottom:8px; }
     .instruction { font-weight:700; margin-top:10px; }
-
-    /* Новый стиль обратного отсчёта */
     .timer {
-      font-size: 90px;
-      color: var(--danger);
+      font-size: 72px;
+      margin: 30px 0;
       font-weight: 700;
-      margin-top: 150px;
-      animation: fadeIn 0.4s ease;
     }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: scale(0.8); }
-      to { opacity: 1; transform: scale(1); }
-    }
-    .countdown-hidden {
-      opacity: 0;
-      transition: opacity 0.3s ease;
-    }
-
     .images {
       display: none;
       justify-content: center;
@@ -109,7 +89,6 @@
       border-radius:12px;
       box-shadow: var(--shadow);
     }
-
     .end-button {
       display:none;
       margin: 20px auto 0;
@@ -125,13 +104,11 @@
       transition: transform .06s ease, box-shadow .2s ease;
     }
     .end-button:hover { transform: scale(1.05); }
-
     #progressContainerFixed {
       position: fixed; bottom:0; left:0; width:100%; height:32px;
       background:#eee; z-index:9999; display:none;
     }
     .dark #progressContainerFixed { background: #222; }
-
     #progressBarFixed {
       height:100%; width:0%;
       background: linear-gradient(to right, #0066ff, #00cfff);
@@ -141,7 +118,6 @@
       position:absolute; right:14px; top:50%; transform:translateY(-50%);
       color:#fff; font-weight:700; font-size:20px; user-select:none;
     }
-
     @media (max-width: 800px){
       .images{ flex-direction: column; align-items: center; }
       .images img{ width:100%; }
@@ -183,7 +159,6 @@
   </div>
 
   <script>
-    // Тема
     (function(){
       const btn = document.getElementById('themeBtn');
       const key = 'pref-theme';
@@ -238,25 +213,24 @@
       }
     }
 
-    // Новый отсчёт
     function startCountdown() {
-      timerEl.style.display = "block";
-      timerEl.textContent = countdown;
       const cdInterval = setInterval(() => {
-        countdown--;
-        if (countdown >= 0) {
-          timerEl.textContent = countdown;
-          timerEl.classList.remove("countdown-hidden");
-          setTimeout(() => timerEl.classList.add("countdown-hidden"), 700);
+        if (countdown > 1) {
+          timerEl.style.color = "#2b6cff";
         } else {
+          timerEl.style.color = "#b30000";
+        }
+        timerEl.textContent = countdown;
+        countdown--;
+        if (countdown < 0) {
           clearInterval(cdInterval);
-          timerEl.style.display = "none";
           startTask();
         }
       }, 1000);
     }
 
     function startTask() {
+      timerEl.style.display = "none";
       progressContainerFixed.style.display = "block";
       imageContainer.style.display = "flex";
       taskContainer.style.display = "block";

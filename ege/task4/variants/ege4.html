@@ -1,45 +1,356 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ЕГЭ — Задание 4</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ЕГЭ — Задание 4: выбор варианта</title>
+  <meta name="description" content="Выбор варианта для задания 4 устной части ЕГЭ. Запись ответа и прослушивание." />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <!-- Анти-мигание темы -->
+  <script>
+    (function () {
+      try {
+        const saved = localStorage.getItem('pref-theme') || 'light';
+        if (saved === 'dark') document.documentElement.classList.add('dark');
+      } catch (_) {}
+    })();
+  </script>
+
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #ffffff;
-      margin: 0;
-      padding: 20px;
-      text-align: center;
+    :root {
+      --bg: #f7f9ff;
+      --card: #ffffff;
+      --text: #0b1020;
+      --muted:#5a6475;
+      --primary:#2b6cff;
+      --primary-600:#1f58d9;
+      --ring:#bfd3ff;
+      --success:#25c26e;
+      --shadow: 0 10px 25px rgba(17,24,39,.08);
+      --btn-1:#6d95ff;
+      --btn-2:#4f7dff;
+      --btn-text:#ffffff;
+      --radius-xl:20px;
+      --grid-gap:40px;      /* больше воздуха */
+      --btn-fs:20px;
+      --btn-pad-y:18px;
+      --btn-pad-x:24px;
+      --btn-minh:56px;
+      --btn-radius:14px;
     }
-    h1 {
-      color: #333;
+    .dark {
+      --bg: #0b1020;
+      --card: rgba(255,255,255,0.08);
+      --text: #eaf0ff;
+      --muted: #b9c2d3;
+      --primary: #6aa3ff;
+      --primary-600: #4b8dff;
+      --ring: #a9c6ff;
+      --success: #5ee397;
+      --shadow: 0 10px 35px rgba(0,0,0,.35);
+      --btn-1:#aecdff;
+      --btn-2:#86b8ff;
+      --btn-text:#ffffff;
     }
-    .text-choice {
-      background-color: #e6f0ff;
-      padding: 15px;
-      margin: 10px auto;
-      max-width: 600px;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: 0.3s;
-      text-decoration: none;
-      color: black;
-      display: block;
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:Inter, system-ui, Segoe UI, Roboto, Arial, sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(1200px 600px at 70% -10%, #29417a40, transparent),
+        radial-gradient(900px 500px at -10% 10%, #344b9340, transparent),
+        var(--bg);
     }
-    .text-choice:hover {
-      background-color: #d0e4ff;
+    a{color:inherit; text-decoration:none}
+    .wrap{max-width:1040px; margin:0 auto; padding:24px}
+
+    header{display:flex; justify-content:space-between; align-items:center; gap:16px; padding:8px 0;}
+    .brand{display:flex; align-items:center; gap:12px}
+    .logo{
+      width:42px; height:42px; border-radius:12px;
+      background: linear-gradient(135deg, var(--primary), #9bd0ff);
+      box-shadow: 0 6px 18px rgba(0,0,0,.25), inset 0 0 12px #ffffff33;
+      display:grid; place-items:center; color:#001133; font-weight:800;
     }
+    .brand-title{font-weight:700; letter-spacing:.2px}
+    .badge{font-size:12px; color:var(--muted)}
+    .theme-toggle{
+      border:1px solid #ffffff22; background:transparent; color:var(--text);
+      padding:10px 14px; border-radius:10px; cursor:pointer; transition:transform .08s ease;
+    }
+    .theme-toggle:active{transform:scale(.98)}
+
+    main{padding:40px 0 24px}
+    .card{
+      background:var(--card);
+      border:1px solid #ffffff1f;
+      border-radius: var(--radius-xl);
+      padding:28px;
+      box-shadow:var(--shadow);
+      backdrop-filter: blur(10px);
+    }
+    .h1{font-size:clamp(26px,5vw,36px); line-height:1.15; margin:0 0 10px}
+    .sub{color:var(--muted); font-size:16px; margin:0 0 18px}
+
+    .frame{
+      border:1px solid #ffffff22;
+      border-radius: calc(var(--radius-xl) - 2px);
+      background:#ffffff06;
+      backdrop-filter: blur(6px);
+      padding:22px;
+      margin-top:12px;
+    }
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
+      gap: var(--grid-gap);
+    }
+    .variant{
+      display:inline-flex; align-items:center; justify-content:center; gap:10px;
+      font-size: var(--btn-fs); font-weight:600;
+      padding: var(--btn-pad-y) var(--btn-pad-x);
+      min-height: var(--btn-minh);
+      border-radius: var(--btn-radius);
+      border:1px solid rgba(255,255,255,.18);
+      background: linear-gradient(135deg, var(--btn-1), var(--btn-2));
+      color: var(--btn-text);
+      text-shadow: 0 1px 0 rgba(0,0,0,.15);
+      box-shadow: 0 12px 24px rgba(75,141,255,.28);
+      transition: transform .06s ease, filter .2s ease, box-shadow .2s ease;
+    }
+    .variant:hover{ transform: translateY(-2px); filter: brightness(1.03) }
+    .variant:focus-visible{ box-shadow: 0 0 0 4px var(--ring); outline: none; }
+
+    /* Пагинация */
+    .pager{
+      display:flex; align-items:center; justify-content:center; gap:12px;
+      margin-top:20px;
+    }
+    .pager-btn{
+      display:inline-flex; align-items:center; justify-content:center;
+      padding:10px 14px; border-radius:10px; border:1px solid #ffffff22;
+      background: var(--card); color: var(--text); cursor:pointer;
+      box-shadow: var(--shadow);
+      transition: transform .06s ease, filter .2s ease;
+    }
+    .pager-btn[disabled]{opacity:.6; cursor:not-allowed}
+    .pager-btn:hover:not([disabled]){ transform: translateY(-1px); filter: brightness(1.02) }
+    .pager-info{ color: var(--muted); font-size:14px }
+
+    /* Блок выбранного варианта + кнопки записи */
+    .task-box{
+      margin-top:22px;
+      background: var(--card);
+      border:1px solid #ffffff1f;
+      border-radius: var(--radius-xl);
+      padding:20px;
+      box-shadow:var(--shadow);
+      display:none;
+    }
+    .task-text{ font-size:18px }
+    .controls{ margin-top:14px; display:flex; flex-wrap:wrap; gap:10px }
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center;
+      gap:8px; font-weight:700; padding:12px 16px;
+      border-radius:12px; border:1px solid transparent; cursor:pointer;
+      background: linear-gradient(135deg, var(--primary), var(--primary-600));
+      color:#fff; box-shadow: 0 8px 18px rgba(43,108,255,.28);
+      transition: transform .06s ease, filter .2s ease;
+    }
+    .btn:hover{ transform: translateY(-1px); filter: brightness(1.02) }
+    .btn[disabled]{ opacity:.6; cursor:not-allowed; transform:none; filter:none }
+
+    footer{padding:26px 0 10px; color:var(--muted); font-size:13px; text-align:center}
+    .back{border:1px dashed #ffffff28; padding:10px 14px; border-radius:10px}
   </style>
 </head>
 <body>
-  <h1>🎧 ЕГЭ — Задание 4</h1>
+  <div class="wrap">
+    <header>
+      <a class="brand" href="../../ege_menu.html" aria-label="Назад к списку заданий">
+        <div class="logo">A</div>
+        <div>
+          <div class="brand-title">Онлайн-тренажёр «Говорение»</div>
+          <div class="badge">ЕГЭ · задание 4</div>
+        </div>
+      </a>
+      <div style="display:flex; gap:10px; align-items:center">
+        <a class="back" href="../../ege_menu.html">← К выбору задания</a>
+        <button class="theme-toggle" id="themeBtn" aria-label="Переключить тему">🌓 Тема</button>
+      </div>
+    </header>
 
-  <a class="text-choice" href="variant1/ege4_var1_1_prepare.html">Вариант 1</a>
-  <div class="text-choice" onclick="alert('Вариант 2 в разработке')">Вариант 2</div>
-  <div class="text-choice" onclick="alert('Вариант 3 в разработке')">Вариант 3</div>
-  <div class="text-choice" onclick="alert('Вариант 4 в разработке')">Вариант 4</div>
-  <div class="text-choice" onclick="alert('Вариант 5 в разработке')">Вариант 5</div>
+    <main>
+      <section class="card">
+        <h1 class="h1">ЕГЭ — задание 4: выбери вариант</h1>
+        <p class="sub">Нажми на вариант, затем запиши и прослушай свой ответ.</p>
 
+        <div class="frame">
+          <nav id="variants" class="grid" aria-label="Варианты задания 4"></nav>
+
+          <div class="pager">
+            <button id="prevBtn" class="pager-btn">← Назад</button>
+            <div id="pagerInfo" class="pager-info"></div>
+            <button id="nextBtn" class="pager-btn">Вперёд →</button>
+          </div>
+        </div>
+
+        <div id="taskBox" class="task-box" role="region" aria-live="polite" aria-label="Выбранный вариант">
+          <div id="taskText" class="task-text">Выберите вариант выше.</div>
+          <div class="controls">
+            <button id="recBtn" class="btn">🔴 Начать запись</button>
+            <button id="stopBtn" class="btn" disabled>⏹️ Остановить</button>
+            <button id="playBtn" class="btn" disabled>▶️ Прослушать</button>
+          </div>
+          <audio id="audio" controls style="display:none; margin-top:12px;"></audio>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      © 2025 — Демо-версия тренажёра ЕГЭ.
+    </footer>
+  </div>
+
+  <script>
+    // Тема
+    (function(){
+      const btn = document.getElementById('themeBtn');
+      const key = 'pref-theme';
+      const root = document.documentElement;
+      function apply(mode){
+        root.classList.toggle('dark', mode === 'dark');
+        localStorage.setItem(key, mode);
+      }
+      apply(localStorage.getItem(key) || 'light');
+      btn.addEventListener('click', () => {
+        const curr = localStorage.getItem(key) || 'light';
+        apply(curr === 'dark' ? 'light' : 'dark');
+      });
+    })();
+
+    // ====== ВАРИАНТЫ + ПАГИНАЦИЯ ======
+    // Настройки
+    const TOTAL_VARIANTS = 60;   // ← поставь фактическое количество
+    const PAGE_SIZE      = 15;    // ← по сколько показывать на странице
+
+    // Заглушки первых 5 вариантов
+    const TASK_TEXTS = {
+      1: "Where was this photo taken?",
+      2: "What is the person doing in the picture?",
+      3: "What time of day do you think it is?",
+      4: "Do you think this person is enjoying the activity?",
+      5: "Would you like to do the same? Why or why not?"
+    };
+
+    const variantsEl = document.getElementById('variants');
+    const prevBtn    = document.getElementById('prevBtn');
+    const nextBtn    = document.getElementById('nextBtn');
+    const pagerInfo  = document.getElementById('pagerInfo');
+
+    let currentPage = 1;
+    const totalPages = Math.max(1, Math.ceil(TOTAL_VARIANTS / PAGE_SIZE));
+
+    function renderPage(page){
+      currentPage = Math.min(Math.max(1, page), totalPages);
+      variantsEl.innerHTML = '';
+      const start = (currentPage - 1) * PAGE_SIZE + 1;
+      const end   = Math.min(TOTAL_VARIANTS, start + PAGE_SIZE - 1);
+
+      const frag = document.createDocumentFragment();
+      for(let n = start; n <= end; n++){
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'variant';
+        btn.dataset.variant = String(n);
+        btn.textContent = `Вариант ${n}`;
+        frag.appendChild(btn);
+      }
+      variantsEl.appendChild(frag);
+
+      pagerInfo.textContent = `Стр. ${currentPage} из ${totalPages} · ${start}–${end} из ${TOTAL_VARIANTS}`;
+      prevBtn.disabled = currentPage === 1;
+      nextBtn.disabled = currentPage === totalPages;
+    }
+
+    prevBtn.addEventListener('click', () => renderPage(currentPage - 1));
+    nextBtn.addEventListener('click', () => renderPage(currentPage + 1));
+
+    renderPage(1);
+
+    // ====== Выбор варианта ======
+    const taskBox  = document.getElementById('taskBox');
+    const taskText = document.getElementById('taskText');
+
+    variantsEl.addEventListener('click', (e) => {
+      const btn = e.target.closest('.variant');
+      if (!btn) return;
+      const n = Number(btn.dataset.variant);
+      const text = TASK_TEXTS[n] || `Вы выбрали вариант ${n}. Начните запись ответа.`;
+      taskText.innerHTML = `<em>"${text}"</em>`;
+      taskBox.style.display = 'block';
+      resetAudio();
+    });
+
+    // ====== Запись / остановка / проигрывание ======
+    let mediaRecorder;
+    let audioChunks = [];
+    const recBtn  = document.getElementById('recBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const playBtn = document.getElementById('playBtn');
+    const audioEl = document.getElementById('audio');
+
+    recBtn.addEventListener('click', startRecording);
+    stopBtn.addEventListener('click', stopRecording);
+    playBtn.addEventListener('click', () => audioEl.src && audioEl.play());
+
+    async function startRecording() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaRecorder = new MediaRecorder(stream);
+        audioChunks = [];
+        mediaRecorder.ondataavailable = (e) => audioChunks.push(e.data);
+        mediaRecorder.onstop = () => {
+          const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+          const url = URL.createObjectURL(audioBlob);
+          audioEl.src = url;
+          audioEl.style.display = 'block';
+          playBtn.disabled = false;
+        };
+        mediaRecorder.start();
+        recBtn.disabled  = true;
+        stopBtn.disabled = false;
+        playBtn.disabled = true;
+      } catch (err) {
+        alert('Не удалось получить доступ к микрофону.');
+        console.error(err);
+      }
+    }
+
+    function stopRecording() {
+      if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+        mediaRecorder.stop();
+        recBtn.disabled  = false;
+        stopBtn.disabled = true;
+      }
+    }
+
+    function resetAudio() {
+      if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+        mediaRecorder.stop();
+      }
+      audioChunks = [];
+      audioEl.src = '';
+      audioEl.style.display = 'none';
+      recBtn.disabled = false;
+      stopBtn.disabled = true;
+      playBtn.disabled = true;
+    }
+  </script>
 </body>
 </html>

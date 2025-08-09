@@ -240,16 +240,9 @@
         btn.className = 'variant';
         btn.textContent = `Вариант ${n}`;
         btn.addEventListener('click', () => {
-          const url = `${EGE_BASE}task1/variants/variant${n}/ege1_var${n}_1_prepare.html`;
-          fetch(url, { method: 'HEAD' })
-            .then(r => {
-              if (r.ok) {
-                window.location.assign(url);
-              } else {
-                alert(`Вариант ${n} в разработке`);
-              }
-            })
-            .catch(() => alert(`Вариант ${n} в разработке`));
+          window.location.assign(
+            `${EGE_BASE}task1/variants/variant${n}/ege1_var${n}_1_prepare.html`
+          );
         });
         frag.appendChild(btn);
       }

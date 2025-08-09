@@ -20,6 +20,7 @@
       --btn-2:#4f7dff;
       --btn-text:#ffffff;
       --shadow: 0 10px 25px rgba(17,24,39,.08);
+      --success:#25c26e;
     }
     :root.dark {
       --bg: #0b1020;
@@ -33,11 +34,14 @@
       --btn-2:#86b8ff;
       --btn-text:#ffffff;
       --shadow: 0 10px 35px rgba(0,0,0,.35);
+      --success:#5ee397;
     }
+
     *{box-sizing:border-box}
     html,body{height:100%}
     body{
-      margin:0; font-family:Inter, system-ui, Segoe UI, Roboto, Arial, sans-serif;
+      margin:0;
+      font-family:Inter, system-ui, Segoe UI, Roboto, Arial, sans-serif;
       color:var(--text);
       background: radial-gradient(1200px 600px at 70% -10%, #29417a40, transparent),
                   radial-gradient(900px 500px at -10% 10%, #344b9340, transparent),
@@ -96,9 +100,6 @@
       0% { transform: scale(1); }
       50% { transform: scale(1.08); }
       100% { transform: scale(1); }
-    }
-    .note{
-      margin-top:16px; font-size:13px; color:var(--muted)
     }
     .right-card{
       display:grid; align-content:center; gap:14px; text-align:left;

@@ -122,6 +122,7 @@
       text-shadow: 0 1px 0 rgba(0,0,0,.15);
       box-shadow: 0 12px 24px rgba(75,141,255,.28);
       transition: transform .06s ease, filter .2s ease, box-shadow .2s ease;
+      cursor: pointer;
     }
     .variant:hover{ transform: translateY(-2px); filter: brightness(1.03) }
     .variant:focus-visible{ box-shadow: 0 0 0 4px var(--ring); outline: none; }
@@ -235,9 +236,8 @@
     })();
 
     // ====== ВАРИАНТЫ + ПАГИНАЦИЯ ======
-    // Настройки
-    const TOTAL_VARIANTS = 60;   // ← поставь фактическое количество
-    const PAGE_SIZE      = 15;    // ← по сколько показывать на странице
+    const TOTAL_VARIANTS = 60;  // всего вариантов
+    const PAGE_SIZE      = 15;  // на страницу
 
     // Заглушки первых 5 вариантов
     const TASK_TEXTS = {
@@ -280,7 +280,6 @@
 
     prevBtn.addEventListener('click', () => renderPage(currentPage - 1));
     nextBtn.addEventListener('click', () => renderPage(currentPage + 1));
-
     renderPage(1);
 
     // ====== Выбор варианта ======
@@ -291,6 +290,14 @@
       const btn = e.target.closest('.variant');
       if (!btn) return;
       const n = Number(btn.dataset.variant);
+
+      // Вариант 1 — переход на реальную страницу варианта
+      if (n === 1) {
+        window.location.assign('../task4/variants/variant1/ege4_var1_1_prepare.html');
+        return;
+      }
+
+      // Остальные — заглушки/тексты
       const text = TASK_TEXTS[n] || `Вы выбрали вариант ${n}. Начните запись ответа.`;
       taskText.innerHTML = `<em>"${text}"</em>`;
       taskBox.style.display = 'block';

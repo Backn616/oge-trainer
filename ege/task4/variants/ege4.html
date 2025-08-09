@@ -33,7 +33,7 @@
       --btn-2:#4f7dff;
       --btn-text:#ffffff;
       --radius-xl:20px;
-      --grid-gap:40px;      /* воздух между карточками вариантов */
+      --grid-gap:40px;
       --btn-fs:20px;
       --btn-pad-y:18px;
       --btn-pad-x:24px;
@@ -127,7 +127,6 @@
     .variant:hover{ transform: translateY(-2px); filter: brightness(1.03) }
     .variant:focus-visible{ box-shadow: 0 0 0 4px var(--ring); outline: none; }
 
-    /* Пагинация */
     .pager{
       display:flex; align-items:center; justify-content:center; gap:12px;
       margin-top:20px;
@@ -143,7 +142,6 @@
     .pager-btn:hover:not([disabled]){ transform: translateY(-1px); filter: brightness(1.02) }
     .pager-info{ color: var(--muted); font-size:14px }
 
-    /* Блок выбранного варианта + кнопки записи */
     .task-box{
       margin-top:22px;
       background: var(--card);
@@ -173,7 +171,7 @@
 <body>
   <div class="wrap">
     <header>
-      <a class="brand" href="../../ege_menu.html" aria-label="Назад к списку заданий">
+      <a class="brand back-to-menu" href="#" aria-label="Назад к списку заданий">
         <div class="logo">A</div>
         <div>
           <div class="brand-title">Онлайн-тренажёр «Говорение»</div>
@@ -181,7 +179,7 @@
         </div>
       </a>
       <div style="display:flex; gap:10px; align-items:center">
-        <a class="back" href="../../ege_menu.html">← К выбору задания</a>
+        <a class="back back-to-menu" href="#">← К выбору задания</a>
         <button class="theme-toggle" id="themeBtn" aria-label="Переключить тему">🌓 Тема</button>
       </div>
     </header>
@@ -235,14 +233,24 @@
       });
     })();
 
+    // База /.../ege/ (чтобы не было удвоений в пути)
+    function getEgeBase() {
+      const parts = location.pathname.split('/'); // ["", "...","ege","..."]
+      const i = parts.indexOf('ege');
+      return i !== -1 ? parts.slice(0, i + 1).join('/') + '/' : '/ege/';
+    }
+    const EGE_BASE = getEgeBase();
+
+    // Назад к меню (проставим корректные href)
+    document.querySelectorAll('.back-to-menu').forEach(a => {
+      a.href = EGE_BASE + 'ege_menu.html';
+    });
+
     // ====== ВАРИАНТЫ + ПАГИНАЦИЯ ======
     const TOTAL_VARIANTS = 60;  // всего вариантов
     const PAGE_SIZE      = 15;  // на страницу
+    const WORKING_VARIANTS = new Set([1, 2, 3]); // уже готовые
 
-    // Варианты, для которых уже есть реальные страницы
-    const WORKING_VARIANTS = new Set([1, 2, 3]);
-
-    // Заглушки первых 5 вариантов
     const TASK_TEXTS = {
       1: "Where was this photo taken?",
       2: "What is the person doing in the picture?",
@@ -295,8 +303,8 @@
       const n = Number(btn.dataset.variant);
 
       if (WORKING_VARIANTS.has(n)) {
-        // Универсальный путь: ../task4/variants/variantN/ege4_varN_1_prepare.html
-        const url = `../task4/variants/variant${n}/ege4_var${n}_1_prepare.html`;
+        // Абсолютный путь от /.../ege/ без «task4/task4»
+        const url = `${EGE_BASE}task4/variants/variant${n}/ege4_var${n}_1_prepare.html`;
         window.location.assign(url);
         return;
       }

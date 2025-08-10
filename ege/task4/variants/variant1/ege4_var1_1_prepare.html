@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
   <meta charset="UTF-8" />
   <title>Task 4 — Preparation</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
 
   <!-- Анти-мигание темы -->
@@ -16,7 +17,6 @@
   </script>
 
   <style>
-    /* Светлая тема */
     :root{
       --bg: #f7f9ff;
       --card: #ffffff;
@@ -28,7 +28,6 @@
       --success: #25c26e;
       --shadow: 0 10px 25px rgba(17,24,39,.08);
     }
-    /* Тёмная тема */
     .dark{
       --bg: #0b1020;
       --card: rgba(255,255,255,0.08);
@@ -42,7 +41,7 @@
     }
 
     body {
-      font-family: 'Roboto', sans-serif;
+      font-family: 'Roboto', system-ui, sans-serif;
       margin: 0;
       padding: 40px 30px 80px;
       color: var(--text);
@@ -54,12 +53,8 @@
       justify-content: center;
     }
 
-    .content-wrapper {
-      max-width: 1500px;
-      width: 100%;
-    }
+    .content-wrapper { max-width: 1500px; width: 100%; }
 
-    /* Стиль под task */
     .task-container {
       background: var(--card);
       border-left: 5px solid var(--primary);
@@ -104,39 +99,22 @@
     }
     .button:hover { transform: scale(1.05); filter: brightness(1.03); }
 
-    /* Прогресс-бар */
     #progressContainerFixed {
-      position: fixed;
-      bottom: 0; left: 0; width: 100%; height: 32px;
-      background: #eee;
-      z-index: 9999;
+      position: fixed; bottom: 0; left: 0; width: 100%; height: 32px;
+      background: #eee; z-index: 9999;
     }
     .dark #progressContainerFixed { background:#222; }
     #progressBarFixed {
-      height: 100%;
-      width: 0%;
+      height: 100%; width: 0%;
       background: linear-gradient(to right, #0066ff, #00cfff);
-      position: relative;
-      transition: width 0.5s linear;
+      position: relative; transition: width .5s linear;
     }
     .progress-time {
-      position: absolute;
-      right: 14px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: white;
-      font-weight: bold;
-      font-size: 20px;
-      user-select: none;
+      position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+      color: #fff; font-weight: 700; font-size: 20px; user-select: none;
       text-shadow: 0 1px 2px rgba(0,0,0,.35);
     }
 
-    @media (max-width: 800px) {
-      .images { flex-direction: column; align-items: center; }
-      .images img { width: 100%; }
-    }
-
-    /* Переключатель темы */
     .theme-toggle{
       position: fixed; top:16px; right:16px; z-index:10000;
       border:1px solid #ffffff22; background:transparent; color:var(--text);
@@ -144,10 +122,15 @@
       transition: transform .08s ease, filter .2s ease;
     }
     .theme-toggle:hover{ transform: translateY(-1px); filter: brightness(1.03); }
+
+    @media (max-width: 800px) {
+      .images { flex-direction: column; align-items: center; }
+      .images img { width: 100%; }
+    }
   </style>
 </head>
 <body>
-  <!-- Тумблер темы -->
+  <!-- Переключатель темы -->
   <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
 
   <div class="content-wrapper">
@@ -170,40 +153,25 @@
       <img src="photo2_countryside.png" alt="Countryside holidays">
     </div>
 
-    <div style="text-align: center; margin-bottom: 30px;">
-      <button class="button" onclick="window.location.href='ege4_var1_2_mic.html'">Перейти к выполнению</button>
+    <div style="text-align:center; margin-bottom:30px;">
+      <button class="button" id="goBtn">Перейти к выполнению</button>
     </div>
   </div>
 
-  <div id="progressContainerFixed">
+  <div id="progressContainerFixed" role="timer" aria-live="polite">
     <div id="progressBarFixed">
       <span id="progressTime" class="progress-time">02:30</span>
     </div>
   </div>
 
   <script>
-    // Таймер
-    const progressBar = document.getElementById("progressBarFixed");
-    const progressTime = document.getElementById("progressTime");
-    const totalTime = 150000; // 2.5 минуты
-    const endTime = Date.now() + totalTime;
+    // == Очистка прошлых данных и маркер подготовки ==
+    try {
+      sessionStorage.removeItem('ege4_audio_base64');
+      sessionStorage.setItem('ege4_prepared', '1');
+    } catch (_) {}
 
-    function updateTimer() {
-      const now = Date.now();
-      const timeLeft = Math.max(0, endTime - now);
-      const minutes = String(Math.floor(timeLeft / 60000)).padStart(2, '0');
-      const seconds = String(Math.floor((timeLeft % 60000) / 1000)).padStart(2, '0');
-      progressTime.textContent = `${minutes}:${seconds}`;
-      progressBar.style.width = `${(timeLeft / totalTime) * 100}%`;
-      if (timeLeft <= 0) {
-        clearInterval(timerInterval);
-        window.location.href = "ege4_var1_2_mic.html";
-      }
-    }
-    updateTimer();
-    const timerInterval = setInterval(updateTimer, 500);
-
-    // Переключатель темы
+    // == Переключатель темы ==
     (function(){
       const btn = document.getElementById('themeBtn');
       const key = 'pref-theme';
@@ -218,6 +186,43 @@
         apply(curr === 'dark' ? 'light' : 'dark');
       });
     })();
+
+    // == Таймер 2:30 и прогресс ==
+    const progressBar = document.getElementById('progressBarFixed');
+    const progressTime = document.getElementById('progressTime');
+    const totalTime = 150000; // 2.5 минуты в мс
+    const endTime = Date.now() + totalTime;
+    const NEXT_URL = 'ege4_var1_2_mic.html';
+
+    function formatLeft(ms){
+      const s = Math.max(0, Math.floor(ms / 1000));
+      const m = String(Math.floor(s/60)).padStart(2, '0');
+      const r = String(s%60).padStart(2, '0');
+      return `${m}:${r}`;
+    }
+
+    function updateTimer() {
+      const now = Date.now();
+      const left = Math.max(0, endTime - now);
+      progressTime.textContent = formatLeft(left);
+      progressBar.style.width = `${(left / totalTime) * 100}%`;
+      if (left <= 0) {
+        clearInterval(timerInterval);
+        window.location.href = NEXT_URL;
+      }
+    }
+    updateTimer();
+    const timerInterval = setInterval(updateTimer, 500);
+
+    // == Кнопка «Перейти к выполнению» ==
+    document.getElementById('goBtn').addEventListener('click', () => {
+      window.location.href = NEXT_URL;
+    });
+
+    // == Страховка: при уходе руками обнулим интервал ==
+    window.addEventListener('beforeunload', () => {
+      try { clearInterval(timerInterval); } catch(_) {}
+    });
   </script>
 </body>
 </html>

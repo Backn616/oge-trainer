@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <title>Результат — Задание 4</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
 
   <!-- Анти-мигание темы -->
@@ -16,7 +17,6 @@
   </script>
 
   <style>
-    /* Светлая тема */
     :root{
       --bg: #f7f9ff;
       --card: #ffffff;
@@ -26,7 +26,6 @@
       --primary-600: #1f58d9;
       --shadow: 0 10px 25px rgba(17,24,39,.08);
     }
-    /* Тёмная тема */
     .dark{
       --bg: #0b1020;
       --card: rgba(255,255,255,0.08);
@@ -48,7 +47,6 @@
         var(--bg);
     }
 
-    /* Переключатель темы */
     .theme-toggle{
       position: fixed; top:16px; right:16px; z-index:10000;
       border:1px solid #ffffff22; background:transparent; color:var(--text);
@@ -64,7 +62,6 @@
       font-size: 36px;
       margin: 12px 0 6px;
       text-align: center;
-      text-shadow: none;
     }
     .status {
       font-size: 22px;
@@ -74,7 +71,6 @@
     }
     .dark .status{ color:#5ee397; }
 
-    /* Карточка задания — как на task */
     .task-container{
       background: var(--card);
       border-left: 5px solid var(--primary);
@@ -100,7 +96,6 @@
       border-radius:12px; box-shadow: var(--shadow);
     }
 
-    /* Кнопки — как на task/prepare */
     .btn{
       display:inline-block;
       padding:16px 32px;
@@ -113,6 +108,7 @@
       margin: 12px;
     }
     .btn:hover{ transform: scale(1.05); filter: brightness(1.03); }
+    .btn:disabled{ opacity:.6; cursor:not-allowed; transform:none; }
 
     audio{
       margin: 20px auto;
@@ -127,18 +123,17 @@
   </style>
 </head>
 <body>
-  <!-- Тумблер темы -->
   <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
 
   <div class="wrap">
     <h1>Результат сохранён</h1>
-    <div class="status">✅ Вы успешно завершили задание. Вы можете прослушать или скачать запись ниже.</div>
+    <div class="status" id="statusText">✅ Вы успешно завершили задание. Вы можете прослушать или скачать запись ниже.</div>
 
     <audio id="audio" controls></audio>
 
     <div style="text-align:center;">
-      <button class="btn" onclick="playAudio()">▶️ Прослушать</button>
-      <button class="btn" onclick="downloadAudio()">⬇️ Скачать запись</button>
+      <button class="btn" id="playBtn">▶️ Прослушать</button>
+      <button class="btn" id="downloadBtn">⬇️ Скачать запись</button>
     </div>
 
     <div class="task-container">
@@ -169,32 +164,7 @@
   </div>
 
   <script>
-    // Аудио из sessionStorage
-    const audio = document.getElementById("audio");
-    const base64 = sessionStorage.getItem("ege4_audio_base64");
-    if (base64) {
-      audio.src = base64;
-    } else {
-      document.body.insertAdjacentHTML(
-        "beforeend",
-        "<p style='color:#b30000; text-align:center; margin-top:10px;'>❌ Запись не найдена.</p>"
-      );
-    }
-
-    function playAudio() {
-      if (audio.src) audio.play();
-      else alert("Запись не найдена.");
-    }
-
-    function downloadAudio() {
-      if (!base64) { alert("Запись не найдена."); return; }
-      const a = document.createElement("a");
-      a.href = base64;
-      a.download = "ege4_recording.webm";
-      a.click();
-    }
-
-    // Переключатель темы
+    // === Тема ===
     (function(){
       const btn = document.getElementById('themeBtn');
       const key = 'pref-theme';
@@ -209,6 +179,92 @@
         apply(curr === 'dark' ? 'light' : 'dark');
       });
     })();
+
+    // === Работа с записью ===
+    const audioEl = document.getElementById("audio");
+    const statusText = document.getElementById("statusText");
+    const playBtn = document.getElementById("playBtn");
+    const downloadBtn = document.getElementById("downloadBtn");
+
+    const base64 = sessionStorage.getItem("ege4_audio_base64");
+    const mimeStored = sessionStorage.getItem("ege4_audio_mime") || "audio/webm";
+
+    let objectURL = null;
+    let fileName = "ege4_recording";
+
+    const extByMime = {
+      "audio/webm": "webm",
+      "audio/webm;codecs=opus": "webm",
+      "audio/ogg": "ogg",
+      "audio/ogg;codecs=opus": "ogg",
+      "audio/mp4": "m4a",
+      "audio/mpeg": "mp3",
+      "audio/wav": "wav"
+    };
+    const normalizedMime = (mimeStored || "").toLowerCase();
+    const fileExt = extByMime[normalizedMime] || "webm";
+    fileName += "." + fileExt;
+
+    function dataURLtoBlob(dataURL) {
+      const parts = (dataURL || "").split(",");
+      if (parts.length < 2) return null;
+      const header = parts[0];
+      const b64 = parts[1];
+      const type = (header.match(/data:(.*?);base64/) || [,"application/octet-stream"])[1];
+      const bin = atob(b64);
+      const len = bin.length;
+      const bytes = new Uint8Array(len);
+      for (let i = 0; i < len; i++) bytes[i] = bin.charCodeAt(i);
+      return new Blob([bytes], { type });
+    }
+
+    function setButtonsEnabled(enabled) {
+      playBtn.disabled = !enabled;
+      downloadBtn.disabled = !enabled;
+    }
+
+    // Инициализация плеера
+    (function init(){
+      if (base64) {
+        try {
+          const blob = dataURLtoBlob(base64);
+          if (blob) {
+            objectURL = URL.createObjectURL(blob);
+            audioEl.src = objectURL;
+            audioEl.type = blob.type || mimeStored;
+          } else {
+            // fallback
+            audioEl.src = base64;
+            audioEl.type = mimeStored;
+          }
+        } catch (e) {
+          // fallback
+          audioEl.src = base64;
+          audioEl.type = mimeStored;
+        }
+        setButtonsEnabled(true);
+      } else {
+        statusText.textContent = "⚠️ Запись не найдена. Возможно, вы запретили доступ к микрофону или страница была закрыта до завершения.";
+        setButtonsEnabled(false);
+      }
+    })();
+
+    // Управление
+    playBtn.addEventListener("click", () => {
+      if (audioEl.src) audioEl.play();
+    });
+
+    downloadBtn.addEventListener("click", () => {
+      if (!audioEl.src) return;
+      const a = document.createElement("a");
+      a.href = objectURL || base64;
+      a.download = fileName;
+      a.click();
+    });
+
+    // Очистка ресурса
+    window.addEventListener("pagehide", () => { if (objectURL) URL.revokeObjectURL(objectURL); });
+    window.addEventListener("beforeunload", () => { if (objectURL) URL.revokeObjectURL(objectURL); });
   </script>
 </body>
 </html>

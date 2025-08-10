@@ -3,8 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <title>Task 4 — Variant 1</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
 
+  <!-- Анти-мигание темы -->
   <script>
     (function(){
       try{
@@ -159,6 +161,7 @@
   </div>
 
   <script>
+    // Тема
     (function(){
       const btn = document.getElementById('themeBtn');
       const key = 'pref-theme';
@@ -182,44 +185,83 @@
     const endBtn = document.getElementById("endBtn");
     const taskContainer = document.getElementById("taskContainer");
 
+    const RESULT_URL = "ege4_var1_4_result.html";
+
     let countdown = 3;
-    let totalTime = 180;
+    let totalTime = 180;       // сек
     let startTime;
     let interval;
     let mediaRecorder = null;
     let audioChunks = [];
     let hasStopped = false;
+    let streamRef = null;
+    let chosenMime = "";
+    let navigating = false;
+    let taskStarted = false;   // «страховки» активируем только после старта задания
+
+    function pickMimeType(){
+      const candidates = [
+        "audio/webm;codecs=opus",
+        "audio/webm",
+        "audio/mp4",            // Safari
+        "audio/ogg;codecs=opus",
+        "audio/ogg"
+      ];
+      for (const t of candidates){
+        if (window.MediaRecorder && MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(t)) {
+          return t;
+        }
+      }
+      return "";
+    }
 
     async function initMic() {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        mediaRecorder = new MediaRecorder(stream);
-        mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+        streamRef = stream;
+
+        chosenMime = pickMimeType();
+        try {
+          mediaRecorder = chosenMime
+            ? new MediaRecorder(stream, { mimeType: chosenMime })
+            : new MediaRecorder(stream);
+        } catch (e) {
+          mediaRecorder = new MediaRecorder(stream);
+          chosenMime = mediaRecorder.mimeType || "";
+        }
+
+        mediaRecorder.ondataavailable = e => { if (e.data && e.data.size) audioChunks.push(e.data); };
         mediaRecorder.onstop = () => {
           if (hasStopped) return;
           hasStopped = true;
-          const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+
+          try { streamRef?.getTracks()?.forEach(t => t.stop()); } catch(_) {}
+
+          const blobType = chosenMime || (mediaRecorder && mediaRecorder.mimeType) || "audio/webm";
+          const audioBlob = new Blob(audioChunks, { type: blobType });
           const reader = new FileReader();
           reader.onloadend = () => {
-            sessionStorage.setItem("ege4_audio_base64", reader.result);
-            window.location.href = "ege4_var1_4_result.html";
+            try {
+              sessionStorage.setItem("ege4_audio_base64", reader.result);
+              sessionStorage.setItem("ege4_audio_mime", blobType);
+            } catch (_) {}
+            gotoResult();
           };
           reader.readAsDataURL(audioBlob);
         };
+
         startCountdown();
       } catch (err) {
         alert("❌ Не удалось получить доступ к микрофону: " + err.message);
+        // продолжаем без записи
+        mediaRecorder = null;
         startCountdown();
       }
     }
 
     function startCountdown() {
       const cdInterval = setInterval(() => {
-        if (countdown > 1) {
-          timerEl.style.color = "#2b6cff";
-        } else {
-          timerEl.style.color = "#b30000";
-        }
+        timerEl.style.color = (countdown > 1) ? "#2b6cff" : "#b30000";
         timerEl.textContent = countdown;
         countdown--;
         if (countdown < 0) {
@@ -230,6 +272,7 @@
     }
 
     function startTask() {
+      taskStarted = true; // теперь «страховки» можно слушать
       timerEl.style.display = "none";
       progressContainerFixed.style.display = "block";
       imageContainer.style.display = "flex";
@@ -239,37 +282,79 @@
       progressTime.textContent = formatTime(totalTime);
       startTime = Date.now();
       audioChunks = [];
-      if (mediaRecorder) mediaRecorder.start();
+
+      if (mediaRecorder && mediaRecorder.state !== "recording") {
+        try { mediaRecorder.start(); } catch(_) {}
+      }
 
       interval = setInterval(() => {
         const timeElapsed = Math.floor((Date.now() - startTime) / 1000);
         const timeLeft = totalTime - timeElapsed;
         progressTime.textContent = formatTime(timeLeft);
         progressBarFixed.style.width = `${(timeLeft / totalTime) * 100}%`;
+
         if (timeLeft <= 0) {
           clearInterval(interval);
-          if (mediaRecorder && mediaRecorder.state === "recording") {
-            mediaRecorder.stop();
-          } else {
-            window.location.href = "ege4_var1_4_result.html";
-          }
+          safeStopOrFinish();
         }
       }, 500);
     }
 
     function formatTime(seconds) {
       const min = String(Math.floor(seconds / 60)).padStart(2, '0');
-      const sec = String(seconds % 60).padStart(2, '0');
+      const sec = String(Math.max(0, seconds % 60)).padStart(2, '0');
       return `${min}:${sec}`;
     }
 
-    function endManually() {
+    function gotoResult(){
+      if (!navigating) navigating = true;
+      if (location.href.endsWith(RESULT_URL)) return;
+      location.href = RESULT_URL;
+    }
+
+    function safeStopOrFinish(){
+      if (hasStopped) { gotoResult(); return; }
       if (mediaRecorder && mediaRecorder.state === "recording") {
-        mediaRecorder.stop();
+        try { mediaRecorder.stop(); } catch(_) { gotoResult(); }
       } else {
-        window.location.href = "ege4_var1_4_result.html";
+        try { streamRef?.getTracks()?.forEach(t => t.stop()); } catch(_) {}
+        gotoResult();
       }
     }
+
+    function endManually() {
+      clearInterval(interval);
+      safeStopOrFinish();
+    }
+
+    // Страховки — только после старта задания
+    document.addEventListener("visibilitychange", () => {
+      if (!taskStarted) return;
+      if (document.hidden) {
+        try { clearInterval(interval); } catch(_) {}
+        safeStopOrFinish();
+      }
+    });
+
+    window.addEventListener("pagehide", () => {
+      if (!taskStarted) return;
+      try { clearInterval(interval); } catch(_) {}
+      safeStopOrFinish();
+    });
+
+    window.addEventListener("freeze", () => {
+      if (!taskStarted) return;
+      try { clearInterval(interval); } catch(_) {}
+      safeStopOrFinish();
+    });
+
+    // blur отключён, чтобы alert/меню не ломали сценарий
+
+    window.addEventListener("beforeunload", () => {
+      try { clearInterval(interval); } catch(_) {}
+      try { if (mediaRecorder && mediaRecorder.state === "recording") mediaRecorder.stop(); } catch(_) {}
+      try { streamRef?.getTracks()?.forEach(t => t.stop()); } catch(_) {}
+    });
 
     window.onload = initMic;
   </script>

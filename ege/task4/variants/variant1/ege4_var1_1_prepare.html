@@ -34,19 +34,20 @@
     }
 
     *{ box-sizing:border-box }
-    html,body{ height:100% }
-
+    html{ height:100%; }
     body{
+      min-height:100svh; /* корректнее на мобилках с плавающими тулбарами */
       font-family:'Roboto', system-ui, sans-serif;
       margin:0;
-      /* достаточно места под фикс-бар + запас на мобильных (safe-area) */
+      /* место под фикс-бар + запас + safe-area */
       padding:40px 30px calc(56px + var(--footer-h) + env(safe-area-inset-bottom, 0px));
       color:var(--text);
       background:
         radial-gradient(1200px 600px at 70% -10%, #29417a40, transparent),
         radial-gradient(900px 500px at -10% 10%, #344b9340, transparent),
         var(--bg);
-      display:block; /* важно: блок, а не flex — чтобы страница нормально скроллилась */
+      display:block;
+      overflow-x:hidden;
     }
 
     a,button{ color:inherit; }
@@ -81,6 +82,9 @@
       color:#fff; border:none; border-radius:12px; cursor:pointer;
       box-shadow:0 10px 22px rgba(43,108,255,.3);
       transition: transform .06s ease, box-shadow .2s ease, filter .2s ease;
+      position:relative; z-index:10000; /* визуально поверх бара на крайних пикселях */
+      /* если к кнопке скроллят якорем/фокусом — докрутим выше бара */
+      scroll-margin-bottom: calc(var(--footer-h) + 24px);
     }
     .button:hover{ transform: translateY(-1px); filter: brightness(1.03); }
 
@@ -96,6 +100,7 @@
     #progressContainerFixed{
       position:fixed; bottom:0; left:0; width:100%; height:var(--footer-h);
       background:#eee; z-index:9999;
+      pointer-events:none; /* не перехватывает клики на самом краю */
     }
     .dark #progressContainerFixed{ background:#222; }
     #progressBarFixed{
@@ -109,10 +114,9 @@
       text-shadow:0 1px 2px rgba(0,0,0,.35);
     }
 
-    /* Проставка под фиксированный нижний бар —
-       даёт докрутить контент так, чтобы нижняя кнопка полностью вышла над баром */
+    /* Проставка под фиксированный нижний бар — побольше запаса */
     .fixed-footer-spacer{
-      height: calc(var(--footer-h) + 24px + env(safe-area-inset-bottom, 0px));
+      height: calc(var(--footer-h) + 56px + env(safe-area-inset-bottom, 0px));
     }
 
     @media (max-width:800px){

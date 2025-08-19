@@ -1,6 +1,5 @@
 // ege/common.js
 
-// === Тумблер темы ===
 export function toggleThemeInit(key = 'pref-theme') {
   const root = document.documentElement;
   const btn = document.getElementById('themeBtn');
@@ -15,17 +14,22 @@ export function toggleThemeInit(key = 'pref-theme') {
   });
 }
 
-// === Защита от двойного перехода ===
 export function navigateOnce(url) {
   if (navigateOnce.lock) return;
   navigateOnce.lock = true;
   location.href = url;
 }
 
-// === Форматирование времени ===
 export function fmtTime(ms) {
   const s = Math.max(0, Math.floor(ms / 1000));
   const m = String(Math.floor(s / 60)).padStart(2, '0');
   const r = String(s % 60).padStart(2, '0');
   return `${m}:${r}`;
+}
+
+// Безопасная остановка записи + переход (Safari-safe)
+export function safeStop(mediaRecorder, streamRef, nextUrl) {
+  try { if (mediaRecorder?.state === 'recording') mediaRecorder.stop(); } catch {}
+  try { streamRef?.getTracks()?.forEach(t => t.stop()); } catch {}
+  navigateOnce(nextUrl);
 }

@@ -7,6 +7,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
+  <!-- Анти-мигание темы -->
   <script>
     (function () {
       try {
@@ -65,6 +66,7 @@
   </style>
 </head>
 <body>
+
   <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
 
   <h1 id="h1">Результат сохранён</h1>
@@ -83,17 +85,18 @@
   </div>
 
   <div class="text-box">
-    Sherlock Holmes is a famous fictional character from British literature. He was created by Sir Arthur Conan Doyle. Holmes is a private detective who lives in London. Many people know him because of his great mind and amazing logical thinking. He solves difficult crimes that others cannot.
+    Bioluminescence is the ability of certain living organisms to produce light. This fascinating phenomenon can be observed in various species of deep-sea fish, jellyfish, fireflies, and even some fungi.
+The light is usually blue or green, which travels best through water. These organisms use light for different reasons. Some attract mates or prey, while others use it to confuse predators. For example, the anglerfish has a glowing lure to draw in its victims in the dark ocean depths.
 
-In the stories, Holmes is usually described as tall and thin. He often wears a hat and smokes a pipe. He is very intelligent and notices the smallest details. He doesn’t talk much and prefers to work alone or with his friend Dr Watson. Holmes likes music and sometimes plays the violin.
+Scientists believe that studying bioluminescence can help develop new medical and technological solutions. Special proteins from glowing jellyfish are already used in genetic research.These discoveries support innovation in areas like disease detection and cell tracking.
 
-Although Holmes is not a real person, he has become a symbol of clever thinking and observation. People all over the world read stories about him and watch films and series. Many believe that Sherlock Holmes is the best detective character ever created.
+Bioluminescence is not only beautiful — it is a powerful tool of survival and discovery.These glowing creatures remind us how much we still have to learn about the natural world. Their light, shining in the darkness, is both mysterious and meaningful.
   </div>
 
   <div>
     <a id="toVariants" class="button" href="#">Перейти к выбору варианта</a>
-    <a id="toTaskMenu" class="button" href="#">Перейти к выбору режима</a>
-    <a id="toModeMenu" class="button" href="#">Перейти к выбору задания</a>
+    <a id="toTaskMenu" class="button" href="#">Перейти к выбору задания</a>
+    <a id="toModeMenu" class="button" href="#">Перейти к выбору режима</a>
     <a id="toHome" class="button" href="/oge-trainer/index.html">Перейти на главную</a>
   </div>
 
@@ -114,42 +117,43 @@ Although Holmes is not a real person, he has become a symbol of clever thinking 
       });
     })();
 
-    // ===== База /.../ege/ и номер варианта =====
+    // ===== Навигация (универсально) =====
+    // База до /ege/
     function getEgeBase(){
-      const parts = location.pathname.split('/').filter(Boolean);
-      const i = parts.indexOf('ege');
-      return i !== -1 ? '/' + parts.slice(0, i + 1).join('/') + '/' : '/ege/';
-    }
-    // ожидаем: .../ege/task1/variants/variant{n}/ege1_var{n}_4_result.html
-    function getVariantNumber(){
-      const m = location.pathname.match(/\/task1\/variants\/variant(\d+)\/ege1_var\1_4_result\.html$/i);
-      return m ? Number(m[1]) : null;
+      const p = location.pathname;
+      const i = p.indexOf('/ege/');
+      return i >= 0 ? p.slice(0, i + 5) : '/ege/';
     }
 
-    const EGE_BASE = getEgeBase();
-    const VAR_N = getVariantNumber();
-
-    // ===== Заголовки и ссылки =====
     (function initNav(){
-      if (VAR_N){
-        document.getElementById('pageTitle').textContent = `Результат — Вариант ${VAR_N}`;
-        document.getElementById('h1').textContent = `Результат сохранён — Вариант ${VAR_N}`;
+      const path = location.pathname;
+      const base = getEgeBase();
+
+      // /ege/task{t}/variants/variant{n}/ege{t}_var{n}_4_result.html
+      const m = path.match(/\/ege\/task(\d+)\/variants\/variant(\d+)\/ege\1_var\2_4_result\.html/i);
+      const task = m ? m[1] : '1';
+      const n    = m ? m[2] : '';
+
+      // Заголовки
+      if (n){
+        document.getElementById('pageTitle').textContent = `Результат — Вариант ${n}`;
+        document.getElementById('h1').textContent = `Результат сохранён — Вариант ${n}`;
       }
 
-      // Повторить этот вариант
-      const repeatHref = VAR_N
-        ? `${EGE_BASE}task1/variants/variant${VAR_N}/ege1_var${VAR_N}_1_prepare.html`
-        : `${EGE_BASE}task1/ege1.html`;
-      document.getElementById('repeatBtn').href = repeatHref;
+      // Повторить этот же вариант (с начала)
+      document.getElementById('repeatBtn').href =
+        path.replace(/_4_result\.html$/i, '_1_prepare.html');
 
-      // ✅ К выбору варианта (список вариантов Task 1)
-      document.getElementById('toVariants').href = `${EGE_BASE}task1/ege1.html`;
+      // ✅ К выбору ВАРИАНТА — обязательно сохраняем папку variants!
+      //    Хвост ".../variants/variantN/<file>" → ".../variants/ege{task}.html"
+      document.getElementById('toVariants').href =
+        path.replace(/\/variants\/variant\d+\/[^/]+$/i, `/variants/ege${task}.html`);
 
-      // ✅ К выбору задания (меню заданий ЕГЭ)
-      document.getElementById('toTaskMenu').href = `${EGE_BASE}ege.html`;
+      // ✅ К выбору ЗАДАНИЯ
+      document.getElementById('toTaskMenu').href = `${base}ege.html`;
 
-      // К выбору режима
-      document.getElementById('toModeMenu').href = `${EGE_BASE}ege_menu.html`;
+      // ✅ К выбору РЕЖИМА
+      document.getElementById('toModeMenu').href = `${base}ege_menu.html`;
     })();
 
     // ===== Аудио =====
@@ -173,7 +177,7 @@ Although Holmes is not a real person, he has become a symbol of clever thinking 
         'audio/wav': 'wav'
       };
       const ext = extByMime[mimeStored] || 'webm';
-      return `ege1_variant${VAR_N || ''}.${ext}`;
+      return `ege1_variant${(location.pathname.match(/variant(\d+)/)||[])[1]||''}.${ext}`;
     })();
 
     function dataURLtoBlob(dataURL){

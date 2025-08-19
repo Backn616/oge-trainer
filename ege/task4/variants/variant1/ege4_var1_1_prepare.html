@@ -192,7 +192,10 @@
     const progressTime = document.getElementById('progressTime');
     const totalTime = 150000; // 2.5 минуты в мс
     const endTime = Date.now() + totalTime;
-    const NEXT_URL = 'ege4_var1_2_mic.html';
+
+    // ✅ Решение "через n": просто меняем окончание файла
+    // .../variantN/ege4_varN_1_prepare.html  →  .../variantN/ege4_varN_2_mic.html
+    const NEXT_URL = location.pathname.replace(/_1_prepare\.html$/i, '_2_mic.html');
 
     function formatLeft(ms){
       const s = Math.max(0, Math.floor(ms / 1000));

@@ -4,9 +4,11 @@
   <meta charset="UTF-8" />
   <title id="pageTitle">Результат — Вариант</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
+  <!-- Анти-мигание темы -->
   <script>
     (function () {
       try {
@@ -38,6 +40,7 @@
     h1{ font-size:36px; color:var(--primary); margin:0 0 10px; }
     .status{ font-size:22px; color:#1f7a2e; margin-bottom:26px; }
     .dark .status{ color:#5ee397; }
+
     .instruction-box{
       max-width:1600px; width:95%; margin:0 auto 30px; font-size:22px; line-height:1.6; text-align:left;
       border:2px solid var(--panel-border); padding:25px; border-radius:12px; background:var(--panel-bg); box-shadow:var(--shadow);
@@ -46,6 +49,7 @@
       max-width:1600px; width:95%; margin:0 auto 30px; font-size:32px; line-height:1.9; text-align:left;
       border:1px solid #ccc; padding:40px; border-radius:12px; background:var(--card); box-shadow:var(--shadow);
     }
+
     .button{
       font-size:20px; padding:16px 32px; background:linear-gradient(135deg, var(--primary), var(--primary-600));
       color:#fff; border:none; border-radius:12px; cursor:pointer; text-decoration:none;
@@ -54,6 +58,7 @@
     }
     .button:hover{ transform:translateY(-1px); filter:brightness(1.03); }
     .button:disabled{ opacity:.6; cursor:not-allowed; transform:none; }
+
     .theme-toggle{
       position:fixed; top:16px; right:16px; z-index:1000;
       border:1px solid #ffffff22; background:transparent; color:var(--text);
@@ -61,10 +66,12 @@
       transition:transform .08s ease, filter .2s ease;
     }
     .theme-toggle:hover{ transform:translateY(-1px); filter:brightness(1.03); }
+
     audio{ margin:20px auto; width:min(900px, 90%); display:block; }
   </style>
 </head>
 <body>
+
   <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
 
   <h1 id="h1">Результат сохранён</h1>
@@ -92,9 +99,9 @@ Although Holmes is not a real person, he has become a symbol of clever thinking 
 
   <div>
     <a id="toVariants" class="button" href="#">Перейти к выбору варианта</a>
-    <a id="toModeMenu"class="button" href="#">Перейти к выбору режима</a>
     <a id="toTaskMenu" class="button" href="#">Перейти к выбору задания</a>
-    <a id="toHome" class="button" href="/oge-trainer/index.html">Перейти на главную</a>   
+    <a id="toModeMenu" class="button" href="#">Перейти к выбору режима</a>
+    <a id="toHome" class="button" href="/oge-trainer/index.html">Перейти на главную</a>
   </div>
 
   <script>
@@ -136,19 +143,18 @@ Although Holmes is not a real person, he has become a symbol of clever thinking 
         document.getElementById('h1').textContent = `Результат сохранён — Вариант ${VAR_N}`;
       }
 
-      // Повторить этот вариант
-      const repeatHref = VAR_N
-        ? `${EGE_BASE}task1/variants/variant${VAR_N}/ege1_var${VAR_N}_1_prepare.html`
-        : `${EGE_BASE}task1/ege1.html`;
-      document.getElementById('repeatBtn').href = repeatHref;
+      // Повторить этот вариант (прямо по текущему пути)
+      document.getElementById('repeatBtn').href =
+        location.pathname.replace(/_4_result\.html$/i, '_1_prepare.html');
 
       // ✅ К выбору варианта (список вариантов Task 1)
-      document.getElementById('toVariants').href = `${EGE_BASE}task1/ege1.html`;
+      //   Раньше было ../ege1.html. Теперь строим от корня /ege/.
+      document.getElementById('toVariants').href = `${EGE_BASE}task1/variants/ege1.html`;
 
       // ✅ К выбору задания (меню заданий ЕГЭ)
       document.getElementById('toTaskMenu').href = `${EGE_BASE}ege.html`;
 
-      // К выбору режима
+      // ✅ К выбору режима (главное меню ЕГЭ)
       document.getElementById('toModeMenu').href = `${EGE_BASE}ege_menu.html`;
     })();
 

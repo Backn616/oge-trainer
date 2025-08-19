@@ -1,10 +1,15 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <title>Task 4 — Variant 1</title>
+  <title>Task 4 — Выполнение</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+
+  <!-- Анти-мигание темы -->
   <script>
     (function(){
       try{
@@ -13,37 +18,99 @@
       }catch(_){}
     })();
   </script>
+
   <style>
-    :root { --bg:#f7f9ff; --card:#ffffff; --text:#0b1020; --muted:#5a6475; --primary:#2b6cff; --primary-600:#1f58d9; --ring:#bfd3ff; --success:#25c26e; --danger:#b30000; --shadow:0 10px 25px rgba(17,24,39,.08); }
-    .dark { --bg:#0b1020; --card:rgba(255,255,255,0.08); --text:#eaf0ff; --muted:#a0aabd; --primary:#6aa3ff; --primary-600:#4b8dff; --ring:#3b4b66; --success:#25c26e; --danger:#ff6b6b; --shadow:0 10px 35px rgba(0,0,0,.35); }
-    body { font-family:'Roboto', sans-serif; margin:0; padding:40px 30px 80px; color:var(--text);
-      background: radial-gradient(1200px 600px at 70% -10%, #29417a40, transparent), radial-gradient(900px 500px at -10% 10%, #344b9340, transparent), var(--bg);
-      text-align:center; }
-    .theme-toggle { position:fixed; top:16px; right:16px; z-index:10000; border:1px solid #ffffff22; background:transparent; color:var(--text);
-      padding:10px 14px; border-radius:10px; cursor:pointer; backdrop-filter: blur(6px); transition: transform .08s ease, filter .2s ease; }
-    .theme-toggle:hover { transform: translateY(-1px); filter: brightness(1.03); }
-    .wrap { max-width:1500px; margin:0 auto; }
-    .task-container { background:var(--card); border-left:5px solid var(--primary); padding:20px 30px 10px; margin:0 auto 20px; font-size:20px; line-height:1.7; text-align:left; box-shadow:var(--shadow); border-radius:12px; display:none; }
-    .instruction { font-weight:700; margin-top:10px; }
-    .timer { font-size:72px; margin:30px 0; font-weight:700; }
-    .images { display:none; justify-content:center; align-items:flex-start; gap:30px; margin-bottom:20px; }
-    .images img { max-width:100%; height:auto; width:48%; border-radius:12px; box-shadow:var(--shadow); }
-    .end-button { display:none; margin:20px auto 0; padding:16px 32px; font-size:20px; font-weight:600;
-      background:linear-gradient(135deg, var(--primary), var(--primary-600)); color:#fff; border:none; border-radius:12px; cursor:pointer; box-shadow:0 10px 22px rgba(43,108,255,.3); transition: transform .06s ease, box-shadow .2s ease; }
-    .end-button:hover { transform: scale(1.05); }
-    #progressContainerFixed { position:fixed; bottom:0; left:0; width:100%; height:32px; background:#eee; z-index:9999; display:none; }
-    .dark #progressContainerFixed { background:#222; }
-    #progressBarFixed { height:100%; width:0%; background: linear-gradient(to right, #0066ff, #00cfff); position:relative; transition: width .5s linear; }
-    .progress-time { position:absolute; right:14px; top:50%; transform:translateY(-50%); color:#fff; font-weight:700; font-size:20px; user-select:none; }
-    @media (max-width:800px){ .images{ flex-direction:column; align-items:center; } .images img{ width:100%; } }
+    :root{
+      --bg:#f7f9ff; --card:#ffffff; --text:#0b1020; --muted:#5a6475;
+      --primary:#2b6cff; --primary-600:#1f58d9; --ring:#bfd3ff; --danger:#b30000;
+      --shadow:0 10px 25px rgba(17,24,39,.08); --focus:0 0 0 4px var(--ring);
+    }
+    .dark{
+      --bg:#0b1020; --card:rgba(255,255,255,0.08); --text:#eaf0ff; --muted:#a0aabd;
+      --primary:#6aa3ff; --primary-600:#4b8dff; --ring:#a9c6ff; --danger:#ff6b6b;
+      --shadow:0 10px 35px rgba(0,0,0,.35);
+    }
+
+    *{ box-sizing:border-box }
+    html,body{ height:100% }
+    body{
+      font-family:'Roboto',sans-serif;
+      margin:0; padding:40px 30px 80px; color:var(--text);
+      background:
+        radial-gradient(1200px 600px at 70% -10%, #29417a40, transparent),
+        radial-gradient(900px 500px at -10% 10%, #344b9340, transparent),
+        var(--bg);
+      text-align:center;
+    }
+    :focus-visible{ outline:none; box-shadow:var(--focus) }
+
+    .theme-toggle{
+      position:fixed; top:16px; right:16px; z-index:10000;
+      border:1px solid #ffffff22; background:transparent; color:var(--text);
+      padding:10px 14px; border-radius:10px; cursor:pointer; backdrop-filter: blur(6px);
+      transition: transform .08s ease, filter .2s ease;
+    }
+    .theme-toggle:hover{ transform: translateY(-1px); filter: brightness(1.03); }
+
+    .wrap{ max-width:1500px; margin:0 auto; }
+    .task-container{
+      background:var(--card); border-left:5px solid var(--primary);
+      padding:20px 30px 10px; margin:0 auto 20px;
+      font-size:20px; line-height:1.7; text-align:left;
+      box-shadow:var(--shadow); border-radius:12px; display:none;
+    }
+    .instruction{ font-weight:700; margin-top:10px; }
+
+    .timer{
+      font-size:72px; margin:30px 0; font-weight:700;
+    }
+
+    .images{
+      display:none; justify-content:center; align-items:flex-start;
+      gap:30px; margin-bottom:20px;
+    }
+    .images img{
+      max-width:100%; height:auto; width:48%;
+      border-radius:12px; box-shadow:var(--shadow);
+    }
+
+    .end-button{
+      display:none; margin:20px auto 0; padding:16px 32px;
+      font-size:20px; font-weight:600;
+      background:linear-gradient(135deg, var(--primary), var(--primary-600));
+      color:#fff; border:none; border-radius:12px; cursor:pointer;
+      box-shadow:0 10px 22px rgba(43,108,255,.3);
+      transition: transform .06s ease, box-shadow .2s ease;
+    }
+    .end-button:hover{ transform:scale(1.05); }
+
+    #progressContainerFixed{
+      position:fixed; bottom:0; left:0; width:100%; height:32px;
+      background:#eee; z-index:9999; display:none;
+    }
+    .dark #progressContainerFixed{ background:#222; }
+    #progressBarFixed{
+      height:100%; width:0%;
+      background: linear-gradient(to right, #0066ff, #00cfff);
+      position:relative; /* без transition — двигаем rAF-ом */
+    }
+    .progress-time{
+      position:absolute; right:14px; top:50%; transform:translateY(-50%);
+      color:#fff; font-weight:700; font-size:20px; user-select:none;
+    }
+
+    @media (max-width:800px){
+      .images{ flex-direction:column; align-items:center; }
+      .images img{ width:100%; }
+    }
   </style>
 </head>
 <body>
-  <button id="themeBtn" class="theme-toggle">🌓 Тема</button>
+  <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
 
   <div class="wrap">
-    <div class="task-container" id="taskContainer">
-      <b>4 Task. Imagine that you and your friend are doing a school project “Spending holidays: in the city or in the countryside”.</b>
+    <div class="task-container" id="taskContainer" aria-labelledby="taskTitle">
+      <b id="taskTitle">4 Task. Imagine that you and your friend are doing a school project “Spending holidays: in the city or in the countryside”.</b>
       You have found some photos to illustrate it but for technical reasons you cannot send them now. Leave a voice message to your friend explaining your choice of the photos and sharing some ideas about the project. In 3 minutes be ready to:
       <ul>
         <li>explain the choice of the illustrations for the project by briefly describing them and noting the differences;</li>
@@ -54,162 +121,221 @@
       <div class="instruction">You will speak for not more than 3 minutes (12–15 sentences). You have to talk continuously.</div>
     </div>
 
-    <div class="timer" id="timer">3</div>
+    <div class="timer" id="timer" aria-live="polite">3</div>
 
-    <div class="images" id="imageContainer">
+    <div class="images" id="imageContainer" aria-label="Project illustrations">
       <img src="photo1_city.png" alt="City holidays">
       <img src="photo2_countryside.png" alt="Countryside holidays">
     </div>
 
-    <button class="end-button" id="endBtn" onclick="endManually()">✅ Закончить</button>
+    <button class="end-button" id="endBtn" type="button" aria-label="Закончить запись">✅ Закончить</button>
   </div>
 
-  <div id="progressContainerFixed">
+  <div id="progressContainerFixed" role="timer" aria-live="polite" aria-label="Оставшееся время ответа">
     <div id="progressBarFixed">
       <span id="progressTime" class="progress-time">03:00</span>
     </div>
   </div>
 
   <script>
+    /* === Тема === */
     (function(){
-      const btn = document.getElementById('themeBtn'); const key = 'pref-theme'; const root = document.documentElement;
-      function apply(mode){ root.classList.toggle('dark', mode === 'dark'); localStorage.setItem(key, mode); }
+      const btn = document.getElementById('themeBtn');
+      const key = 'pref-theme';
+      const root = document.documentElement;
+      function apply(m){ root.classList.toggle('dark', m==='dark'); localStorage.setItem(key, m); }
       apply(localStorage.getItem(key) || 'light');
-      btn.addEventListener('click', () => { const curr = localStorage.getItem(key) || 'light'; apply(curr === 'dark' ? 'light' : 'dark'); });
+      btn.addEventListener('click', ()=>{ const curr = localStorage.getItem(key) || 'light'; apply(curr==='dark'?'light':'dark'); });
     })();
 
-    const timerEl = document.getElementById("timer");
-    const progressBarFixed = document.getElementById("progressBarFixed");
-    const progressTime = document.getElementById("progressTime");
-    const progressContainerFixed = document.getElementById("progressContainerFixed");
-    const imageContainer = document.getElementById("imageContainer");
-    const endBtn = document.getElementById("endBtn");
-    const taskContainer = document.getElementById("taskContainer");
+    /* === DOM === */
+    const timerEl = document.getElementById('timer');
+    const progressBar = document.getElementById('progressBarFixed');
+    const progressTime = document.getElementById('progressTime');
+    const progressContainer = document.getElementById('progressContainerFixed');
+    const imageContainer = document.getElementById('imageContainer');
+    const endBtn = document.getElementById('endBtn');
+    const taskContainer = document.getElementById('taskContainer');
 
+    /* === Навигация «через n» === */
     const RESULT_URL = location.pathname.replace(/_3_task\.html$/i, '_4_result.html');
-
-    let countdown = 3;
-    let totalTime = 180; // сек
-    let startTime;
-    let interval;
-    let mediaRecorder = null;
-    let audioChunks = [];
-    let hasStopped = false;
-    let streamRef = null;
-    let chosenMime = "";
     let navigating = false;
-    let taskStarted = false;
-
-    function pickMimeType(){
-      const candidates = ["audio/webm;codecs=opus","audio/webm","audio/mp4","audio/ogg;codecs=opus","audio/ogg"];
-      for (const t of candidates){ if (window.MediaRecorder && MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(t)) return t; }
-      return "";
+    function navigateOnce(url){
+      if (navigating) return;
+      navigating = true;
+      location.href = url;
     }
 
-    async function initMic() {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    /* === Запись === */
+    let mediaRecorder = null;
+    let audioChunks = [];
+    let streamRef = null;
+    let chosenMime = '';
+    let hasStopped = false;
+
+    function pickMimeType(){
+      const candidates = [
+        'audio/webm;codecs=opus',
+        'audio/webm',
+        'audio/mp4',            // Safari
+        'audio/ogg;codecs=opus',
+        'audio/ogg'
+      ];
+      for (const t of candidates){
+        if (window.MediaRecorder?.isTypeSupported?.(t)) return t;
+      }
+      return '';
+    }
+
+    async function initMic(){
+      try{
+        const stream = await navigator.mediaDevices.getUserMedia({ audio:true });
         streamRef = stream;
 
         chosenMime = pickMimeType();
-        try { mediaRecorder = chosenMime ? new MediaRecorder(stream, { mimeType: chosenMime }) : new MediaRecorder(stream); }
-        catch { mediaRecorder = new MediaRecorder(stream); chosenMime = mediaRecorder.mimeType || ""; }
+        try{
+          mediaRecorder = chosenMime ? new MediaRecorder(stream, { mimeType: chosenMime })
+                                     : new MediaRecorder(stream);
+        }catch{
+          mediaRecorder = new MediaRecorder(stream);
+          chosenMime = mediaRecorder.mimeType || '';
+        }
 
-        mediaRecorder.ondataavailable = e => { if (e.data && e.data.size) audioChunks.push(e.data); };
+        mediaRecorder.ondataavailable = (e)=>{ if (e.data && e.data.size) audioChunks.push(e.data); };
         mediaRecorder.onstop = () => {
           if (hasStopped) return;
           hasStopped = true;
-          try { streamRef?.getTracks()?.forEach(t => t.stop()); } catch(_) {}
-          const blobType = chosenMime || (mediaRecorder && mediaRecorder.mimeType) || "audio/webm";
+          try{ streamRef?.getTracks()?.forEach(t=>t.stop()); }catch{}
+          const blobType = chosenMime || mediaRecorder?.mimeType || 'audio/webm';
           const audioBlob = new Blob(audioChunks, { type: blobType });
           const reader = new FileReader();
           reader.onloadend = () => {
-            try {
-              sessionStorage.setItem("ege4_audio_base64", reader.result);
-              sessionStorage.setItem("ege4_audio_mime", blobType);
-            } catch (_) {}
-            gotoResult();
+            try{
+              sessionStorage.setItem('ege4_audio_base64', reader.result);
+              sessionStorage.setItem('ege4_audio_mime', blobType);
+              const meta = JSON.parse(sessionStorage.getItem('ege4_meta')||'{}');
+              meta.recordedAt = Date.now();
+              meta.actualDurationSec = Math.round((Date.now() - (meta.taskStartedAt||Date.now()))/1000);
+              sessionStorage.setItem('ege4_meta', JSON.stringify(meta));
+            }catch{}
+            navigateOnce(RESULT_URL);
           };
           reader.readAsDataURL(audioBlob);
         };
 
         startCountdown();
-      } catch (err) {
-        alert("❌ Не удалось получить доступ к микрофону: " + err.message);
-        mediaRecorder = null;
+      }catch(err){
+        alert('❌ Не удалось получить доступ к микрофону: ' + err.message);
+        mediaRecorder = null; // продолжим без записи
         startCountdown();
       }
     }
 
-    function startCountdown() {
-      const cdInterval = setInterval(() => {
-        timerEl.style.color = (countdown > 1) ? "#2b6cff" : "#b30000";
+    /* === Countdown 3 → старт задания === */
+    let countdown = 3;
+    function startCountdown(){
+      const cd = setInterval(()=>{
+        timerEl.style.color = (countdown > 1) ? '#2b6cff' : '#b30000';
         timerEl.textContent = countdown;
         countdown--;
-        if (countdown < 0) { clearInterval(cdInterval); startTask(); }
+        if (countdown < 0){
+          clearInterval(cd);
+          startTask();
+        }
       }, 1000);
     }
 
-    function startTask() {
-      taskStarted = true;
-      timerEl.style.display = "none";
-      progressContainerFixed.style.display = "block";
-      imageContainer.style.display = "flex";
-      taskContainer.style.display = "block";
-      endBtn.style.display = "inline-block";
+    /* === Задание (3:00) — плавный rAF‑таймер === */
+    const TOTAL_MS = 180_000;
+    let startTs = 0;
+    let rafId = 0;
 
-      progressTime.textContent = formatTime(totalTime);
-      startTime = Date.now();
+    function startTask(){
+      // UI
+      taskContainer.style.display = 'block';
+      imageContainer.style.display = 'flex';
+      endBtn.style.display = 'inline-block';
+      progressContainer.style.display = 'block';
+      timerEl.style.display = 'none';
+
+      // Метаданные
+      try{
+        const meta = JSON.parse(sessionStorage.getItem('ege4_meta')||'{}');
+        meta.taskStartedAt = Date.now();
+        meta.limitSec = 180;
+        sessionStorage.setItem('ege4_meta', JSON.stringify(meta));
+      }catch{}
+
+      // Запись
       audioChunks = [];
+      try{ if (mediaRecorder && mediaRecorder.state !== 'recording') mediaRecorder.start(); }catch{}
 
-      if (mediaRecorder && mediaRecorder.state !== "recording") { try { mediaRecorder.start(); } catch(_) {} }
-
-      interval = setInterval(() => {
-        const timeElapsed = Math.floor((Date.now() - startTime) / 1000);
-        const timeLeft = totalTime - timeElapsed;
-        progressTime.textContent = formatTime(timeLeft);
-        progressBarFixed.style.width = `${(timeLeft / totalTime) * 100}%`;
-        if (timeLeft <= 0) { clearInterval(interval); safeStopOrFinish(); }
-      }, 500);
+      // rAF таймер
+      startTs = performance.now();
+      progressTime.textContent = formatTime(TOTAL_MS);
+      tick();
     }
 
-    function formatTime(seconds) {
-      const min = String(Math.floor(seconds / 60)).padStart(2, '0');
-      const sec = String(Math.max(0, seconds % 60)).padStart(2, '0');
-      return `${min}:${sec}`;
-    }
+    function tick(){
+      const now = performance.now();
+      const elapsed = now - startTs;
+      const left = Math.max(0, TOTAL_MS - elapsed);
 
-    function gotoResult(){
-      if (!navigating) navigating = true;
-      if (location.href.endsWith(RESULT_URL)) return;
-      location.href = RESULT_URL;
-    }
+      progressTime.textContent = formatTime(left);
+      progressBar.style.width = `${(left / TOTAL_MS) * 100}%`;
 
-    function safeStopOrFinish(){
-      if (hasStopped) { gotoResult(); return; }
-      if (mediaRecorder && mediaRecorder.state === "recording") {
-        try { mediaRecorder.stop(); } catch(_) { gotoResult(); }
-      } else {
-        try { streamRef?.getTracks()?.forEach(t => t.stop()); } catch(_) {}
-        gotoResult();
+      if (left <= 0){
+        safeStopOrFinish();
+      }else{
+        rafId = requestAnimationFrame(tick);
       }
     }
 
-    function endManually() { clearInterval(interval); safeStopOrFinish(); }
+    function formatTime(ms){
+      const s = Math.max(0, Math.floor(ms/1000));
+      const m = String(Math.floor(s/60)).padStart(2,'0');
+      const r = String(s%60).padStart(2,'0');
+      return `${m}:${r}`;
+    }
 
-    document.addEventListener("visibilitychange", () => {
+    function safeStopOrFinish(){
+      try{ cancelAnimationFrame(rafId); }catch{}
+      if (hasStopped) { navigateOnce(RESULT_URL); return; }
+      try{
+        if (mediaRecorder && mediaRecorder.state === 'recording') {
+          mediaRecorder.stop();
+        } else {
+          try{ streamRef?.getTracks()?.forEach(t=>t.stop()); }catch{}
+          navigateOnce(RESULT_URL);
+        }
+      }catch{
+        try{ streamRef?.getTracks()?.forEach(t=>t.stop()); }catch{}
+        navigateOnce(RESULT_URL);
+      }
+    }
+
+    // Ручное завершение
+    endBtn.addEventListener('click', ()=>{
+      safeStopOrFinish();
+    });
+
+    /* === Страховки после старта === */
+    let taskStarted = false;
+    document.addEventListener('visibilitychange', ()=>{
+      if (!taskStarted && countdown < 0) taskStarted = true;
       if (!taskStarted) return;
-      if (document.hidden) { try { clearInterval(interval); } catch(_) {} safeStopOrFinish(); }
+      if (document.hidden) safeStopOrFinish();
     });
-    window.addEventListener("pagehide", () => { if (!taskStarted) return; try { clearInterval(interval); } catch(_) {} safeStopOrFinish(); });
-    window.addEventListener("freeze", () => { if (!taskStarted) return; try { clearInterval(interval); } catch(_) {} safeStopOrFinish(); });
+    window.addEventListener('pagehide', ()=>{ if (countdown < 0) safeStopOrFinish(); });
+    window.addEventListener('freeze', ()=>{ if (countdown < 0) safeStopOrFinish(); });
 
-    window.addEventListener("beforeunload", () => {
-      try { clearInterval(interval); } catch(_) {}
-      try { if (mediaRecorder && mediaRecorder.state === "recording") mediaRecorder.stop(); } catch(_) {}
-      try { streamRef?.getTracks()?.forEach(t => t.stop()); } catch(_) {}
+    window.addEventListener('beforeunload', ()=>{
+      try{ cancelAnimationFrame(rafId); }catch{}
+      try{ if (mediaRecorder && mediaRecorder.state === 'recording') mediaRecorder.stop(); }catch{}
+      try{ streamRef?.getTracks()?.forEach(t=>t.stop()); }catch{}
     });
 
+    // Старт
     window.onload = initMic;
   </script>
 </body>

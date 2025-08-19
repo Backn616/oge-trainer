@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Task 1 — Preparation</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <!-- Анти-мигание темы -->
+  <script>
+    (function(){
+      try{
+        const saved = localStorage.getItem('pref-theme') || 'light';
+        if(saved === 'dark') document.documentElement.classList.add('dark');
+      }catch(_){}
+    })();
+  </script>
+
+  <style>
+    :root{
+      --bg:#f7f9ff; --text:#0b1020; --muted:#5a6475; --card:#ffffff;
+      --primary:#2b6cff; --primary-600:#1f58d9; --shadow:0 10px 25px rgba(17,24,39,.08);
+      --panel-bg:#f9f9f9; --panel-border:#0077cc;
+    }
+    .dark{
+      --bg:#0b1020; --text:#eaf0ff; --muted:#b9c2d3; --card:rgba(255,255,255,.08);
+      --primary:#6aa3ff; --primary-600:#4b8dff; --shadow:0 10px 35px rgba(0,0,0,.35);
+      --panel-bg:rgba(255,255,255,.08); --panel-border:#4b8dff;
+    }
+
+    body{
+      font-family: Inter, system-ui, Segoe UI, Roboto, Arial, sans-serif;
+      margin:0; padding:40px 20px 80px; color:var(--text); text-align:center;
+      background:
+        radial-gradient(1200px 600px at 70% -10%, #29417a40, transparent),
+        radial-gradient(900px 500px at -10% 10%, #344b9340, transparent),
+        var(--bg);
+    }
+
+    .instruction-box{
+      max-width:1600px; width:95%; margin:0 auto 30px; font-size:22px; line-height:1.6; text-align:left;
+      border:2px solid var(--panel-border); padding:25px; border-radius:12px; background:var(--panel-bg); box-shadow:var(--shadow);
+    }
+    .text-box{
+      max-width:1600px; width:95%; margin:0 auto 30px; font-size:32px; line-height:1.9; text-align:left;
+      border:1px solid #ccc; padding:40px; border-radius:12px; background:var(--card); box-shadow:var(--shadow);
+    }
+
+    .button{
+      font-size:20px; padding:16px 32px; background:linear-gradient(135deg, var(--primary), var(--primary-600));
+      color:#fff; border:none; border-radius:12px; cursor:pointer;
+      box-shadow:0 10px 22px rgba(43,108,255,.28); transition:transform .06s ease, filter .2s ease;
+      display:inline-block;
+    }
+    .button:hover{ transform:translateY(-1px); filter:brightness(1.03); }
+
+    .theme-toggle{
+      position:fixed; top:16px; right:16px; z-index:1000; border:1px solid #ffffff22; background:transparent; color:var(--text);
+      padding:10px 14px; border-radius:10px; cursor:pointer; backdrop-filter: blur(6px); transition:transform .08s ease, filter .2s ease;
+    }
+    .theme-toggle:hover{ transform:translateY(-1px); filter:brightness(1.03); }
+
+    #progressContainerFixed{
+      position:fixed; bottom:0; left:0; width:100%; height:32px; background:#eee; z-index:9999;
+    }
+    .dark #progressContainerFixed{ background:#222; }
+    #progressBarFixed{
+      height:100%; width:0%; background:linear-gradient(to right, #0066ff, #00cfff);
+      position:relative; transition:width .5s linear;
+    }
+    .progress-time{
+      position:absolute; right:14px; top:50%; transform:translateY(-50%); color:#fff; font-weight:700; font-size:20px; user-select:none;
+      text-shadow:0 1px 2px rgba(0,0,0,.35);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Тумблер темы -->
+  <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
+
+  <div class="instruction-box">
+    <p><strong>Task 1.</strong> Imagine that you are preparing a project with your friend. You have found some interesting material for the presentation and you want to read this text to your friend. You have 1.5 minutes to read the text silently, then be ready to read it out loud. You will not have more than 1.5 minutes to read it.</p>
+  </div>
+
+  <div class="text-box">
+    Yuri Gagarin is one of the most famous people in Russian history. He was the first person to travel into space. His flight took place on the 12th of April, 1961, and lasted only 108 minutes, but it changed the world forever. He flew around the Earth in a spacecraft called Vostok 1.
+
+Gagarin was born in a small village and studied to become a pilot. He was chosen for the space mission because of his excellent health, quick thinking, and strong personality. After his flight, he became a hero not only in the Soviet Union but also in many other countries.
+
+People remember Gagarin for his bravery and his famous smile. He proved that space travel was possible and inspired future generations of scientists and astronauts. Today, many streets, schools, and even planets are named after him. Yuri Gagarin will always be a symbol of courage and progress.
+
+  <div style="text-align:center; margin-bottom:30px;">
+    <button id="goBtn" class="button" aria-label="Перейти к выполнению (будет запрос доступа к микрофону)">
+      Перейти к выполнению
+    </button>
+  </div>
+
+  <div id="progressContainerFixed" role="timer" aria-live="polite">
+    <div id="progressBarFixed">
+      <span id="progressTime" class="progress-time">01:30</span>
+    </div>
+  </div>
+
+  <script>
+    // == Очистка прошлых данных и маркер подготовки ==
+    try {
+      sessionStorage.removeItem('ege1_audio_base64');
+      sessionStorage.removeItem('ege1_audio_mime');
+      sessionStorage.setItem('ege1_prepared', '1');
+    } catch (_) {}
+
+    // == Переключатель темы ==
+    (function(){
+      const btn = document.getElementById('themeBtn');
+      const key = 'pref-theme';
+      const root = document.documentElement;
+      function apply(mode){
+        root.classList.toggle('dark', mode === 'dark');
+        localStorage.setItem(key, mode);
+      }
+      apply(localStorage.getItem(key) || 'light');
+      btn.addEventListener('click', ()=>{
+        const curr = localStorage.getItem(key) || 'light';
+        apply(curr === 'dark' ? 'light' : 'dark');
+      });
+    })();
+
+    // == Таймер 1:30 и прогресс ==
+    const progressBar = document.getElementById('progressBarFixed');
+    const progressTime = document.getElementById('progressTime');
+
+    // ✅ ДИНАМИЧЕСКАЯ СБОРКА ССЫЛКИ НА СЛЕДУЮЩИЙ ШАГ (mic)
+    // Пример текущего файла: .../variant7/ege1_var7_1_prepare.html
+    // Меняем только окончание файла на _2_mic.html, номер варианта сохраняется автоматически.
+    const NEXT_URL = location.pathname.replace(/_1_prepare\.html$/i, '_2_mic.html');
+
+    const totalMs = 90_000; // 1.5 минуты
+    const endTime = Date.now() + totalMs;
+    let timerId = null;
+
+    function fmt(ms){
+      const s = Math.max(0, Math.floor(ms/1000));
+      const m = String(Math.floor(s/60)).padStart(2,'0');
+      const r = String(s%60).padStart(2,'0');
+      return `${m}:${r}`;
+    }
+
+    function tick(){
+      const left = Math.max(0, endTime - Date.now());
+      progressTime.textContent = fmt(left);
+      progressBar.style.width = `${(left/totalMs)*100}%`;
+      if (left <= 0){
+        clearInterval(timerId);
+        // Переход по окончании подготовки
+        window.location.href = NEXT_URL;
+      }
+    }
+    tick();
+    timerId = setInterval(tick, 500);
+
+    // == Кнопка ручного перехода ==
+    document.getElementById('goBtn').addEventListener('click', ()=>{
+      window.location.href = NEXT_URL;
+    });
+
+    // == Страховка: очистим интервал при уходе ==
+    window.addEventListener('beforeunload', ()=>{ try{ clearInterval(timerId); }catch(_){} });
+  </script>
+</body>
+</html>

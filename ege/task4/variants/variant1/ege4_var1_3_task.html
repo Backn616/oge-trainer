@@ -185,7 +185,8 @@
     const endBtn = document.getElementById("endBtn");
     const taskContainer = document.getElementById("taskContainer");
 
-    const RESULT_URL = "ege4_var1_4_result.html";
+    // ✅ Решение «через n»: ege4_varN_3_task.html → ege4_varN_4_result.html
+    const RESULT_URL = location.pathname.replace(/_3_task\.html$/i, '_4_result.html');
 
     let countdown = 3;
     let totalTime = 180;       // сек
@@ -347,8 +348,6 @@
       try { clearInterval(interval); } catch(_) {}
       safeStopOrFinish();
     });
-
-    // blur отключён, чтобы alert/меню не ломали сценарий
 
     window.addEventListener("beforeunload", () => {
       try { clearInterval(interval); } catch(_) {}

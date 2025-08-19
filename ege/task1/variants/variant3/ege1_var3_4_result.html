@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title id="pageTitle">Результат — Вариант</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <!-- Анти-мигание темы -->
+  <script>
+    (function () {
+      try {
+        const saved = localStorage.getItem('pref-theme') || 'light';
+        if (saved === 'dark') document.documentElement.classList.add('dark');
+      } catch (_) {}
+    })();
+  </script>
+
+  <style>
+    :root{
+      --bg:#f7f9ff; --text:#0b1020; --muted:#5a6475; --card:#ffffff;
+      --primary:#2b6cff; --primary-600:#1f58d9; --shadow:0 10px 25px rgba(17,24,39,.08);
+      --panel-bg:#f9f9f9; --panel-border:#0077cc;
+    }
+    .dark{
+      --bg:#0b1020; --text:#eaf0ff; --muted:#b9c2d3; --card:rgba(255,255,255,.08);
+      --primary:#6aa3ff; --primary-600:#4b8dff; --shadow:0 10px 35px rgba(0,0,0,.35);
+      --panel-bg:rgba(255,255,255,.08); --panel-border:#4b8dff;
+    }
+    body{
+      font-family: Inter, system-ui, Segoe UI, Roboto, Arial, sans-serif;
+      margin:0; padding:40px 20px 60px; color:var(--text); text-align:center;
+      background:
+        radial-gradient(1200px 600px at 70% -10%, #29417a40, transparent),
+        radial-gradient(900px 500px at -10% 10%, #344b9340, transparent),
+        var(--bg);
+    }
+    h1{ font-size:36px; color:var(--primary); margin:0 0 10px; }
+    .status{ font-size:22px; color:#1f7a2e; margin-bottom:26px; }
+    .dark .status{ color:#5ee397; }
+    .instruction-box{
+      max-width:1600px; width:95%; margin:0 auto 30px; font-size:22px; line-height:1.6; text-align:left;
+      border:2px solid var(--panel-border); padding:25px; border-radius:12px; background:var(--panel-bg); box-shadow:var(--shadow);
+    }
+    .text-box{
+      max-width:1600px; width:95%; margin:0 auto 30px; font-size:32px; line-height:1.9; text-align:left;
+      border:1px solid #ccc; padding:40px; border-radius:12px; background:var(--card); box-shadow:var(--shadow);
+    }
+    .button{
+      font-size:20px; padding:16px 32px; background:linear-gradient(135deg, var(--primary), var(--primary-600));
+      color:#fff; border:none; border-radius:12px; cursor:pointer; text-decoration:none;
+      box-shadow:0 10px 22px rgba(43,108,255,.28); transition:transform .06s ease, filter .2s ease;
+      display:inline-block; margin:12px;
+    }
+    .button:hover{ transform:translateY(-1px); filter:brightness(1.03); }
+    .button:disabled{ opacity:.6; cursor:not-allowed; transform:none; }
+    .theme-toggle{
+      position:fixed; top:16px; right:16px; z-index:1000;
+      border:1px solid #ffffff22; background:transparent; color:var(--text);
+      padding:10px 14px; border-radius:10px; cursor:pointer; backdrop-filter: blur(6px);
+      transition:transform .08s ease, filter .2s ease;
+    }
+    .theme-toggle:hover{ transform:translateY(-1px); filter:brightness(1.03); }
+    audio{ margin:20px auto; width:min(900px, 90%); display:block; }
+  </style>
+</head>
+<body>
+
+  <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
+
+  <h1 id="h1">Результат сохранён</h1>
+  <div id="statusText" class="status">✅ Вы успешно завершили задание. Вы можете прослушать или скачать запись ниже.</div>
+
+  <audio id="audio" controls></audio>
+
+  <div>
+    <button id="playBtn" class="button">▶️ Прослушать</button>
+    <button id="downloadBtn" class="button">⬇️ Скачать запись</button>
+    <a id="repeatBtn" class="button" href="#">🔁 Повторить этот вариант</a>
+  </div>
+
+  <div class="instruction-box">
+    <p><strong>Task 1.</strong> Imagine that you are preparing a project with your friend. You have found some interesting material for the presentation and you want to read this text to your friend.</p>
+  </div>
+
+  <div class="text-box">
+    Many students say that school is both exciting and tough. They enjoy learning new things, spending time with classmates, and taking part in school events. However, preparing for exams and writing essays can be stressful and tiring. Some students also worry about their academic performance.
+
+Being thoughtful and responsible helps students succeed. They should plan their time carefully and avoid leaving everything until the last moment. Through experience, they learn how to study effectively and deal with pressure. Revision is important, especially before final exams.
+
+School life also teaches us important values like friendship and respect. Although some subjects may seem boring or difficult at first, they often become interesting when taught by a passionate teacher. In the end, going through these years makes students stronger and more confident.
+  </div>
+
+  <div>
+    <a id="toVariants" class="button" href="#">Перейти к выбору варианта</a>
+    <a id="toTaskMenu" class="button" href="#">Перейти к выбору задания</a>
+    <a id="toModeMenu" class="button" href="#">Перейти к выбору режима</a>
+    <a id="toHome" class="button" href="/oge-trainer/index.html">Перейти на главную</a>
+  </div>
+
+  <script>
+    // ===== Тема =====
+    (function(){
+      const btn = document.getElementById('themeBtn');
+      const key = 'pref-theme';
+      const root = document.documentElement;
+      function apply(mode){
+        root.classList.toggle('dark', mode === 'dark');
+        localStorage.setItem(key, mode);
+      }
+      apply(localStorage.getItem(key) || 'light');
+      btn.addEventListener('click', () => {
+        const curr = localStorage.getItem(key) || 'light';
+        apply(curr === 'dark' ? 'light' : 'dark');
+      });
+    })();
+
+    // ===== Навигация (универсально) =====
+    // База до /ege/
+    function getEgeBase(){
+      const p = location.pathname;
+      const i = p.indexOf('/ege/');
+      return i >= 0 ? p.slice(0, i + 5) : '/ege/';
+    }
+
+    (function initNav(){
+      const path = location.pathname;
+      const base = getEgeBase();
+
+      // /ege/task{t}/variants/variant{n}/ege{t}_var{n}_4_result.html
+      const m = path.match(/\/ege\/task(\d+)\/variants\/variant(\d+)\/ege\1_var\2_4_result\.html/i);
+      const task = m ? m[1] : '1';
+      const n    = m ? m[2] : '';
+
+      // Заголовки
+      if (n){
+        document.getElementById('pageTitle').textContent = `Результат — Вариант ${n}`;
+        document.getElementById('h1').textContent = `Результат сохранён — Вариант ${n}`;
+      }
+
+      // Повторить этот же вариант (с начала)
+      document.getElementById('repeatBtn').href =
+        path.replace(/_4_result\.html$/i, '_1_prepare.html');
+
+      // ✅ К выбору ВАРИАНТА — обязательно сохраняем папку variants!
+      //    Хвост ".../variants/variantN/<file>" → ".../variants/ege{task}.html"
+      document.getElementById('toVariants').href =
+        path.replace(/\/variants\/variant\d+\/[^/]+$/i, `/variants/ege${task}.html`);
+
+      // ✅ К выбору ЗАДАНИЯ
+      document.getElementById('toTaskMenu').href = `${base}ege.html`;
+
+      // ✅ К выбору РЕЖИМА
+      document.getElementById('toModeMenu').href = `${base}ege_menu.html`;
+    })();
+
+    // ===== Аудио =====
+    const audioEl = document.getElementById('audio');
+    const statusText = document.getElementById('statusText');
+    const playBtn = document.getElementById('playBtn');
+    const downloadBtn = document.getElementById('downloadBtn');
+
+    const base64 = sessionStorage.getItem('ege1_audio_base64');
+    const mimeStored = (sessionStorage.getItem('ege1_audio_mime') || 'audio/webm').toLowerCase();
+
+    let objectURL = null;
+    let fileName = (function(){
+      const extByMime = {
+        'audio/webm': 'webm',
+        'audio/webm;codecs=opus': 'webm',
+        'audio/ogg': 'ogg',
+        'audio/ogg;codecs=opus': 'ogg',
+        'audio/mp4': 'm4a',
+        'audio/mpeg': 'mp3',
+        'audio/wav': 'wav'
+      };
+      const ext = extByMime[mimeStored] || 'webm';
+      return `ege1_variant${(location.pathname.match(/variant(\d+)/)||[])[1]||''}.${ext}`;
+    })();
+
+    function dataURLtoBlob(dataURL){
+      const parts = (dataURL || '').split(',');
+      if (parts.length < 2) return null;
+      const header = parts[0];
+      const b64 = parts[1];
+      const type = (header.match(/data:(.*?);base64/) || [,'application/octet-stream'])[1];
+      const bin = atob(b64);
+      const len = bin.length;
+      const bytes = new Uint8Array(len);
+      for (let i = 0; i < len; i++) bytes[i] = bin.charCodeAt(i);
+      return new Blob([bytes], { type });
+    }
+    function setButtonsEnabled(enabled){
+      playBtn.disabled = !enabled;
+      downloadBtn.disabled = !enabled;
+    }
+
+    (function initAudio(){
+      if (base64) {
+        try {
+          const blob = dataURLtoBlob(base64);
+          if (blob) {
+            objectURL = URL.createObjectURL(blob);
+            audioEl.src = objectURL;
+            audioEl.type = blob.type || mimeStored;
+          } else {
+            audioEl.src = base64;
+            audioEl.type = mimeStored;
+          }
+          setButtonsEnabled(true);
+        } catch {
+          audioEl.src = base64;
+          audioEl.type = mimeStored;
+          setButtonsEnabled(true);
+        }
+      } else {
+        statusText.textContent = '⚠️ Запись не найдена. Возможно, вы запретили доступ к микрофону или страница была закрыта до завершения.';
+        setButtonsEnabled(false);
+      }
+    })();
+
+    playBtn.addEventListener('click', ()=>{ if (audioEl.src) audioEl.play(); });
+    downloadBtn.addEventListener('click', ()=>{
+      if (!audioEl.src) return;
+      const a = document.createElement('a');
+      a.href = objectURL || base64;
+      a.download = fileName;
+      a.click();
+    });
+    window.addEventListener('pagehide', ()=>{ if (objectURL) URL.revokeObjectURL(objectURL); });
+    window.addEventListener('beforeunload', ()=>{ if (objectURL) URL.revokeObjectURL(objectURL); });
+  </script>
+</body>
+</html>

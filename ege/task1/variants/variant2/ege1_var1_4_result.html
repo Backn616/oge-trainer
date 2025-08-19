@@ -2,14 +2,11 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <title>Результат — Вариант 2</title>
+  <title id="pageTitle">Результат — Вариант</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <!-- Шрифт Inter -->
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
-  <!-- Анти-мигание темы -->
   <script>
     (function () {
       try {
@@ -30,7 +27,6 @@
       --primary:#6aa3ff; --primary-600:#4b8dff; --shadow:0 10px 35px rgba(0,0,0,.35);
       --panel-bg:rgba(255,255,255,.08); --panel-border:#4b8dff;
     }
-
     body{
       font-family: Inter, system-ui, Segoe UI, Roboto, Arial, sans-serif;
       margin:0; padding:40px 20px 60px; color:var(--text); text-align:center;
@@ -39,11 +35,9 @@
         radial-gradient(900px 500px at -10% 10%, #344b9340, transparent),
         var(--bg);
     }
-
     h1{ font-size:36px; color:var(--primary); margin:0 0 10px; }
     .status{ font-size:22px; color:#1f7a2e; margin-bottom:26px; }
     .dark .status{ color:#5ee397; }
-
     .instruction-box{
       max-width:1600px; width:95%; margin:0 auto 30px; font-size:22px; line-height:1.6; text-align:left;
       border:2px solid var(--panel-border); padding:25px; border-radius:12px; background:var(--panel-bg); box-shadow:var(--shadow);
@@ -52,7 +46,6 @@
       max-width:1600px; width:95%; margin:0 auto 30px; font-size:32px; line-height:1.9; text-align:left;
       border:1px solid #ccc; padding:40px; border-radius:12px; background:var(--card); box-shadow:var(--shadow);
     }
-
     .button{
       font-size:20px; padding:16px 32px; background:linear-gradient(135deg, var(--primary), var(--primary-600));
       color:#fff; border:none; border-radius:12px; cursor:pointer; text-decoration:none;
@@ -61,7 +54,6 @@
     }
     .button:hover{ transform:translateY(-1px); filter:brightness(1.03); }
     .button:disabled{ opacity:.6; cursor:not-allowed; transform:none; }
-
     .theme-toggle{
       position:fixed; top:16px; right:16px; z-index:1000;
       border:1px solid #ffffff22; background:transparent; color:var(--text);
@@ -69,16 +61,13 @@
       transition:transform .08s ease, filter .2s ease;
     }
     .theme-toggle:hover{ transform:translateY(-1px); filter:brightness(1.03); }
-
     audio{ margin:20px auto; width:min(900px, 90%); display:block; }
   </style>
 </head>
 <body>
-
-  <!-- Тумблер темы -->
   <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
 
-  <h1>Результат сохранён</h1>
+  <h1 id="h1">Результат сохранён</h1>
   <div id="statusText" class="status">✅ Вы успешно завершили задание. Вы можете прослушать или скачать запись ниже.</div>
 
   <audio id="audio" controls></audio>
@@ -86,6 +75,7 @@
   <div>
     <button id="playBtn" class="button">▶️ Прослушать</button>
     <button id="downloadBtn" class="button">⬇️ Скачать запись</button>
+    <a id="repeatBtn" class="button" href="#">🔁 Повторить этот вариант</a>
   </div>
 
   <div class="instruction-box">
@@ -101,14 +91,14 @@ Although Holmes is not a real person, he has become a symbol of clever thinking 
   </div>
 
   <div>
-    <a href="../ege1.html" class="button">Перейти к выбору варианта</a>
-    <a href="../../../ege.html" class="button">Перейти к выбору задания</a>
-    <a href="../../../ege_menu.html" class="button">Перейти к выбору режима</a>
-    <a href="/oge-trainer/index.html" class="button">Перейти на главную</a>
+    <a id="toVariants" class="button" href="#">Перейти к выбору варианта</a>
+    <a id="toTaskMenu" class="button" href="#">Перейти к выбору режима</a>
+    <a id="toModeMenu" class="button" href="#">Перейти к выбору задания</a>
+    <a id="toHome" class="button" href="/oge-trainer/index.html">Перейти на главную</a>
   </div>
 
   <script>
-    // === Тема ===
+    // ===== Тема =====
     (function(){
       const btn = document.getElementById('themeBtn');
       const key = 'pref-theme';
@@ -124,7 +114,45 @@ Although Holmes is not a real person, he has become a symbol of clever thinking 
       });
     })();
 
-    // === Работа с записью (MIME/Blob/objectURL) ===
+    // ===== База /.../ege/ и номер варианта =====
+    function getEgeBase(){
+      const parts = location.pathname.split('/').filter(Boolean);
+      const i = parts.indexOf('ege');
+      return i !== -1 ? '/' + parts.slice(0, i + 1).join('/') + '/' : '/ege/';
+    }
+    // ожидаем: .../ege/task1/variants/variant{n}/ege1_var{n}_4_result.html
+    function getVariantNumber(){
+      const m = location.pathname.match(/\/task1\/variants\/variant(\d+)\/ege1_var\1_4_result\.html$/i);
+      return m ? Number(m[1]) : null;
+    }
+
+    const EGE_BASE = getEgeBase();
+    const VAR_N = getVariantNumber();
+
+    // ===== Заголовки и ссылки =====
+    (function initNav(){
+      if (VAR_N){
+        document.getElementById('pageTitle').textContent = `Результат — Вариант ${VAR_N}`;
+        document.getElementById('h1').textContent = `Результат сохранён — Вариант ${VAR_N}`;
+      }
+
+      // Повторить этот вариант
+      const repeatHref = VAR_N
+        ? `${EGE_BASE}task1/variants/variant${VAR_N}/ege1_var${VAR_N}_1_prepare.html`
+        : `${EGE_BASE}task1/ege1.html`;
+      document.getElementById('repeatBtn').href = repeatHref;
+
+      // ✅ К выбору варианта (список вариантов Task 1)
+      document.getElementById('toVariants').href = `${EGE_BASE}task1/ege1.html`;
+
+      // ✅ К выбору задания (меню заданий ЕГЭ)
+      document.getElementById('toTaskMenu').href = `${EGE_BASE}ege.html`;
+
+      // К выбору режима
+      document.getElementById('toModeMenu').href = `${EGE_BASE}ege_menu.html`;
+    })();
+
+    // ===== Аудио =====
     const audioEl = document.getElementById('audio');
     const statusText = document.getElementById('statusText');
     const playBtn = document.getElementById('playBtn');
@@ -134,18 +162,19 @@ Although Holmes is not a real person, he has become a symbol of clever thinking 
     const mimeStored = (sessionStorage.getItem('ege1_audio_mime') || 'audio/webm').toLowerCase();
 
     let objectURL = null;
-    let fileName = 'ege1_recording';
-
-    const extByMime = {
-      'audio/webm': 'webm',
-      'audio/webm;codecs=opus': 'webm',
-      'audio/ogg': 'ogg',
-      'audio/ogg;codecs=opus': 'ogg',
-      'audio/mp4': 'm4a',
-      'audio/mpeg': 'mp3',
-      'audio/wav': 'wav'
-    };
-    fileName += '.' + (extByMime[mimeStored] || 'webm');
+    let fileName = (function(){
+      const extByMime = {
+        'audio/webm': 'webm',
+        'audio/webm;codecs=opus': 'webm',
+        'audio/ogg': 'ogg',
+        'audio/ogg;codecs=opus': 'ogg',
+        'audio/mp4': 'm4a',
+        'audio/mpeg': 'mp3',
+        'audio/wav': 'wav'
+      };
+      const ext = extByMime[mimeStored] || 'webm';
+      return `ege1_variant${VAR_N || ''}.${ext}`;
+    })();
 
     function dataURLtoBlob(dataURL){
       const parts = (dataURL || '').split(',');
@@ -159,14 +188,12 @@ Although Holmes is not a real person, he has become a symbol of clever thinking 
       for (let i = 0; i < len; i++) bytes[i] = bin.charCodeAt(i);
       return new Blob([bytes], { type });
     }
-
     function setButtonsEnabled(enabled){
       playBtn.disabled = !enabled;
       downloadBtn.disabled = !enabled;
     }
 
-    // Инициализация плеера
-    (function init(){
+    (function initAudio(){
       if (base64) {
         try {
           const blob = dataURLtoBlob(base64);
@@ -175,12 +202,12 @@ Although Holmes is not a real person, he has become a symbol of clever thinking 
             audioEl.src = objectURL;
             audioEl.type = blob.type || mimeStored;
           } else {
-            audioEl.src = base64;       // fallback
+            audioEl.src = base64;
             audioEl.type = mimeStored;
           }
           setButtonsEnabled(true);
         } catch {
-          audioEl.src = base64;         // fallback
+          audioEl.src = base64;
           audioEl.type = mimeStored;
           setButtonsEnabled(true);
         }
@@ -190,7 +217,6 @@ Although Holmes is not a real person, he has become a symbol of clever thinking 
       }
     })();
 
-    // Управление
     playBtn.addEventListener('click', ()=>{ if (audioEl.src) audioEl.play(); });
     downloadBtn.addEventListener('click', ()=>{
       if (!audioEl.src) return;
@@ -199,8 +225,6 @@ Although Holmes is not a real person, he has become a symbol of clever thinking 
       a.download = fileName;
       a.click();
     });
-
-    // Очистка ресурса
     window.addEventListener('pagehide', ()=>{ if (objectURL) URL.revokeObjectURL(objectURL); });
     window.addEventListener('beforeunload', ()=>{ if (objectURL) URL.revokeObjectURL(objectURL); });
   </script>

@@ -156,7 +156,9 @@ Although Holmes is not a real person, he has become a symbol of clever thinking 
     const progressBar = document.getElementById('progressBarFixed');
     const progressTime = document.getElementById('progressTime');
 
-    const RESULT_URL = 'ege1_var2_4_result.html';
+    // 🔁 ДИНАМИЧЕСКИЙ ПУТЬ НА RESULT (без хардкода n):
+    // .../ege1_varN_3_task.html  →  .../ege1_varN_4_result.html
+    const RESULT_URL = location.pathname.replace(/_3_task\.html$/i, '_4_result.html');
 
     let countdown = 3;
     let totalTime = 90; // секунд
@@ -316,7 +318,6 @@ Although Holmes is not a real person, he has become a symbol of clever thinking 
       try { clearInterval(timerInterval); } catch(_) {}
       safeStopOrFinish();
     });
-    // blur отключён: системные диалоги не ломают сценарий
 
     window.addEventListener("beforeunload", () => {
       try { clearInterval(timerInterval); } catch(_) {}

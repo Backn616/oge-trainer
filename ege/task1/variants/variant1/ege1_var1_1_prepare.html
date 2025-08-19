@@ -132,7 +132,11 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
     // == Таймер 1:30 и прогресс ==
     const progressBar = document.getElementById('progressBarFixed');
     const progressTime = document.getElementById('progressTime');
-    const NEXT_URL = 'ege1_var1_2_mic.html';
+
+    // ✅ ДИНАМИЧЕСКАЯ СБОРКА ССЫЛКИ НА СЛЕДУЮЩИЙ ШАГ (mic)
+    // Пример текущего файла: .../variant7/ege1_var7_1_prepare.html
+    // Меняем только окончание файла на _2_mic.html, номер варианта сохраняется автоматически.
+    const NEXT_URL = location.pathname.replace(/_1_prepare\.html$/i, '_2_mic.html');
 
     const totalMs = 90_000; // 1.5 минуты
     const endTime = Date.now() + totalMs;
@@ -151,13 +155,14 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
       progressBar.style.width = `${(left/totalMs)*100}%`;
       if (left <= 0){
         clearInterval(timerId);
+        // Переход по окончании подготовки
         window.location.href = NEXT_URL;
       }
     }
     tick();
     timerId = setInterval(tick, 500);
 
-    // == Кнопка перехода ==
+    // == Кнопка ручного перехода ==
     document.getElementById('goBtn').addEventListener('click', ()=>{
       window.location.href = NEXT_URL;
     });

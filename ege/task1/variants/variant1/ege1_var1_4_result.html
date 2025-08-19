@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <title>Результат — Вариант 1</title>
+  <title id="pageTitle">Результат — Вариант</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <!-- Шрифт Inter -->
@@ -78,7 +78,7 @@
   <!-- Тумблер темы -->
   <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
 
-  <h1>Результат сохранён</h1>
+  <h1 id="h1">Результат сохранён</h1>
   <div id="statusText" class="status">✅ Вы успешно завершили задание. Вы можете прослушать или скачать запись ниже.</div>
 
   <audio id="audio" controls></audio>
@@ -86,6 +86,7 @@
   <div>
     <button id="playBtn" class="button">▶️ Прослушать</button>
     <button id="downloadBtn" class="button">⬇️ Скачать запись</button>
+    <a id="repeatBtn" class="button" href="#">🔁 Повторить этот вариант</a>
   </div>
 
   <div class="instruction-box">
@@ -93,19 +94,18 @@
   </div>
 
   <div class="text-box">
-    Bioluminescence is the ability of certain living organisms to produce light. This fascinating phenomenon can be observed in various species of deep-sea fish, jellyfish, fireflies, and even some fungi.
-The light is usually blue or green, which travels best through water. These organisms use light for different reasons. Some attract mates or prey, while others use it to confuse predators. For example, the anglerfish has a glowing lure to draw in its victims in the dark ocean depths.
+    Sherlock Holmes is a famous fictional character from British literature. He was created by Sir Arthur Conan Doyle. Holmes is a private detective who lives in London. Many people know him because of his great mind and amazing logical thinking. He solves difficult crimes that others cannot.
 
-Scientists believe that studying bioluminescence can help develop new medical and technological solutions. Special proteins from glowing jellyfish are already used in genetic research.These discoveries support innovation in areas like disease detection and cell tracking.
+In the stories, Holmes is usually described as tall and thin. He often wears a hat and smokes a pipe. He is very intelligent and notices the smallest details. He doesn’t talk much and prefers to work alone or with his friend Dr Watson. Holmes likes music and sometimes plays the violin.
 
-Bioluminescence is not only beautiful — it is a powerful tool of survival and discovery.These glowing creatures remind us how much we still have to learn about the natural world. Their light, shining in the darkness, is both mysterious and meaningful.
+Although Holmes is not a real person, he has become a symbol of clever thinking and observation. People all over the world read stories about him and watch films and series. Many believe that Sherlock Holmes is the best detective character ever created.
   </div>
 
   <div>
-    <a href="../ege1.html" class="button">Перейти к выбору варианта</a>
-    <a href="../../../ege.html" class="button">Перейти к выбору задания</a>
-    <a href="../../../ege_menu.html" class="button">Перейти к выбору режима</a>
-    <a href="/oge-trainer/index.html" class="button">Перейти на главную</a>
+    <a id="toVariants" class="button" href="#">Перейти к выбору варианта</a>
+    <a id="toTaskMenu" class="button" href="#">Перейти к выбору задания</a>
+    <a id="toModeMenu" class="button" href="#">Перейти к выбору режима</a>
+    <a id="toHome" class="button" href="/oge-trainer/index.html">Перейти на главную</a>
   </div>
 
   <script>
@@ -125,6 +125,48 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
       });
     })();
 
+    // ==== Помощники: EGE_BASE и номер варианта из пути ====
+    function getEgeBase() {
+      const parts = location.pathname.split('/').filter(Boolean);
+      const i = parts.indexOf('ege');
+      return i !== -1 ? '/' + parts.slice(0, i + 1).join('/') + '/' : '/ege/';
+    }
+    // Ожидаем путь вида .../task1/variants/variant{n}/ege1_var{n}_4_result.html
+    function getVariantNumber() {
+      const m = location.pathname.match(/\/variant(\d+)\/ege1_var\1_4_result\.html$/i);
+      return m ? Number(m[1]) : null;
+    }
+
+    const EGE_BASE = getEgeBase();
+    const VAR_N = getVariantNumber();
+
+    // ==== ДИНАМИЧЕСКИЕ ЗАГОЛОВКИ И ССЫЛКИ ====
+    (function setDynamicNavigation(){
+      // Заголовок и <title>
+      if (VAR_N) {
+        document.getElementById('pageTitle').textContent = `Результат — Вариант ${VAR_N}`;
+        document.getElementById('h1').textContent = `Результат сохранён — Вариант ${VAR_N}`;
+      }
+
+      // Ссылки:
+      // 1) Повторить этот вариант (с самого начала)
+      const repeatHref = location.pathname.replace(/_4_result\.html$/i, '_1_prepare.html');
+      document.getElementById('repeatBtn').href = repeatHref;
+
+      // 2) К выбору варианта (список variant1..N для Task 1)
+      //    заменяем .../variants/variantN/ege1_varN_4_result.html → .../ege1.html
+      const toVariantsHref = location.pathname.replace(/\/variants\/variant\d+\/ege1_var\d+_4_result\.html$/i, '/ege1.html');
+      document.getElementById('toVariants').href = toVariantsHref;
+
+      // 3) К выбору задания (меню task1/task2/task3/task4)
+      //    заменяем .../variants/variantN/ege1_varN_4_result.html → /ege.html
+      const toTaskMenuHref = location.pathname.replace(/\/variants\/variant\d+\/ege1_var\d+_4_result\.html$/i, '/ege.html');
+      document.getElementById('toTaskMenu').href = toTaskMenuHref;
+
+      // 4) К выбору режима (главное меню ЕГЭ)
+      document.getElementById('toModeMenu').href = EGE_BASE + 'ege_menu.html';
+    })();
+
     // === Работа с записью (MIME/Blob/objectURL) ===
     const audioEl = document.getElementById('audio');
     const statusText = document.getElementById('statusText');
@@ -135,18 +177,20 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
     const mimeStored = (sessionStorage.getItem('ege1_audio_mime') || 'audio/webm').toLowerCase();
 
     let objectURL = null;
-    let fileName = 'ege1_recording';
-
-    const extByMime = {
-      'audio/webm': 'webm',
-      'audio/webm;codecs=opus': 'webm',
-      'audio/ogg': 'ogg',
-      'audio/ogg;codecs=opus': 'ogg',
-      'audio/mp4': 'm4a',
-      'audio/mpeg': 'mp3',
-      'audio/wav': 'wav'
-    };
-    fileName += '.' + (extByMime[mimeStored] || 'webm');
+    let fileName = (function(){
+      // красивое имя файла: ege1_variant{n}.ext
+      const extByMime = {
+        'audio/webm': 'webm',
+        'audio/webm;codecs=opus': 'webm',
+        'audio/ogg': 'ogg',
+        'audio/ogg;codecs=opus': 'ogg',
+        'audio/mp4': 'm4a',
+        'audio/mpeg': 'mp3',
+        'audio/wav': 'wav'
+      };
+      const ext = extByMime[mimeStored] || 'webm';
+      return `ege1_variant${VAR_N || ''}.${ext}`;
+    })();
 
     function dataURLtoBlob(dataURL){
       const parts = (dataURL || '').split(',');

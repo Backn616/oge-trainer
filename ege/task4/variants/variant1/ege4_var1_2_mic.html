@@ -9,16 +9,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
 
-  <!-- Анти-мигание темы -->
-  <script>
-    (function(){
-      try{
-        const saved = localStorage.getItem('pref-theme') || 'light';
-        if(saved === 'dark') document.documentElement.classList.add('dark');
-      }catch(_){}
-    })();
-  </script>
-
   <style>
     :root{
       --bg:#f7f9ff; --card:#ffffff; --text:#0b1020;
@@ -33,7 +23,7 @@
     }
 
     *{ box-sizing:border-box }
-    html,body{ height:100% }
+    html{ height:100%; }
     body{
       font-family:'Roboto',system-ui,sans-serif;
       margin:0; padding:40px 20px;
@@ -43,7 +33,7 @@
         var(--bg);
       color:var(--text);
       display:flex; justify-content:center; align-items:center;
-      min-height:100vh;
+      min-height:100svh; /* стабильнее на мобилках */
     }
     :focus-visible{ outline:none; box-shadow:var(--focus) }
 
@@ -92,7 +82,7 @@
       <strong>разрешите сайту использовать микрофон</strong>, чтобы начать запись ответа.
     </p>
 
-    <!-- Делаем href сразу, и всё равно дублируем переход через JS с защитой -->
+    <!-- Ставим href, и всё равно дублируем переход через JS с защитой -->
     <a id="nextLink"
        class="button"
        href="#"
@@ -102,43 +92,25 @@
     </a>
   </main>
 
-  <script>
-    // === Единый тумблер темы ===
-    (function themeInit(){
-      const btn = document.getElementById('themeBtn');
-      const key = 'pref-theme';
-      const root = document.documentElement;
-      function apply(mode){
-        root.classList.toggle('dark', mode === 'dark');
-        localStorage.setItem(key, mode);
-      }
-      apply(localStorage.getItem(key) || 'light');
-      btn.addEventListener('click', () => {
-        const curr = localStorage.getItem(key) || 'light';
-        apply(curr === 'dark' ? 'light' : 'dark');
-      });
-    })();
+  <!-- Скрипт -->
+  <script type="module">
+    import { toggleThemeInit, navigateOnce } from '../../../common.js';
 
-    // === Подготовка sessionStorage для Task 4 ===
+    toggleThemeInit();
+
+    // Подготовка sessionStorage для Task 4
     try{
       sessionStorage.removeItem('ege4_audio_base64'); // очистка возможной старой записи
       sessionStorage.setItem('ege4_warned','1');      // маркер показа предупреждения
-      // Доп. метаданные шага (можно отобразить в result)
       const meta = JSON.parse(sessionStorage.getItem('ege4_meta') || '{}');
       meta.warnedAt = Date.now();
       sessionStorage.setItem('ege4_meta', JSON.stringify(meta));
-    }catch(_){}
+    }catch{}
 
-    // === Навигация «через n» и защита от двойного перехода ===
+    // Навигация
     const NEXT_URL = location.pathname.replace(/_2_mic\.html$/i, '_3_task.html');
-    let navigating = false;
-    function navigateOnce(url){
-      if (navigating) return;
-      navigating = true;
-      location.href = url;
-    }
 
-    // Ставим href (на случай отключённого JS) и перехватываем клик
+    // Ставим href (fallback без JS) и защищённый переход
     const a = document.getElementById('nextLink');
     a.href = NEXT_URL;
     a.addEventListener('click', (e) => {
@@ -146,13 +118,10 @@
       navigateOnce(NEXT_URL);
     });
 
-    // Страховки: если вкладку сворачивают/уходят — просто двигаемся дальше
-    document.addEventListener('visibilitychange', () => {
-      if (document.hidden) navigateOnce(NEXT_URL);
-    });
+    // Страховки: если вкладку сворачивают/уходят — двигаемся дальше
+    document.addEventListener('visibilitychange', () => { if (document.hidden) navigateOnce(NEXT_URL); });
     window.addEventListener('pagehide', () => navigateOnce(NEXT_URL));
     window.addEventListener('freeze', () => navigateOnce(NEXT_URL));
-    window.addEventListener('beforeunload', () => { /* ничего, переход уже защищён */ });
   </script>
 </body>
 </html>

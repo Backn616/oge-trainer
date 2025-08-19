@@ -5,8 +5,6 @@
   <title>Task 4 — Variant 1</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
-
-  <!-- Анти-мигание темы -->
   <script>
     (function(){
       try{
@@ -15,115 +13,29 @@
       }catch(_){}
     })();
   </script>
-
   <style>
-    :root {
-      --bg: #f7f9ff;
-      --card: #ffffff;
-      --text: #0b1020;
-      --muted: #5a6475;
-      --primary: #2b6cff;
-      --primary-600: #1f58d9;
-      --ring: #bfd3ff;
-      --success: #25c26e;
-      --danger: #b30000;
-      --shadow: 0 10px 25px rgba(17,24,39,.08);
-    }
-    .dark {
-      --bg: #0b1020;
-      --card: rgba(255,255,255,0.08);
-      --text: #eaf0ff;
-      --muted: #a0aabd;
-      --primary: #6aa3ff;
-      --primary-600: #4b8dff;
-      --ring: #3b4b66;
-      --success: #25c26e;
-      --danger: #ff6b6b;
-      --shadow: 0 10px 35px rgba(0,0,0,.35);
-    }
-    body {
-      font-family: 'Roboto', sans-serif;
-      margin:0;
-      padding: 40px 30px 80px;
-      color: var(--text);
-      background: radial-gradient(1200px 600px at 70% -10%, #29417a40, transparent),
-                  radial-gradient(900px 500px at -10% 10%, #344b9340, transparent),
-                  var(--bg);
-      text-align: center;
-    }
-    .theme-toggle {
-      position: fixed; top:16px; right:16px; z-index:10000;
-      border:1px solid #ffffff22; background:transparent; color:var(--text);
-      padding:10px 14px; border-radius:10px; cursor:pointer; backdrop-filter: blur(6px);
-      transition: transform .08s ease, filter .2s ease;
-    }
+    :root { --bg:#f7f9ff; --card:#ffffff; --text:#0b1020; --muted:#5a6475; --primary:#2b6cff; --primary-600:#1f58d9; --ring:#bfd3ff; --success:#25c26e; --danger:#b30000; --shadow:0 10px 25px rgba(17,24,39,.08); }
+    .dark { --bg:#0b1020; --card:rgba(255,255,255,0.08); --text:#eaf0ff; --muted:#a0aabd; --primary:#6aa3ff; --primary-600:#4b8dff; --ring:#3b4b66; --success:#25c26e; --danger:#ff6b6b; --shadow:0 10px 35px rgba(0,0,0,.35); }
+    body { font-family:'Roboto', sans-serif; margin:0; padding:40px 30px 80px; color:var(--text);
+      background: radial-gradient(1200px 600px at 70% -10%, #29417a40, transparent), radial-gradient(900px 500px at -10% 10%, #344b9340, transparent), var(--bg);
+      text-align:center; }
+    .theme-toggle { position:fixed; top:16px; right:16px; z-index:10000; border:1px solid #ffffff22; background:transparent; color:var(--text);
+      padding:10px 14px; border-radius:10px; cursor:pointer; backdrop-filter: blur(6px); transition: transform .08s ease, filter .2s ease; }
     .theme-toggle:hover { transform: translateY(-1px); filter: brightness(1.03); }
     .wrap { max-width:1500px; margin:0 auto; }
-    .task-container {
-      background: var(--card);
-      border-left: 5px solid var(--primary);
-      padding: 20px 30px 10px 30px;
-      margin: 0 auto 20px;
-      font-size: 20px;
-      line-height: 1.7;
-      text-align: left;
-      box-shadow: var(--shadow);
-      border-radius: 12px;
-      display: none;
-    }
+    .task-container { background:var(--card); border-left:5px solid var(--primary); padding:20px 30px 10px; margin:0 auto 20px; font-size:20px; line-height:1.7; text-align:left; box-shadow:var(--shadow); border-radius:12px; display:none; }
     .instruction { font-weight:700; margin-top:10px; }
-    .timer {
-      font-size: 72px;
-      margin: 30px 0;
-      font-weight: 700;
-    }
-    .images {
-      display: none;
-      justify-content: center;
-      align-items: flex-start;
-      gap: 30px;
-      margin-bottom: 20px;
-    }
-    .images img {
-      max-width:100%;
-      height:auto;
-      width:48%;
-      border-radius:12px;
-      box-shadow: var(--shadow);
-    }
-    .end-button {
-      display:none;
-      margin: 20px auto 0;
-      padding: 16px 32px;
-      font-size: 20px;
-      font-weight:600;
-      background: linear-gradient(135deg, var(--primary), var(--primary-600));
-      color:#fff;
-      border:none;
-      border-radius:12px;
-      cursor:pointer;
-      box-shadow: 0 10px 22px rgba(43,108,255,.3);
-      transition: transform .06s ease, box-shadow .2s ease;
-    }
+    .timer { font-size:72px; margin:30px 0; font-weight:700; }
+    .images { display:none; justify-content:center; align-items:flex-start; gap:30px; margin-bottom:20px; }
+    .images img { max-width:100%; height:auto; width:48%; border-radius:12px; box-shadow:var(--shadow); }
+    .end-button { display:none; margin:20px auto 0; padding:16px 32px; font-size:20px; font-weight:600;
+      background:linear-gradient(135deg, var(--primary), var(--primary-600)); color:#fff; border:none; border-radius:12px; cursor:pointer; box-shadow:0 10px 22px rgba(43,108,255,.3); transition: transform .06s ease, box-shadow .2s ease; }
     .end-button:hover { transform: scale(1.05); }
-    #progressContainerFixed {
-      position: fixed; bottom:0; left:0; width:100%; height:32px;
-      background:#eee; z-index:9999; display:none;
-    }
-    .dark #progressContainerFixed { background: #222; }
-    #progressBarFixed {
-      height:100%; width:0%;
-      background: linear-gradient(to right, #0066ff, #00cfff);
-      position:relative; transition: width .5s linear;
-    }
-    .progress-time {
-      position:absolute; right:14px; top:50%; transform:translateY(-50%);
-      color:#fff; font-weight:700; font-size:20px; user-select:none;
-    }
-    @media (max-width: 800px){
-      .images{ flex-direction: column; align-items: center; }
-      .images img{ width:100%; }
-    }
+    #progressContainerFixed { position:fixed; bottom:0; left:0; width:100%; height:32px; background:#eee; z-index:9999; display:none; }
+    .dark #progressContainerFixed { background:#222; }
+    #progressBarFixed { height:100%; width:0%; background: linear-gradient(to right, #0066ff, #00cfff); position:relative; transition: width .5s linear; }
+    .progress-time { position:absolute; right:14px; top:50%; transform:translateY(-50%); color:#fff; font-weight:700; font-size:20px; user-select:none; }
+    @media (max-width:800px){ .images{ flex-direction:column; align-items:center; } .images img{ width:100%; } }
   </style>
 </head>
 <body>
@@ -139,9 +51,7 @@
         <li>mention the disadvantages (1–2) of the two ways;</li>
         <li>express your opinion on the subject of the project – which way of spending holidays presented in the pictures you would prefer and why.</li>
       </ul>
-      <div class="instruction">
-        You will speak for not more than 3 minutes (12–15 sentences). You have to talk continuously.
-      </div>
+      <div class="instruction">You will speak for not more than 3 minutes (12–15 sentences). You have to talk continuously.</div>
     </div>
 
     <div class="timer" id="timer">3</div>
@@ -161,20 +71,11 @@
   </div>
 
   <script>
-    // Тема
     (function(){
-      const btn = document.getElementById('themeBtn');
-      const key = 'pref-theme';
-      const root = document.documentElement;
-      function apply(mode){
-        root.classList.toggle('dark', mode === 'dark');
-        localStorage.setItem(key, mode);
-      }
+      const btn = document.getElementById('themeBtn'); const key = 'pref-theme'; const root = document.documentElement;
+      function apply(mode){ root.classList.toggle('dark', mode === 'dark'); localStorage.setItem(key, mode); }
       apply(localStorage.getItem(key) || 'light');
-      btn.addEventListener('click', () => {
-        const curr = localStorage.getItem(key) || 'light';
-        apply(curr === 'dark' ? 'light' : 'dark');
-      });
+      btn.addEventListener('click', () => { const curr = localStorage.getItem(key) || 'light'; apply(curr === 'dark' ? 'light' : 'dark'); });
     })();
 
     const timerEl = document.getElementById("timer");
@@ -185,11 +86,10 @@
     const endBtn = document.getElementById("endBtn");
     const taskContainer = document.getElementById("taskContainer");
 
-    // ✅ Решение «через n»: ege4_varN_3_task.html → ege4_varN_4_result.html
     const RESULT_URL = location.pathname.replace(/_3_task\.html$/i, '_4_result.html');
 
     let countdown = 3;
-    let totalTime = 180;       // сек
+    let totalTime = 180; // сек
     let startTime;
     let interval;
     let mediaRecorder = null;
@@ -198,21 +98,11 @@
     let streamRef = null;
     let chosenMime = "";
     let navigating = false;
-    let taskStarted = false;   // «страховки» активируем только после старта задания
+    let taskStarted = false;
 
     function pickMimeType(){
-      const candidates = [
-        "audio/webm;codecs=opus",
-        "audio/webm",
-        "audio/mp4",            // Safari
-        "audio/ogg;codecs=opus",
-        "audio/ogg"
-      ];
-      for (const t of candidates){
-        if (window.MediaRecorder && MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(t)) {
-          return t;
-        }
-      }
+      const candidates = ["audio/webm;codecs=opus","audio/webm","audio/mp4","audio/ogg;codecs=opus","audio/ogg"];
+      for (const t of candidates){ if (window.MediaRecorder && MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(t)) return t; }
       return "";
     }
 
@@ -222,22 +112,14 @@
         streamRef = stream;
 
         chosenMime = pickMimeType();
-        try {
-          mediaRecorder = chosenMime
-            ? new MediaRecorder(stream, { mimeType: chosenMime })
-            : new MediaRecorder(stream);
-        } catch (e) {
-          mediaRecorder = new MediaRecorder(stream);
-          chosenMime = mediaRecorder.mimeType || "";
-        }
+        try { mediaRecorder = chosenMime ? new MediaRecorder(stream, { mimeType: chosenMime }) : new MediaRecorder(stream); }
+        catch { mediaRecorder = new MediaRecorder(stream); chosenMime = mediaRecorder.mimeType || ""; }
 
         mediaRecorder.ondataavailable = e => { if (e.data && e.data.size) audioChunks.push(e.data); };
         mediaRecorder.onstop = () => {
           if (hasStopped) return;
           hasStopped = true;
-
           try { streamRef?.getTracks()?.forEach(t => t.stop()); } catch(_) {}
-
           const blobType = chosenMime || (mediaRecorder && mediaRecorder.mimeType) || "audio/webm";
           const audioBlob = new Blob(audioChunks, { type: blobType });
           const reader = new FileReader();
@@ -254,7 +136,6 @@
         startCountdown();
       } catch (err) {
         alert("❌ Не удалось получить доступ к микрофону: " + err.message);
-        // продолжаем без записи
         mediaRecorder = null;
         startCountdown();
       }
@@ -265,15 +146,12 @@
         timerEl.style.color = (countdown > 1) ? "#2b6cff" : "#b30000";
         timerEl.textContent = countdown;
         countdown--;
-        if (countdown < 0) {
-          clearInterval(cdInterval);
-          startTask();
-        }
+        if (countdown < 0) { clearInterval(cdInterval); startTask(); }
       }, 1000);
     }
 
     function startTask() {
-      taskStarted = true; // теперь «страховки» можно слушать
+      taskStarted = true;
       timerEl.style.display = "none";
       progressContainerFixed.style.display = "block";
       imageContainer.style.display = "flex";
@@ -284,20 +162,14 @@
       startTime = Date.now();
       audioChunks = [];
 
-      if (mediaRecorder && mediaRecorder.state !== "recording") {
-        try { mediaRecorder.start(); } catch(_) {}
-      }
+      if (mediaRecorder && mediaRecorder.state !== "recording") { try { mediaRecorder.start(); } catch(_) {} }
 
       interval = setInterval(() => {
         const timeElapsed = Math.floor((Date.now() - startTime) / 1000);
         const timeLeft = totalTime - timeElapsed;
         progressTime.textContent = formatTime(timeLeft);
         progressBarFixed.style.width = `${(timeLeft / totalTime) * 100}%`;
-
-        if (timeLeft <= 0) {
-          clearInterval(interval);
-          safeStopOrFinish();
-        }
+        if (timeLeft <= 0) { clearInterval(interval); safeStopOrFinish(); }
       }, 500);
     }
 
@@ -323,31 +195,14 @@
       }
     }
 
-    function endManually() {
-      clearInterval(interval);
-      safeStopOrFinish();
-    }
+    function endManually() { clearInterval(interval); safeStopOrFinish(); }
 
-    // Страховки — только после старта задания
     document.addEventListener("visibilitychange", () => {
       if (!taskStarted) return;
-      if (document.hidden) {
-        try { clearInterval(interval); } catch(_) {}
-        safeStopOrFinish();
-      }
+      if (document.hidden) { try { clearInterval(interval); } catch(_) {} safeStopOrFinish(); }
     });
-
-    window.addEventListener("pagehide", () => {
-      if (!taskStarted) return;
-      try { clearInterval(interval); } catch(_) {}
-      safeStopOrFinish();
-    });
-
-    window.addEventListener("freeze", () => {
-      if (!taskStarted) return;
-      try { clearInterval(interval); } catch(_) {}
-      safeStopOrFinish();
-    });
+    window.addEventListener("pagehide", () => { if (!taskStarted) return; try { clearInterval(interval); } catch(_) {} safeStopOrFinish(); });
+    window.addEventListener("freeze", () => { if (!taskStarted) return; try { clearInterval(interval); } catch(_) {} safeStopOrFinish(); });
 
     window.addEventListener("beforeunload", () => {
       try { clearInterval(interval); } catch(_) {}

@@ -127,9 +127,9 @@ Although Holmes is not a real person, he has become a symbol of clever thinking 
 
     // ==== Помощники: EGE_BASE и номер варианта из пути ====
     function getEgeBase() {
-      const parts = location.pathname.split('/').filter(Boolean);
+      const parts = location.pathname.split('/');
       const i = parts.indexOf('ege');
-      return i !== -1 ? '/' + parts.slice(0, i + 1).join('/') + '/' : '/ege/';
+      return i !== -1 ? parts.slice(0, i + 1).join('/') + '/' : '/ege/';
     }
     // Ожидаем путь вида .../task1/variants/variant{n}/ege1_var{n}_4_result.html
     function getVariantNumber() {
@@ -148,22 +148,19 @@ Although Holmes is not a real person, he has become a symbol of clever thinking 
         document.getElementById('h1').textContent = `Результат сохранён — Вариант ${VAR_N}`;
       }
 
-      // Ссылки:
       // 1) Повторить этот вариант (с самого начала)
-      const repeatHref = location.pathname.replace(/_4_result\.html$/i, '_1_prepare.html');
-      document.getElementById('repeatBtn').href = repeatHref;
+      document.getElementById('repeatBtn').href =
+        location.pathname.replace(/_4_result\.html$/i, '_1_prepare.html');
 
-      // 2) К выбору варианта (список variant1..N для Task 1)
-      //    заменяем .../variants/variantN/ege1_varN_4_result.html → .../ege1.html
-      const toVariantsHref = location.pathname.replace(/\/variants\/variant\d+\/ege1_var\d+_4_result\.html$/i, '/ege1.html');
-      document.getElementById('toVariants').href = toVariantsHref;
+      // 2) К выбору варианта: .../variants/variantN/FILE → .../variants/ege1.html
+      //    Работает как твой ../ege1.html, но без хардкода.
+      document.getElementById('toVariants').href =
+        location.pathname.replace(/\/variant\d+\/[^/]+$/i, '/ege1.html');
 
-      // 3) К выбору задания (меню task1/task2/task3/task4)
-      //    заменяем .../variants/variantN/ege1_varN_4_result.html → /ege.html
-      const toTaskMenuHref = location.pathname.replace(/\/variants\/variant\d+\/ege1_var\d+_4_result\.html$/i, '/ege.html');
-      document.getElementById('toTaskMenu').href = toTaskMenuHref;
+      // 3) К выбору задания: всегда из корня раздела EGE (аналог ../../../ege.html)
+      document.getElementById('toTaskMenu').href = EGE_BASE + 'ege.html';
 
-      // 4) К выбору режима (главное меню ЕГЭ)
+      // 4) К выбору режима: главное меню ЕГЭ
       document.getElementById('toModeMenu').href = EGE_BASE + 'ege_menu.html';
     })();
 

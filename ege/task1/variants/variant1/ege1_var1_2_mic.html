@@ -92,7 +92,8 @@
       Если вы готовы выполнить устную часть, пожалуйста<br>
       <strong>разрешите сайту использовать микрофон</strong>, чтобы начать запись ответа.
     </p>
-    <a href="ege1_var1_3_task.html"
+    <a id="nextLink"
+       href="#"
        class="button"
        role="button"
        aria-label="Перейти к заданию (будет запрос доступа к микрофону)">
@@ -101,12 +102,35 @@
   </main>
 
   <script>
+    // ===== ВСПОМОГАТЕЛЬНОЕ: база /ege/ и номер варианта из пути =====
+    function getEgeBase(){
+      const parts = location.pathname.split('/');
+      const i = parts.indexOf('ege');
+      return i !== -1 ? parts.slice(0, i + 1).join('/') + '/' : '/ege/';
+    }
+    function getVariantFromPath(){
+      // ожидаем .../task1/variants/variant{n}/ege1_var{n}_2_mic.html
+      const m = location.pathname.match(/variant(\d+)\/ege1_var\1_2_mic\.html$/);
+      return m ? Number(m[1]) : null;
+    }
+    const EGE_BASE = getEgeBase();
+    const VAR_N = getVariantFromPath();
+
     // Сброс предыдущей записи и маркер предупреждения
     try{
       sessionStorage.removeItem('ege1_audio_base64');
       sessionStorage.removeItem('ege1_audio_mime');
       sessionStorage.setItem('ege1_warned','1');
     }catch(_){}
+
+    // Устанавливаем ссылку "ОК" динамически на Task
+    (function(){
+      const a = document.getElementById('nextLink');
+      const url = VAR_N
+        ? `${EGE_BASE}task1/variants/variant${VAR_N}/ege1_var${VAR_N}_3_task.html`
+        : 'ege1_var1_3_task.html'; // фолбэк на случай нетипичного пути
+      a.href = url;
+    })();
 
     // Переключатель темы
     (function(){

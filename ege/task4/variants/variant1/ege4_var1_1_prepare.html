@@ -9,121 +9,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
 
-  <!-- Анти-мигание темы -->
-  <script>
-    (function(){
-      try{
-        const saved = localStorage.getItem('pref-theme') || 'light';
-        if(saved === 'dark') document.documentElement.classList.add('dark');
-      }catch(_){}
-    })();
-  </script>
-
-  <style>
-    :root{
-      --bg:#f7f9ff; --card:#ffffff; --text:#0b1020; --muted:#5a6475;
-      --primary:#2b6cff; --primary-600:#1f58d9; --ring:#bfd3ff; --success:#25c26e;
-      --shadow:0 10px 25px rgba(17,24,39,.08);
-      --focus:0 0 0 4px var(--ring);
-      --footer-h:32px; /* фикс-бар снизу */
-    }
-    .dark{
-      --bg:#0b1020; --card:rgba(255,255,255,0.08); --text:#eaf0ff; --muted:#b9c2d3;
-      --primary:#6aa3ff; --primary-600:#4b8dff; --ring:#a9c6ff; --success:#5ee397;
-      --shadow:0 10px 35px rgba(0,0,0,.35);
-    }
-
-    *{ box-sizing:border-box }
-    html{ height:100%; }
-    body{
-      min-height:100svh; /* корректнее на мобилках с плавающими тулбарами */
-      font-family:'Roboto', system-ui, sans-serif;
-      margin:0;
-      /* место под фикс-бар + запас + safe-area */
-      padding:40px 30px calc(56px + var(--footer-h) + env(safe-area-inset-bottom, 0px));
-      color:var(--text);
-      background:
-        radial-gradient(1200px 600px at 70% -10%, #29417a40, transparent),
-        radial-gradient(900px 500px at -10% 10%, #344b9340, transparent),
-        var(--bg);
-      display:block;
-      overflow-x:hidden;
-    }
-
-    a,button{ color:inherit; }
-    :focus-visible{ outline:none; box-shadow:var(--focus) }
-
-    .content-wrapper{ max-width:1500px; width:100%; margin:0 auto; }
-
-    .task-container{
-      background:var(--card);
-      border-left:5px solid var(--primary);
-      padding:20px 30px 10px 30px;
-      margin-bottom:30px;
-      font-size:20px; line-height:1.7; text-align:left;
-      box-shadow:var(--shadow); border-radius:12px;
-    }
-    .task-container ul{ margin:10px 0 15px 20px; }
-    .task-container li{ margin-bottom:8px; }
-    .task-container .instruction{ font-weight:700; margin-top:10px; }
-
-    .images{
-      display:flex; justify-content:center; align-items:flex-start;
-      gap:30px; margin-bottom:30px;
-    }
-    .images img{
-      max-width:100%; height:auto; width:48%;
-      border-radius:12px; box-shadow:var(--shadow);
-    }
-
-    .button{
-      font-size:20px; padding:16px 32px;
-      background:linear-gradient(135deg, var(--primary), var(--primary-600));
-      color:#fff; border:none; border-radius:12px; cursor:pointer;
-      box-shadow:0 10px 22px rgba(43,108,255,.3);
-      transition: transform .06s ease, box-shadow .2s ease, filter .2s ease;
-      position:relative; z-index:10000; /* визуально поверх бара на крайних пикселях */
-      /* если к кнопке скроллят якорем/фокусом — докрутим выше бара */
-      scroll-margin-bottom: calc(var(--footer-h) + 24px);
-    }
-    .button:hover{ transform: translateY(-1px); filter: brightness(1.03); }
-
-    .theme-toggle{
-      position:fixed; top:16px; right:16px; z-index:10000;
-      border:1px solid #ffffff22; background:transparent; color:var(--text);
-      padding:10px 14px; border-radius:10px; cursor:pointer; backdrop-filter: blur(6px);
-      transition:transform .08s ease, filter .2s ease;
-    }
-    .theme-toggle:hover{ transform: translateY(-1px); filter: brightness(1.03); }
-
-    /* фиксированный прогресс-бар снизу */
-    #progressContainerFixed{
-      position:fixed; bottom:0; left:0; width:100%; height:var(--footer-h);
-      background:#eee; z-index:9999;
-      pointer-events:none; /* не перехватывает клики на самом краю */
-    }
-    .dark #progressContainerFixed{ background:#222; }
-    #progressBarFixed{
-      height:100%; width:0%;
-      background: linear-gradient(to right, #0066ff, #00cfff);
-      position:relative;
-    }
-    .progress-time{
-      position:absolute; right:14px; top:50%; transform:translateY(-50%);
-      color:#fff; font-weight:700; font-size:20px; user-select:none;
-      text-shadow:0 1px 2px rgba(0,0,0,.35);
-    }
-
-    /* Проставка под фиксированный нижний бар — побольше запаса */
-    .fixed-footer-spacer{
-      height: calc(var(--footer-h) + 56px + env(safe-area-inset-bottom, 0px));
-    }
-
-    @media (max-width:800px){
-      .images{ flex-direction:column; align-items:center; }
-      .images img{ width:100%; }
-    }
-  </style>
+  <!-- Стили (оставь свои, со spacer и safe-area) -->
+  <link rel="stylesheet" href="style_prepare.css" />
 </head>
 <body>
   <!-- Тумблер темы -->
@@ -158,70 +45,43 @@
     </div>
   </div>
 
-  <!-- Проставка перед фикс-баром, чтобы нижний контент мог докрутиться выше него -->
+  <!-- Spacer -->
   <div class="fixed-footer-spacer" aria-hidden="true"></div>
 
-  <!-- Прогресс: роль таймера + aria-live -->
+  <!-- Прогресс -->
   <div id="progressContainerFixed" role="timer" aria-live="polite" aria-label="Оставшееся время подготовки">
     <div id="progressBarFixed">
       <span id="progressTime" class="progress-time">02:30</span>
     </div>
   </div>
 
-  <script>
-    /* === Тумблер темы === */
-    (function themeInit(){
-      const btn = document.getElementById('themeBtn');
-      const key = 'pref-theme';
-      const root = document.documentElement;
-      function apply(mode){
-        root.classList.toggle('dark', mode === 'dark');
-        localStorage.setItem(key, mode);
-      }
-      apply(localStorage.getItem(key) || 'light');
-      btn.addEventListener('click', () => {
-        const curr = localStorage.getItem(key) || 'light';
-        apply(curr === 'dark' ? 'light' : 'dark');
-      });
-    })();
+  <!-- Скрипт -->
+  <script type="module">
+    import { toggleThemeInit, navigateOnce, fmtTime } from '../../../common.js';
 
-    /* === sessionStorage метки === */
-    try{
+    toggleThemeInit();
+
+    // sessionStorage метки
+    try {
       sessionStorage.removeItem('ege4_audio_base64');
       sessionStorage.setItem('ege4_prepared','1');
       sessionStorage.setItem('ege4_meta', JSON.stringify({
         preparedAt: Date.now(),
         prepareDurationSec: 150
       }));
-    }catch(_){}
+    } catch {}
 
-    /* === Навигация «через n» + защита от двойного перехода === */
     const NEXT_URL = location.pathname.replace(/_1_prepare\.html$/i, '_2_mic.html');
-    let navigating = false;
-    function navigateOnce(url){
-      if (navigating) return;
-      navigating = true;
-      location.href = url;
-    }
-
-    /* === Плавный таймер 2:30 (rAF) === */
-    const TOTAL_MS = 150000; // 2.5 минуты
+    const TOTAL_MS = 150000;
     const endTs = performance.now() + TOTAL_MS;
     const bar = document.getElementById('progressBarFixed');
     const timeEl = document.getElementById('progressTime');
 
-    function fmt(ms){
-      const s = Math.max(0, Math.floor(ms/1000));
-      const m = String(Math.floor(s/60)).padStart(2,'0');
-      const r = String(s%60).padStart(2,'0');
-      return `${m}:${r}`;
-    }
-
     function tick(){
       const left = Math.max(0, endTs - performance.now());
-      timeEl.textContent = fmt(left);
+      timeEl.textContent = fmtTime(left);
       bar.style.width = `${(left / TOTAL_MS) * 100}%`;
-      if (left <= 0){
+      if (left <= 0) {
         navigateOnce(NEXT_URL);
       } else {
         requestAnimationFrame(tick);
@@ -229,14 +89,13 @@
     }
     requestAnimationFrame(tick);
 
-    // Кнопка ручного перехода
-    document.getElementById('goBtn').addEventListener('click', () => navigateOnce(NEXT_URL));
+    document.getElementById('goBtn')
+      .addEventListener('click', () => navigateOnce(NEXT_URL));
 
-    // Страховки: при сворачивании/уходе — уходим дальше
+    // страховки
     document.addEventListener('visibilitychange', () => { if (document.hidden) navigateOnce(NEXT_URL); });
     window.addEventListener('pagehide', () => navigateOnce(NEXT_URL));
     window.addEventListener('freeze', () => navigateOnce(NEXT_URL));
-    window.addEventListener('beforeunload', () => { /* rAF сам остановится */ });
   </script>
 </body>
 </html>

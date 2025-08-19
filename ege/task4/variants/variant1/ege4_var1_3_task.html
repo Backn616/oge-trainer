@@ -24,6 +24,7 @@
       --bg:#f7f9ff; --card:#ffffff; --text:#0b1020; --muted:#5a6475;
       --primary:#2b6cff; --primary-600:#1f58d9; --ring:#bfd3ff; --danger:#b30000;
       --shadow:0 10px 25px rgba(17,24,39,.08); --focus:0 0 0 4px var(--ring);
+      --footer-h:32px; /* высота фиксированного бара снизу */
     }
     .dark{
       --bg:#0b1020; --card:rgba(255,255,255,0.08); --text:#eaf0ff; --muted:#a0aabd;
@@ -35,7 +36,10 @@
     html,body{ height:100% }
     body{
       font-family:'Roboto',sans-serif;
-      margin:0; padding:40px 30px 80px; color:var(--text);
+      margin:0;
+      /* добавили запас под фикс-бар + safe-area */
+      padding:40px 30px calc(80px + var(--footer-h) + env(safe-area-inset-bottom, 0px));
+      color:var(--text);
       background:
         radial-gradient(1200px 600px at 70% -10%, #29417a40, transparent),
         radial-gradient(900px 500px at -10% 10%, #344b9340, transparent),
@@ -84,19 +88,26 @@
     }
     .end-button:hover{ transform:scale(1.05); }
 
+    /* фиксированный прогресс-бар снизу */
     #progressContainerFixed{
-      position:fixed; bottom:0; left:0; width:100%; height:32px;
+      position:fixed; bottom:0; left:0; width:100%; height:var(--footer-h);
       background:#eee; z-index:9999; display:none;
     }
     .dark #progressContainerFixed{ background:#222; }
     #progressBarFixed{
       height:100%; width:0%;
       background: linear-gradient(to right, #0066ff, #00cfff);
-      position:relative; /* без transition — двигаем rAF-ом */
+      position:relative;
     }
     .progress-time{
       position:absolute; right:14px; top:50%; transform:translateY(-50%);
       color:#fff; font-weight:700; font-size:20px; user-select:none;
+    }
+
+    /* Проставка под фиксированный нижний бар:
+       позволяет докрутить кнопку/контент выше бара */
+    .fixed-footer-spacer{
+      height: calc(var(--footer-h) + 24px + env(safe-area-inset-bottom, 0px));
     }
 
     @media (max-width:800px){
@@ -130,6 +141,9 @@
 
     <button class="end-button" id="endBtn" type="button" aria-label="Закончить запись">✅ Закончить</button>
   </div>
+
+  <!-- Проставка перед фикс-баром, чтобы нижняя кнопка могла полностью выйти над ним -->
+  <div class="fixed-footer-spacer" aria-hidden="true"></div>
 
   <div id="progressContainerFixed" role="timer" aria-live="polite" aria-label="Оставшееся время ответа">
     <div id="progressBarFixed">
@@ -245,7 +259,7 @@
       }, 1000);
     }
 
-    /* === Задание (3:00) — плавный rAF‑таймер === */
+    /* === Задание (3:00) — плавный rAF-таймер === */
     const TOTAL_MS = 180_000;
     let startTs = 0;
     let rafId = 0;
@@ -315,9 +329,7 @@
     }
 
     // Ручное завершение
-    endBtn.addEventListener('click', ()=>{
-      safeStopOrFinish();
-    });
+    endBtn.addEventListener('click', ()=>{ safeStopOrFinish(); });
 
     /* === Страховки после старта === */
     let taskStarted = false;

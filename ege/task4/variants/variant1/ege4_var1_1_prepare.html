@@ -5,7 +5,7 @@
   <title>Task 4 — Preparation</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- Fonts: preconnect + stylesheet -->
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
 
@@ -24,7 +24,8 @@
       --bg:#f7f9ff; --card:#ffffff; --text:#0b1020; --muted:#5a6475;
       --primary:#2b6cff; --primary-600:#1f58d9; --ring:#bfd3ff; --success:#25c26e;
       --shadow:0 10px 25px rgba(17,24,39,.08);
-      --focus: 0 0 0 4px var(--ring);
+      --focus:0 0 0 4px var(--ring);
+      --footer-h:32px; /* фикс-бар снизу */
     }
     .dark{
       --bg:#0b1020; --card:rgba(255,255,255,0.08); --text:#eaf0ff; --muted:#b9c2d3;
@@ -32,44 +33,42 @@
       --shadow:0 10px 35px rgba(0,0,0,.35);
     }
 
-    /* Base */
     *{ box-sizing:border-box }
     html,body{ height:100% }
+
     body{
-      font-family: 'Roboto', system-ui, sans-serif;
-      margin:0; padding:40px 30px 80px; color:var(--text);
+      font-family:'Roboto', system-ui, sans-serif;
+      margin:0;
+      /* достаточно места под фикс-бар + запас на мобильных (safe-area) */
+      padding:40px 30px calc(56px + var(--footer-h) + env(safe-area-inset-bottom, 0px));
+      color:var(--text);
       background:
         radial-gradient(1200px 600px at 70% -10%, #29417a40, transparent),
         radial-gradient(900px 500px at -10% 10%, #344b9340, transparent),
         var(--bg);
-      display:flex; justify-content:center;
+      display:block; /* важное: блок, а не flex — чтобы страница нормально скроллилась */
     }
+
     a,button{ color:inherit; }
+    :focus-visible{ outline:none; box-shadow:var(--focus) }
 
-    /* Focus-visible для доступности */
-    :focus-visible{ outline:none; box-shadow: var(--focus) }
-
-    .content-wrapper { max-width: 1500px; width: 100%; }
+    .content-wrapper{ max-width:1500px; width:100%; margin:0 auto; }
 
     .task-container{
-      background: var(--card);
-      border-left: 5px solid var(--primary);
-      padding: 20px 30px 10px 30px;
-      margin-bottom: 30px;
-      font-size: 20px;
-      line-height: 1.7;
-      text-align: left;
-      box-shadow: var(--shadow);
-      border-radius: 12px;
+      background:var(--card);
+      border-left:5px solid var(--primary);
+      padding:20px 30px 10px 30px;
+      margin-bottom:30px;
+      font-size:20px; line-height:1.7; text-align:left;
+      box-shadow:var(--shadow); border-radius:12px;
     }
     .task-container ul{ margin:10px 0 15px 20px; }
     .task-container li{ margin-bottom:8px; }
     .task-container .instruction{ font-weight:700; margin-top:10px; }
 
     .images{
-      display: flex;
-      justify-content: center; align-items: flex-start;
-      gap: 30px; margin-bottom: 30px;
+      display:flex; justify-content:center; align-items:flex-start;
+      gap:30px; margin-bottom:30px;
     }
     .images img{
       max-width:100%; height:auto; width:48%;
@@ -77,47 +76,47 @@
     }
 
     .button{
-      font-size: 20px; padding: 16px 32px;
-      background: linear-gradient(135deg, var(--primary), var(--primary-600));
-      color: #fff; border: none; border-radius: 12px; cursor: pointer;
-      box-shadow: 0 10px 22px rgba(43,108,255,.3);
+      font-size:20px; padding:16px 32px;
+      background:linear-gradient(135deg, var(--primary), var(--primary-600));
+      color:#fff; border:none; border-radius:12px; cursor:pointer;
+      box-shadow:0 10px 22px rgba(43,108,255,.3);
       transition: transform .06s ease, box-shadow .2s ease, filter .2s ease;
     }
     .button:hover{ transform: translateY(-1px); filter: brightness(1.03); }
 
     .theme-toggle{
-      position: fixed; top:16px; right:16px; z-index:10000;
+      position:fixed; top:16px; right:16px; z-index:10000;
       border:1px solid #ffffff22; background:transparent; color:var(--text);
       padding:10px 14px; border-radius:10px; cursor:pointer; backdrop-filter: blur(6px);
       transition:transform .08s ease, filter .2s ease;
     }
     .theme-toggle:hover{ transform: translateY(-1px); filter: brightness(1.03); }
 
-    /* Прогресс-бар (fixed) */
+    /* фиксированный прогресс-бар снизу */
     #progressContainerFixed{
-      position: fixed; bottom: 0; left: 0; width: 100%; height: 32px;
-      background: #eee; z-index: 9999;
+      position:fixed; bottom:0; left:0; width:100%; height:var(--footer-h);
+      background:#eee; z-index:9999;
     }
     .dark #progressContainerFixed{ background:#222; }
     #progressBarFixed{
-      height: 100%; width: 0%;
+      height:100%; width:0%;
       background: linear-gradient(to right, #0066ff, #00cfff);
-      position: relative;
+      position:relative;
     }
     .progress-time{
-      position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
-      color: #fff; font-weight: 700; font-size: 20px; user-select: none;
-      text-shadow: 0 1px 2px rgba(0,0,0,.35);
+      position:absolute; right:14px; top:50%; transform:translateY(-50%);
+      color:#fff; font-weight:700; font-size:20px; user-select:none;
+      text-shadow:0 1px 2px rgba(0,0,0,.35);
     }
 
-    @media (max-width: 800px){
-      .images{ flex-direction: column; align-items: center; }
-      .images img{ width: 100%; }
+    @media (max-width:800px){
+      .images{ flex-direction:column; align-items:center; }
+      .images img{ width:100%; }
     }
   </style>
 </head>
 <body>
-  <!-- Переключатель темы -->
+  <!-- Тумблер темы -->
   <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
 
   <div class="content-wrapper">
@@ -157,7 +156,7 @@
   </div>
 
   <script>
-    // === Единый инициализатор темы ===
+    /* === Тумблер темы === */
     (function themeInit(){
       const btn = document.getElementById('themeBtn');
       const key = 'pref-theme';
@@ -173,18 +172,17 @@
       });
     })();
 
-    // === Подготовка sessionStorage для Task 4 ===
+    /* === sessionStorage метки === */
     try{
       sessionStorage.removeItem('ege4_audio_base64');
       sessionStorage.setItem('ege4_prepared','1');
-      // Метаданные подготовки — на будущее (можно показать в result)
       sessionStorage.setItem('ege4_meta', JSON.stringify({
         preparedAt: Date.now(),
         prepareDurationSec: 150
       }));
     }catch(_){}
 
-    // === Навигация «через n» и защита от двойного перехода ===
+    /* === Навигация «через n» + защита от двойного перехода === */
     const NEXT_URL = location.pathname.replace(/_1_prepare\.html$/i, '_2_mic.html');
     let navigating = false;
     function navigateOnce(url){
@@ -193,14 +191,14 @@
       location.href = url;
     }
 
-    // === Плавный таймер 2:30 на requestAnimationFrame ===
+    /* === Плавный таймер 2:30 (rAF) === */
     const TOTAL_MS = 150000; // 2.5 минуты
     const endTs = performance.now() + TOTAL_MS;
     const bar = document.getElementById('progressBarFixed');
     const timeEl = document.getElementById('progressTime');
 
     function fmt(ms){
-      const s = Math.max(0, Math.floor(ms / 1000));
+      const s = Math.max(0, Math.floor(ms/1000));
       const m = String(Math.floor(s/60)).padStart(2,'0');
       const r = String(s%60).padStart(2,'0');
       return `${m}:${r}`;
@@ -221,13 +219,11 @@
     // Кнопка ручного перехода
     document.getElementById('goBtn').addEventListener('click', () => navigateOnce(NEXT_URL));
 
-    // Страховки: при сворачивании/уходе — тихо уходим дальше
-    document.addEventListener('visibilitychange', () => {
-      if (document.hidden) navigateOnce(NEXT_URL);
-    });
+    // Страховки: при сворачивании/уходе — уходим дальше
+    document.addEventListener('visibilitychange', () => { if (document.hidden) navigateOnce(NEXT_URL); });
     window.addEventListener('pagehide', () => navigateOnce(NEXT_URL));
     window.addEventListener('freeze', () => navigateOnce(NEXT_URL));
-    window.addEventListener('beforeunload', () => { /* rAF сам оборвётся */ });
+    window.addEventListener('beforeunload', () => { /* rAF сам остановится */ });
   </script>
 </body>
 </html>

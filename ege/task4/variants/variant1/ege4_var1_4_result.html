@@ -4,65 +4,43 @@
   <meta charset="UTF-8" />
   <title id="pageTitle">Результат — Задание 4</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Шрифт -->
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+
+  <!-- Общие стили -->
+  <link rel="stylesheet" href="../style_common.css" />
 
   <!-- Анти-мигание темы -->
   <script>
     (function(){
       try{
         const saved = localStorage.getItem('pref-theme') || 'light';
-        if(saved === 'dark') document.documentElement.classList.add('dark');
+        if (saved === 'dark') document.documentElement.classList.add('dark');
       }catch(_){}
     })();
   </script>
 
   <style>
-    :root{
-      --bg:#f7f9ff;
-      --card:#ffffff;
-      --text:#0b1020;
-      --muted:#5a6475;
-      --primary:#2b6cff;
-      --primary-600:#1f58d9;
-      --shadow:0 10px 25px rgba(17,24,39,.08);
-    }
-    .dark{
-      --bg:#0b1020;
-      --card:rgba(255,255,255,.08);
-      --text:#eaf0ff;
-      --muted:#b9c2d3;
-      --primary:#6aa3ff;
-      --primary-600:#4b8dff;
-      --shadow:0 10px 35px rgba(0,0,0,.35);
-    }
-
-    body{
-      font-family:'Roboto',system-ui,sans-serif;
-      margin:0; padding:40px 30px 56px; color:var(--text);
-      background:
-        radial-gradient(1200px 600px at 70% -10%, #29417a40, transparent),
-        radial-gradient(900px 500px at -10% 10%, #344b9340, transparent),
-        var(--bg);
-    }
-
-    .theme-toggle{
-      position:fixed; top:16px; right:16px; z-index:10000;
-      border:1px solid #ffffff22; background:transparent; color:var(--text);
-      padding:10px 14px; border-radius:10px; cursor:pointer; backdrop-filter: blur(6px);
-      transition: transform .08s ease, filter .2s ease;
-    }
-    .theme-toggle:hover{ transform: translateY(-1px); filter: brightness(1.03); }
-
+    /* Немного локальных стилей под образец */
     .wrap{ max-width:1500px; margin:0 auto; }
-
-    h1{
-      color:var(--primary); font-size:36px; margin:12px 0 6px; text-align:center;
-    }
-    .status{
-      font-size:22px; color:#1f7a2e; text-align:center; margin:10px 0 26px;
-    }
+    h1{ color:var(--primary); font-size:36px; margin:12px 0 6px; text-align:center; }
+    .status{ font-size:22px; color:#1f7a2e; text-align:center; margin:10px 0 26px; }
     .dark .status{ color:#5ee397; }
+    audio{ margin:20px auto; width:min(900px, 90%); display:block; }
 
+    .btn{
+      display:inline-block; padding:16px 32px; margin:12px;
+      font-size:20px; font-weight:600; color:#fff; text-decoration:none; cursor:pointer;
+      border:none; border-radius:12px;
+      background:linear-gradient(135deg, var(--primary), var(--primary-600));
+      box-shadow:0 10px 22px rgba(43,108,255,.3);
+      transition: transform .06s ease, filter .2s ease, box-shadow .2s ease;
+    }
+    .btn:hover{ transform: scale(1.05); filter: brightness(1.03); }
+    .btn:disabled{ opacity:.6; cursor:not-allowed; transform:none; }
+
+    /* Карточка и изображения — как на других страницах */
     .task-container{
       background:var(--card);
       border-left:5px solid var(--primary);
@@ -82,22 +60,6 @@
       max-width:100%; height:auto; width:48%;
       border-radius:12px; box-shadow:var(--shadow);
     }
-
-    .btn{
-      display:inline-block; padding:16px 32px; margin:12px;
-      font-size:20px; font-weight:600; color:#fff; text-decoration:none; cursor:pointer;
-      border:none; border-radius:12px;
-      background:linear-gradient(135deg, var(--primary), var(--primary-600));
-      box-shadow:0 10px 22px rgba(43,108,255,.3);
-      transition: transform .06s ease, filter .2s ease, box-shadow .2s ease;
-    }
-    .btn:hover{ transform: scale(1.05); filter: brightness(1.03); }
-    .btn:disabled{ opacity:.6; cursor:not-allowed; transform:none; }
-
-    audio{
-      margin:20px auto; width:min(900px, 90%); display:block;
-    }
-
     @media (max-width:800px){
       .images{ flex-direction:column; align-items:center; }
       .images img{ width:100%; }
@@ -105,21 +67,24 @@
   </style>
 </head>
 <body>
+  <!-- Переключатель темы -->
   <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
 
   <div class="wrap">
     <h1 id="h1">Результат сохранён — Вариант <span id="varNum">?</span></h1>
-    <div class="status" id="statusText">✅ Вы успешно завершили задание. Вы можете прослушать или скачать запись ниже.</div>
+    <div class="status" id="statusText">
+      ✅ Вы успешно завершили задание. Вы можете прослушать или скачать запись ниже.
+    </div>
 
     <audio id="audio" controls></audio>
 
     <div style="text-align:center;">
-      <button class="btn" id="playBtn">▶️ Прослушать</button>
-      <button class="btn" id="downloadBtn">⬇️ Скачать запись</button>
+      <button class="btn" id="playBtn" disabled>▶️ Прослушать</button>
+      <button class="btn" id="downloadBtn" disabled>⬇️ Скачать запись</button>
       <a class="btn" id="repeatBtn" href="#">🔁 Повторить этот вариант</a>
     </div>
 
-    <!-- Контент задания и изображения -->
+    <!-- Контент задания -->
     <div class="task-container">
       <b>4 Task. Imagine that you and your friend are doing a school project “Spending holidays: in the city or in the countryside”.</b>
       <p>You have found some photos to illustrate it but for technical reasons you cannot send them now. Leave a voice message to your friend explaining your choice of the photos and sharing some ideas about the project. In 2.5 minutes be ready to:</p>
@@ -147,131 +112,125 @@
     </div>
   </div>
 
-  <script>
-    // === Очистка состояния варианта ===
-    function resetVariantState() {
-      try {
-        sessionStorage.removeItem('ege4_audio_base64');
-        sessionStorage.removeItem('ege4_audio_mime');
-        sessionStorage.removeItem('ege4_warned');
-        sessionStorage.removeItem('ege4_meta');
-        sessionStorage.removeItem('ege4_endAt');
-      } catch(e) {
-        console.warn('Не удалось очистить состояние варианта:', e);
-      }
-    }
+  <script type="module">
+    import { toggleThemeInit } from '../common.js';
+    toggleThemeInit();
 
-    // === Тема ===
-    (function(){
-      const btn = document.getElementById('themeBtn');
-      const key = 'pref-theme';
-      const root = document.documentElement;
-      function apply(mode){ root.classList.toggle('dark', mode === 'dark'); localStorage.setItem(key, mode); }
-      apply(localStorage.getItem(key) || 'light');
-      btn.addEventListener('click', ()=>{ const c = localStorage.getItem(key) || 'light'; apply(c === 'dark' ? 'light' : 'dark'); });
-    })();
+    // --- Вариант/заголовки ---
+    const path = location.pathname;
+    const m = path.match(/variant(\d+)/i);
+    const varNum = m ? m[1] : '?';
+    document.getElementById('varNum').textContent = varNum;
+    document.title = `Результат — Задание 4 · Вариант ${varNum}`;
 
-    // === Навигация через n ===
+    // --- Навигация: собрать корректные href'ы ---
     function getEgeBase(){
-      const p = location.pathname;
-      const i = p.indexOf('/ege/');
-      return i >= 0 ? p.slice(0, i + 5) : '/ege/';
+      const i = path.indexOf('/ege/');
+      return i >= 0 ? path.slice(0, i + 5) : '/ege/';
+    }
+    const base = getEgeBase();
+
+    // ожидаем: /ege/task4/variants/variantN/ege4_varN_4_result.html
+    const toVariants = document.getElementById('toVariants');
+    const toTaskMenu = document.getElementById('toTaskMenu');
+    const toModeMenu = document.getElementById('toModeMenu');
+
+    if (toVariants) toVariants.href = path.replace(/\/variants\/variant\d+\/[^/]+$/i, `/variants/ege4.html`);
+    if (toTaskMenu) toTaskMenu.href = `${base}ege.html`;
+    if (toModeMenu) toModeMenu.href = `${base}ege_menu.html`;
+
+    // --- Полная очистка состояния задания 4 (чтобы новый заход был «с нуля») ---
+    function clearTask4State(){
+      try{
+        // Удаляем все ключи, начинающиеся на ege4_
+        const keys = Object.keys(sessionStorage);
+        keys.forEach(k => {
+          if (k.startsWith('ege4_')) sessionStorage.removeItem(k);
+        });
+        // На всякий случай: подчищаем возможные перс-ключи prepare по варианту
+        if (varNum && /^\d+$/.test(varNum)) {
+          sessionStorage.removeItem(`ege4_var${varNum}_prepare_endtime`);
+        }
+      }catch{}
     }
 
-    (function initNav(){
-      const path = location.pathname;
-      const base = getEgeBase();
+    function clearAndGo(url){
+      clearTask4State();
+      location.href = url;
+    }
 
-      const m = path.match(/\/ege\/task(\d+)\/variants\/variant(\d+)\/ege\1_var\2_4_result\.html/i);
-      const task = m ? m[1] : '4';
-      const n    = m ? m[2] : '';
-
-      if (n){
-        document.getElementById('pageTitle').textContent = `Результат — Задание ${task} · Вариант ${n}`;
-        document.getElementById('varNum').textContent = n;
-      }
-
-      // ссылки
-      const repeat = document.getElementById('repeatBtn');
-      if (repeat) repeat.href = path.replace(/_4_result\.html$/i, '_1_prepare.html');
-
-      const toVariants = document.getElementById('toVariants');
-      if (toVariants) toVariants.href =
-        path.replace(/\/variants\/variant\d+\/[^/]+$/i, `/variants/ege${task}.html`);
-
-      const toTaskMenu = document.getElementById('toTaskMenu');
-      if (toTaskMenu) toTaskMenu.href = `${base}ege.html`;
-
-      const toModeMenu = document.getElementById('toModeMenu');
-      if (toModeMenu) toModeMenu.href = `${base}ege_menu.html`;
-
-      // навесим очистку на все кнопки
-      document.querySelectorAll('.nav-btn, #repeatBtn').forEach(btn=>{
-        btn.addEventListener('click', ()=> resetVariantState());
+    // «Повторить этот вариант» → на _1_prepare с обнулением
+    const repeat = document.getElementById('repeatBtn');
+    if (repeat){
+      const repeatHref = path.replace(/_4_result\.html$/i, '_1_prepare.html');
+      repeat.href = repeatHref;
+      repeat.addEventListener('click', (e)=>{
+        e.preventDefault();
+        clearAndGo(repeatHref);
       });
-    })();
+    }
 
-    // === Аудио ===
-    const audioEl = document.getElementById('audio');
-    const statusText = document.getElementById('statusText');
-    const playBtn = document.getElementById('playBtn');
+    // Остальные «перейти к ...» — тоже с обнулением
+    document.querySelectorAll('.nav-btn').forEach(a=>{
+      a.addEventListener('click', (e)=>{
+        e.preventDefault();
+        clearAndGo(a.href);
+      });
+    });
+
+    // --- Аудио ---
+    const audioEl     = document.getElementById('audio');
+    const playBtn     = document.getElementById('playBtn');
     const downloadBtn = document.getElementById('downloadBtn');
+    const statusText  = document.getElementById('statusText');
 
-    const base64 = sessionStorage.getItem('ege4_audio_base64');
+    const base64     = sessionStorage.getItem('ege4_audio_base64');
     const mimeStored = (sessionStorage.getItem('ege4_audio_mime') || 'audio/webm').toLowerCase();
 
     let objectURL = null;
-    const variantMatch = (location.pathname.match(/variant(\d+)/) || [,''])[1];
-
     const extByMime = {
-      'audio/webm': 'webm',
-      'audio/webm;codecs=opus': 'webm',
-      'audio/ogg': 'ogg',
-      'audio/ogg;codecs=opus': 'ogg',
-      'audio/mp4': 'm4a',
-      'audio/mpeg': 'mp3',
-      'audio/wav': 'wav'
+      'audio/webm':'webm','audio/webm;codecs=opus':'webm',
+      'audio/ogg':'ogg','audio/ogg;codecs=opus':'ogg',
+      'audio/mp4':'m4a','audio/mpeg':'mp3','audio/wav':'wav'
     };
-    const fileExt = extByMime[mimeStored] || 'webm';
-    const fileName = `ege4_variant${variantMatch}.${fileExt}`;
+    const fileExt  = extByMime[mimeStored] || 'webm';
+    const fileName = `ege4_variant${varNum}.${fileExt}`;
 
     function dataURLtoBlob(dataURL){
       const parts = (dataURL || '').split(',');
       if (parts.length < 2) return null;
-      const header = parts[0];
-      const b64 = parts[1];
+      const header = parts[0], b64 = parts[1];
       const type = (header.match(/data:(.*?);base64/) || [,'application/octet-stream'])[1];
       const bin = atob(b64);
-      const len = bin.length;
-      const bytes = new Uint8Array(len);
-      for (let i = 0; i < len; i++) bytes[i] = bin.charCodeAt(i);
+      const bytes = new Uint8Array(bin.length);
+      for (let i=0;i<bin.length;i++) bytes[i] = bin.charCodeAt(i);
       return new Blob([bytes], { type });
     }
 
-    function setButtonsEnabled(enabled){
-      playBtn.disabled = !enabled;
-      downloadBtn.disabled = !enabled;
+    function setButtonsEnabled(en){
+      playBtn.disabled = !en;
+      downloadBtn.disabled = !en;
     }
 
     (function initAudio(){
-      if (base64) {
-        try {
+      if (base64){
+        try{
           const blob = dataURLtoBlob(base64);
-          if (blob) {
-            objectURL = URL.createObjectURL(blob);
+          if (blob){
+            objectURL   = URL.createObjectURL(blob);
             audioEl.src = objectURL;
-            audioEl.type = blob.type || mimeStored;
-          } else {
+            audioEl.type= blob.type || mimeStored;
+          }else{
             audioEl.src = base64;
-            audioEl.type = mimeStored;
+            audioEl.type= mimeStored;
           }
           setButtonsEnabled(true);
-        } catch {
+        }catch{
           audioEl.src = base64;
-          audioEl.type = mimeStored;
+          audioEl.type= mimeStored;
           setButtonsEnabled(true);
         }
-      } else {
+      }else{
         statusText.textContent = '⚠️ Запись не найдена. Возможно, вы запретили доступ к микрофону или страница была закрыта до завершения.';
         setButtonsEnabled(false);
       }
@@ -286,6 +245,7 @@
       a.click();
     });
 
+    // Очистка ресурсов
     window.addEventListener('pagehide', ()=>{ if (objectURL) URL.revokeObjectURL(objectURL); });
     window.addEventListener('beforeunload', ()=>{ if (objectURL) URL.revokeObjectURL(objectURL); });
   </script>

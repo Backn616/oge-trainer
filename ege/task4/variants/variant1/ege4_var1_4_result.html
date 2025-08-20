@@ -155,9 +155,8 @@
     document.getElementById('varNum').textContent = varNum;
     document.title = `Результат — Задание 4 · Вариант ${varNum}`;
 
-    // --- Повторить ---
+    // --- Повторить (с нуля) ---
     const repeat = document.getElementById('repeatBtn');
-    if (repeat) repeat.href = path.replace(/_4_result\.html$/i, '_1_prepare.html');
 
     // --- Навигация ---
     function getEgeBase(){
@@ -166,37 +165,41 @@
     }
     const base = getEgeBase();
     const toVariants = document.getElementById('toVariants');
+    const toTaskMenu = document.getElementById('toTaskMenu');
+    const toModeMenu = document.getElementById('toModeMenu');
+    const toHome     = document.getElementById('toHome');
+
     if (toVariants) toVariants.href = path.replace(/\/variants\/variant\d+\/[^/]+$/i, `/variants/ege4.html`);
-    document.getElementById('toTaskMenu').href = `${base}ege.html`;
-    document.getElementById('toModeMenu').href = `${base}ege_menu.html`;
+    if (toTaskMenu) toTaskMenu.href = `${base}ege.html`;
+    if (toModeMenu) toModeMenu.href = `${base}ege_menu.html`;
 
     // --- Аудио ---
-    const audioEl = document.getElementById('audio');
-    const playBtn = document.getElementById('playBtn');
+    const audioEl     = document.getElementById('audio');
+    const playBtn     = document.getElementById('playBtn');
     const downloadBtn = document.getElementById('downloadBtn');
-    const statusText = document.getElementById('statusText');
+    const statusText  = document.getElementById('statusText');
 
-    const base64 = sessionStorage.getItem('ege4_audio_base64');
+    const base64     = sessionStorage.getItem('ege4_audio_base64');
     const mimeStored = (sessionStorage.getItem('ege4_audio_mime') || 'audio/webm').toLowerCase();
 
     let objectURL = null;
     const extByMime = {
       'audio/webm': 'webm', 'audio/webm;codecs=opus': 'webm',
-      'audio/ogg': 'ogg', 'audio/ogg;codecs=opus': 'ogg',
-      'audio/mp4': 'm4a', 'audio/mpeg': 'mp3', 'audio/wav': 'wav'
+      'audio/ogg': 'ogg',  'audio/ogg;codecs=opus': 'ogg',
+      'audio/mp4': 'm4a',  'audio/mpeg': 'mp3', 'audio/wav': 'wav'
     };
-    const fileExt = extByMime[mimeStored] || 'webm';
+    const fileExt  = extByMime[mimeStored] || 'webm';
     const fileName = `ege4_variant${varNum}.${fileExt}`;
 
     function dataURLtoBlob(dataURL){
       const parts = (dataURL || '').split(',');
       if (parts.length < 2) return null;
       const header = parts[0];
-      const b64 = parts[1];
-      const type = (header.match(/data:(.*?);base64/) || [,'application/octet-stream'])[1];
-      const bin = atob(b64);
-      const len = bin.length;
-      const bytes = new Uint8Array(len);
+      const b64    = parts[1];
+      const type   = (header.match(/data:(.*?);base64/) || [,'application/octet-stream'])[1];
+      const bin    = atob(b64);
+      const len    = bin.length;
+      const bytes  = new Uint8Array(len);
       for (let i = 0; i < len; i++) bytes[i] = bin.charCodeAt(i);
       return new Blob([bytes], { type });
     }
@@ -206,20 +209,21 @@
       downloadBtn.disabled = !enabled;
     }
 
+    // --- Подготовка аудио ---
     if (base64) {
       try {
         const blob = dataURLtoBlob(base64);
         if (blob) {
           objectURL = URL.createObjectURL(blob);
-          audioEl.src = objectURL;
+          audioEl.src  = objectURL;
           audioEl.type = blob.type || mimeStored;
         } else {
-          audioEl.src = base64;
+          audioEl.src  = base64;
           audioEl.type = mimeStored;
         }
         setButtonsEnabled(true);
       } catch {
-        audioEl.src = base64;
+        audioEl.src  = base64;
         audioEl.type = mimeStored;
         setButtonsEnabled(true);
       }
@@ -237,6 +241,41 @@
       a.click();
     });
 
+    // --- ВАЖНО: обнуление состояния задания 4 при переходах с result ---
+    function clearTask4State(){
+      try{
+        // жёстко чистим все ключи по заданию 4
+        const KEYS = [
+          'ege4_audio_base64','ege4_audio_mime',
+          'ege4_prepared','ege4_warned','ege4_meta',
+          'ege4_task_finished','ege4_task_left_ms'
+        ];
+        KEYS.forEach(k => sessionStorage.removeItem(k));
+      }catch{}
+    }
+
+    function clearAndGo(url){
+      clearTask4State();
+      location.href = url;
+    }
+
+    // «Повторить этот вариант» — как первый запуск: чистим и ведём на _1_prepare
+    if (repeat){
+      const repeatHref = path.replace(/_4_result\.html$/i, '_1_prepare.html');
+      repeat.href = repeatHref;
+      repeat.addEventListener('click', (e)=>{
+        e.preventDefault();
+        clearAndGo(repeatHref);
+      });
+    }
+
+    // Любая другая навигация («перейти к ...») — тоже чистим состояние
+    if (toVariants) toVariants.addEventListener('click', (e)=>{ e.preventDefault(); clearAndGo(toVariants.href); });
+    if (toTaskMenu) toTaskMenu.addEventListener('click', (e)=>{ e.preventDefault(); clearAndGo(toTaskMenu.href); });
+    if (toModeMenu) toModeMenu.addEventListener('click', (e)=>{ e.preventDefault(); clearAndGo(toModeMenu.href); });
+    if (toHome)     toHome.addEventListener('click',     (e)=>{ e.preventDefault(); clearAndGo(toHome.href); });
+
+    // Очистка ресурсов
     window.addEventListener('pagehide', ()=>{ if (objectURL) URL.revokeObjectURL(objectURL); });
     window.addEventListener('beforeunload', ()=>{ if (objectURL) URL.revokeObjectURL(objectURL); });
   </script>

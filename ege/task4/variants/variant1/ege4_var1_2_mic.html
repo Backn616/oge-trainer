@@ -5,11 +5,10 @@
   <title>Предупреждение — доступ к микрофону</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <!-- Шрифт -->
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
 
-  <!-- Общие стили (лежит на уровень выше папки variant1) -->
+  <!-- Общие стили (фон/карточка/кнопка) -->
   <link rel="stylesheet" href="../style_common.css">
 </head>
 <body>
@@ -40,14 +39,16 @@
   <script type="module">
     import { toggleThemeInit, navigateOnce } from '../common.js';
 
+    // Тема
     toggleThemeInit();
 
-    // Служебные ключи
+    // Следующая страница (task)
     const NEXT_URL = location.pathname.replace(/_2_mic\.html$/i, '_3_task.html');
 
-    // Готовим sessionStorage для задания 4
+    // Подготовка sessionStorage для задания 4
     try {
-      sessionStorage.removeItem('ege4_audio_base64'); // очистка возможной прошлой записи
+      sessionStorage.removeItem('ege4_audio_base64'); // на всякий случай — старая запись
+      sessionStorage.removeItem('ege4_audio_mime');
       sessionStorage.setItem('ege4_warned', '1');     // маркер показа предупреждения
       const meta = JSON.parse(sessionStorage.getItem('ege4_meta') || '{}');
       meta.warnedAt = Date.now();
@@ -56,17 +57,19 @@
 
     // Кнопка «ОК» — единственная точка перехода
     const a = document.getElementById('nextLink');
-    a.href = NEXT_URL;
+    a.href = NEXT_URL; // fallback, если JS отключён
     a.addEventListener('click', (e) => {
       e.preventDefault();
       navigateOnce(NEXT_URL);
     });
 
-    // После возврата по Back из task сбрасываем лок, чтобы кнопка снова работала
-    window.addEventListener('pageshow', () => { navigateOnce.lock = false; });
+    // Возврат по Back/Forward (BFCache): просто снимаем замок, чтобы кнопка снова работала
+    window.addEventListener('pageshow', () => {
+      navigateOnce.lock = false;
+    });
 
     // ВАЖНО: никаких автопереходов при сворачивании/уходе
-    // (убраны обработчики visibilitychange/pagehide/freeze)
+    // (никаких visibilitychange/pagehide/freeze)
   </script>
 </body>
 </html>

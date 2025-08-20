@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>ЕГЭ — Задание 4: выбор варианта</title>
   <meta name="description" content="Выбор варианта для задания 4 устной части ЕГЭ. Запись ответа и прослушивание." />
-  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
 
-  <!-- Общие стили -->
-  <link rel="stylesheet" href="style_common.css" />
+  <!-- Внешний вид как в пробном файле -->
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
   <!-- Анти-мигание темы -->
   <script>
@@ -21,7 +21,56 @@
   </script>
 
   <style>
+    :root {
+      --bg: #f7f9ff;
+      --card: #ffffff;
+      --text: #0b1020;
+      --muted:#5a6475;
+      --primary:#2b6cff;
+      --primary-600:#1f58d9;
+      --ring:#bfd3ff;
+      --success:#25c26e;
+      --shadow: 0 10px 25px rgba(17,24,39,.08);
+      --btn-1:#6d95ff;
+      --btn-2:#4f7dff;
+      --btn-text:#ffffff;
+      --radius-xl:20px;
+      --grid-gap:40px;
+      --btn-fs:20px;
+      --btn-pad-y:18px;
+      --btn-pad-x:24px;
+      --btn-minh:56px;
+      --btn-radius:14px;
+    }
+    .dark {
+      --bg: #0b1020;
+      --card: rgba(255,255,255,0.08);
+      --text: #eaf0ff;
+      --muted: #b9c2d3;
+      --primary: #6aa3ff;
+      --primary-600: #4b8dff;
+      --ring: #a9c6ff;
+      --success: #5ee397;
+      --shadow: 0 10px 35px rgba(0,0,0,.35);
+      --btn-1:#aecdff;
+      --btn-2:#86b8ff;
+      --btn-text:#ffffff;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:Inter, system-ui, Segoe UI, Roboto, Arial, sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(1200px 600px at 70% -10%, #29417a40, transparent),
+        radial-gradient(900px 500px at -10% 10%, #344b9340, transparent),
+        var(--bg);
+    }
+    a{color:inherit; text-decoration:none}
     .wrap{max-width:1040px; margin:0 auto; padding:24px}
+
     header{display:flex; justify-content:space-between; align-items:center; gap:16px; padding:8px 0;}
     .brand{display:flex; align-items:center; gap:12px}
     .logo{
@@ -32,39 +81,60 @@
     }
     .brand-title{font-weight:700; letter-spacing:.2px}
     .badge{font-size:12px; color:var(--muted)}
+    .theme-toggle{
+      border:1px solid #ffffff22; background:transparent; color:var(--text);
+      padding:10px 14px; border-radius:10px; cursor:pointer; transition:transform .08s ease;
+    }
+    .theme-toggle:active{transform:scale(.98)}
+
     main{padding:40px 0 24px}
     .card{
       background:var(--card);
-      border-left:5px solid var(--primary);
-      border-radius:12px;
+      border:1px solid #ffffff1f;
+      border-radius: var(--radius-xl);
       padding:28px;
       box-shadow:var(--shadow);
+      backdrop-filter: blur(10px);
     }
     .h1{font-size:clamp(26px,5vw,36px); line-height:1.15; margin:0 0 10px}
     .sub{color:var(--muted); font-size:16px; margin:0 0 18px}
-    .frame{margin-top:12px}
+
+    .frame{
+      border:1px solid #ffffff22;
+      border-radius: calc(var(--radius-xl) - 2px);
+      background:#ffffff06;
+      backdrop-filter: blur(6px);
+      padding:22px;
+      margin-top:12px;
+    }
     .grid{
       display:grid;
       grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
-      gap: 24px;
+      gap: var(--grid-gap);
     }
     .variant{
       display:inline-flex; align-items:center; justify-content:center; gap:10px;
-      font-size:20px; font-weight:600;
-      padding:18px 24px;
-      min-height:56px;
-      border-radius:12px;
-      background: linear-gradient(135deg, var(--primary), var(--primary-600));
-      color: #fff;
+      font-size: var(--btn-fs); font-weight:600;
+      padding: var(--btn-pad-y) var(--btn-pad-x);
+      min-height: var(--btn-minh);
+      border-radius: var(--btn-radius);
+      border:1px solid rgba(255,255,255,.18);
+      background: linear-gradient(135deg, var(--btn-1), var(--btn-2));
+      color: var(--btn-text);
       text-shadow: 0 1px 0 rgba(0,0,0,.15);
       box-shadow: 0 12px 24px rgba(75,141,255,.28);
-      cursor: pointer;
       transition: transform .06s ease, filter .2s ease, box-shadow .2s ease;
+      cursor: pointer;
     }
     .variant:hover{ transform: translateY(-2px); filter: brightness(1.03) }
     .variant:focus-visible{ box-shadow: 0 0 0 4px var(--ring); outline: none; }
-    .pager{display:flex; align-items:center; justify-content:center; gap:12px; margin-top:20px;}
+
+    .pager{
+      display:flex; align-items:center; justify-content:center; gap:12px;
+      margin-top:20px;
+    }
     .pager-btn{
+      display:inline-flex; align-items:center; justify-content:center;
       padding:10px 14px; border-radius:10px; border:1px solid #ffffff22;
       background: var(--card); color: var(--text); cursor:pointer;
       box-shadow: var(--shadow);
@@ -73,13 +143,12 @@
     .pager-btn[disabled]{opacity:.6; cursor:not-allowed}
     .pager-btn:hover:not([disabled]){ transform: translateY(-1px); filter: brightness(1.02) }
     .pager-info{ color: var(--muted); font-size:14px }
+
     footer{padding:26px 0 10px; color:var(--muted); font-size:13px; text-align:center}
+    .back{border:1px dashed #ffffff28; padding:10px 14px; border-radius:10px}
   </style>
 </head>
 <body>
-  <!-- Тумблер темы -->
-  <button class="theme-toggle" id="themeBtn" aria-label="Переключить тему">🌓 Тема</button>
-
   <div class="wrap">
     <header>
       <a class="brand back-to-menu" href="#" aria-label="Назад к списку заданий">
@@ -89,18 +158,24 @@
           <div class="badge">ЕГЭ · задание 4</div>
         </div>
       </a>
+      <div style="display:flex; gap:10px; align-items:center">
+        <a class="back back-to-menu" href="#">← К выбору задания</a>
+        <button class="theme-toggle" id="themeBtn" aria-label="Переключить тему">🌓 Тема</button>
+      </div>
     </header>
 
     <main>
       <section class="card">
         <h1 class="h1">ЕГЭ — задание 4: выбери вариант</h1>
         <p class="sub">Нажми на вариант, затем запиши и прослушай свой ответ.</p>
+
         <div class="frame">
           <nav id="variants" class="grid" aria-label="Варианты задания 4"></nav>
+
           <div class="pager">
-            <button id="prevBtn" class="pager-btn">← Назад</button>
-            <div id="pagerInfo" class="pager-info"></div>
-            <button id="nextBtn" class="pager-btn">Вперёд →</button>
+            <button id="prevBtn" class="pager-btn" type="button" aria-label="← Назад">← Назад</button>
+            <div id="pagerInfo" class="pager-info" aria-live="polite"></div>
+            <button id="nextBtn" class="pager-btn" type="button" aria-label="Вперёд →">Вперёд →</button>
           </div>
         </div>
       </section>
@@ -110,24 +185,26 @@
   </div>
 
   <script type="module">
-    import { toggleThemeInit } from './common.js';
+    import { toggleThemeInit, navigateOnce } from './common.js';
+
+    // Тема (наш общий init)
     toggleThemeInit();
 
-    // ===== Надёжная база пути вида /.../ege/ =====
+    // База /.../ege/
     function getEgeBase() {
       const parts = location.pathname.split('/').filter(Boolean);
       const i = parts.indexOf('ege');
-      let base;
-      if (i !== -1) {
-        base = '/' + parts.slice(0, i + 1).join('/') + '/';
-      } else {
-        base = '/ege/';
-      }
+      let base = (i !== -1) ? ('/' + parts.slice(0, i + 1).join('/') + '/') : '/ege/';
       return base.replace(/\/{2,}/g, '/');
     }
     const EGE_BASE = getEgeBase();
 
-    // ===== Варианты + пагинация =====
+    // Привязываем "к выбору задания"
+    document.querySelectorAll('.back-to-menu').forEach(a => {
+      a.href = EGE_BASE + 'ege_menu.html';
+    });
+
+    // Пагинация
     const TOTAL_VARIANTS = 60;
     const PAGE_SIZE      = 15;
 
@@ -162,16 +239,19 @@
       nextBtn.disabled = currentPage === totalPages;
     }
 
+    function goToVariant(n){
+      const url = `${EGE_BASE}task4/variants/variant${n}/ege4_var${n}_1_prepare.html`
+        .replace(/\/{2,}/g, '/')
+        .replace(':/', '://');
+      navigateOnce(url);
+    }
+
     prevBtn.addEventListener('click', () => renderPage(currentPage - 1));
     nextBtn.addEventListener('click', () => renderPage(currentPage + 1));
     renderPage(1);
 
-    // ===== Переход на страницы варианта =====
-    function goToVariant(n){
-      const url = `${EGE_BASE}task4/variants/variant${n}/ege4_var${n}_1_prepare.html`;
-      const normalized = url.replace(/\/{2,}/g, '/').replace(':/', '://');
-      window.location.assign(normalized);
-    }
+    // Снять замок при возврате из BFCache
+    window.addEventListener('pageshow', () => { navigateOnce.lock = false; });
   </script>
 </body>
 </html>

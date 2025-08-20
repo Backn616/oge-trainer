@@ -4,8 +4,6 @@
   <meta charset="UTF-8" />
   <title id="pageTitle">Результат — Задание 4</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-  <!-- Шрифт -->
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
 
   <!-- Анти-мигание темы -->
@@ -99,14 +97,11 @@
   </style>
 </head>
 <body>
-  <!-- Переключатель темы -->
   <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
 
   <div class="wrap">
     <h1 id="h1">Результат сохранён — Вариант <span id="varNum">?</span></h1>
-    <div class="status" id="statusText">
-      ✅ Вы успешно завершили задание. Вы можете прослушать или скачать запись ниже.
-    </div>
+    <div class="status" id="statusText">✅ Вы успешно завершили задание. Вы можете прослушать или скачать запись ниже.</div>
 
     <audio id="audio" controls></audio>
 
@@ -144,58 +139,59 @@
     </div>
   </div>
 
-  <script type="module">
-    import { toggleThemeInit } from '../../../common.js';
-    toggleThemeInit();
+  <script>
+    /* === Тема === */
+    (function(){
+      const btn = document.getElementById('themeBtn');
+      const key = 'pref-theme';
+      const root = document.documentElement;
+      function apply(mode){ root.classList.toggle('dark', mode === 'dark'); localStorage.setItem(key, mode); }
+      apply(localStorage.getItem(key) || 'light');
+      btn.addEventListener('click', ()=>{ const c = localStorage.getItem(key) || 'light'; apply(c === 'dark' ? 'light' : 'dark'); });
+    })();
 
-    // --- Определяем вариант ---
+    /* === Вариант + ссылки (работают и без JS) === */
     const path = location.pathname;
     const vm = path.match(/variant(\d+)/i);
     const varNum = vm ? vm[1] : '?';
     document.getElementById('varNum').textContent = varNum;
     document.title = `Результат — Задание 4 · Вариант ${varNum}`;
 
-    // --- Построение ссылок (fallback для отключённого JS) ---
-    // Ожидаемый путь: /ege/task4/variants/variantN/ege4_varN_4_result.html
+    // базовый /ege/
+    const baseIdx = path.indexOf('/ege/');
+    const baseEge = baseIdx >= 0 ? path.slice(0, baseIdx + 5) : '/ege/';
+
+    // построим href-ы
     const toVariants = document.getElementById('toVariants');
     const toTaskMenu = document.getElementById('toTaskMenu');
     const toModeMenu = document.getElementById('toModeMenu');
     const toHome     = document.getElementById('toHome');
-    const repeat     = document.getElementById('repeatBtn');
+    const repeatBtn  = document.getElementById('repeatBtn');
 
-    // /ege/ базовый префикс
-    const baseEgeIdx = path.indexOf('/ege/');
-    const baseEge = baseEgeIdx >= 0 ? path.slice(0, baseEgeIdx + 5) : '/ege/';
-
-    // Вариант: список вариантов задания 4
-    const variantsListHref = path.replace(/\/variants\/variant\d+\/[^/]+$/i, '/variants/ege4.html');
-    // Повторить этот же вариант сначала
-    const repeatHref = path.replace(/_4_result\.html$/i, '_1_prepare.html');
-    // Меню заданий ЕГЭ
+    const variantsHref = path.replace(/\/variants\/variant\d+\/[^/]+$/i, '/variants/ege4.html');
+    const repeatHref   = path.replace(/_4_result\.html$/i, '_1_prepare.html');
     const taskMenuHref = baseEge + 'ege.html';
-    // Главное меню ЕГЭ
     const modeMenuHref = baseEge + 'ege_menu.html';
-    // Главная — уже задана абсолютным href в разметке
 
-    if (toVariants) toVariants.href = variantsListHref;
-    if (repeat)     repeat.href     = repeatHref;
+    if (toVariants) toVariants.href = variantsHref;
+    if (repeatBtn)  repeatBtn.href  = repeatHref;
     if (toTaskMenu) toTaskMenu.href = taskMenuHref;
     if (toModeMenu) toModeMenu.href = modeMenuHref;
 
-    // --- Аудио ---
+    /* === Аудио === */
     const audioEl     = document.getElementById('audio');
+    const statusText  = document.getElementById('statusText');
     const playBtn     = document.getElementById('playBtn');
     const downloadBtn = document.getElementById('downloadBtn');
-    const statusText  = document.getElementById('statusText');
 
     const base64     = sessionStorage.getItem('ege4_audio_base64');
     const mimeStored = (sessionStorage.getItem('ege4_audio_mime') || 'audio/webm').toLowerCase();
 
     let objectURL = null;
     const extByMime = {
-      'audio/webm': 'webm', 'audio/webm;codecs=opus': 'webm',
-      'audio/ogg': 'ogg',  'audio/ogg;codecs=opus': 'ogg',
-      'audio/mp4': 'm4a',  'audio/mpeg': 'mp3', 'audio/wav': 'wav'
+      'audio/webm':'webm','audio/webm;codecs=opus':'webm',
+      'audio/ogg':'ogg','audio/ogg;codecs=opus':'ogg',
+      'audio/mp4':'m4a','audio/mpeg':'mp3','audio/wav':'wav'
     };
     const fileExt  = extByMime[mimeStored] || 'webm';
     const fileName = `ege4_variant${varNum}.${fileExt}`;
@@ -209,78 +205,91 @@
       const bin    = atob(b64);
       const len    = bin.length;
       const bytes  = new Uint8Array(len);
-      for (let i = 0; i < len; i++) bytes[i] = bin.charCodeAt(i);
+      for (let i=0;i<len;i++) bytes[i] = bin.charCodeAt(i);
       return new Blob([bytes], { type });
     }
 
     function setButtonsEnabled(enabled){
-      playBtn.disabled = !enabled;
-      downloadBtn.disabled = !enabled;
+      const disabled = !enabled;
+      playBtn.disabled = disabled;
+      downloadBtn.disabled = disabled;
+      playBtn.setAttribute('aria-disabled', String(disabled));
+      downloadBtn.setAttribute('aria-disabled', String(disabled));
+      playBtn.tabIndex = disabled ? -1 : 0;
+      downloadBtn.tabIndex = disabled ? -1 : 0;
+      if (disabled){
+        playBtn.title = 'Запись отсутствует';
+        downloadBtn.title = 'Запись отсутствует';
+      } else {
+        playBtn.removeAttribute('title');
+        downloadBtn.removeAttribute('title');
+      }
     }
 
-    // Подготовить аудио
-    if (base64) {
-      try {
-        const blob = dataURLtoBlob(base64);
-        if (blob) {
-          objectURL = URL.createObjectURL(blob);
-          audioEl.src  = objectURL;
-          audioEl.type = blob.type || mimeStored;
-        } else {
+    (function initAudio(){
+      if (base64) {
+        try {
+          const blob = dataURLtoBlob(base64);
+          if (blob) {
+            objectURL = URL.createObjectURL(blob);
+            audioEl.src  = objectURL;
+            audioEl.type = blob.type || mimeStored;
+          } else {
+            audioEl.src  = base64;
+            audioEl.type = mimeStored;
+          }
+          setButtonsEnabled(true);
+        } catch {
           audioEl.src  = base64;
           audioEl.type = mimeStored;
+          setButtonsEnabled(true);
         }
-        setButtonsEnabled(true);
-      } catch {
-        audioEl.src  = base64;
-        audioEl.type = mimeStored;
-        setButtonsEnabled(true);
+      } else {
+        statusText.textContent = '⚠️ Запись не найдена. Возможно, вы запретили доступ к микрофону или страница была закрыта до завершения.';
+        setButtonsEnabled(false);
       }
-    } else {
-      statusText.textContent = '⚠️ Запись не найдена. Возможно, вы запретили доступ к микрофону или страница была закрыта до завершения.';
-      setButtonsEnabled(false);
-    }
+    })();
 
-    playBtn.addEventListener('click', ()=>{ if (audioEl.src) audioEl.play(); });
+    playBtn.addEventListener('click', ()=>{ if (!playBtn.disabled && audioEl.src) audioEl.play(); });
     downloadBtn.addEventListener('click', ()=>{
-      if (!audioEl.src) return;
+      if (downloadBtn.disabled || !audioEl.src) return;
       const a = document.createElement('a');
       a.href = objectURL || base64;
       a.download = fileName;
       a.click();
     });
 
-    // --- Жёсткий сброс состояния задания 4 перед ЛЮБОЙ навигацией с result ---
-    function clearTask4State(){
+    /* === Сброс состояния при любых переходах с result === */
+    function resetTask4(){
       try{
-        const KEYS = [
+        [
           'ege4_audio_base64','ege4_audio_mime',
           'ege4_prepared','ege4_warned','ege4_meta',
           'ege4_task_finished','ege4_task_left_ms'
-        ];
-        KEYS.forEach(k => sessionStorage.removeItem(k));
+        ].forEach(k=>sessionStorage.removeItem(k));
       }catch{}
     }
     function clearAndGo(url){
       try{ if (objectURL) URL.revokeObjectURL(objectURL); }catch{}
-      clearTask4State();
-      // используем assign, чтобы не было BFCache-возврата с «призраками»
+      resetTask4();
       location.assign(url);
     }
 
-    // Повторить вариант — как первый запуск
-    if (repeat){
-      repeat.addEventListener('click', (e)=>{
+    // Повторить этот вариант — как впервые
+    if (repeatBtn){
+      repeatBtn.addEventListener('click', (e)=>{
         e.preventDefault();
-        clearAndGo(repeat.href);
-      }, {passive:false});
+        clearAndGo(repeatBtn.href);
+      });
     }
-
-    // Остальные переходы — тоже сбрасывают состояние ПЕРЕД навигацией
-    if (toVariants) toVariants.addEventListener('click', (e)=>{ e.preventDefault(); clearAndGo(toVariants.href); }, {passive:false});
-    if (toTaskMenu) toTaskMenu.addEventListener('click', (e)=>{ e.preventDefault(); clearAndGo(toTaskMenu.href); }, {passive:false});
-    if (toModeMenu) toModeMenu.addEventListener('click', (e)=>{ e.preventDefault(); clearAndGo(toModeMenu.href); }, {passive:false});
-    if (toHome)     toHome.addEventListener('click',     (e)=>{ e.preventDefault(); clearAndGo(toHome.href);     }, {passive:false});
+    // Остальные кнопки — тоже сбрасывают состояние перед уходом
+    [['toVariants', toVariants], ['toTaskMenu', toTaskMenu], ['toModeMenu', toModeMenu], ['toHome', toHome]].forEach(([_, el])=>{
+      if (!el) return;
+      el.addEventListener('click', (e)=>{
+        e.preventDefault();
+        clearAndGo(el.href);
+      });
+    });
 
     // Очистка URL-ресурса аудио при уходе
     window.addEventListener('pagehide', ()=>{ try{ if (objectURL) URL.revokeObjectURL(objectURL); }catch{} });

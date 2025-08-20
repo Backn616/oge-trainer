@@ -9,8 +9,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
 
-  <!-- Общие стили -->
-  <link rel="stylesheet" href="style_common.css">
+  <!-- Общие стили (на уровень выше) -->
+  <link rel="stylesheet" href="../style_common.css">
 </head>
 <body>
   <!-- Тумблер темы -->
@@ -26,33 +26,27 @@
         <strong>разрешите сайту использовать микрофон</strong>, чтобы начать запись ответа.
       </p>
 
-      <!-- Ставим href, и всё равно дублируем переход через JS с защитой -->
-      <a id="nextLink"
-         class="button"
-         href="#"
-         role="button"
+      <a id="nextLink" class="button" href="#" role="button"
          aria-label="Перейти к заданию с запросом доступа к микрофону">
         ОК
       </a>
     </section>
   </main>
 
-  <!-- Скрипт -->
+  <!-- Скрипт (тоже на уровень выше) -->
   <script type="module">
-    import { toggleThemeInit, navigateOnce } from './common.js';
+    import { toggleThemeInit, navigateOnce } from '../common.js';
 
     toggleThemeInit();
 
-    // Подготовка sessionStorage
     try {
-      sessionStorage.removeItem('ege4_audio_base64'); // очистка старой записи
+      sessionStorage.removeItem('ege4_audio_base64');
       sessionStorage.setItem('ege4_warned','1');
       const meta = JSON.parse(sessionStorage.getItem('ege4_meta') || '{}');
       meta.warnedAt = Date.now();
       sessionStorage.setItem('ege4_meta', JSON.stringify(meta));
     } catch {}
 
-    // Навигация
     const NEXT_URL = location.pathname.replace(/_2_mic\.html$/i, '_3_task.html');
 
     const a = document.getElementById('nextLink');
@@ -62,7 +56,6 @@
       navigateOnce(NEXT_URL);
     });
 
-    // fallback-навигация при уходе со страницы
     document.addEventListener('visibilitychange', () => { if (document.hidden) navigateOnce(NEXT_URL); });
     window.addEventListener('pagehide', () => navigateOnce(NEXT_URL));
     window.addEventListener('freeze', () => navigateOnce(NEXT_URL));

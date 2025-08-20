@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
 
-  <!-- Общие стили (на уровень выше) -->
+  <!-- Общие стили (лежит на уровень выше папки variant1) -->
   <link rel="stylesheet" href="../style_common.css">
 </head>
 <body>
@@ -26,29 +26,35 @@
         <strong>разрешите сайту использовать микрофон</strong>, чтобы начать запись ответа.
       </p>
 
-      <a id="nextLink" class="button" href="#" role="button"
+      <!-- Ставим href (fallback без JS) и дублируем переход через JS с защитой -->
+      <a id="nextLink"
+         class="button"
+         href="#"
+         role="button"
          aria-label="Перейти к заданию с запросом доступа к микрофону">
         ОК
       </a>
     </section>
   </main>
 
-  <!-- Скрипт (тоже на уровень выше) -->
   <script type="module">
     import { toggleThemeInit, navigateOnce } from '../common.js';
 
     toggleThemeInit();
 
+    // Служебные ключи
+    const NEXT_URL = location.pathname.replace(/_2_mic\.html$/i, '_3_task.html');
+
+    // Готовим sessionStorage для задания 4
     try {
-      sessionStorage.removeItem('ege4_audio_base64');
-      sessionStorage.setItem('ege4_warned','1');
+      sessionStorage.removeItem('ege4_audio_base64'); // очистка возможной прошлой записи
+      sessionStorage.setItem('ege4_warned', '1');     // маркер показа предупреждения
       const meta = JSON.parse(sessionStorage.getItem('ege4_meta') || '{}');
       meta.warnedAt = Date.now();
       sessionStorage.setItem('ege4_meta', JSON.stringify(meta));
     } catch {}
 
-    const NEXT_URL = location.pathname.replace(/_2_mic\.html$/i, '_3_task.html');
-
+    // Кнопка «ОК» — единственная точка перехода
     const a = document.getElementById('nextLink');
     a.href = NEXT_URL;
     a.addEventListener('click', (e) => {
@@ -56,9 +62,11 @@
       navigateOnce(NEXT_URL);
     });
 
-    document.addEventListener('visibilitychange', () => { if (document.hidden) navigateOnce(NEXT_URL); });
-    window.addEventListener('pagehide', () => navigateOnce(NEXT_URL));
-    window.addEventListener('freeze', () => navigateOnce(NEXT_URL));
+    // После возврата по Back из task сбрасываем лок, чтобы кнопка снова работала
+    window.addEventListener('pageshow', () => { navigateOnce.lock = false; });
+
+    // ВАЖНО: никаких автопереходов при сворачивании/уходе
+    // (убраны обработчики visibilitychange/pagehide/freeze)
   </script>
 </body>
 </html>

@@ -1,3 +1,4 @@
+<!-- task4/ege4.html -->
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -5,8 +6,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>ЕГЭ — Задание 4: выбор варианта</title>
   <meta name="description" content="Выбор варианта для задания 4 устной части ЕГЭ. Запись ответа и прослушивание." />
+
+  <!-- Шрифт: ускорение загрузки и единый с проектом -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+
+  <!-- Общие стили проекта -->
+  <link rel="stylesheet" href="../style_common.css" />
 
   <!-- Анти-мигание темы -->
   <script>
@@ -19,211 +26,110 @@
   </script>
 
   <style>
-    :root {
-      --bg: #f7f9ff;
-      --card: #ffffff;
-      --text: #0b1020;
-      --muted:#5a6475;
-      --primary:#2b6cff;
-      --primary-600:#1f58d9;
-      --ring:#bfd3ff;
-      --success:#25c26e;
-      --shadow: 0 10px 25px rgba(17,24,39,.08);
-      --btn-1:#6d95ff;
-      --btn-2:#4f7dff;
-      --btn-text:#ffffff;
-      --radius-xl:20px;
-      --grid-gap:40px;
-      --btn-fs:20px;
-      --btn-pad-y:18px;
-      --btn-pad-x:24px;
-      --btn-minh:56px;
-      --btn-radius:14px;
+    /* Лёгкая вёрстка под список вариантов — в духе общего стиля */
+    .wrap{
+      max-width: 1200px;
+      width: 100%;
+      margin: 0 auto;
     }
-    .dark {
-      --bg: #0b1020;
-      --card: rgba(255,255,255,0.08);
-      --text: #eaf0ff;
-      --muted: #b9c2d3;
-      --primary: #6aa3ff;
-      --primary-600: #4b8dff;
-      --ring: #a9c6ff;
-      --success: #5ee397;
-      --shadow: 0 10px 35px rgba(0,0,0,.35);
-      --btn-1:#aecdff;
-      --btn-2:#86b8ff;
-      --btn-text:#ffffff;
+    header{
+      display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:16px;
     }
+    .brand{
+      display:flex; align-items:center; gap:12px; text-align:left;
+      background:var(--card); border-radius:12px; padding:10px 14px; box-shadow:var(--shadow);
+    }
+    .brand b{ display:block; font-size:18px; }
+    .brand small{ display:block; color:var(--muted); margin-top:2px; }
 
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0;
-      font-family:Inter, system-ui, Segoe UI, Roboto, Arial, sans-serif;
-      color:var(--text);
-      background:
-        radial-gradient(1200px 600px at 70% -10%, #29417a40, transparent),
-        radial-gradient(900px 500px at -10% 10%, #344b9340, transparent),
-        var(--bg);
-    }
-    a{color:inherit; text-decoration:none}
-    .wrap{max-width:1040px; margin:0 auto; padding:24px}
+    /* Карточка-контейнер (используем task-container для единого вида) */
+    .picker-card.task-container{ margin-top: 8px; }
+    .picker-sub{ color:var(--muted); margin:8px 0 18px; }
 
-    header{display:flex; justify-content:space-between; align-items:center; gap:16px; padding:8px 0;}
-    .brand{display:flex; align-items:center; gap:12px}
-    .logo{
-      width:42px; height:42px; border-radius:12px;
-      background: linear-gradient(135deg, var(--primary), #9bd0ff);
-      box-shadow: 0 6px 18px rgba(0,0,0,.25), inset 0 0 12px #ffffff33;
-      display:grid; place-items:center; color:#001133; font-weight:800;
-    }
-    .brand-title{font-weight:700; letter-spacing:.2px}
-    .badge{font-size:12px; color:var(--muted)}
-    .theme-toggle{
-      border:1px solid #ffffff22; background:transparent; color:var(--text);
-      padding:10px 14px; border-radius:10px; cursor:pointer; transition:transform .08s ease;
-    }
-    .theme-toggle:active{transform:scale(.98)}
-
-    main{padding:40px 0 24px}
-    .card{
-      background:var(--card);
-      border:1px solid #ffffff1f;
-      border-radius: var(--radius-xl);
-      padding:28px;
-      box-shadow:var(--shadow);
-      backdrop-filter: blur(10px);
-    }
-    .h1{font-size:clamp(26px,5vw,36px); line-height:1.15; margin:0 0 10px}
-    .sub{color:var(--muted); font-size:16px; margin:0 0 18px}
-
-    .frame{
-      border:1px solid #ffffff22;
-      border-radius: calc(var(--radius-xl) - 2px);
-      background:#ffffff06;
-      backdrop-filter: blur(6px);
-      padding:22px;
-      margin-top:12px;
-    }
-    .grid{
+    /* Сетка вариантов */
+    .grid-variants{
       display:grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
-      gap: var(--grid-gap);
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
     }
-    .variant{
-      display:inline-flex; align-items:center; justify-content:center; gap:10px;
-      font-size: var(--btn-fs); font-weight:600;
-      padding: var(--btn-pad-y) var(--btn-pad-x);
-      min-height: var(--btn-minh);
-      border-radius: var(--btn-radius);
-      border:1px solid rgba(255,255,255,.18);
-      background: linear-gradient(135deg, var(--btn-1), var(--btn-2));
-      color: var(--btn-text);
-      text-shadow: 0 1px 0 rgba(0,0,0,.15);
-      box-shadow: 0 12px 24px rgba(75,141,255,.28);
+
+    /* Кнопка варианта — компактнее, чем .button */
+    .variant-btn{
+      display:inline-flex; align-items:center; justify-content:center; gap:8px;
+      padding:14px 18px;
+      min-height:52px;
+      border:none; border-radius:12px; cursor:pointer;
+      font-size:18px; font-weight:600; color:#fff;
+      background:linear-gradient(135deg, var(--primary), var(--primary-600));
+      box-shadow:0 10px 22px rgba(43,108,255,.28);
       transition: transform .06s ease, filter .2s ease, box-shadow .2s ease;
-      cursor: pointer;
     }
-    .variant:hover{ transform: translateY(-2px); filter: brightness(1.03) }
-    .variant:focus-visible{ box-shadow: 0 0 0 4px var(--ring); outline: none; }
+    .variant-btn:hover{ transform: translateY(-1px); filter: brightness(1.03); }
+    .variant-btn:focus-visible{ outline:none; box-shadow:0 0 0 4px var(--ring); }
 
+    /* Пагинация */
     .pager{
-      display:flex; align-items:center; justify-content:center; gap:12px;
-      margin-top:20px;
+      display:flex; align-items:center; justify-content:center; gap:12px; margin-top:18px;
     }
-    .pager-btn{
-      display:inline-flex; align-items:center; justify-content:center;
-      padding:10px 14px; border-radius:10px; border:1px solid #ffffff22;
-      background: var(--card); color: var(--text); cursor:pointer;
-      box-shadow: var(--shadow);
-      transition: transform .06s ease, filter .2s ease;
-    }
-    .pager-btn[disabled]{opacity:.6; cursor:not-allowed}
-    .pager-btn:hover:not([disabled]){ transform: translateY(-1px); filter: brightness(1.02) }
-    .pager-info{ color: var(--muted); font-size:14px }
+    .pager .button{ padding:10px 16px; font-size:16px; }
+    .pager-info{ color:var(--muted); font-size:14px; }
 
-    footer{padding:26px 0 10px; color:var(--muted); font-size:13px; text-align:center}
-    .back{border:1px dashed #ffffff28; padding:10px 14px; border-radius:10px}
-
-    @media (max-width: 520px){
-      :root { --grid-gap: 20px; --btn-fs: 18px; }
-    }
+    footer{ color:var(--muted); font-size:13px; margin-top:18px; text-align:center; }
   </style>
 </head>
 <body>
-  <div class="wrap">
+  <!-- Тумблер темы -->
+  <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
+
+  <div class="content-wrapper wrap">
     <header>
-      <a class="brand back-to-menu" href="#" aria-label="Назад к списку заданий">
-        <div class="logo">A</div>
+      <a id="backToMenuTop" class="brand" href="#" aria-label="Назад к списку заданий">
         <div>
-          <div class="brand-title">Онлайн-тренажёр «Говорение»</div>
-          <div class="badge">ЕГЭ · задание 4</div>
+          <b>Онлайн‑тренажёр «Говорение»</b>
+          <small>ЕГЭ · задание 4</small>
         </div>
       </a>
-      <div style="display:flex; gap:10px; align-items:center">
-        <a class="back back-to-menu" href="#">← К выбору задания</a>
-        <button class="theme-toggle" id="themeBtn" aria-label="Переключить тему">🌓 Тема</button>
-      </div>
+      <a id="backToMenuLink" class="button" href="#" aria-label="К выбору задания">← К выбору задания</a>
     </header>
 
-    <main>
-      <section class="card">
-        <h1 class="h1">ЕГЭ — задание 4: выбери вариант</h1>
-        <p class="sub">Нажми на вариант, затем запиши и прослушай свой ответ.</p>
+    <section class="task-container picker-card" aria-labelledby="h1">
+      <b id="h1">ЕГЭ — задание 4: выбери вариант</b>
+      <p class="picker-sub">Нажми на вариант, затем запиши и прослушай свой ответ.</p>
 
-        <div class="frame">
-          <nav id="variants" class="grid" aria-label="Варианты задания 4"></nav>
+      <nav id="variants" class="grid-variants" aria-label="Варианты задания 4"></nav>
 
-          <div class="pager">
-            <button id="prevBtn" class="pager-btn">← Назад</button>
-            <div id="pagerInfo" class="pager-info"></div>
-            <button id="nextBtn" class="pager-btn">Вперёд →</button>
-          </div>
-        </div>
-      </section>
-    </main>
+      <div class="pager" aria-label="Пагинация вариантов">
+        <button id="prevBtn" class="button" type="button" aria-label="Предыдущая страница">← Назад</button>
+        <div id="pagerInfo" class="pager-info" aria-live="polite"></div>
+        <button id="nextBtn" class="button" type="button" aria-label="Следующая страница">Вперёд →</button>
+      </div>
+    </section>
 
-    <footer>© 2025 — Демо-версия тренажёра ЕГЭ.</footer>
+    <footer>© 2025 — Демо‑версия тренажёра ЕГЭ.</footer>
   </div>
 
-  <script>
-    // ===== Тема =====
-    (function(){
-      const btn = document.getElementById('themeBtn');
-      const key = 'pref-theme';
-      const root = document.documentElement;
-      function apply(mode){
-        root.classList.toggle('dark', mode === 'dark');
-        localStorage.setItem(key, mode);
-      }
-      apply(localStorage.getItem(key) || 'light');
-      btn.addEventListener('click', () => {
-        const curr = localStorage.getItem(key) || 'light';
-        apply(curr === 'dark' ? 'light' : 'dark');
-      });
-    })();
+  <script type="module">
+    import { toggleThemeInit, navigateOnce } from '../common.js';
 
-    // ===== Надёжная база пути вида /.../ege/ =====
+    // Тема
+    toggleThemeInit();
+
+    // Надёжная база пути вида /.../ege/
     function getEgeBase() {
-      const parts = location.pathname.split('/').filter(Boolean); // убираем пустые
+      const parts = location.pathname.split('/').filter(Boolean);
       const i = parts.indexOf('ege');
-      let base;
-      if (i !== -1) {
-        base = '/' + parts.slice(0, i + 1).join('/') + '/';
-      } else {
-        base = '/ege/'; // запасной вариант
-      }
-      // нормализуем двойные слэши
+      const base = (i !== -1) ? ('/' + parts.slice(0, i + 1).join('/') + '/') : '/ege/';
       return base.replace(/\/{2,}/g, '/');
     }
     const EGE_BASE = getEgeBase();
 
     // Кнопки "Назад к меню"
-    document.querySelectorAll('.back-to-menu').forEach(a => {
-      a.href = EGE_BASE + 'ege_menu.html';
-    });
+    const menuURL = `${EGE_BASE}ege_menu.html`;
+    const backTop = document.getElementById('backToMenuTop');
+    const backBtn = document.getElementById('backToMenuLink');
+    backTop.href = menuURL; backBtn.href = menuURL;
 
-    // ===== Варианты + пагинация =====
+    // Варианты + пагинация
     const TOTAL_VARIANTS = 60;
     const PAGE_SIZE      = 15;
 
@@ -232,11 +138,30 @@
     const nextBtn    = document.getElementById('nextBtn');
     const pagerInfo  = document.getElementById('pagerInfo');
 
-    let currentPage = 1;
+    // Память о последней странице и выбранном варианте (необязательная «приятность»)
+    const LAST_PAGE_KEY = 'ege4_lastPage';
+    const LAST_VAR_KEY  = 'ege4_lastVariant';
+
+    let currentPage = Math.max(1, Math.min(
+      Math.ceil((Number(sessionStorage.getItem(LAST_VAR_KEY)) || 1) / PAGE_SIZE) ||
+      Number(sessionStorage.getItem(LAST_PAGE_KEY)) || 1,
+      Math.ceil(TOTAL_VARIANTS / PAGE_SIZE)
+    ));
     const totalPages = Math.ceil(TOTAL_VARIANTS / PAGE_SIZE);
 
+    function goToVariant(n) {
+      try { sessionStorage.setItem(LAST_VAR_KEY, String(n)); } catch {}
+      const url = `${EGE_BASE}task4/variants/variant${n}/ege4_var${n}_1_prepare.html`
+        .replace(/\/{2,}/g, '/')
+        .replace(':/', '://');
+      navigateOnce(url);
+    }
+
     function renderPage(page){
-      currentPage = Math.min(Math.max(1, page), totalPages);
+      const safePage = Math.min(Math.max(1, page), totalPages);
+      currentPage = safePage;
+      try { sessionStorage.setItem(LAST_PAGE_KEY, String(currentPage)); } catch {}
+
       variantsEl.innerHTML = '';
       const start = (currentPage - 1) * PAGE_SIZE + 1;
       const end   = Math.min(TOTAL_VARIANTS, start + PAGE_SIZE - 1);
@@ -245,9 +170,9 @@
       for(let n = start; n <= end; n++){
         const btn = document.createElement('button');
         btn.type = 'button';
-        btn.className = 'variant';
+        btn.className = 'variant-btn';
         btn.textContent = `Вариант ${n}`;
-        btn.dataset.n = String(n);
+        btn.setAttribute('aria-label', `Перейти к варианту ${n}`);
         btn.addEventListener('click', () => goToVariant(n));
         frag.appendChild(btn);
       }
@@ -260,17 +185,12 @@
 
     prevBtn.addEventListener('click', () => renderPage(currentPage - 1));
     nextBtn.addEventListener('click', () => renderPage(currentPage + 1));
-    renderPage(1);
 
-    // ===== Переход на страницы варианта через n =====
-    function goToVariant(n){
-      // Пример конечного пути:
-      // /.../ege/task4/variants/variant3/ege4_var3_1_prepare.html
-      const url = `${EGE_BASE}task4/variants/variant${n}/ege4_var${n}_1_prepare.html`;
-      // На всякий случай нормализуем слэши:
-      const normalized = url.replace(/\/{2,}/g, '/').replace(':/', '://');
-      window.location.assign(normalized);
-    }
+    // Первый рендер
+    renderPage(currentPage);
+
+    // BFCache: снять замок для navigateOnce
+    window.addEventListener('pageshow', () => { navigateOnce.lock = false; });
   </script>
 </body>
 </html>

@@ -196,7 +196,7 @@
   </div>
 
   <script type="module">
-    import { toggleThemeInit, navigateOnce } from './common.js';
+    import { toggleThemeInit, navigateOnce } from '../common.js';  // ← исправленный путь
 
     // Тема (общая инициализация)
     toggleThemeInit();
@@ -252,7 +252,6 @@
 
       // Обновляем aria-current «Страница X»
       currentMarker.textContent = `Страница ${currentPage}`;
-      // (aria-current="page" уже стоит на элементе)
     }
 
     function goToVariant(n){

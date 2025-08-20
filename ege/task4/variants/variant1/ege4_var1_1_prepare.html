@@ -9,10 +9,10 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
 
-  <!-- Единый стиль для всех страниц -->
-  <link rel="stylesheet" href="../../style_common.css" />
+  <!-- ЕДИНЫЙ СТИЛЬ (лежит в ege/style_common.css) -->
+  <link rel="stylesheet" href="../../../style_common.css" />
 
-  <!-- Анти-мигание темы (темная до загрузки JS) -->
+  <!-- Анти-мигание темы до загрузки модулей -->
   <script>
     (function(){
       try{
@@ -42,20 +42,19 @@
     </div>
 
     <div class="images" aria-label="Project illustrations">
+      <!-- Картинки лежат рядом с этим файлом -->
       <img src="photo1_city.png" alt="City holidays">
       <img src="photo2_countryside.png" alt="Countryside holidays">
     </div>
 
     <div style="text-align:center; margin-bottom:30px;">
-      <button id="goBtn" class="button"
-              aria-label="Перейти к выполнению"
-              title="Перейти к выполнению">
+      <button id="goBtn" class="button" aria-label="Перейти к выполнению" title="Перейти к выполнению">
         Перейти к выполнению
       </button>
     </div>
   </div>
 
-  <!-- Проставка перед фикс-баром, чтобы нижняя кнопка могла полностью выйти над ним -->
+  <!-- Проставка, чтобы нижняя кнопка могла полностью выйти над фикс-баром -->
   <div class="fixed-footer-spacer" aria-hidden="true"></div>
 
   <!-- Фиксированный прогресс-бар снизу -->
@@ -65,14 +64,14 @@
     </div>
   </div>
 
-  <!-- Логика: ES-модуль с общими функциями -->
+  <!-- ЛОГИКА: ES-модуль из ege/common.js -->
   <script type="module">
-    import { toggleThemeInit, navigateOnce, fmtTime } from "../../common.js";
+    import { toggleThemeInit, navigateOnce, fmtTime } from "../../../common.js";
 
-    // 1) Тумблер темы (общий)
+    // 1) Тумблер темы
     toggleThemeInit();
 
-    // 2) sessionStorage метки этого шага
+    // 2) sessionStorage метки
     try{
       sessionStorage.removeItem('ege4_audio_base64');
       sessionStorage.setItem('ege4_prepared','1');
@@ -82,9 +81,9 @@
       }));
     }catch(_){}
 
-    // 3) Переход на следующий шаг
+    // 3) Переход на следующий шаг (mic)
     const NEXT_URL = location.pathname.replace(/_1_prepare\.html$/i, '_2_mic.html');
-    let navigating = false; // локальный флаг, если вдруг вызовут напрямую
+    let navigating = false;
     function goNext(){
       if (navigating) return;
       navigating = true;
@@ -92,8 +91,8 @@
     }
     document.getElementById('goBtn')?.addEventListener('click', goNext);
 
-    // 4) Плавный таймер 2:30 (rAF) + прогресс полоса
-    const TOTAL_MS = 150000; // 2.5 минуты
+    // 4) Таймер 2:30 (rAF) + прогресс
+    const TOTAL_MS = 150000;
     const endTs = performance.now() + TOTAL_MS;
     const bar = document.getElementById('progressBarFixed');
     const timeEl = document.getElementById('progressTime');
@@ -102,7 +101,7 @@
       const left = Math.max(0, endTs - performance.now());
       timeEl.textContent = fmtTime(left);
       bar.style.width = `${(left / TOTAL_MS) * 100}%`;
-      if (left <= 0){
+      if (left <= 0) {
         goNext();
       } else {
         requestAnimationFrame(tick);
@@ -110,7 +109,7 @@
     }
     requestAnimationFrame(tick);
 
-    // 5) Страховки: если вкладка свернулась/ушли — двигаемся дальше
+    // 5) Страховки
     document.addEventListener('visibilitychange', () => { if (document.hidden) goNext(); });
     window.addEventListener('pagehide', () => goNext());
     window.addEventListener('freeze', () => goNext());

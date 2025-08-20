@@ -5,7 +5,9 @@
   <title id="pageTitle">Результат — Задание 4</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- Шрифт -->
+  <!-- Шрифт: ускорение загрузки -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
 
   <!-- Общие стили -->
@@ -79,9 +81,9 @@
     <audio id="audio" controls></audio>
 
     <div style="text-align:center;">
-      <button class="btn" id="playBtn" disabled>▶️ Прослушать</button>
-      <button class="btn" id="downloadBtn" disabled>⬇️ Скачать запись</button>
-      <a class="btn" id="repeatBtn" href="#">🔁 Повторить этот вариант</a>
+      <button class="btn" id="playBtn" type="button" aria-label="Проиграть запись" disabled>▶️ Прослушать</button>
+      <button class="btn" id="downloadBtn" type="button" aria-label="Скачать запись" disabled>⬇️ Скачать запись</button>
+      <a class="btn" id="repeatBtn" href="#" role="button" aria-label="Повторить этот вариант">🔁 Повторить этот вариант</a>
     </div>
 
     <!-- Контент задания -->
@@ -105,10 +107,10 @@
     </div>
 
     <div style="text-align:center;">
-      <a class="btn nav-btn" id="toVariants" href="#">Перейти к выбору варианта</a>
-      <a class="btn nav-btn" id="toModeMenu" href="#">Перейти к выбору задания</a>
-      <a class="btn nav-btn" id="toTaskMenu" href="#">Перейти к выбору режима</a>
-      <a class="btn nav-btn" id="toHome" href="/oge-trainer/index.html">Перейти на главную</a>
+      <a class="btn nav-btn" id="toVariants" href="#" role="button" aria-label="Перейти к выбору варианта">Перейти к выбору варианта</a>
+      <a class="btn nav-btn" id="toModeMenu" href="#" role="button" aria-label="Перейти к выбору задания">Перейти к выбору задания</a>
+      <a class="btn nav-btn" id="toTaskMenu" href="#" role="button" aria-label="Перейти к выбору режима">Перейти к выбору режима</a>
+      <a class="btn nav-btn" id="toHome" href="/oge-trainer/index.html" role="button" aria-label="Перейти на главную">Перейти на главную</a>
     </div>
   </div>
 

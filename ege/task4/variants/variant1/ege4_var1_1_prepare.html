@@ -2,15 +2,11 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <title>Task 4 — Подготовка</title>
+  <title>Подготовка — Задание 4</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
-
-  <!-- Общие стили -->
-  <link rel="stylesheet" href="../../../style_common.css" />
+  <!-- Подключаем общий стиль -->
+  <link rel="stylesheet" href="../../style_common.css" />
 
   <!-- Анти-мигание темы -->
   <script>
@@ -26,30 +22,42 @@
   <!-- Тумблер темы -->
   <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
 
-  <main class="card" role="dialog" aria-labelledby="prepTitle" aria-describedby="prepText">
-    <h1 id="prepTitle">Подготовка</h1>
+  <main class="card" role="main" aria-labelledby="prepTitle" aria-describedby="prepText">
+    <h1 id="prepTitle">Задание 4. Подготовка</h1>
     <p id="prepText">
-      На следующем шаге у вас будет <strong>1 минута</strong> на подготовку.<br><br>
-      Постарайтесь внимательно ознакомиться с заданием и продумать ответ.<br><br>
-      Когда будете готовы — нажмите кнопку, чтобы начать подготовку.
+      <strong>Task.</strong> Imagine that you and your friend are doing a school project 
+      <em>“Spending holidays: in the city or in the countryside”.</em><br><br>
+      You have found some photos to illustrate it but for technical reasons you cannot send them now. 
+      Leave a voice message to your friend explaining your choice of the photos and sharing some ideas about the project. 
+      In <strong>2.5 minutes</strong> be ready to:
     </p>
+    <ul>
+      <li>explain the choice of the illustrations for the project by briefly describing them and noting the differences;</li>
+      <li>mention the advantages (1–2) of the two ways of spending holidays;</li>
+      <li>mention the disadvantages (1–2) of the two ways;</li>
+      <li>express your opinion on the subject of the project – which way of spending holidays presented in the pictures you would prefer and why.</li>
+    </ul>
+    <p>
+      You will speak for not more than 3 minutes (12–15 sentences). You have to talk continuously.
+    </p>
+
+    <div class="images">
+      <img src="../../photo1_city.png" alt="City holidays" />
+      <img src="../../photo2_countryside.png" alt="Countryside holidays" />
+    </div>
+
+    <div class="timer" id="timer">01:30</div>
 
     <a id="nextLink"
        class="button"
        href="#"
        role="button"
-       aria-label="Перейти к этапу подготовки">
-      ▶ Начать подготовку
+       aria-label="Перейти к выполнению задания">
+      Перейти к выполнению
     </a>
   </main>
 
-  <!-- Общий JS -->
-  <script src="../../../common.js"></script>
-  <script>
-    // === Навигация ===
-    const NEXT_URL = location.pathname.replace(/_1_prepare\.html$/i, '_2_mic.html');
-    const a = document.getElementById('nextLink');
-    a.href = NEXT_URL;
-  </script>
+  <!-- Подключаем общий JS -->
+  <script src="../../common.js"></script>
 </body>
 </html>

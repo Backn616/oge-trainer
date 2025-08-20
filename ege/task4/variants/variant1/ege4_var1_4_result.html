@@ -140,14 +140,27 @@
     </div>
 
     <div style="text-align:center;">
-      <a class="btn" id="toVariants" href="#">Перейти к выбору варианта</a>
-      <a class="btn" id="toModeMenu" href="#">Перейти к выбору задания</a>
-      <a class="btn" id="toTaskMenu" href="#">Перейти к выбору режима</a>
-      <a class="btn" id="toHome" href="/oge-trainer/index.html">Перейти на главную</a>
+      <a class="btn nav-btn" id="toVariants" href="#">Перейти к выбору варианта</a>
+      <a class="btn nav-btn" id="toModeMenu" href="#">Перейти к выбору задания</a>
+      <a class="btn nav-btn" id="toTaskMenu" href="#">Перейти к выбору режима</a>
+      <a class="btn nav-btn" id="toHome" href="/oge-trainer/index.html">Перейти на главную</a>
     </div>
   </div>
 
   <script>
+    // === Очистка состояния варианта ===
+    function resetVariantState() {
+      try {
+        sessionStorage.removeItem('ege4_audio_base64');
+        sessionStorage.removeItem('ege4_audio_mime');
+        sessionStorage.removeItem('ege4_warned');
+        sessionStorage.removeItem('ege4_meta');
+        sessionStorage.removeItem('ege4_endAt');
+      } catch(e) {
+        console.warn('Не удалось очистить состояние варианта:', e);
+      }
+    }
+
     // === Тема ===
     (function(){
       const btn = document.getElementById('themeBtn');
@@ -158,7 +171,7 @@
       btn.addEventListener('click', ()=>{ const c = localStorage.getItem(key) || 'light'; apply(c === 'dark' ? 'light' : 'dark'); });
     })();
 
-    // === Навигация ===
+    // === Навигация через n ===
     function getEgeBase(){
       const p = location.pathname;
       const i = p.indexOf('/ege/');
@@ -178,6 +191,7 @@
         document.getElementById('varNum').textContent = n;
       }
 
+      // ссылки
       const repeat = document.getElementById('repeatBtn');
       if (repeat) repeat.href = path.replace(/_4_result\.html$/i, '_1_prepare.html');
 
@@ -190,23 +204,12 @@
 
       const toModeMenu = document.getElementById('toModeMenu');
       if (toModeMenu) toModeMenu.href = `${base}ege_menu.html`;
+
+      // навесим очистку на все кнопки
+      document.querySelectorAll('.nav-btn, #repeatBtn').forEach(btn=>{
+        btn.addEventListener('click', ()=> resetVariantState());
+      });
     })();
-
-    // === Сброс состояния задания ===
-    function resetTask4() {
-      try {
-        const keys = Object.keys(sessionStorage);
-        for (const k of keys) {
-          if (k.startsWith('ege4_')) sessionStorage.removeItem(k);
-        }
-      } catch {}
-    }
-
-    function clearAndGo(url){
-      try{ if (objectURL) URL.revokeObjectURL(objectURL); }catch{}
-      resetTask4();
-      location.assign(url);
-    }
 
     // === Аудио ===
     const audioEl = document.getElementById('audio');
@@ -235,8 +238,9 @@
     function dataURLtoBlob(dataURL){
       const parts = (dataURL || '').split(',');
       if (parts.length < 2) return null;
+      const header = parts[0];
       const b64 = parts[1];
-      const type = (dataURL.match(/data:(.*?);base64/) || [,'application/octet-stream'])[1];
+      const type = (header.match(/data:(.*?);base64/) || [,'application/octet-stream'])[1];
       const bin = atob(b64);
       const len = bin.length;
       const bytes = new Uint8Array(len);
@@ -274,21 +278,12 @@
     })();
 
     playBtn.addEventListener('click', ()=>{ if (audioEl.src) audioEl.play(); });
-    downloadBtn.addEventListener('click', ()=>{ if (!audioEl.src) return;
+    downloadBtn.addEventListener('click', ()=>{
+      if (!audioEl.src) return;
       const a = document.createElement('a');
       a.href = objectURL || base64;
       a.download = fileName;
       a.click();
-    });
-
-    // === Привязка очистки к кнопкам ===
-    [['repeatBtn'], ['toVariants'], ['toTaskMenu'], ['toModeMenu'], ['toHome']].forEach(([id])=>{
-      const el = document.getElementById(id);
-      if (!el) return;
-      el.addEventListener('click', (e)=>{
-        e.preventDefault();
-        clearAndGo(el.href);
-      });
     });
 
     window.addEventListener('pagehide', ()=>{ if (objectURL) URL.revokeObjectURL(objectURL); });

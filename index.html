@@ -3,82 +3,73 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Тренажёр Говорения ОГЭ/ЕГЭ — демо</title>
-  <meta name="description" content="Онлайн-тренажёр устной части ОГЭ и ЕГЭ по английскому: таймер, подсказки, запись голоса, задания ФИПИ." />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="ege/style_common.css" />
+  <title>Онлайн-тренажёр «Говорение»</title>
+
+  <!-- Шрифт -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+
+  <!-- Общие стили -->
+  <link rel="stylesheet" href="style_common.css" />
+
+  <!-- Анти-мигание темы -->
+  <script>
+    (function(){
+      try{
+        const saved = localStorage.getItem('pref-theme') || 'light';
+        if (saved === 'dark') document.documentElement.classList.add('dark');
+      }catch(_){}
+    })();
+  </script>
 </head>
-<body class="home">
-  <div class="wrap">
-    <header>
-      <a class="brand" href="#" aria-label="На главную">
-        <div class="logo">A</div>
-        <div>
-          <div class="brand-title">Онлайн-тренажёр «Говорение»</div>
-          <div class="badge">ОГЭ / ЕГЭ по английскому</div>
-        </div>
-      </a>
-      <button class="theme-toggle" id="themeBtn" aria-label="Переключить тему">🌓 Тема</button>
-    </header>
+<body>
+  <!-- Тумблер темы -->
+  <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
 
-    <main>
-      <section class="hero">
-        <div class="card">
-          <h1 class="h1">Подготовь устную часть <span style="white-space:nowrap">ОГЭ и ЕГЭ</span> уверенно</h1>
-          <p class="sub">Тренируй ответы с таймером, мини-подсказками и записью голоса. Основано на демо-материалах ФИПИ.</p>
-          <div class="cta">
-            <a href="oge/oge.html" class="btn btn-primary" aria-label="Перейти к тренажёру ОГЭ">
-              🎒 Перейти к ОГЭ
-            </a>
-            <a href="ege/ege.html" class="btn btn-primary" aria-label="Перейти к тренажёру ЕГЭ">
-              🎓 Перейти к ЕГЭ
-            </a>
-          </div>
-        </div>
+  <div class="content-wrapper">
+    <!-- Левая карточка -->
+    <div class="main-card">
+      <h1 class="title">Подготовь устную часть ОГЭ и ЕГЭ уверенно</h1>
+      <p class="subtitle">Тренируй ответы с таймером, мини-подсказками и записью голоса. Основано на демо-материалах ФИПИ.</p>
+      <div class="buttons">
+        <a href="oge/index.html" class="button">📕 Перейти к ОГЭ</a>
+        <a href="ege/index.html" class="button">🎓 Перейти к ЕГЭ</a>
+      </div>
+    </div>
 
-        <div class="right-card">
-          <div class="tile">
-            <div class="dot"></div>
-            <div>
-              <strong>Быстрый старт</strong><br>
-              Открой раздел и начни говорить — без регистрации.
-            </div>
-          </div>
-          <div class="tile">
-            <div style="font-size:20px">⏱</div>
-            <div>
-              <strong>Таймер экзамена</strong><br>
-              Реалистичный хронометраж заданий устной части, как на реальном экзамене.
-            </div>
-          </div>
-          <div class="tile">
-            <div style="font-size:20px">🎙</div>
-            <div>
-              <strong>Запись ответа</strong><br>
-              Записывай и переслушивай, чтобы отслеживать прогресс, дикцию и темп.
-            </div>
-          </div>
-          <div class="tile">
-            <div style="font-size:20px">🧩</div>
-            <div>
-              <strong>Задания в стиле ФИПИ</strong><br>
-              Карточки «Вопросы/Интервью/Фото», удобные планы ответов и критерии.
-            </div>
-          </div>
-        </div>
-      </section>
-    </main>
-
-    <footer>
-      <div>© 2025 — Проект в разработке. Демо-версия.</div>
-      <div style="margin-top:6px">Есть идея или нашли баг? Напишите нам: <a href="mailto:hello@example.com">hello@example.com</a></div>
-    </footer>
+    <!-- Правая колонка -->
+    <div class="features">
+      <div class="feature">
+        <h3>Быстрый старт</h3>
+        <p>Открой раздел и начни говорить — без регистрации.</p>
+      </div>
+      <div class="feature">
+        <h3>Таймер экзамена</h3>
+        <p>Реалистичный хронометраж заданий устной части, как на реальном экзамене.</p>
+      </div>
+      <div class="feature">
+        <h3>Запись ответа</h3>
+        <p>Записывай и переслушивай, чтобы отслеживать прогресс, дикцию и темп.</p>
+      </div>
+      <div class="feature">
+        <h3>Задания в стиле ФИПИ</h3>
+        <p>Карточки «Вопросы/Интервью/Фото», удобные планы ответов и критерии.</p>
+      </div>
+    </div>
   </div>
 
-  <script type="module">
-    import { toggleThemeInit } from './ege/common.js';
-    toggleThemeInit();
+  <footer>
+    <p>© 2025 — Проект в разработке. Демо-версия.</p>
+    <p>Есть идея или нашли баг? Напишите нам: <a href="mailto:hello@example.com">hello@example.com</a></p>
+  </footer>
+
+  <!-- Скрипт переключения темы -->
+  <script>
+    document.getElementById('themeBtn').addEventListener('click', function(){
+      document.documentElement.classList.toggle('dark');
+      localStorage.setItem('pref-theme',
+        document.documentElement.classList.contains('dark') ? 'dark' : 'light'
+      );
+    });
   </script>
 </body>
 </html>

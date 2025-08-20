@@ -21,42 +21,53 @@
     :root{
       --bg:#f7f9ff; --text:#0b1020; --muted:#5a6475; --card:#ffffff;
       --primary:#2b6cff; --primary-600:#1f58d9; --shadow:0 10px 25px rgba(17,24,39,.08);
-      --panel-bg:#f9f9f9; --panel-border:#0077cc;
       --footer-h:32px;
     }
     .dark{
       --bg:#0b1020; --text:#eaf0ff; --muted:#b9c2d3; --card:rgba(255,255,255,.08);
       --primary:#6aa3ff; --primary-600:#4b8dff; --shadow:0 10px 35px rgba(0,0,0,.35);
-      --panel-bg:rgba(255,255,255,.08); --panel-border:#4b8dff;
     }
 
     body{
       font-family: Inter, system-ui, Segoe UI, Roboto, Arial, sans-serif;
       margin:0; 
-      padding:40px 20px 80px;
-      color:var(--text); 
-      text-align:center;
+      padding:40px 20px 80px; /* как в Task 1 */
+      color:var(--text);
       background:
         radial-gradient(1200px 600px at 70% -10%, #29417a40, transparent),
         radial-gradient(900px 500px at -10% 10%, #344b9340, transparent),
         var(--bg);
+      text-align:center;
     }
 
     .instruction-box{
-      max-width:1600px; width:95%; margin:0 auto 30px; font-size:22px; line-height:1.6; text-align:left;
-      border:2px solid var(--panel-border); padding:25px; border-radius:12px; background:var(--panel-bg); box-shadow:var(--shadow);
+      max-width:1600px; width:95%; margin:0 auto 30px;
+      font-size:22px; line-height:1.6; text-align:left;
+      border:2px solid #0077cc; padding:25px; border-radius:12px;
+      background:#f9f9f9; box-shadow:var(--shadow);
     }
+    .task-box{
+      max-width:1600px; width:95%; margin:0 auto 30px;
+      font-size:20px; line-height:1.7; text-align:left;
+      border:1px solid #ccc; padding:24px 28px; border-radius:12px;
+      background:var(--card); box-shadow:var(--shadow);
+    }
+    .task-box ul{ margin:10px 0 15px 20px; }
+    .task-box li{ margin-bottom:8px; }
+    .task-box .instruction{ font-weight:700; margin-top:10px; }
+
     .photo-box{
-      max-width:1600px; width:95%; margin:0 auto 30px; font-size:22px; line-height:1.6; text-align:center;
-      border:1px solid #ccc; padding:20px; border-radius:12px; background:var(--card); box-shadow:var(--shadow);
+      max-width:1600px; width:95%; margin:0 auto 30px;
+      border:1px solid #ccc; padding:20px; border-radius:12px;
+      background:var(--card); box-shadow:var(--shadow);
       display:flex; justify-content:space-around; gap:20px;
     }
     .photo-box img{
-      max-width:48%; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,.12);
+      max-width:48%; height:auto; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,.12);
     }
 
     .button{
-      font-size:20px; padding:16px 32px; 
+      font-size:20px; padding:16px 32px;
       background:linear-gradient(135deg, var(--primary), var(--primary-600));
       color:#fff; border:none; border-radius:12px; cursor:pointer;
       box-shadow:0 10px 22px rgba(43,108,255,.28);
@@ -74,6 +85,7 @@
     }
     .theme-toggle:hover{ transform:translateY(-1px); filter:brightness(1.03); }
 
+    /* фикс-бар как в Task 1 */
     #progressContainerFixed{
       position:fixed; bottom:0; left:0; width:100%; height:var(--footer-h);
       background:#eee; z-index:9999;
@@ -97,36 +109,46 @@
   <!-- Тумблер темы -->
   <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
 
-  <div class="instruction-box">
-    <p><strong>Task 4.</strong> Study the two photographs. You have 2.5 minutes to get ready to compare and contrast them.</p>
+  <!-- Формулировка задания — ИДЕНТИЧНА образцу -->
+  <div class="task-box" aria-labelledby="taskTitle">
+    <b id="taskTitle">4 Task. Imagine that you and your friend are doing a school project “Spending holidays: in the city or in the countryside”.</b>
+    You have found some photos to illustrate it but for technical reasons you cannot send them now. Leave a voice message to your friend explaining your choice of the photos and sharing some ideas about the project. <strong>In 2.5 minutes</strong> be ready to:
+    <ul>
+      <li>explain the choice of the illustrations for the project by briefly describing them and noting the differences;</li>
+      <li>mention the advantages (1–2) of the two ways of spending holidays;</li>
+      <li>mention the disadvantages (1–2) of the two ways;</li>
+      <li>express your opinion on the subject of the project – which way of spending holidays presented in the pictures you would prefer and why.</li>
+    </ul>
+    <div class="instruction">
+      You will speak for not more than 3 minutes (12–15 sentences). You have to talk continuously.
+    </div>
   </div>
 
-  <div class="photo-box">
-    <img src="photo1_city.png" alt="Photo 1">
-    <img src="photo2_countryside.png" alt="Photo 2">
+  <div class="photo-box" aria-label="Project illustrations">
+    <img src="photo1_city.png" alt="City holidays">
+    <img src="photo2_countryside.png" alt="Countryside holidays">
   </div>
 
   <div style="text-align:center; margin-bottom:30px;">
-    <button id="goBtn" class="button" aria-label="Перейти к выполнению (будет запрос доступа к микрофону)">
+    <button id="goBtn" class="button" aria-label="Перейти к выполнению">
       Перейти к выполнению
     </button>
   </div>
 
-  <div id="progressContainerFixed" role="timer" aria-live="polite">
+  <div id="progressContainerFixed" role="timer" aria-live="polite" aria-label="Оставшееся время подготовки">
     <div id="progressBarFixed">
       <span id="progressTime" class="progress-time">02:30</span>
     </div>
   </div>
 
   <script>
-    // Очистка прошлых данных
-    try {
+    // Очистка прошлых данных для Task 4
+    try{
       sessionStorage.removeItem('ege4_audio_base64');
-      sessionStorage.removeItem('ege4_audio_mime');
-      sessionStorage.setItem('ege4_prepared', '1');
-    } catch (_) {}
+      sessionStorage.setItem('ege4_prepared','1');
+    }catch(_){}
 
-    // Переключатель темы
+    // Тумблер темы
     (function(){
       const btn = document.getElementById('themeBtn');
       const key = 'pref-theme';
@@ -142,10 +164,10 @@
       });
     })();
 
-    // Таймер 2:30 и прогресс
+    // Таймер 2.5 минуты + прогресс; переход на mic
+    const NEXT_URL = location.pathname.replace(/_1_prepare\.html$/i, '_2_mic.html');
     const progressBar = document.getElementById('progressBarFixed');
     const progressTime = document.getElementById('progressTime');
-    const NEXT_URL = location.pathname.replace(/_1_prepare\.html$/i, '_2_mic.html');
 
     const totalMs = 150_000; // 2.5 минуты
     const endTime = Date.now() + totalMs;
@@ -170,13 +192,11 @@
     tick();
     timerId = setInterval(tick, 500);
 
-    // Кнопка перехода
     document.getElementById('goBtn').addEventListener('click', ()=>{
       window.location.href = NEXT_URL;
     });
 
-    // Страховка: очистим интервал при уходе
-    window.addEventListener('beforeunload', ()=>{ try{ clearInterval(timerId); }catch(_){} });
+    window.addEventListener('beforeunload', ()=>{ try{ clearInterval(timerId); }catch(_){ } });
   </script>
 </body>
 </html>

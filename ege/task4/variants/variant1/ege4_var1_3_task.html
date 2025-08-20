@@ -49,7 +49,7 @@
     <button class="button" id="endBtn" type="button" aria-label="Закончить запись" style="display:none">✅ Закончить</button>
   </div>
 
-  <!-- Небольшая проставка, чтобы нижняя кнопка могла выйти над фикс-баром -->
+  <!-- Проставка, чтобы нижняя кнопка могла выйти над фикс-баром -->
   <div style="height: calc(var(--footer-h) + 24px);"></div>
 
   <!-- Фиксированный прогресс-бар снизу -->
@@ -64,19 +64,29 @@
 
     toggleThemeInit();
 
-    /* === DOM === */
-    const timerEl           = document.getElementById('timer');
-    const taskContainer     = document.getElementById('taskContainer');
-    const imageContainer    = document.getElementById('imageContainer');
-    const endBtn            = document.getElementById('endBtn');
-    const progressWrap      = document.getElementById('progressContainerFixed');
-    const progressBar       = document.getElementById('progressBarFixed');
-    const progressTime      = document.getElementById('progressTime');
+    // === DOM ===
+    const timerEl        = document.getElementById('timer');
+    const taskContainer  = document.getElementById('taskContainer');
+    const imageContainer = document.getElementById('imageContainer');
+    const endBtn         = document.getElementById('endBtn');
+    const progressWrap   = document.getElementById('progressContainerFixed');
+    const progressBar    = document.getElementById('progressBarFixed');
+    const progressTime   = document.getElementById('progressTime');
 
-    /* === Навигация === */
+    // === Навигация ===
     const RESULT_URL = location.pathname.replace(/_3_task\.html$/i, '_4_result.html');
+    window.addEventListener('pageshow', () => { navigateOnce.lock = false; });
 
-    /* === Запись === */
+    // === Ключи хранения «заморозки» ===
+    const FIN_KEY  = 'ege4_task_finished';
+    const LEFT_KEY = 'ege4_task_left_ms';
+
+    // === Служебные ===
+    const TOTAL_MS = 180_000;
+    let endTs = 0;          // крайняя точка по «стенной» времени (Date.now)
+    let rafId = 0;
+
+    // === Запись ===
     let mediaRecorder = null;
     let audioChunks   = [];
     let streamRef     = null;
@@ -95,6 +105,21 @@
         if (window.MediaRecorder?.isTypeSupported?.(t)) return t;
       }
       return '';
+    }
+
+    // === Экран «после завершения» (при возврате назад) ===
+    function showEndedState(){
+      taskContainer.style.display  = 'block';
+      imageContainer.style.display = 'flex';
+      endBtn.style.display         = 'inline-block';
+      progressWrap.style.display   = 'block';
+      timerEl.style.display        = 'none';
+
+      const left = Math.max(0, parseInt(sessionStorage.getItem(LEFT_KEY)||'0', 10));
+      progressTime.textContent = fmtTime(left);
+      progressBar.style.width  = `${(left / TOTAL_MS) * 100}%`;
+
+      endBtn.onclick = () => navigateOnce(RESULT_URL);
     }
 
     async function initMic(){
@@ -141,7 +166,7 @@
       }
     }
 
-    /* === Countdown 3 → старт задания === */
+    // === Countdown 3 → старт задания ===
     let countdown = 3;
     function startCountdown(){
       const cd = setInterval(()=>{
@@ -155,15 +180,8 @@
       }, 1000);
     }
 
-    /* === Задание (3:00) — плавный rAF-таймер === */
-    const TOTAL_MS = 180_000;
-    let startTs = 0;
-    let rafId = 0;
-    let taskStarted = false;
-
+    // === Запуск задания и таймера ===
     function startTask(){
-      taskStarted = true;
-
       // UI
       taskContainer.style.display  = 'block';
       imageContainer.style.display = 'flex';
@@ -183,19 +201,19 @@
       audioChunks = [];
       try{ if (mediaRecorder && mediaRecorder.state !== 'recording') mediaRecorder.start(); }catch{}
 
-      // rAF таймер
-      startTs = performance.now();
+      // «Стенное» время конца — не зависит от вкладки/фокуса
+      endTs = Date.now() + TOTAL_MS;
       progressTime.textContent = fmtTime(TOTAL_MS);
       tick();
+
+      // Кнопка «Закончить»
+      endBtn.onclick = () => safeStopOrFinish();
     }
 
     function tick(){
-      const now = performance.now();
-      const elapsed = now - startTs;
-      const left = Math.max(0, TOTAL_MS - elapsed);
-
+      const left = Math.max(0, endTs - Date.now());
       progressTime.textContent = fmtTime(left);
-      progressBar.style.width = `${(left / TOTAL_MS) * 100}%`;
+      progressBar.style.width  = `${(left / TOTAL_MS) * 100}%`;
 
       if (left <= 0){
         safeStopOrFinish();
@@ -205,8 +223,17 @@
     }
 
     function safeStopOrFinish(){
+      // Сохраняем «заморозку»
+      let leftForStore = 0;
+      try{ leftForStore = Math.max(0, endTs - Date.now()); }catch{}
+      try{
+        sessionStorage.setItem(FIN_KEY, '1');
+        sessionStorage.setItem(LEFT_KEY, String(Math.round(leftForStore)));
+      }catch{}
+
       try{ cancelAnimationFrame(rafId); }catch{}
       if (hasStopped) { navigateOnce(RESULT_URL); return; }
+
       try{
         if (mediaRecorder && mediaRecorder.state === 'recording') {
           mediaRecorder.stop();
@@ -220,25 +247,23 @@
       }
     }
 
-    // Ручное завершение
-    endBtn.addEventListener('click', ()=> safeStopOrFinish());
-
-    /* === Страховки после старта === */
-    document.addEventListener('visibilitychange', ()=>{
-      if (!taskStarted) return;
-      if (document.hidden) safeStopOrFinish();
-    });
-    window.addEventListener('pagehide', ()=>{ if (taskStarted) safeStopOrFinish(); });
-    window.addEventListener('freeze',   ()=>{ if (taskStarted) safeStopOrFinish(); });
-
+    // В отличие от прошлой версии, НЕТ автопереходов при смене вкладки.
+    // Время идёт само по себе (через Date.now), и по истечении — обычный переход.
     window.addEventListener('beforeunload', ()=>{
       try{ cancelAnimationFrame(rafId); }catch{}
       try{ if (mediaRecorder && mediaRecorder.state === 'recording') mediaRecorder.stop(); }catch{}
       try{ streamRef?.getTracks()?.forEach(t=>t.stop()); }catch{}
     });
 
-    // Старт
-    window.onload = initMic;
+    // === Входная точка ===
+    const alreadyFinished = sessionStorage.getItem(FIN_KEY) === '1';
+    if (alreadyFinished){
+      showEndedState();           // статический экран, без записи/таймера
+      endBtn.onclick = () => navigateOnce(RESULT_URL);
+      timerEl.style.display = 'none';
+    }else{
+      window.onload = initMic;
+    }
   </script>
 </body>
 </html>

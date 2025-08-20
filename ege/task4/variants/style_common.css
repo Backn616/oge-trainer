@@ -99,6 +99,9 @@ a,button{ color:inherit; text-decoration:none; }
   position:relative;
   transition: width .5s linear;
 }
+/* rAF-страницы отключают CSS-инерцию */
+#progressBarFixed.rAF { transition: none; }
+
 .progress-time{
   position:absolute; right:14px; top:50%; transform:translateY(-50%);
   color:#fff; font-weight:700; font-size:20px; user-select:none;
@@ -129,4 +132,12 @@ a,button{ color:inherit; text-decoration:none; }
 @media (max-width:800px){
   .images{ flex-direction:column; align-items:center; }
   .images img{ width:100%; }
+}
+
+/* Уважение prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
 }

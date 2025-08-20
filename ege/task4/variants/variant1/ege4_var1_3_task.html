@@ -23,21 +23,20 @@
   </script>
 
   <style>
-    /* --- только усиление визуала отсчёта --- */
+    /* Усиление визуала отсчёта */
     .timer{
-      font-size: 120px;        /* крупные цифры */
+      font-size: 120px;
       margin: 60px 0;
       font-weight: 800;
       color: var(--primary);
       letter-spacing: 4px;
       text-shadow: 0 4px 12px rgba(0,0,0,.25);
-      transition: transform .25s ease;  /* для «пульса» */
+      transition: transform .25s ease;
       will-change: transform;
     }
   </style>
 </head>
 <body>
-  <!-- Тумблер темы -->
   <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
 
   <div class="content-wrapper">
@@ -63,10 +62,8 @@
     <button class="button" id="endBtn" type="button" aria-label="Закончить запись" style="display:none">✅ Закончить</button>
   </div>
 
-  <!-- Проставка, чтобы нижняя кнопка могла выйти над фикс-баром -->
   <div style="height: calc(var(--footer-h) + 24px);"></div>
 
-  <!-- Фиксированный прогресс-бар снизу -->
   <div id="progressContainerFixed" role="timer" aria-live="polite" aria-label="Оставшееся время ответа" style="display:none">
     <div id="progressBarFixed">
       <span id="progressTime" class="progress-time">03:00</span>
@@ -78,7 +75,6 @@
 
     toggleThemeInit();
 
-    // === DOM ===
     const timerEl        = document.getElementById('timer');
     const taskContainer  = document.getElementById('taskContainer');
     const imageContainer = document.getElementById('imageContainer');
@@ -87,20 +83,16 @@
     const progressBar    = document.getElementById('progressBarFixed');
     const progressTime   = document.getElementById('progressTime');
 
-    // === Навигация ===
     const RESULT_URL = location.pathname.replace(/_3_task\.html$/i, '_4_result.html');
     window.addEventListener('pageshow', () => { navigateOnce.lock = false; });
 
-    // === Ключи хранения «заморозки» ===
     const FIN_KEY  = 'ege4_task_finished';
     const LEFT_KEY = 'ege4_task_left_ms';
 
-    // === Служебные ===
     const TOTAL_MS = 180_000;
-    let endTs = 0;          // крайняя точка по «стенной» времени (Date.now)
+    let endTs = 0;
     let rafId = 0;
 
-    // === Запись ===
     let mediaRecorder = null;
     let audioChunks   = [];
     let streamRef     = null;
@@ -111,7 +103,7 @@
       const candidates = [
         'audio/webm;codecs=opus',
         'audio/webm',
-        'audio/mp4',            // Safari
+        'audio/mp4',
         'audio/ogg;codecs=opus',
         'audio/ogg'
       ];
@@ -121,7 +113,6 @@
       return '';
     }
 
-    // === Экран «после завершения» (при возврате назад) ===
     function showEndedState(){
       taskContainer.style.display  = 'block';
       imageContainer.style.display = 'flex';
@@ -131,7 +122,8 @@
 
       const left = Math.max(0, parseInt(sessionStorage.getItem(LEFT_KEY)||'0', 10));
       progressTime.textContent = fmtTime(left);
-      progressBar.style.width  = `${(left / TOTAL_MS) * 100)%}`;
+      progressBar.style.width  = `${(left / TOTAL_MS) * 100}%`;
+
       endBtn.onclick = () => navigateOnce(RESULT_URL);
     }
 
@@ -174,20 +166,18 @@
         startCountdown();
       }catch(err){
         alert('❌ Не удалось получить доступ к микрофону: ' + err.message);
-        mediaRecorder = null; // продолжим без записи
+        mediaRecorder = null;
         startCountdown();
       }
     }
 
-    // === Countdown 3 → старт задания ===
     let countdown = 3;
     function startCountdown(){
       const cd = setInterval(()=>{
-        // цвет как раньше (2..3 — синий, 1..0 — красный)
         timerEl.style.color = (countdown > 1) ? '#2b6cff' : '#b30000';
         timerEl.textContent = countdown;
 
-        // маленькая «пульсация» цифры
+        // «пульс»
         timerEl.style.transform = 'scale(1.25)';
         setTimeout(()=>{ timerEl.style.transform = 'scale(1)'; }, 250);
 
@@ -199,16 +189,13 @@
       }, 1000);
     }
 
-    // === Запуск задания и таймера ===
     function startTask(){
-      // UI
       taskContainer.style.display  = 'block';
       imageContainer.style.display = 'flex';
       endBtn.style.display         = 'inline-block';
       progressWrap.style.display   = 'block';
       timerEl.style.display        = 'none';
 
-      // Метаданные
       try{
         const meta = JSON.parse(sessionStorage.getItem('ege4_meta')||'{}');
         meta.taskStartedAt = Date.now();
@@ -216,11 +203,9 @@
         sessionStorage.setItem('ege4_meta', JSON.stringify(meta));
       }catch{}
 
-      // Запись
       audioChunks = [];
       try{ if (mediaRecorder && mediaRecorder.state !== 'recording') mediaRecorder.start(); }catch{}
 
-      // «Стенное» время конца
       endTs = Date.now() + TOTAL_MS;
       progressTime.textContent = fmtTime(TOTAL_MS);
       tick();
@@ -241,7 +226,6 @@
     }
 
     function safeStopOrFinish(){
-      // Сохраняем «заморозку»
       let leftForStore = 0;
       try{ leftForStore = Math.max(0, endTs - Date.now()); }catch{}
       try{
@@ -256,7 +240,7 @@
         if (mediaRecorder && mediaRecorder.state === 'recording') {
           mediaRecorder.stop();
         } else {
-          try{ streamRef?.getTracks()?.forEach(t=>т.stop()); }catch{}
+          try{ streamRef?.getTracks()?.forEach(t=>t.stop()); }catch{}
           navigateOnce(RESULT_URL);
         }
       }catch{
@@ -272,7 +256,6 @@
       try{ streamRef?.getTracks()?.forEach(t=>t.stop()); }catch{}
     });
 
-    // === Входная точка ===
     const alreadyFinished = sessionStorage.getItem(FIN_KEY) === '1';
     if (alreadyFinished){
       showEndedState();

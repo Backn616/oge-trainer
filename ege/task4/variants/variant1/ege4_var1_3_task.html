@@ -21,6 +21,20 @@
       }catch(_){}
     })();
   </script>
+
+  <style>
+    /* --- только усиление визуала отсчёта --- */
+    .timer{
+      font-size: 120px;        /* крупные цифры */
+      margin: 60px 0;
+      font-weight: 800;
+      color: var(--primary);
+      letter-spacing: 4px;
+      text-shadow: 0 4px 12px rgba(0,0,0,.25);
+      transition: transform .25s ease;  /* для «пульса» */
+      will-change: transform;
+    }
+  </style>
 </head>
 <body>
   <!-- Тумблер темы -->
@@ -117,8 +131,7 @@
 
       const left = Math.max(0, parseInt(sessionStorage.getItem(LEFT_KEY)||'0', 10));
       progressTime.textContent = fmtTime(left);
-      progressBar.style.width  = `${(left / TOTAL_MS) * 100}%`;
-
+      progressBar.style.width  = `${(left / TOTAL_MS) * 100)%}`;
       endBtn.onclick = () => navigateOnce(RESULT_URL);
     }
 
@@ -170,8 +183,14 @@
     let countdown = 3;
     function startCountdown(){
       const cd = setInterval(()=>{
+        // цвет как раньше (2..3 — синий, 1..0 — красный)
         timerEl.style.color = (countdown > 1) ? '#2b6cff' : '#b30000';
         timerEl.textContent = countdown;
+
+        // маленькая «пульсация» цифры
+        timerEl.style.transform = 'scale(1.25)';
+        setTimeout(()=>{ timerEl.style.transform = 'scale(1)'; }, 250);
+
         countdown--;
         if (countdown < 0){
           clearInterval(cd);
@@ -201,12 +220,11 @@
       audioChunks = [];
       try{ if (mediaRecorder && mediaRecorder.state !== 'recording') mediaRecorder.start(); }catch{}
 
-      // «Стенное» время конца — не зависит от вкладки/фокуса
+      // «Стенное» время конца
       endTs = Date.now() + TOTAL_MS;
       progressTime.textContent = fmtTime(TOTAL_MS);
       tick();
 
-      // Кнопка «Закончить»
       endBtn.onclick = () => safeStopOrFinish();
     }
 
@@ -238,7 +256,7 @@
         if (mediaRecorder && mediaRecorder.state === 'recording') {
           mediaRecorder.stop();
         } else {
-          try{ streamRef?.getTracks()?.forEach(t=>t.stop()); }catch{}
+          try{ streamRef?.getTracks()?.forEach(t=>т.stop()); }catch{}
           navigateOnce(RESULT_URL);
         }
       }catch{
@@ -247,8 +265,7 @@
       }
     }
 
-    // В отличие от прошлой версии, НЕТ автопереходов при смене вкладки.
-    // Время идёт само по себе (через Date.now), и по истечении — обычный переход.
+    // НЕТ автопереходов при смене вкладки — время считает по Date.now()
     window.addEventListener('beforeunload', ()=>{
       try{ cancelAnimationFrame(rafId); }catch{}
       try{ if (mediaRecorder && mediaRecorder.state === 'recording') mediaRecorder.stop(); }catch{}
@@ -258,7 +275,7 @@
     // === Входная точка ===
     const alreadyFinished = sessionStorage.getItem(FIN_KEY) === '1';
     if (alreadyFinished){
-      showEndedState();           // статический экран, без записи/таймера
+      showEndedState();
       endBtn.onclick = () => navigateOnce(RESULT_URL);
       timerEl.style.display = 'none';
     }else{

@@ -5,28 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Тренажёр Говорения ОГЭ/ЕГЭ — демо</title>
   <meta name="description" content="Онлайн-тренажёр устной части ОГЭ и ЕГЭ по английскому: таймер, подсказки, запись голоса, задания ФИПИ." />
-
-  <!-- Шрифт, как в образце -->
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-
-  <!-- Общие стили -->
   <link rel="stylesheet" href="ege/style_common.css" />
-
-  <!-- Анти-мигание темы -->
-  <script>
-    (function(){
-      try{
-        const saved = localStorage.getItem('pref-theme') || 'light';
-        if (saved === 'dark') document.documentElement.classList.add('dark');
-      }catch(_){}
-    })();
-  </script>
 </head>
 <body class="home">
   <div class="wrap">
     <header>
-      <a class="brand" href="#">
+      <a class="brand" href="#" aria-label="На главную">
         <div class="logo">A</div>
         <div>
           <div class="brand-title">Онлайн-тренажёр «Говорение»</div>
@@ -40,10 +26,14 @@
       <section class="hero">
         <div class="card">
           <h1 class="h1">Подготовь устную часть <span style="white-space:nowrap">ОГЭ и ЕГЭ</span> уверенно</h1>
-          <p class="sub">Тренируй ответы с таймером, мини‑подсказками и записью голоса. Основано на демо‑материалах ФИПИ.</p>
+          <p class="sub">Тренируй ответы с таймером, мини-подсказками и записью голоса. Основано на демо-материалах ФИПИ.</p>
           <div class="cta">
-            <a href="oge/oge.html" class="btn" aria-label="Перейти к тренажёру ОГЭ">🎒 Перейти к ОГЭ</a>
-            <a href="ege/ege.html" class="btn" aria-label="Перейти к тренажёру ЕГЭ">🎓 Перейти к ЕГЭ</a>
+            <a href="oge/oge.html" class="btn btn-primary" aria-label="Перейти к тренажёру ОГЭ">
+              🎒 Перейти к ОГЭ
+            </a>
+            <a href="ege/ege.html" class="btn btn-primary" aria-label="Перейти к тренажёру ЕГЭ">
+              🎓 Перейти к ЕГЭ
+            </a>
           </div>
         </div>
 
@@ -81,12 +71,11 @@
     </main>
 
     <footer>
-      <div>© 2025 — Проект в разработке. Демо‑версия.</div>
+      <div>© 2025 — Проект в разработке. Демо-версия.</div>
       <div style="margin-top:6px">Есть идея или нашли баг? Напишите нам: <a href="mailto:hello@example.com">hello@example.com</a></div>
     </footer>
   </div>
 
-  <!-- Общий JS -->
   <script type="module">
     import { toggleThemeInit } from './ege/common.js';
     toggleThemeInit();

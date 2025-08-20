@@ -59,39 +59,72 @@
 
   <!-- Логика страницы -->
   <script type="module">
-    import { toggleThemeInit, startPrepareTimer, navigateOnce } from "../common.js";
+    import { toggleThemeInit, navigateOnce } from "../common.js";
 
     // === Тема ===
     toggleThemeInit();
 
-    // Очистка старых данных и установка новых меток
-    try {
+    // (опционально) служебные метки — не влияют на таймер
+    try{
       sessionStorage.removeItem('ege4_audio_base64');
       sessionStorage.setItem('ege4_prepared','1');
       const meta = { preparedAt: Date.now(), prepareDurationSec: 150 };
       sessionStorage.setItem('ege4_meta', JSON.stringify(meta));
-    } catch(_) {}
+    }catch{}
 
-    // Переход на mic
+    // URL следующего шага (mic)
     const NEXT_URL = location.pathname.replace(/_1_prepare\.html$/i, '_2_mic.html');
 
+    // Кнопка "Перейти"
     document.getElementById('goBtn')?.addEventListener('click', () => {
       navigateOnce(NEXT_URL);
     });
 
-    // Таймер 2:30
-    const progressBar = document.getElementById('progressBarFixed');
-    const progressTime = document.getElementById('progressTime');
+    // === Таймер 2:30 без сохранения состояния ===
+    const TOTAL_MS = 150_000;
+    const barEl  = document.getElementById('progressBarFixed');
+    const timeEl = document.getElementById('progressTime');
 
-    startPrepareTimer({
-      barEl: progressBar,
-      timeEl: progressTime,
-      totalMs: 150_000,                 
-      nextUrl: NEXT_URL,
-      key: 'ege4_var1_prepare_endtime'  
-    });
+    let rafId = null;
+    let endTs = 0;
 
-    // --- Обработка возврата из истории (BFCache/Back) ---
+    function fmt(ms){
+      const s = Math.max(0, Math.floor(ms/1000));
+      const m = String(Math.floor(s/60)).padStart(2,'0');
+      const r = String(s%60).padStart(2,'0');
+      return `${m}:${r}`;
+    }
+
+    function stopTick(){
+      if (rafId !== null) {
+        cancelAnimationFrame(rafId);
+        rafId = null;
+      }
+    }
+
+    function tick(){
+      const left = Math.max(0, endTs - performance.now());
+      timeEl.textContent = fmt(left);
+      barEl.style.width = `${(left / TOTAL_MS) * 100}%`;
+      if (left <= 0){
+        navigateOnce(NEXT_URL);
+      } else {
+        rafId = requestAnimationFrame(tick);
+      }
+    }
+
+    function startTimerFresh(){
+      stopTick();
+      endTs = performance.now() + TOTAL_MS;   // всегда заново 02:30
+      timeEl.textContent = '02:30';
+      barEl.style.width = '100%';
+      rafId = requestAnimationFrame(tick);
+    }
+
+    // Первый запуск
+    startTimerFresh();
+
+    // === Перезапуск при возврате «назад» / BFCache ===
     function isBackForwardNav(){
       try {
         const nav = performance.getEntriesByType('navigation')[0];
@@ -100,12 +133,12 @@
     }
 
     window.addEventListener('pageshow', (e) => {
-      // кнопка снова активна
+      // снять "замок" для кнопки на случай возврата
       navigateOnce.lock = false;
 
-      // если вернулись из BFCache или по кнопке "назад" → перезапуск страницы
+      // если вернулись из BFCache или по back/forward — перезапускаем таймер с 02:30
       if (e.persisted || isBackForwardNav()) {
-        location.replace(location.href);
+        startTimerFresh();
       }
     });
   </script>

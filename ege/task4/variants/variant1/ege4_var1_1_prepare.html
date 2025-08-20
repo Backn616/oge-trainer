@@ -2,100 +2,54 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <title>Task 4 — Preparation</title>
+  <title>Task 4 — Подготовка</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
 
-  <!-- Стили (оставь свои, со spacer и safe-area) -->
-  <link rel="stylesheet" href="style_prepare.css" />
+  <!-- Общие стили -->
+  <link rel="stylesheet" href="../../../style_common.css" />
+
+  <!-- Анти-мигание темы -->
+  <script>
+    (function(){
+      try{
+        const saved = localStorage.getItem('pref-theme') || 'light';
+        if(saved === 'dark') document.documentElement.classList.add('dark');
+      }catch(_){}
+    })();
+  </script>
 </head>
 <body>
   <!-- Тумблер темы -->
   <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
 
-  <div class="content-wrapper">
-    <div class="task-container" aria-labelledby="taskTitle">
-      <b id="taskTitle">4 Task. Imagine that you and your friend are doing a school project “Spending holidays: in the city or in the countryside”.</b>
-      You have found some photos to illustrate it but for technical reasons you cannot send them now. Leave a voice message to your friend explaining your choice of the photos and sharing some ideas about the project. In 2.5 minutes be ready to:
-      <ul>
-        <li>explain the choice of the illustrations for the project by briefly describing them and noting the differences;</li>
-        <li>mention the advantages (1–2) of the two ways of spending holidays;</li>
-        <li>mention the disadvantages (1–2) of the two ways;</li>
-        <li>express your opinion on the subject of the project – which way of spending holidays presented in the pictures you would prefer and why.</li>
-      </ul>
-      <div class="instruction">
-        You will speak for not more than 3 minutes (12–15 sentences). You have to talk continuously.
-      </div>
-    </div>
+  <main class="card" role="dialog" aria-labelledby="prepTitle" aria-describedby="prepText">
+    <h1 id="prepTitle">Подготовка</h1>
+    <p id="prepText">
+      На следующем шаге у вас будет <strong>1 минута</strong> на подготовку.<br><br>
+      Постарайтесь внимательно ознакомиться с заданием и продумать ответ.<br><br>
+      Когда будете готовы — нажмите кнопку, чтобы начать подготовку.
+    </p>
 
-    <div class="images" aria-label="Project illustrations">
-      <img src="photo1_city.png" alt="City holidays">
-      <img src="photo2_countryside.png" alt="Countryside holidays">
-    </div>
+    <a id="nextLink"
+       class="button"
+       href="#"
+       role="button"
+       aria-label="Перейти к этапу подготовки">
+      ▶ Начать подготовку
+    </a>
+  </main>
 
-    <div style="text-align:center; margin-bottom:30px;">
-      <button id="goBtn" class="button"
-              aria-label="Перейти к выполнению"
-              title="Перейти к выполнению">
-        Перейти к выполнению
-      </button>
-    </div>
-  </div>
-
-  <!-- Spacer -->
-  <div class="fixed-footer-spacer" aria-hidden="true"></div>
-
-  <!-- Прогресс -->
-  <div id="progressContainerFixed" role="timer" aria-live="polite" aria-label="Оставшееся время подготовки">
-    <div id="progressBarFixed">
-      <span id="progressTime" class="progress-time">02:30</span>
-    </div>
-  </div>
-
-  <!-- Скрипт -->
-  <script type="module">
-    import { toggleThemeInit, navigateOnce, fmtTime } from '../../../common.js';
-
-    toggleThemeInit();
-
-    // sessionStorage метки
-    try {
-      sessionStorage.removeItem('ege4_audio_base64');
-      sessionStorage.setItem('ege4_prepared','1');
-      sessionStorage.setItem('ege4_meta', JSON.stringify({
-        preparedAt: Date.now(),
-        prepareDurationSec: 150
-      }));
-    } catch {}
-
+  <!-- Общий JS -->
+  <script src="../../../common.js"></script>
+  <script>
+    // === Навигация ===
     const NEXT_URL = location.pathname.replace(/_1_prepare\.html$/i, '_2_mic.html');
-    const TOTAL_MS = 150000;
-    const endTs = performance.now() + TOTAL_MS;
-    const bar = document.getElementById('progressBarFixed');
-    const timeEl = document.getElementById('progressTime');
-
-    function tick(){
-      const left = Math.max(0, endTs - performance.now());
-      timeEl.textContent = fmtTime(left);
-      bar.style.width = `${(left / TOTAL_MS) * 100}%`;
-      if (left <= 0) {
-        navigateOnce(NEXT_URL);
-      } else {
-        requestAnimationFrame(tick);
-      }
-    }
-    requestAnimationFrame(tick);
-
-    document.getElementById('goBtn')
-      .addEventListener('click', () => navigateOnce(NEXT_URL));
-
-    // страховки
-    document.addEventListener('visibilitychange', () => { if (document.hidden) navigateOnce(NEXT_URL); });
-    window.addEventListener('pagehide', () => navigateOnce(NEXT_URL));
-    window.addEventListener('freeze', () => navigateOnce(NEXT_URL));
+    const a = document.getElementById('nextLink');
+    a.href = NEXT_URL;
   </script>
 </body>
 </html>

@@ -2,18 +2,22 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <title>Подготовка — Задание 4</title>
+  <title>Task 4 — Preparation</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- Подключаем общий стиль -->
+  <!-- Шрифт -->
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+
+  <!-- Единый стиль для всех страниц -->
   <link rel="stylesheet" href="../../style_common.css" />
 
-  <!-- Анти-мигание темы -->
+  <!-- Анти-мигание темы (темная до загрузки JS) -->
   <script>
     (function(){
       try{
         const saved = localStorage.getItem('pref-theme') || 'light';
-        if(saved === 'dark') document.documentElement.classList.add('dark');
+        if (saved === 'dark') document.documentElement.classList.add('dark');
       }catch(_){}
     })();
   </script>
@@ -22,42 +26,94 @@
   <!-- Тумблер темы -->
   <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
 
-  <main class="card" role="main" aria-labelledby="prepTitle" aria-describedby="prepText">
-    <h1 id="prepTitle">Задание 4. Подготовка</h1>
-    <p id="prepText">
-      <strong>Task.</strong> Imagine that you and your friend are doing a school project 
-      <em>“Spending holidays: in the city or in the countryside”.</em><br><br>
-      You have found some photos to illustrate it but for technical reasons you cannot send them now. 
-      Leave a voice message to your friend explaining your choice of the photos and sharing some ideas about the project. 
-      In <strong>2.5 minutes</strong> be ready to:
-    </p>
-    <ul>
-      <li>explain the choice of the illustrations for the project by briefly describing them and noting the differences;</li>
-      <li>mention the advantages (1–2) of the two ways of spending holidays;</li>
-      <li>mention the disadvantages (1–2) of the two ways;</li>
-      <li>express your opinion on the subject of the project – which way of spending holidays presented in the pictures you would prefer and why.</li>
-    </ul>
-    <p>
-      You will speak for not more than 3 minutes (12–15 sentences). You have to talk continuously.
-    </p>
-
-    <div class="images">
-      <img src="../../photo1_city.png" alt="City holidays" />
-      <img src="../../photo2_countryside.png" alt="Countryside holidays" />
+  <div class="content-wrapper">
+    <div class="task-container" aria-labelledby="taskTitle">
+      <b id="taskTitle">4 Task. Imagine that you and your friend are doing a school project “Spending holidays: in the city or in the countryside”.</b>
+      You have found some photos to illustrate it but for technical reasons you cannot send them now. Leave a voice message to your friend explaining your choice of the photos and sharing some ideas about the project. In 2.5 minutes be ready to:
+      <ul>
+        <li>explain the choice of the illustrations for the project by briefly describing them and noting the differences;</li>
+        <li>mention the advantages (1–2) of the two ways of spending holidays;</li>
+        <li>mention the disadvantages (1–2) of the two ways;</li>
+        <li>express your opinion on the subject of the project – which way of spending holidays presented in the pictures you would prefer and why.</li>
+      </ul>
+      <div class="instruction">
+        You will speak for not more than 3 minutes (12–15 sentences). You have to talk continuously.
+      </div>
     </div>
 
-    <div class="timer" id="timer">01:30</div>
+    <div class="images" aria-label="Project illustrations">
+      <img src="photo1_city.png" alt="City holidays">
+      <img src="photo2_countryside.png" alt="Countryside holidays">
+    </div>
 
-    <a id="nextLink"
-       class="button"
-       href="#"
-       role="button"
-       aria-label="Перейти к выполнению задания">
-      Перейти к выполнению
-    </a>
-  </main>
+    <div style="text-align:center; margin-bottom:30px;">
+      <button id="goBtn" class="button"
+              aria-label="Перейти к выполнению"
+              title="Перейти к выполнению">
+        Перейти к выполнению
+      </button>
+    </div>
+  </div>
 
-  <!-- Подключаем общий JS -->
-  <script src="../../common.js"></script>
+  <!-- Проставка перед фикс-баром, чтобы нижняя кнопка могла полностью выйти над ним -->
+  <div class="fixed-footer-spacer" aria-hidden="true"></div>
+
+  <!-- Фиксированный прогресс-бар снизу -->
+  <div id="progressContainerFixed" role="timer" aria-live="polite" aria-label="Оставшееся время подготовки">
+    <div id="progressBarFixed">
+      <span id="progressTime" class="progress-time">02:30</span>
+    </div>
+  </div>
+
+  <!-- Логика: ES-модуль с общими функциями -->
+  <script type="module">
+    import { toggleThemeInit, navigateOnce, fmtTime } from "../../common.js";
+
+    // 1) Тумблер темы (общий)
+    toggleThemeInit();
+
+    // 2) sessionStorage метки этого шага
+    try{
+      sessionStorage.removeItem('ege4_audio_base64');
+      sessionStorage.setItem('ege4_prepared','1');
+      sessionStorage.setItem('ege4_meta', JSON.stringify({
+        preparedAt: Date.now(),
+        prepareDurationSec: 150
+      }));
+    }catch(_){}
+
+    // 3) Переход на следующий шаг
+    const NEXT_URL = location.pathname.replace(/_1_prepare\.html$/i, '_2_mic.html');
+    let navigating = false; // локальный флаг, если вдруг вызовут напрямую
+    function goNext(){
+      if (navigating) return;
+      navigating = true;
+      navigateOnce(NEXT_URL);
+    }
+    document.getElementById('goBtn')?.addEventListener('click', goNext);
+
+    // 4) Плавный таймер 2:30 (rAF) + прогресс полоса
+    const TOTAL_MS = 150000; // 2.5 минуты
+    const endTs = performance.now() + TOTAL_MS;
+    const bar = document.getElementById('progressBarFixed');
+    const timeEl = document.getElementById('progressTime');
+
+    function tick(){
+      const left = Math.max(0, endTs - performance.now());
+      timeEl.textContent = fmtTime(left);
+      bar.style.width = `${(left / TOTAL_MS) * 100}%`;
+      if (left <= 0){
+        goNext();
+      } else {
+        requestAnimationFrame(tick);
+      }
+    }
+    requestAnimationFrame(tick);
+
+    // 5) Страховки: если вкладка свернулась/ушли — двигаемся дальше
+    document.addEventListener('visibilitychange', () => { if (document.hidden) goNext(); });
+    window.addEventListener('pagehide', () => goNext());
+    window.addEventListener('freeze', () => goNext());
+  </script>
 </body>
 </html>

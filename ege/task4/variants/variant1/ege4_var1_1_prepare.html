@@ -4,114 +4,73 @@
   <meta charset="UTF-8" />
   <title>Task 4 — Preparation</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
-  <!-- Общие стили (вид как в var2) -->
-  <link rel="stylesheet" href="../style_common.css" />
-
-  <!-- Анти-мигание темы -->
-  <script>
-    (function(){
-      try{
-        const saved = localStorage.getItem('pref-theme') || 'light';
-        if (saved === 'dark') document.documentElement.classList.add('dark');
-      }catch(_){}
-    })();
-  </script>
+  <!-- Общие стили -->
+  <link rel="stylesheet" href="../style_common.css">
 </head>
 <body>
   <!-- Тумблер темы -->
   <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
 
-  <div class="content-wrapper">
-    <div class="task-container" aria-labelledby="taskTitle">
-      <b id="taskTitle">4 Task. Imagine that you and your friend are doing a school project “Spending holidays: in the city or in the countryside”.</b>
-      You have found some photos to illustrate it but for technical reasons you cannot send them now. Leave a voice message to your friend explaining your choice of the photos and sharing some ideas about the project. <strong>In 2.5 minutes</strong> be ready to:
-      <ul>
-        <li>explain the choice of the illustrations for the project by briefly describing them and noting the differences;</li>
-        <li>mention the advantages (1–2) of the two ways of spending holidays;</li>
-        <li>mention the disadvantages (1–2) of the two ways;</li>
-        <li>express your opinion on the subject of the project – which way of spending holidays presented in the pictures you would prefer and why.</li>
-      </ul>
-      <div class="instruction">
-        You will speak for not more than 3 minutes (12–15 sentences). You have to talk continuously.
-      </div>
-    </div>
-
-    <div class="images" aria-label="Project illustrations">
-      <img src="photo1_city.png" alt="City holidays">
-      <img src="photo2_countryside.png" alt="Countryside holidays">
-    </div>
-
-    <div style="text-align:center; margin-bottom:30px;">
-      <button id="goBtn" class="button" aria-label="Перейти к выполнению">Перейти к выполнению</button>
-    </div>
+  <!-- Инструкция -->
+  <div class="instruction-box">
+    <p>
+      <strong>Task 4.</strong> You are going to give a talk about school uniforms. 
+      You will have to start in <strong>2.5 minutes</strong> and speak for not more than 3 minutes. 
+      You have to talk continuously.
+    </p>
+    <p>You will have to:</p>
+    <ul>
+      <li>say whether it is necessary to wear a school uniform, and why</li>
+      <li>explain what school uniform is usually like in Russia</li>
+      <li>say if you would like to wear a school uniform and why</li>
+    </ul>
+    <p>
+      You have to talk continuously.
+    </p>
   </div>
 
-  <!-- Фикс-бар прогресса -->
-  <div id="progressContainerFixed" role="timer" aria-live="polite" aria-label="Оставшееся время подготовки">
+  <!-- Кнопка -->
+  <div style="text-align:center; margin-bottom:30px;">
+    <button id="goBtn" class="button">
+      Перейти к выполнению
+    </button>
+  </div>
+
+  <!-- Прогресс-бар -->
+  <div id="progressContainerFixed" role="timer" aria-live="polite">
     <div id="progressBarFixed">
       <span id="progressTime" class="progress-time">02:30</span>
     </div>
   </div>
 
-  <!-- Логика страницы -->
+  <!-- Скрипт -->
   <script type="module">
-    import { toggleThemeInit, fmtTime, navigateOnce } from "../common.js";
+    import { toggleThemeInit, startPrepareTimer, navigateOnce } from "../common.js";
 
-    // Тема
     toggleThemeInit();
 
-    // Метки шага
-    try{
-      sessionStorage.removeItem('ege4_audio_base64');
-      sessionStorage.setItem('ege4_prepared','1');
-      const meta = JSON.parse(sessionStorage.getItem('ege4_meta')||'{}');
-      meta.preparedAt = Date.now();
-      meta.prepareDurationSec = 150;
-      sessionStorage.setItem('ege4_meta', JSON.stringify(meta));
-    }catch(_){}
+    const progressBar = document.getElementById('progressBarFixed');
+    const progressTime = document.getElementById('progressTime');
 
-    // Переход
+    // Определяем автоматически ссылку на mic-страницу
     const NEXT_URL = location.pathname.replace(/_1_prepare\.html$/i, '_2_mic.html');
-    document.getElementById('goBtn')?.addEventListener('click', () => {
-      try{ sessionStorage.removeItem('ege4_prepare_deadline'); }catch(_){}
-      navigateOnce(NEXT_URL);
+
+    // Старт таймера
+    startPrepareTimer({
+      barEl: progressBar,
+      timeEl: progressTime,
+      totalMs: 150_000, // 2.5 минуты
+      nextUrl: NEXT_URL,
+      key: 'ege4_var2_prepare_endtime'
     });
 
-    // Таймер 2:30 по дедлайну (устойчив к возвратам)
-    const TOTAL_MS = 150000;
-    const DEADLINE_KEY = 'ege4_prepare_deadline';
-
-    const bar = document.getElementById('progressBarFixed');
-    const timeEl = document.getElementById('progressTime');
-
-    let deadline = Number(sessionStorage.getItem(DEADLINE_KEY));
-    if (!deadline) {
-      deadline = Date.now() + TOTAL_MS;
-      try{ sessionStorage.setItem(DEADLINE_KEY, String(deadline)); }catch(_){}
-    }
-
-    function tick(){
-      // читаем актуальный дедлайн (на случай BFCache/возврата)
-      const stored = Number(sessionStorage.getItem(DEADLINE_KEY));
-      if (stored) deadline = stored;
-
-      const left = Math.max(0, deadline - Date.now());
-      timeEl.textContent = fmtTime(left);
-      bar.style.width = `${(left / TOTAL_MS) * 100}%`;
-
-      if (left <= 0){
-        try{ sessionStorage.removeItem(DEADLINE_KEY); }catch(_){}
-        navigateOnce(NEXT_URL);
-      }else{
-        requestAnimationFrame(tick);
-      }
-    }
-    requestAnimationFrame(tick);
-
-    // При возврате из BFCache перезапустим анимацию
-    window.addEventListener('pageshow', (e)=>{ if (e.persisted) requestAnimationFrame(tick); });
+    // Кнопка ручного перехода
+    document.getElementById('goBtn').addEventListener('click', () => {
+      navigateOnce(NEXT_URL);
+    });
   </script>
 </body>
 </html>

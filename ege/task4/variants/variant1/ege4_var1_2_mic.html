@@ -5,11 +5,23 @@
   <title>Предупреждение — доступ к микрофону</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- Шрифт -->
+  <!-- Шрифт: ускорение загрузки -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
 
   <!-- Общие стили (фон/карточка/кнопка) -->
   <link rel="stylesheet" href="../style_common.css">
+
+  <!-- Анти-мигание темы -->
+  <script>
+    (function(){
+      try{
+        const saved = localStorage.getItem('pref-theme') || 'light';
+        if (saved === 'dark') document.documentElement.classList.add('dark');
+      }catch(_){}
+    })();
+  </script>
 </head>
 <body>
   <!-- Тумблер темы -->
@@ -43,7 +55,9 @@
     toggleThemeInit();
 
     // Следующая страница (task)
-    const NEXT_URL = location.pathname.replace(/_2_mic\.html$/i, '_3_task.html');
+    const NEXT_URL = /_2_mic\.html$/i.test(location.pathname)
+      ? location.pathname.replace(/_2_mic\.html$/i, '_3_task.html')
+      : location.pathname.replace(/\.html$/i, '_3_task.html');
 
     // Подготовка sessionStorage для задания 4
     try {

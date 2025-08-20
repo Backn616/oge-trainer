@@ -1,166 +1,109 @@
 :root {
-  --bg: #f7f9ff;
-  --card: #ffffff;
-  --text: #0b1020;
-  --muted: #5a6475;
-  --primary: #2b6cff;
-  --primary-600: #1f58d9;
-  --ring: #bfd3ff;
-  --shadow: 0 10px 25px rgba(17, 24, 39, .08);
-  --footer-h: 32px; /* фиксированная высота нижнего бара */
+  --bg:#f7f9ff;
+  --card:#ffffff;
+  --text:#0b1020;
+  --muted:#5a6475;
+  --primary:#2b6cff;
+  --primary-600:#1f58d9;
+  --ring:#bfd3ff;
+  --shadow:0 10px 25px rgba(17,24,39,.08);
+  --footer-h:32px; /* высота нижнего фикс-бара */
 }
 
-.dark {
-  --bg: #0b1020;
-  --card: rgba(255, 255, 255, 0.08);
-  --text: #eaf0ff;
-  --muted: #b9c2d3;
-  --primary: #6aa3ff;
-  --primary-600: #4b8dff;
-  --ring: #a9c6ff;
-  --shadow: 0 10px 35px rgba(0,0,0,.35);
+.dark{
+  --bg:#0b1020;
+  --card:rgba(255,255,255,.08);
+  --text:#eaf0ff;
+  --muted:#b9c2d3;
+  --primary:#6aa3ff;
+  --primary-600:#4b8dff;
+  --ring:#a9c6ff;
+  --shadow:0 10px 35px rgba(0,0,0,.35);
 }
 
-/* фон и базовые отступы */
-body {
-  font-family: 'Roboto', system-ui, sans-serif;
-  margin: 0;
-  padding: 40px 30px calc(80px + var(--footer-h) + env(safe-area-inset-bottom, 0px));
-  color: var(--text);
+/* Фон и базовые отступы (точно как в var2, но без перекрытий) */
+body{
+  font-family:'Roboto', system-ui, sans-serif;
+  margin:0;
+  padding:40px 30px calc(80px + var(--footer-h) + env(safe-area-inset-bottom, 0px));
+  color:var(--text);
   background:
     radial-gradient(1200px 600px at 70% -10%, #29417a40, transparent),
     radial-gradient(900px 500px at -10% 10%, #344b9340, transparent),
     var(--bg);
-  display: flex;
-  justify-content: center;
-  text-align: center;
+  display:flex;
+  justify-content:center;
+  text-align:center;
 }
 
-a, button {
-  color: inherit;
-  text-decoration: none;
+a,button{ color:inherit; text-decoration:none; }
+:focus-visible{ outline:none; box-shadow:0 0 0 4px var(--ring) }
+
+.content-wrapper{ max-width:1500px; width:100%; }
+
+/* Карточка задания */
+.task-container{
+  background:var(--card);
+  border-left:5px solid var(--primary);
+  padding:20px 30px 10px 30px;
+  margin-bottom:30px;
+  font-size:20px; line-height:1.7; text-align:left;
+  box-shadow:var(--shadow); border-radius:12px;
+}
+.task-container ul{ margin:10px 0 15px 20px; }
+.task-container li{ margin-bottom:8px; }
+.task-container .instruction{ font-weight:700; margin-top:10px; }
+
+/* Блок изображений */
+.images{
+  display:flex; justify-content:center; align-items:flex-start;
+  gap:30px; margin-bottom:30px;
+}
+.images img{
+  max-width:100%; height:auto; width:48%;
+  border-radius:12px; box-shadow:var(--shadow);
 }
 
-:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 4px var(--ring);
-}
-
-/* контейнер */
-.content-wrapper {
-  max-width: 1500px;
-  width: 100%;
-}
-
-/* блок задания */
-.task-container {
-  background: var(--card);
-  border-left: 5px solid var(--primary);
-  padding: 20px 30px 10px 30px;
-  margin-bottom: 30px;
-  font-size: 20px;
-  line-height: 1.7;
-  text-align: left;
-  box-shadow: var(--shadow);
-  border-radius: 12px;
-}
-.task-container ul {
-  margin: 10px 0 15px 20px;
-}
-.task-container li {
-  margin-bottom: 8px;
-}
-.task-container .instruction {
-  font-weight: 700;
-  margin-top: 10px;
-}
-
-/* картинки */
-.images {
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  gap: 30px;
-  margin-bottom: 30px;
-}
-.images img {
-  max-width: 100%;
-  height: auto;
-  width: 48%;
-  border-radius: 12px;
-  box-shadow: var(--shadow);
-}
-
-/* кнопка */
-.button {
-  font-size: 20px;
-  padding: 16px 32px;
-  background: linear-gradient(135deg, var(--primary), var(--primary-600));
-  color: #fff;
-  border: none;
-  border-radius: 12px;
-  cursor: pointer;
-  box-shadow: 0 10px 22px rgba(43,108,255,.3);
+/* Кнопка */
+.button{
+  font-size:20px; padding:16px 32px;
+  background:linear-gradient(135deg, var(--primary), var(--primary-600));
+  color:#fff; border:none; border-radius:12px; cursor:pointer;
+  box-shadow:0 10px 22px rgba(43,108,255,.3);
   transition: transform .06s ease, box-shadow .2s ease, filter .2s ease;
-  display: inline-block;
+  display:inline-block;
 }
-.button:hover {
-  transform: scale(1.05);
-  filter: brightness(1.03);
-}
+.button:hover{ transform:scale(1.05); filter:brightness(1.03); }
 
-/* тумблер темы */
-.theme-toggle {
-  position: fixed;
-  top: 16px;
-  right: 16px;
-  z-index: 10000;
-  border: 1px solid #ffffff22;
-  background: transparent;
-  color: var(--text);
-  padding: 10px 14px;
-  border-radius: 10px;
-  cursor: pointer;
-  backdrop-filter: blur(6px);
-  transition: transform .08s ease, filter .2s ease;
+/* Тумблер темы */
+.theme-toggle{
+  position:fixed; top:16px; right:16px; z-index:10000;
+  border:1px solid #ffffff22; background:transparent; color:var(--text);
+  padding:10px 14px; border-radius:10px; cursor:pointer; backdrop-filter: blur(6px);
+  transition:transform .08s ease, filter .2s ease;
 }
-.theme-toggle:hover {
-  transform: translateY(-1px);
-  filter: brightness(1.03);
-}
+.theme-toggle:hover{ transform: translateY(-1px); filter: brightness(1.03); }
 
-/* прогресс-бар */
-#progressContainerFixed {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: var(--footer-h);
-  background: #eee;
-  z-index: 9999;
+/* Фиксированный прогресс-бар снизу (как в var2) */
+#progressContainerFixed{
+  position:fixed; bottom:0; left:0; width:100%; height:var(--footer-h);
+  background:#eee; z-index:9999;
 }
-.dark #progressContainerFixed { background: #222; }
-#progressBarFixed {
-  height: 100%;
-  width: 0%;
+.dark #progressContainerFixed{ background:#222; }
+#progressBarFixed{
+  height:100%; width:0%;
   background: linear-gradient(to right, #0066ff, #00cfff);
-  position: relative;
+  position:relative;
   transition: width .5s linear;
 }
-.progress-time {
-  position: absolute;
-  right: 14px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #fff;
-  font-weight: 700;
-  font-size: 20px;
-  user-select: none;
-  text-shadow: 0 1px 2px rgba(0,0,0,.35);
+.progress-time{
+  position:absolute; right:14px; top:50%; transform:translateY(-50%);
+  color:#fff; font-weight:700; font-size:20px; user-select:none;
+  text-shadow:0 1px 2px rgba(0,0,0,.35);
 }
 
-/* адаптив */
-@media (max-width: 800px) {
-  .images { flex-direction: column; align-items: center; }
-  .images img { width: 100%; }
+/* Адаптив */
+@media (max-width:800px){
+  .images{ flex-direction:column; align-items:center; }
+  .images img{ width:100%; }
 }

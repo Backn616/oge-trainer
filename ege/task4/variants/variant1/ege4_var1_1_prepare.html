@@ -4,42 +4,31 @@
   <meta charset="UTF-8" />
   <title>Task 4 — Preparation</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
-  <!-- Шрифт -->
-  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
-
-  <!-- Подключаем общий стиль -->
-  <link rel="stylesheet" href="../../style_common.css">
-
-  <!-- Анти-мигание темы -->
-  <script>
-    (function(){
-      try {
-        const saved = localStorage.getItem('pref-theme') || 'light';
-        if(saved === 'dark') document.documentElement.classList.add('dark');
-      } catch(_) {}
-    })();
-  </script>
+  <!-- Общие стили -->
+  <link rel="stylesheet" href="style_common.css">
 </head>
 <body>
-
   <!-- Тумблер темы -->
   <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
 
-  <div class="content-wrapper">
-    <div class="task-container">
-      <p><strong>Task 4.</strong> You are going to give a talk about …</p>
-      <p class="instruction">In 2.5 minutes be ready to:</p>
-      <ul>
-        <li>talk about …</li>
-        <li>say what …</li>
-        <li>explain why …</li>
-      </ul>
-    </div>
+  <!-- Инструкция -->
+  <div class="instruction-box">
+    <p><strong>Task 4.</strong> You are going to give a talk about … You will have to start in 2.5 minutes and speak for not more than 3 minutes (12–15 sentences).</p>
+    <p>Remember to say:</p>
+    <ul>
+      <li>…</li>
+      <li>…</li>
+      <li>…</li>
+    </ul>
+    <p>You will have to talk continuously.</p>
+  </div>
 
-    <div style="text-align:center; margin-bottom:30px;">
-      <button id="goBtn" class="button">Перейти к выполнению</button>
-    </div>
+  <!-- Кнопка перехода -->
+  <div style="text-align:center; margin-bottom:30px;">
+    <button id="goBtn" class="button" aria-label="Перейти к выполнению">Перейти к выполнению</button>
   </div>
 
   <!-- Прогресс-бар -->
@@ -49,29 +38,45 @@
     </div>
   </div>
 
+  <!-- Скрипт -->
   <script type="module">
-    import { toggleThemeInit, fmtTime, navigateOnce } from "../../common.js";
+    import { toggleThemeInit, fmtTime, navigateOnce } from './common.js';
 
     toggleThemeInit();
 
-    const progressBar = document.getElementById("progressBarFixed");
-    const progressTime = document.getElementById("progressTime");
-    const NEXT_URL = location.pathname.replace(/_1_prepare\.html$/i, "_2_mic.html");
-
+    // Таймер 2.5 минуты
     const totalMs = 150_000; // 2.5 минуты
     const endTime = Date.now() + totalMs;
+    let timerId = null;
 
-    function tick(){
+    const progressBar = document.getElementById('progressBarFixed');
+    const progressTime = document.getElementById('progressTime');
+
+    // Автогенерация ссылки на следующий шаг (mic)
+    const NEXT_URL = location.pathname.replace(/_1_prepare\.html$/i, '_2_mic.html');
+
+    function tick() {
       const left = Math.max(0, endTime - Date.now());
       progressTime.textContent = fmtTime(left);
       progressBar.style.width = `${(left / totalMs) * 100}%`;
-      if(left <= 0) navigateOnce(NEXT_URL);
+      if (left <= 0) {
+        clearInterval(timerId);
+        navigateOnce(NEXT_URL);
+      }
     }
-    tick();
-    const timerId = setInterval(tick, 500);
 
-    document.getElementById("goBtn").addEventListener("click", ()=> navigateOnce(NEXT_URL));
-    window.addEventListener("beforeunload", ()=> clearInterval(timerId));
+    tick();
+    timerId = setInterval(tick, 500);
+
+    // Кнопка ручного перехода
+    document.getElementById('goBtn').addEventListener('click', () => {
+      navigateOnce(NEXT_URL);
+    });
+
+    // Страховка при уходе
+    window.addEventListener('beforeunload', () => {
+      try { clearInterval(timerId); } catch (_) {}
+    });
   </script>
 </body>
 </html>

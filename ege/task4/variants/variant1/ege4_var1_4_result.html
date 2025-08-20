@@ -150,28 +150,37 @@
 
     // --- Определяем вариант ---
     const path = location.pathname;
-    const m = path.match(/variant(\d+)/i);
-    const varNum = m ? m[1] : '?';
+    const vm = path.match(/variant(\d+)/i);
+    const varNum = vm ? vm[1] : '?';
     document.getElementById('varNum').textContent = varNum;
     document.title = `Результат — Задание 4 · Вариант ${varNum}`;
 
-    // --- Повторить (с нуля) ---
-    const repeat = document.getElementById('repeatBtn');
-
-    // --- Навигация ---
-    function getEgeBase(){
-      const i = path.indexOf('/ege/');
-      return i >= 0 ? path.slice(0, i + 5) : '/ege/';
-    }
-    const base = getEgeBase();
+    // --- Построение ссылок (fallback для отключённого JS) ---
+    // Ожидаемый путь: /ege/task4/variants/variantN/ege4_varN_4_result.html
     const toVariants = document.getElementById('toVariants');
     const toTaskMenu = document.getElementById('toTaskMenu');
     const toModeMenu = document.getElementById('toModeMenu');
     const toHome     = document.getElementById('toHome');
+    const repeat     = document.getElementById('repeatBtn');
 
-    if (toVariants) toVariants.href = path.replace(/\/variants\/variant\d+\/[^/]+$/i, `/variants/ege4.html`);
-    if (toTaskMenu) toTaskMenu.href = `${base}ege.html`;
-    if (toModeMenu) toModeMenu.href = `${base}ege_menu.html`;
+    // /ege/ базовый префикс
+    const baseEgeIdx = path.indexOf('/ege/');
+    const baseEge = baseEgeIdx >= 0 ? path.slice(0, baseEgeIdx + 5) : '/ege/';
+
+    // Вариант: список вариантов задания 4
+    const variantsListHref = path.replace(/\/variants\/variant\d+\/[^/]+$/i, '/variants/ege4.html');
+    // Повторить этот же вариант сначала
+    const repeatHref = path.replace(/_4_result\.html$/i, '_1_prepare.html');
+    // Меню заданий ЕГЭ
+    const taskMenuHref = baseEge + 'ege.html';
+    // Главное меню ЕГЭ
+    const modeMenuHref = baseEge + 'ege_menu.html';
+    // Главная — уже задана абсолютным href в разметке
+
+    if (toVariants) toVariants.href = variantsListHref;
+    if (repeat)     repeat.href     = repeatHref;
+    if (toTaskMenu) toTaskMenu.href = taskMenuHref;
+    if (toModeMenu) toModeMenu.href = modeMenuHref;
 
     // --- Аудио ---
     const audioEl     = document.getElementById('audio');
@@ -209,7 +218,7 @@
       downloadBtn.disabled = !enabled;
     }
 
-    // --- Подготовка аудио ---
+    // Подготовить аудио
     if (base64) {
       try {
         const blob = dataURLtoBlob(base64);
@@ -241,10 +250,9 @@
       a.click();
     });
 
-    // --- ВАЖНО: обнуление состояния задания 4 при переходах с result ---
+    // --- Жёсткий сброс состояния задания 4 перед ЛЮБОЙ навигацией с result ---
     function clearTask4State(){
       try{
-        // жёстко чистим все ключи по заданию 4
         const KEYS = [
           'ege4_audio_base64','ege4_audio_mime',
           'ege4_prepared','ege4_warned','ege4_meta',
@@ -253,31 +261,30 @@
         KEYS.forEach(k => sessionStorage.removeItem(k));
       }catch{}
     }
-
     function clearAndGo(url){
+      try{ if (objectURL) URL.revokeObjectURL(objectURL); }catch{}
       clearTask4State();
-      location.href = url;
+      // используем assign, чтобы не было BFCache-возврата с «призраками»
+      location.assign(url);
     }
 
-    // «Повторить этот вариант» — как первый запуск: чистим и ведём на _1_prepare
+    // Повторить вариант — как первый запуск
     if (repeat){
-      const repeatHref = path.replace(/_4_result\.html$/i, '_1_prepare.html');
-      repeat.href = repeatHref;
       repeat.addEventListener('click', (e)=>{
         e.preventDefault();
-        clearAndGo(repeatHref);
-      });
+        clearAndGo(repeat.href);
+      }, {passive:false});
     }
 
-    // Любая другая навигация («перейти к ...») — тоже чистим состояние
-    if (toVariants) toVariants.addEventListener('click', (e)=>{ e.preventDefault(); clearAndGo(toVariants.href); });
-    if (toTaskMenu) toTaskMenu.addEventListener('click', (e)=>{ e.preventDefault(); clearAndGo(toTaskMenu.href); });
-    if (toModeMenu) toModeMenu.addEventListener('click', (e)=>{ e.preventDefault(); clearAndGo(toModeMenu.href); });
-    if (toHome)     toHome.addEventListener('click',     (e)=>{ e.preventDefault(); clearAndGo(toHome.href); });
+    // Остальные переходы — тоже сбрасывают состояние ПЕРЕД навигацией
+    if (toVariants) toVariants.addEventListener('click', (e)=>{ e.preventDefault(); clearAndGo(toVariants.href); }, {passive:false});
+    if (toTaskMenu) toTaskMenu.addEventListener('click', (e)=>{ e.preventDefault(); clearAndGo(toTaskMenu.href); }, {passive:false});
+    if (toModeMenu) toModeMenu.addEventListener('click', (e)=>{ e.preventDefault(); clearAndGo(toModeMenu.href); }, {passive:false});
+    if (toHome)     toHome.addEventListener('click',     (e)=>{ e.preventDefault(); clearAndGo(toHome.href);     }, {passive:false});
 
-    // Очистка ресурсов
-    window.addEventListener('pagehide', ()=>{ if (objectURL) URL.revokeObjectURL(objectURL); });
-    window.addEventListener('beforeunload', ()=>{ if (objectURL) URL.revokeObjectURL(objectURL); });
+    // Очистка URL-ресурса аудио при уходе
+    window.addEventListener('pagehide', ()=>{ try{ if (objectURL) URL.revokeObjectURL(objectURL); }catch{} });
+    window.addEventListener('beforeunload', ()=>{ try{ if (objectURL) URL.revokeObjectURL(objectURL); }catch{} });
   </script>
 </body>
 </html>

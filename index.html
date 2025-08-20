@@ -5,140 +5,47 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Тренажёр Говорения ОГЭ/ЕГЭ — демо</title>
   <meta name="description" content="Онлайн-тренажёр устной части ОГЭ и ЕГЭ по английскому: таймер, подсказки, запись голоса, задания ФИПИ." />
-
-  <!-- Шрифты + оба preconnect -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
+  
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <!-- Общие стили -->
+  <link rel="stylesheet" href="style_common.css" />
 
   <!-- Анти-мигание темы -->
   <script>
     (function(){
       try{
         const saved = localStorage.getItem('pref-theme') || 'light';
-        if (saved === 'dark') document.documentElement.classList.add('dark');
+        if(saved === 'dark') document.documentElement.classList.add('dark');
       }catch(_){}
     })();
   </script>
 
   <style>
-    /* Светлая тема по умолчанию */
-    :root {
-      --bg: #f7f9ff;
-      --card: #ffffff;
-      --text: #0b1020;
-      --muted: #5a6475;
-      --primary: #2b6cff;
-      --primary-600: #1f58d9;
-      --ring: #bfd3ff;
-      --success: #25c26e;
-      --shadow: 0 10px 25px rgba(17,24,39,.08);
-    }
-
-    /* Тёмная тема */
-    .dark {
-      --bg: #0b1020;
-      --card: rgba(255,255,255,0.08);
-      --text: #eaf0ff;
-      --muted: #b9c2d3;
-      --primary: #6aa3ff;
-      --primary-600: #4b8dff;
-      --ring: #a9c6ff;
-      --success: #5ee397;
-      --shadow: 0 10px 35px rgba(0,0,0,.35);
-    }
-
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0; font-family:Inter, system-ui, Segoe UI, Roboto, Arial, sans-serif;
-      color:var(--text);
-      background:
-        radial-gradient(1200px 600px at 70% -10%, #29417a40, transparent),
-        radial-gradient(900px 500px at -10% 10%, #344b9340, transparent),
-        var(--bg);
-    }
-    a{color:inherit}
-    /* Фокус-стиль как в общем стиле */
-    :focus-visible{ outline: none; box-shadow: 0 0 0 4px var(--ring); border-radius: 10px; }
-
-    .wrap{max-width:1040px; margin:0 auto; padding:24px}
-    header{
-      display:flex; justify-content:space-between; align-items:center; gap:16px; padding:8px 0;
-    }
-    .brand{display:flex; align-items:center; gap:12px; text-decoration:none}
-    .logo{
-      width:42px; height:42px; border-radius:12px;
-      background: linear-gradient(135deg, var(--primary), #9bd0ff);
-      box-shadow: 0 6px 18px rgba(0,0,0,.25), inset 0 0 12px #ffffff33;
-      display:grid; place-items:center; color:#001133; font-weight:800;
-    }
-    .brand-title{font-weight:700; letter-spacing:.2px}
-    .badge{font-size:12px; color:var(--muted)}
-    .theme-toggle{
-      border:1px solid #ffffff22; background:transparent; color:var(--text);
-      padding:10px 14px; border-radius:10px; cursor:pointer;
-      transition: transform .08s ease, filter .2s ease;
-    }
-    .theme-toggle:hover{ transform: translateY(-1px); filter: brightness(1.02); }
-    .theme-toggle:active{transform: scale(.98)}
-
     main{padding:40px 0 24px}
-    .hero{
-      display:grid; grid-template-columns: 1.1fr .9fr; gap:28px; align-items:center;
-    }
-    @media (max-width:880px){ .hero{grid-template-columns:1fr} }
-    .card{
-      background:var(--card); border:1px solid #ffffff1f; border-radius:20px; padding:26px; box-shadow:var(--shadow);
-      backdrop-filter: blur(10px);
-    }
-    .h1{
-      font-size: clamp(28px, 5vw, 40px); line-height:1.15; margin:0 0 12px;
-    }
+    .hero{display:grid; grid-template-columns:1.1fr .9fr; gap:28px; align-items:center}
+    @media(max-width:880px){.hero{grid-template-columns:1fr}}
+
+    .card{padding:26px}
+    .h1{font-size:clamp(28px,5vw,40px); line-height:1.15; margin:0 0 12px}
     .sub{color:var(--muted); font-size:16px; margin:0 0 22px}
-    .cta{
-      display:flex; flex-wrap:wrap; gap:12px; margin-top:10px
-    }
-    .btn{
-      display:inline-flex; align-items:center; gap:10px; text-decoration:none;
-      font-size: 20px;
-      padding:18px 26px; border-radius:12px; border:1px solid transparent; font-weight:600;
-      transition: transform .06s ease, box-shadow .2s ease, border-color .2s ease, background .2s ease;
-      outline: none;
-      background: linear-gradient(135deg, var(--primary), var(--primary-600));
-      color:white; box-shadow: 0 10px 22px rgba(43,108,255,.3);
-      animation: pulse 1.5s infinite;
-    }
-    .btn:hover{transform: scale(1.05)}
 
-    /* Пульсация (и уважение reduce-motion) */
-    @keyframes pulse {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.08); }
-      100% { transform: scale(1); }
-    }
-    @media (prefers-reduced-motion: reduce){
-      .btn{ animation: none !important; }
-    }
+    .cta{display:flex; flex-wrap:wrap; gap:12px; margin-top:10px}
+    .btn{font-size:20px; padding:18px 26px; border-radius:12px; min-height:60px}
 
-    .note{
-      margin-top:16px; font-size:13px; color:var(--muted)
-    }
-    .right-card{
-      display:grid; align-content:center; gap:14px; text-align:left;
-    }
+    .right-card{display:grid; align-content:center; gap:14px; text-align:left}
     .tile{
-      display:flex; align-items:center; gap:12px; padding:12px; border-radius:14px;
-      border:1px dashed #ffffff28; background:#ffffff0b
+      display:flex; align-items:center; gap:12px; padding:12px;
+      border-radius:14px; border:1px dashed #ffffff28; background:#ffffff0b
     }
-    .dot{width:10px; height:10px; border-radius:50%; background: var(--success); box-shadow:0 0 0 4px #25c26e22}
-    footer{padding:30px 0 10px; color:var(--muted); font-size:13px; text-align:center}
+    .dot{width:10px; height:10px; border-radius:50%; background:var(--success); box-shadow:0 0 0 4px #25c26e22}
   </style>
 </head>
 <body>
   <div class="wrap">
     <header>
-      <a class="brand" href="/" aria-label="На главную">
+      <a class="brand" href="#">
         <div class="logo">A</div>
         <div>
           <div class="brand-title">Онлайн-тренажёр «Говорение»</div>
@@ -153,36 +60,36 @@
         <div class="card">
           <h1 class="h1">Подготовь устную часть <span style="white-space:nowrap">ОГЭ и ЕГЭ</span> уверенно</h1>
           <p class="sub">Тренируй ответы с таймером, мини-подсказками и записью голоса. Основано на демо-материалах ФИПИ.</p>
-          <div class="cta" role="navigation" aria-label="Быстрые ссылки">
-            <a href="oge/oge.html" class="btn btn-primary" aria-label="Перейти к тренажёру ОГЭ">🎒 Перейти к ОГЭ</a>
-            <a href="ege/ege.html" class="btn btn-primary" aria-label="Перейти к тренажёру ЕГЭ">🎓 Перейти к ЕГЭ</a>
+          <div class="cta">
+            <a href="oge/oge.html" class="btn" aria-label="Перейти к тренажёру ОГЭ">🎒 Перейти к ОГЭ</a>
+            <a href="ege/ege.html" class="btn" aria-label="Перейти к тренажёру ЕГЭ">🎓 Перейти к ЕГЭ</a>
           </div>
         </div>
 
-        <div class="right-card" aria-label="Преимущества">
+        <div class="right-card">
           <div class="tile">
-            <div class="dot" aria-hidden="true"></div>
+            <div class="dot"></div>
             <div>
               <strong>Быстрый старт</strong><br>
               Открой раздел и начни говорить — без регистрации.
             </div>
           </div>
           <div class="tile">
-            <div style="font-size:20px" aria-hidden="true">⏱</div>
+            <div style="font-size:20px">⏱</div>
             <div>
               <strong>Таймер экзамена</strong><br>
               Реалистичный хронометраж заданий устной части, как на реальном экзамене.
             </div>
           </div>
           <div class="tile">
-            <div style="font-size:20px" aria-hidden="true">🎙</div>
+            <div style="font-size:20px">🎙</div>
             <div>
               <strong>Запись ответа</strong><br>
               Записывай и переслушивай, чтобы отслеживать прогресс, дикцию и темп.
             </div>
           </div>
           <div class="tile">
-            <div style="font-size:20px" aria-hidden="true">🧩</div>
+            <div style="font-size:20px">🧩</div>
             <div>
               <strong>Задания в стиле ФИПИ</strong><br>
               Карточки «Вопросы/Интервью/Фото», удобные планы ответов и критерии.
@@ -198,24 +105,10 @@
     </footer>
   </div>
 
-  <script>
-    (function(){
-      const btn = document.getElementById('themeBtn');
-      const key = 'pref-theme';
-      const html = document.documentElement;
-
-      function apply(mode){
-        html.classList.toggle('dark', mode === 'dark');
-        localStorage.setItem(key, mode);
-      }
-
-      apply(localStorage.getItem(key) || 'light');
-
-      btn.addEventListener('click', () => {
-        const curr = localStorage.getItem(key) || 'light';
-        apply(curr === 'dark' ? 'light' : 'dark');
-      });
-    })();
+  <!-- Общий код -->
+  <script type="module">
+    import { toggleThemeInit } from './common.js';
+    toggleThemeInit();
   </script>
 </body>
 </html>

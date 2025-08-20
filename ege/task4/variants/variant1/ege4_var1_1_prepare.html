@@ -55,8 +55,7 @@
     </div>
   </div>
 
-  <!-- Проставка, чтобы нижняя кнопка полностью выходила над фикс-баром -->
-  <div class="fixed-footer-spacer" aria-hidden="true"></div>
+  <!-- ВАЖНО: проставки нет — как в Task 1 -->
 
   <!-- Фиксированный прогресс-бар снизу -->
   <div id="progressContainerFixed" role="timer" aria-live="polite" aria-label="Оставшееся время подготовки">
@@ -124,8 +123,6 @@
       try{ navigateOnce.lock = false; }catch{}
       if (e.persisted) requestAnimationFrame(tick);
     });
-
-    // Никаких автопереходов при скрытии вкладки — считаем только по дедлайну.
   </script>
 </body>
 </html>

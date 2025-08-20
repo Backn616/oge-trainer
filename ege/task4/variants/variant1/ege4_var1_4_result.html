@@ -18,13 +18,21 @@
 
   <style>
     :root{
-      --bg:#f7f9ff; --card:#ffffff; --text:#0b1020; --muted:#5a6475;
-      --primary:#2b6cff; --primary-600:#1f58d9;
+      --bg:#f7f9ff;
+      --card:#ffffff;
+      --text:#0b1020;
+      --muted:#5a6475;
+      --primary:#2b6cff;
+      --primary-600:#1f58d9;
       --shadow:0 10px 25px rgba(17,24,39,.08);
     }
     .dark{
-      --bg:#0b1020; --card:rgba(255,255,255,.08); --text:#eaf0ff; --muted:#b9c2d3;
-      --primary:#6aa3ff; --primary-600:#4b8dff;
+      --bg:#0b1020;
+      --card:rgba(255,255,255,.08);
+      --text:#eaf0ff;
+      --muted:#b9c2d3;
+      --primary:#6aa3ff;
+      --primary-600:#4b8dff;
       --shadow:0 10px 35px rgba(0,0,0,.35);
     }
 
@@ -111,7 +119,7 @@
       <a class="btn" id="repeatBtn" href="#">🔁 Повторить этот вариант</a>
     </div>
 
-    <!-- Контент задания -->
+    <!-- Контент задания и изображения -->
     <div class="task-container">
       <b>4 Task. Imagine that you and your friend are doing a school project “Spending holidays: in the city or in the countryside”.</b>
       <p>You have found some photos to illustrate it but for technical reasons you cannot send them now. Leave a voice message to your friend explaining your choice of the photos and sharing some ideas about the project. In 2.5 minutes be ready to:</p>
@@ -140,7 +148,7 @@
   </div>
 
   <script>
-    /* === Тема === */
+    // === Тема ===
     (function(){
       const btn = document.getElementById('themeBtn');
       const key = 'pref-theme';
@@ -150,80 +158,95 @@
       btn.addEventListener('click', ()=>{ const c = localStorage.getItem(key) || 'light'; apply(c === 'dark' ? 'light' : 'dark'); });
     })();
 
-    /* === Вариант + ссылки (работают и без JS) === */
-    const path = location.pathname;
-    const vm = path.match(/variant(\d+)/i);
-    const varNum = vm ? vm[1] : '?';
-    document.getElementById('varNum').textContent = varNum;
-    document.title = `Результат — Задание 4 · Вариант ${varNum}`;
+    // === Навигация ===
+    function getEgeBase(){
+      const p = location.pathname;
+      const i = p.indexOf('/ege/');
+      return i >= 0 ? p.slice(0, i + 5) : '/ege/';
+    }
 
-    // базовый /ege/
-    const baseIdx = path.indexOf('/ege/');
-    const baseEge = baseIdx >= 0 ? path.slice(0, baseIdx + 5) : '/ege/';
+    (function initNav(){
+      const path = location.pathname;
+      const base = getEgeBase();
 
-    // построим href-ы
-    const toVariants = document.getElementById('toVariants');
-    const toTaskMenu = document.getElementById('toTaskMenu');
-    const toModeMenu = document.getElementById('toModeMenu');
-    const toHome     = document.getElementById('toHome');
-    const repeatBtn  = document.getElementById('repeatBtn');
+      const m = path.match(/\/ege\/task(\d+)\/variants\/variant(\d+)\/ege\1_var\2_4_result\.html/i);
+      const task = m ? m[1] : '4';
+      const n    = m ? m[2] : '';
 
-    const variantsHref = path.replace(/\/variants\/variant\d+\/[^/]+$/i, '/variants/ege4.html');
-    const repeatHref   = path.replace(/_4_result\.html$/i, '_1_prepare.html');
-    const taskMenuHref = baseEge + 'ege.html';
-    const modeMenuHref = baseEge + 'ege_menu.html';
+      if (n){
+        document.getElementById('pageTitle').textContent = `Результат — Задание ${task} · Вариант ${n}`;
+        document.getElementById('varNum').textContent = n;
+      }
 
-    if (toVariants) toVariants.href = variantsHref;
-    if (repeatBtn)  repeatBtn.href  = repeatHref;
-    if (toTaskMenu) toTaskMenu.href = taskMenuHref;
-    if (toModeMenu) toModeMenu.href = modeMenuHref;
+      const repeat = document.getElementById('repeatBtn');
+      if (repeat) repeat.href = path.replace(/_4_result\.html$/i, '_1_prepare.html');
 
-    /* === Аудио === */
-    const audioEl     = document.getElementById('audio');
-    const statusText  = document.getElementById('statusText');
-    const playBtn     = document.getElementById('playBtn');
+      const toVariants = document.getElementById('toVariants');
+      if (toVariants) toVariants.href =
+        path.replace(/\/variants\/variant\d+\/[^/]+$/i, `/variants/ege${task}.html`);
+
+      const toTaskMenu = document.getElementById('toTaskMenu');
+      if (toTaskMenu) toTaskMenu.href = `${base}ege.html`;
+
+      const toModeMenu = document.getElementById('toModeMenu');
+      if (toModeMenu) toModeMenu.href = `${base}ege_menu.html`;
+    })();
+
+    // === Сброс состояния задания ===
+    function resetTask4() {
+      try {
+        const keys = Object.keys(sessionStorage);
+        for (const k of keys) {
+          if (k.startsWith('ege4_')) sessionStorage.removeItem(k);
+        }
+      } catch {}
+    }
+
+    function clearAndGo(url){
+      try{ if (objectURL) URL.revokeObjectURL(objectURL); }catch{}
+      resetTask4();
+      location.assign(url);
+    }
+
+    // === Аудио ===
+    const audioEl = document.getElementById('audio');
+    const statusText = document.getElementById('statusText');
+    const playBtn = document.getElementById('playBtn');
     const downloadBtn = document.getElementById('downloadBtn');
 
-    const base64     = sessionStorage.getItem('ege4_audio_base64');
+    const base64 = sessionStorage.getItem('ege4_audio_base64');
     const mimeStored = (sessionStorage.getItem('ege4_audio_mime') || 'audio/webm').toLowerCase();
 
     let objectURL = null;
+    const variantMatch = (location.pathname.match(/variant(\d+)/) || [,''])[1];
+
     const extByMime = {
-      'audio/webm':'webm','audio/webm;codecs=opus':'webm',
-      'audio/ogg':'ogg','audio/ogg;codecs=opus':'ogg',
-      'audio/mp4':'m4a','audio/mpeg':'mp3','audio/wav':'wav'
+      'audio/webm': 'webm',
+      'audio/webm;codecs=opus': 'webm',
+      'audio/ogg': 'ogg',
+      'audio/ogg;codecs=opus': 'ogg',
+      'audio/mp4': 'm4a',
+      'audio/mpeg': 'mp3',
+      'audio/wav': 'wav'
     };
-    const fileExt  = extByMime[mimeStored] || 'webm';
-    const fileName = `ege4_variant${varNum}.${fileExt}`;
+    const fileExt = extByMime[mimeStored] || 'webm';
+    const fileName = `ege4_variant${variantMatch}.${fileExt}`;
 
     function dataURLtoBlob(dataURL){
       const parts = (dataURL || '').split(',');
       if (parts.length < 2) return null;
-      const header = parts[0];
-      const b64    = parts[1];
-      const type   = (header.match(/data:(.*?);base64/) || [,'application/octet-stream'])[1];
-      const bin    = atob(b64);
-      const len    = bin.length;
-      const bytes  = new Uint8Array(len);
-      for (let i=0;i<len;i++) bytes[i] = bin.charCodeAt(i);
+      const b64 = parts[1];
+      const type = (dataURL.match(/data:(.*?);base64/) || [,'application/octet-stream'])[1];
+      const bin = atob(b64);
+      const len = bin.length;
+      const bytes = new Uint8Array(len);
+      for (let i = 0; i < len; i++) bytes[i] = bin.charCodeAt(i);
       return new Blob([bytes], { type });
     }
 
     function setButtonsEnabled(enabled){
-      const disabled = !enabled;
-      playBtn.disabled = disabled;
-      downloadBtn.disabled = disabled;
-      playBtn.setAttribute('aria-disabled', String(disabled));
-      downloadBtn.setAttribute('aria-disabled', String(disabled));
-      playBtn.tabIndex = disabled ? -1 : 0;
-      downloadBtn.tabIndex = disabled ? -1 : 0;
-      if (disabled){
-        playBtn.title = 'Запись отсутствует';
-        downloadBtn.title = 'Запись отсутствует';
-      } else {
-        playBtn.removeAttribute('title');
-        downloadBtn.removeAttribute('title');
-      }
+      playBtn.disabled = !enabled;
+      downloadBtn.disabled = !enabled;
     }
 
     (function initAudio(){
@@ -232,15 +255,15 @@
           const blob = dataURLtoBlob(base64);
           if (blob) {
             objectURL = URL.createObjectURL(blob);
-            audioEl.src  = objectURL;
+            audioEl.src = objectURL;
             audioEl.type = blob.type || mimeStored;
           } else {
-            audioEl.src  = base64;
+            audioEl.src = base64;
             audioEl.type = mimeStored;
           }
           setButtonsEnabled(true);
         } catch {
-          audioEl.src  = base64;
+          audioEl.src = base64;
           audioEl.type = mimeStored;
           setButtonsEnabled(true);
         }
@@ -250,40 +273,17 @@
       }
     })();
 
-    playBtn.addEventListener('click', ()=>{ if (!playBtn.disabled && audioEl.src) audioEl.play(); });
-    downloadBtn.addEventListener('click', ()=>{
-      if (downloadBtn.disabled || !audioEl.src) return;
+    playBtn.addEventListener('click', ()=>{ if (audioEl.src) audioEl.play(); });
+    downloadBtn.addEventListener('click', ()=>{ if (!audioEl.src) return;
       const a = document.createElement('a');
       a.href = objectURL || base64;
       a.download = fileName;
       a.click();
     });
 
-    /* === Сброс состояния при любых переходах с result === */
-    function resetTask4(){
-      try{
-        [
-          'ege4_audio_base64','ege4_audio_mime',
-          'ege4_prepared','ege4_warned','ege4_meta',
-          'ege4_task_finished','ege4_task_left_ms'
-        ].forEach(k=>sessionStorage.removeItem(k));
-      }catch{}
-    }
-    function clearAndGo(url){
-      try{ if (objectURL) URL.revokeObjectURL(objectURL); }catch{}
-      resetTask4();
-      location.assign(url);
-    }
-
-    // Повторить этот вариант — как впервые
-    if (repeatBtn){
-      repeatBtn.addEventListener('click', (e)=>{
-        e.preventDefault();
-        clearAndGo(repeatBtn.href);
-      });
-    }
-    // Остальные кнопки — тоже сбрасывают состояние перед уходом
-    [['toVariants', toVariants], ['toTaskMenu', toTaskMenu], ['toModeMenu', toModeMenu], ['toHome', toHome]].forEach(([_, el])=>{
+    // === Привязка очистки к кнопкам ===
+    [['repeatBtn'], ['toVariants'], ['toTaskMenu'], ['toModeMenu'], ['toHome']].forEach(([id])=>{
+      const el = document.getElementById(id);
       if (!el) return;
       el.addEventListener('click', (e)=>{
         e.preventDefault();
@@ -291,9 +291,8 @@
       });
     });
 
-    // Очистка URL-ресурса аудио при уходе
-    window.addEventListener('pagehide', ()=>{ try{ if (objectURL) URL.revokeObjectURL(objectURL); }catch{} });
-    window.addEventListener('beforeunload', ()=>{ try{ if (objectURL) URL.revokeObjectURL(objectURL); }catch{} });
+    window.addEventListener('pagehide', ()=>{ if (objectURL) URL.revokeObjectURL(objectURL); });
+    window.addEventListener('beforeunload', ()=>{ if (objectURL) URL.revokeObjectURL(objectURL); });
   </script>
 </body>
 </html>

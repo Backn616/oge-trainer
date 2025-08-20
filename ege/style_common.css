@@ -1,42 +1,42 @@
 :root{
   --bg:#f7f9ff; --card:#ffffff; --text:#0b1020; --muted:#5a6475;
-  --primary:#2b6cff; --primary-600:#1f58d9; --ring:#bfd3ff; --success:#25c26e; --danger:#b30000;
+  --primary:#2b6cff; --primary-600:#1f58d9; --ring:#bfd3ff;
   --shadow:0 10px 25px rgba(17,24,39,.08);
-  --focus:0 0 0 4px var(--ring);
-  --footer-h:32px; /* высота фикс-бара снизу */
+  --footer-h:32px;
 }
 .dark{
   --bg:#0b1020; --card:rgba(255,255,255,0.08); --text:#eaf0ff; --muted:#b9c2d3;
-  --primary:#6aa3ff; --primary-600:#4b8dff; --ring:#a9c6ff; --success:#5ee397; --danger:#ff6b6b;
+  --primary:#6aa3ff; --primary-600:#4b8dff; --ring:#a9c6ff;
   --shadow:0 10px 35px rgba(0,0,0,.35);
 }
 
 *{ box-sizing:border-box }
 html,body{ height:100% }
 
-/* ⬇️ Фон и отступы В ТОЧНОСТИ как в Task 1 */
+/* фон и низ — как в твоём файле var2 */
 body{
-  font-family:'Roboto', system-ui, sans-serif;
+  font-family: 'Roboto', system-ui, sans-serif;
   margin:0;
-  padding:40px 20px calc(80px + env(safe-area-inset-bottom, 0px));  /* только 80px + safe-area */
+  padding:40px 30px 80px; /* 80px снизу, без проставок */
   color:var(--text);
   background:
     radial-gradient(1200px 600px at 70% -10%, #29417a40, transparent),
     radial-gradient(900px 500px at -10% 10%, #344b9340, transparent),
     var(--bg);
+  display:flex; justify-content:center; text-align:center;
 }
 
 a,button{ color:inherit; text-decoration:none; }
-:focus-visible{ outline:none; box-shadow:var(--focus) }
+:focus-visible{ outline:none; box-shadow:0 0 0 4px var(--ring) }
 
-/* Обёртка и карточка задания */
-.content-wrapper{ max-width:1500px; width:100%; margin:0 auto; }
+.content-wrapper{ max-width:1500px; width:100%; }
 
+/* карточка задания — как в var2 */
 .task-container{
   background:var(--card);
   border-left:5px solid var(--primary);
   padding:20px 30px 10px 30px;
-  margin:0 auto 30px;
+  margin-bottom:30px;
   font-size:20px; line-height:1.7; text-align:left;
   box-shadow:var(--shadow); border-radius:12px;
 }
@@ -44,7 +44,7 @@ a,button{ color:inherit; text-decoration:none; }
 .task-container li{ margin-bottom:8px; }
 .task-container .instruction{ font-weight:700; margin-top:10px; }
 
-/* Изображения */
+/* блок с картинками — как в var2 */
 .images{
   display:flex; justify-content:center; align-items:flex-start;
   gap:30px; margin-bottom:30px;
@@ -54,36 +54,37 @@ a,button{ color:inherit; text-decoration:none; }
   border-radius:12px; box-shadow:var(--shadow);
 }
 
-/* Кнопка */
+/* кнопка — как в var2 */
 .button{
   font-size:20px; padding:16px 32px;
   background:linear-gradient(135deg, var(--primary), var(--primary-600));
   color:#fff; border:none; border-radius:12px; cursor:pointer;
   box-shadow:0 10px 22px rgba(43,108,255,.3);
   transition: transform .06s ease, box-shadow .2s ease, filter .2s ease;
-  position:relative; z-index:10000;
+  display:inline-block;
 }
-.button:hover{ transform: translateY(-1px); filter: brightness(1.03); }
+.button:hover{ transform: scale(1.05); filter: brightness(1.03); }
 
-/* Тумблер темы */
+/* тумблер темы — как в var2 */
 .theme-toggle{
   position:fixed; top:16px; right:16px; z-index:10000;
   border:1px solid #ffffff22; background:transparent; color:var(--text);
   padding:10px 14px; border-radius:10px; cursor:pointer; backdrop-filter: blur(6px);
-  transition:transform .08s ease, filter .2s ease;
+  transition: transform .08s ease, filter .2s ease;
 }
 .theme-toggle:hover{ transform: translateY(-1px); filter: brightness(1.03); }
 
-/* Фиксированный прогресс-бар снизу */
+/* фиксированный прогресс-бар снизу — как в var2 */
 #progressContainerFixed{
   position:fixed; bottom:0; left:0; width:100%; height:var(--footer-h);
-  background:#eee; z-index:9999; pointer-events:none; /* не перехватывает клики */
+  background:#eee; z-index:9999;
 }
 .dark #progressContainerFixed{ background:#222; }
 #progressBarFixed{
   height:100%; width:0%;
   background: linear-gradient(to right, #0066ff, #00cfff);
   position:relative;
+  transition: width .5s linear;
 }
 .progress-time{
   position:absolute; right:14px; top:50%; transform:translateY(-50%);
@@ -91,9 +92,7 @@ a,button{ color:inherit; text-decoration:none; }
   text-shadow:0 1px 2px rgba(0,0,0,.35);
 }
 
-/* В ЭТОМ ВАРИАНТЕ проставку не используем (как в Task 1) */
-/* .fixed-footer-spacer { height:0; } */
-
+/* адаптив */
 @media (max-width:800px){
   .images{ flex-direction:column; align-items:center; }
   .images img{ width:100%; }

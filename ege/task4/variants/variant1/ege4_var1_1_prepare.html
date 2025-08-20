@@ -11,7 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
 
   <!-- Общие стили (фон, карточка, кнопка, фикс-бар) -->
-  <link rel="stylesheet" href="../style_common.css" />
+  <link rel="stylesheet" href="../../../style_common.css" />
 
   <!-- Анти-мигание темы -->
   <script>
@@ -61,7 +61,7 @@
 
   <!-- Логика страницы -->
   <script type="module">
-    import { toggleThemeInit, navigateOnce, startPrepareTimer, fmtTime } from "../common.js";
+    import { toggleThemeInit, navigateOnce, startPrepareTimer, fmtTime } from "../../../common.js";
 
     // === Тема ===
     toggleThemeInit();
@@ -88,7 +88,7 @@
     const TOTAL_MS = 150_000;
     const barEl  = document.getElementById('progressBarFixed');
     const timeEl = document.getElementById('progressTime');
-    // отключим CSS-инерцию ширины (см. style_common.css: #progressBarFixed.rAF)
+    // если в style_common.css есть правило для .rAF — отключит CSS-инерцию
     barEl.classList.add('rAF');
 
     let stopTimer = null;
@@ -98,16 +98,16 @@
       timeEl.textContent = fmtTime(TOTAL_MS);
       barEl.style.width = '100%';
 
-      // Запуск таймера: без сохранения endTime в sessionStorage (persist:false)
+      // Запуск таймера
       stopTimer?.();
       stopTimer = startPrepareTimer({
         barEl,
         timeEl,
         totalMs: TOTAL_MS,
         nextUrl: NEXT_URL,
-        key: 'ege4_prepare_end',   // ключ нужен по API, но persist:false — так что хранить не будет
+        key: 'ege4_prepare_end',
         persist: false,
-        textEveryMs: 250,          // обновляем видимый текст не на каждом кадре
+        textEveryMs: 250,
         useRAF: true
       });
     }

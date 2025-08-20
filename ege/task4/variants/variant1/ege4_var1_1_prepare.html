@@ -1,81 +1,47 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <title>Task 4 — Preparation</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Задание 4 — Подготовка</title>
 
   <!-- Общие стили -->
-  <link rel="stylesheet" href="style_common.css">
+  <link rel="stylesheet" href="../style_common.css">
+
+  <!-- Скрипт -->
+  <script type="module" src="../common.js"></script>
 </head>
 <body>
-  <!-- Тумблер темы -->
-  <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
+  <button id="theme-toggle">🌗 Тема</button>
 
-  <!-- Инструкция -->
-  <div class="instruction-box">
-    <p><strong>Task 4.</strong> You are going to give a talk about … You will have to start in 2.5 minutes and speak for not more than 3 minutes (12–15 sentences).</p>
-    <p>Remember to say:</p>
+  <main class="card">
+    <h2>Task 4.</h2>
+    <p>
+      You are going to give a talk about … You will have to start in 2.5 minutes and speak for not more than 3 minutes (12–15 sentences).
+    </p>
+    <p><b>Remember to say:</b></p>
     <ul>
       <li>…</li>
       <li>…</li>
       <li>…</li>
     </ul>
     <p>You will have to talk continuously.</p>
-  </div>
 
-  <!-- Кнопка перехода -->
-  <div style="text-align:center; margin-bottom:30px;">
-    <button id="goBtn" class="button" aria-label="Перейти к выполнению">Перейти к выполнению</button>
-  </div>
+    <div class="controls">
+      <button id="nextBtn">Перейти к выполнению</button>
+    </div>
+  </main>
 
   <!-- Прогресс-бар -->
-  <div id="progressContainerFixed" role="timer" aria-live="polite">
-    <div id="progressBarFixed">
-      <span id="progressTime" class="progress-time">02:30</span>
-    </div>
+  <div id="progress-container">
+    <div id="progress-bar"></div>
+    <span id="timer"></span>
   </div>
 
-  <!-- Скрипт -->
-  <script type="module">
-    import { toggleThemeInit, fmtTime, navigateOnce } from './common.js';
-
-    toggleThemeInit();
-
-    // Таймер 2.5 минуты
-    const totalMs = 150_000; // 2.5 минуты
-    const endTime = Date.now() + totalMs;
-    let timerId = null;
-
-    const progressBar = document.getElementById('progressBarFixed');
-    const progressTime = document.getElementById('progressTime');
-
-    // Автогенерация ссылки на следующий шаг (mic)
-    const NEXT_URL = location.pathname.replace(/_1_prepare\.html$/i, '_2_mic.html');
-
-    function tick() {
-      const left = Math.max(0, endTime - Date.now());
-      progressTime.textContent = fmtTime(left);
-      progressBar.style.width = `${(left / totalMs) * 100}%`;
-      if (left <= 0) {
-        clearInterval(timerId);
-        navigateOnce(NEXT_URL);
-      }
-    }
-
-    tick();
-    timerId = setInterval(tick, 500);
-
-    // Кнопка ручного перехода
-    document.getElementById('goBtn').addEventListener('click', () => {
-      navigateOnce(NEXT_URL);
-    });
-
-    // Страховка при уходе
-    window.addEventListener('beforeunload', () => {
-      try { clearInterval(timerId); } catch (_) {}
+  <script>
+    startCountdown({
+      duration: 150, // 2.5 минуты = 150 секунд
+      nextPage: "ege4_var1_2_mic.html"
     });
   </script>
 </body>

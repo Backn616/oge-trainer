@@ -4,125 +4,179 @@
   <meta charset="UTF-8" />
   <title>Task 4 — Preparation</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-  <!-- Шрифт -->
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
-
-  <!-- ЕДИНЫЙ СТИЛЬ -->
-  <link rel="stylesheet" href="../../../style_common.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
   <!-- Анти-мигание темы -->
   <script>
     (function(){
       try{
         const saved = localStorage.getItem('pref-theme') || 'light';
-        if (saved === 'dark') document.documentElement.classList.add('dark');
+        if(saved === 'dark') document.documentElement.classList.add('dark');
       }catch(_){}
     })();
   </script>
+
+  <style>
+    :root{
+      --bg:#f7f9ff; --text:#0b1020; --muted:#5a6475; --card:#ffffff;
+      --primary:#2b6cff; --primary-600:#1f58d9; --shadow:0 10px 25px rgba(17,24,39,.08);
+      --panel-bg:#f9f9f9; --panel-border:#0077cc;
+      --footer-h:32px;
+    }
+    .dark{
+      --bg:#0b1020; --text:#eaf0ff; --muted:#b9c2d3; --card:rgba(255,255,255,.08);
+      --primary:#6aa3ff; --primary-600:#4b8dff; --shadow:0 10px 35px rgba(0,0,0,.35);
+      --panel-bg:rgba(255,255,255,.08); --panel-border:#4b8dff;
+    }
+
+    body{
+      font-family: Inter, system-ui, Segoe UI, Roboto, Arial, sans-serif;
+      margin:0; 
+      padding:40px 20px 80px;
+      color:var(--text); 
+      text-align:center;
+      background:
+        radial-gradient(1200px 600px at 70% -10%, #29417a40, transparent),
+        radial-gradient(900px 500px at -10% 10%, #344b9340, transparent),
+        var(--bg);
+    }
+
+    .instruction-box{
+      max-width:1600px; width:95%; margin:0 auto 30px; font-size:22px; line-height:1.6; text-align:left;
+      border:2px solid var(--panel-border); padding:25px; border-radius:12px; background:var(--panel-bg); box-shadow:var(--shadow);
+    }
+    .photo-box{
+      max-width:1600px; width:95%; margin:0 auto 30px; font-size:22px; line-height:1.6; text-align:center;
+      border:1px solid #ccc; padding:20px; border-radius:12px; background:var(--card); box-shadow:var(--shadow);
+      display:flex; justify-content:space-around; gap:20px;
+    }
+    .photo-box img{
+      max-width:48%; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,.12);
+    }
+
+    .button{
+      font-size:20px; padding:16px 32px; 
+      background:linear-gradient(135deg, var(--primary), var(--primary-600));
+      color:#fff; border:none; border-radius:12px; cursor:pointer;
+      box-shadow:0 10px 22px rgba(43,108,255,.28);
+      transition:transform .06s ease, filter .2s ease;
+      display:inline-block;
+    }
+    .button:hover{ transform:translateY(-1px); filter:brightness(1.03); }
+
+    .theme-toggle{
+      position:fixed; top:16px; right:16px; z-index:1000;
+      border:1px solid #ffffff22; background:transparent; color:var(--text);
+      padding:10px 14px; border-radius:10px; cursor:pointer;
+      backdrop-filter: blur(6px);
+      transition:transform .08s ease, filter .2s ease;
+    }
+    .theme-toggle:hover{ transform:translateY(-1px); filter:brightness(1.03); }
+
+    #progressContainerFixed{
+      position:fixed; bottom:0; left:0; width:100%; height:var(--footer-h);
+      background:#eee; z-index:9999;
+    }
+    .dark #progressContainerFixed{ background:#222; }
+    #progressBarFixed{
+      height:100%; width:0%;
+      background:linear-gradient(to right, #0066ff, #00cfff);
+      position:relative;
+      transition:width .5s linear;
+    }
+    .progress-time{
+      position:absolute; right:14px; top:50%; transform:translateY(-50%);
+      color:#fff; font-weight:700; font-size:20px; user-select:none;
+      text-shadow:0 1px 2px rgba(0,0,0,.35);
+    }
+  </style>
 </head>
 <body>
+
   <!-- Тумблер темы -->
   <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
 
-  <div class="content-wrapper">
-    <div class="task-container" aria-labelledby="taskTitle">
-      <b id="taskTitle">4 Task. Imagine that you and your friend are doing a school project “Spending holidays: in the city or in the countryside”.</b>
-      You have found some photos to illustrate it but for technical reasons you cannot send them now. Leave a voice message to your friend explaining your choice of the photos and sharing some ideas about the project. <strong>In 2.5 minutes</strong> be ready to:
-      <ul>
-        <li>explain the choice of the illustrations for the project by briefly describing them and noting the differences;</li>
-        <li>mention the advantages (1–2) of the two ways of spending holidays;</li>
-        <li>mention the disadvantages (1–2) of the two ways;</li>
-        <li>express your opinion on the subject of the project – which way of spending holidays presented in the pictures you would prefer and why.</li>
-      </ul>
-      <div class="instruction">
-        You will speak for not more than 3 minutes (12–15 sentences). You have to talk continuously.
-      </div>
-    </div>
-
-    <div class="images" aria-label="Project illustrations">
-      <img src="photo1_city.png" alt="City holidays">
-      <img src="photo2_countryside.png" alt="Countryside holidays">
-    </div>
-
-    <div style="text-align:center; margin-bottom:30px;">
-      <button id="goBtn" class="button"
-              aria-label="Перейти к выполнению"
-              title="Перейти к выполнению">
-        Перейти к выполнению
-      </button>
-    </div>
+  <div class="instruction-box">
+    <p><strong>Task 4.</strong> Study the two photographs. You have 2.5 minutes to get ready to compare and contrast them.</p>
   </div>
 
-  <!-- ВАЖНО: проставки нет — как в Task 1 -->
+  <div class="photo-box">
+    <img src="photo1_city.png" alt="Photo 1">
+    <img src="photo2_countryside.png" alt="Photo 2">
+  </div>
 
-  <!-- Фиксированный прогресс-бар снизу -->
-  <div id="progressContainerFixed" role="timer" aria-live="polite" aria-label="Оставшееся время подготовки">
+  <div style="text-align:center; margin-bottom:30px;">
+    <button id="goBtn" class="button" aria-label="Перейти к выполнению (будет запрос доступа к микрофону)">
+      Перейти к выполнению
+    </button>
+  </div>
+
+  <div id="progressContainerFixed" role="timer" aria-live="polite">
     <div id="progressBarFixed">
       <span id="progressTime" class="progress-time">02:30</span>
     </div>
   </div>
 
-  <!-- ЛОГИКА: ES-модуль -->
-  <script type="module">
-    import { toggleThemeInit, navigateOnce, fmtTime } from "../../../common.js";
-
-    // Тема
-    toggleThemeInit();
-
-    // Метки шага
-    try{
+  <script>
+    // Очистка прошлых данных
+    try {
       sessionStorage.removeItem('ege4_audio_base64');
-      sessionStorage.setItem('ege4_prepared','1');
-      const meta = JSON.parse(sessionStorage.getItem('ege4_meta')||'{}');
-      meta.preparedAt = Date.now();
-      meta.prepareDurationSec = 150; // 2.5 минуты
-      sessionStorage.setItem('ege4_meta', JSON.stringify(meta));
-    }catch(_){}
+      sessionStorage.removeItem('ege4_audio_mime');
+      sessionStorage.setItem('ege4_prepared', '1');
+    } catch (_) {}
 
-    // Переход на следующий шаг
+    // Переключатель темы
+    (function(){
+      const btn = document.getElementById('themeBtn');
+      const key = 'pref-theme';
+      const root = document.documentElement;
+      function apply(mode){
+        root.classList.toggle('dark', mode === 'dark');
+        localStorage.setItem(key, mode);
+      }
+      apply(localStorage.getItem(key) || 'light');
+      btn.addEventListener('click', ()=>{
+        const curr = localStorage.getItem(key) || 'light';
+        apply(curr === 'dark' ? 'light' : 'dark');
+      });
+    })();
+
+    // Таймер 2:30 и прогресс
+    const progressBar = document.getElementById('progressBarFixed');
+    const progressTime = document.getElementById('progressTime');
     const NEXT_URL = location.pathname.replace(/_1_prepare\.html$/i, '_2_mic.html');
-    document.getElementById('goBtn')?.addEventListener('click', () => {
-      try{ sessionStorage.removeItem('ege4_prepare_deadline'); }catch{}
-      navigateOnce(NEXT_URL);
-    });
 
-    // Таймер 2:30 от фиксированного дедлайна (живёт при возврате назад)
-    const TOTAL_MS = 150_000;
-    const DEADLINE_KEY = 'ege4_prepare_deadline';
+    const totalMs = 150_000; // 2.5 минуты
+    const endTime = Date.now() + totalMs;
+    let timerId = null;
 
-    let deadline = Number(sessionStorage.getItem(DEADLINE_KEY));
-    if (!deadline) {
-      deadline = Date.now() + TOTAL_MS;
-      try{ sessionStorage.setItem(DEADLINE_KEY, String(deadline)); }catch{}
+    function fmt(ms){
+      const s = Math.max(0, Math.floor(ms/1000));
+      const m = String(Math.floor(s/60)).padStart(2,'0');
+      const r = String(s%60).padStart(2,'0');
+      return `${m}:${r}`;
     }
-
-    const bar = document.getElementById('progressBarFixed');
-    const timeEl = document.getElementById('progressTime');
 
     function tick(){
-      const stored = Number(sessionStorage.getItem(DEADLINE_KEY)) || deadline;
-      if (stored) deadline = stored;
-
-      const left = Math.max(0, deadline - Date.now());
-      timeEl.textContent = fmtTime(left);
-      bar.style.width = `${(left / TOTAL_MS) * 100}%`;
-
-      if (left <= 0) {
-        try{ sessionStorage.removeItem(DEADLINE_KEY); }catch{}
-        navigateOnce(NEXT_URL);
-      } else {
-        requestAnimationFrame(tick);
+      const left = Math.max(0, endTime - Date.now());
+      progressTime.textContent = fmt(left);
+      progressBar.style.width = `${(left/totalMs)*100}%`;
+      if (left <= 0){
+        clearInterval(timerId);
+        window.location.href = NEXT_URL;
       }
     }
-    requestAnimationFrame(tick);
+    tick();
+    timerId = setInterval(tick, 500);
 
-    // Возврат из BFCache: «разбудить» анимацию и снять возможный замок
-    window.addEventListener('pageshow', (e) => {
-      try{ navigateOnce.lock = false; }catch{}
-      if (e.persisted) requestAnimationFrame(tick);
+    // Кнопка перехода
+    document.getElementById('goBtn').addEventListener('click', ()=>{
+      window.location.href = NEXT_URL;
     });
+
+    // Страховка: очистим интервал при уходе
+    window.addEventListener('beforeunload', ()=>{ try{ clearInterval(timerId); }catch(_){} });
   </script>
 </body>
 </html>

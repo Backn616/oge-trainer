@@ -1,80 +1,131 @@
-<script type="module">
-  // общий код лежит в /ege/
-  import { toggleThemeInit, navigateOnce } from '../../common.js';
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Task 4 — Preparation</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  // Тема
-  toggleThemeInit();
+  <!-- Шрифт: ускорение загрузки -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
 
-  // База до /ege/ — нужна для ссылок «к выбору задания»
-  function getEgeBase() {
-    const parts = location.pathname.split('/').filter(Boolean);
-    const i = parts.indexOf('ege');
-    let base = (i !== -1) ? ('/' + parts.slice(0, i + 1).join('/') + '/') : '/ege/';
-    return base.replace(/\/{2,}/g, '/');
-  }
-  const EGE_BASE = getEgeBase();
+  <!-- Общие стили (фон, карточка, кнопка, фикс-бар) -->
+  <link rel="stylesheet" href="../../style_common.css" />
 
-  // Кнопки «К выбору задания»
-  document.querySelectorAll('.back-to-menu').forEach(a => {
-    a.href = EGE_BASE + 'ege_menu.html';
-  });
+  <!-- Анти-мигание темы -->
+  <script>
+    (function(){
+      try{
+        const saved = localStorage.getItem('pref-theme') || 'light';
+        if (saved === 'dark') document.documentElement.classList.add('dark');
+      }catch(_){}
+    })();
+  </script>
+</head>
+<body>
+  <!-- Тумблер темы -->
+  <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
 
-  // ===== Расчёт базового каталога для вариантов =====
-  // /ege/task4/variants/ege4.html  -->  /ege/task4/variants/
-  const VARIANTS_BASE = location.pathname.replace(/ege4\.html$/i, '');
+  <div class="content-wrapper">
+    <div class="task-container" aria-labelledby="taskTitle">
+      <b id="taskTitle">4 Task. Imagine that you and your friend are doing a school project “Spending holidays: in the city or in the countryside”.</b>
+      You have found some photos to illustrate it but for technical reasons you cannot send them now. Leave a voice message to your friend explaining your choice of the photos and sharing some ideas about the project. <strong>In 2.5 minutes</strong> be ready to:
+      <ul>
+        <li>explain the choice of the illustrations for the project by briefly describing them and noting the differences;</li>
+        <li>mention the advantages (1–2) of the two ways of spending holidays;</li>
+        <li>mention the disadvantages (1–2) of the two ways;</li>
+        <li>express your opinion on the subject of the project – which way of spending holidays presented in the pictures you would prefer and why.</li>
+      </ul>
+      <div class="instruction">
+        You will speak for not more than 3 minutes (12–15 sentences). You have to talk continuously.
+      </div>
+    </div>
 
-  // Пагинация
-  const TOTAL_VARIANTS = 60;
-  const PAGE_SIZE      = 15;
+    <div class="images" aria-label="Project illustrations">
+      <img src="photo1_city.png" alt="City holidays">
+      <img src="photo2_countryside.png" alt="Countryside holidays">
+    </div>
 
-  const variantsEl = document.getElementById('variants');
-  const prevBtn    = document.getElementById('prevBtn');
-  const nextBtn    = document.getElementById('nextBtn');
-  const pagerInfo  = document.getElementById('pagerInfo');
-  const currentMarker = document.getElementById('currentPageMarker');
+    <div style="text-align:center; margin-bottom:30px;">
+      <button id="goBtn" class="button" aria-label="Перейти к выполнению">Перейти к выполнению</button>
+    </div>
+  </div>
 
-  let currentPage = 1;
-  const totalPages = Math.ceil(TOTAL_VARIANTS / PAGE_SIZE);
+  <!-- Фиксированный прогресс-бар снизу -->
+  <div id="progressContainerFixed" role="timer" aria-live="polite" aria-label="Оставшееся время подготовки">
+    <div id="progressBarFixed">
+      <span id="progressTime" class="progress-time">02:30</span>
+    </div>
+  </div>
 
-  function renderPage(page){
-    currentPage = Math.min(Math.max(1, page), totalPages);
-    variantsEl.innerHTML = '';
-    const start = (currentPage - 1) * PAGE_SIZE + 1;
-    const end   = Math.min(TOTAL_VARIANTS, start + PAGE_SIZE - 1);
+  <!-- Логика страницы -->
+  <script type="module">
+    import { toggleThemeInit, navigateOnce, startPrepareTimer, fmtTime } from "../../common.js";
 
-    const frag = document.createDocumentFragment();
-    for(let n = start; n <= end; n++){
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'variant';
-      btn.textContent = `Вариант ${n}`;
-      btn.setAttribute('aria-label', `Перейти к варианту ${n}`);
-      btn.addEventListener('click', () => goToVariant(n));
-      frag.appendChild(btn);
+    // === Тема ===
+    toggleThemeInit();
+
+    // Служебные метки — не влияют на таймер
+    try{
+      sessionStorage.removeItem('ege4_audio_base64');
+      sessionStorage.setItem('ege4_prepared','1');
+      const meta = { preparedAt: Date.now(), prepareDurationSec: 150 };
+      sessionStorage.setItem('ege4_meta', JSON.stringify(meta));
+    }catch{}
+
+    // URL следующего шага (mic)
+    const NEXT_URL = /_1_prepare\.html$/i.test(location.pathname)
+      ? location.pathname.replace(/_1_prepare\.html$/i, '_2_mic.html')
+      : location.pathname.replace(/\.html$/i, '_2_mic.html');
+
+    // Кнопка "Перейти"
+    document.getElementById('goBtn')?.addEventListener('click', () => {
+      navigateOnce(NEXT_URL);
+    });
+
+    // === Таймер 2:30 через унифицированный rAF-таймер ===
+    const TOTAL_MS = 150_000;
+    const barEl  = document.getElementById('progressBarFixed');
+    const timeEl = document.getElementById('progressTime');
+    barEl.classList.add('rAF');
+
+    let stopTimer = null;
+
+    function startTimerFresh(){
+      timeEl.textContent = fmtTime(TOTAL_MS);
+      barEl.style.width = '100%';
+
+      stopTimer?.();
+      stopTimer = startPrepareTimer({
+        barEl,
+        timeEl,
+        totalMs: TOTAL_MS,
+        nextUrl: NEXT_URL,
+        key: 'ege4_prepare_end',
+        persist: false,
+        textEveryMs: 250,
+        useRAF: true
+      });
     }
-    variantsEl.appendChild(frag);
 
-    pagerInfo.textContent = `Стр. ${currentPage} из ${totalPages} · ${start}–${end} из ${TOTAL_VARIANTS}`;
-    prevBtn.disabled = currentPage === 1;
-    nextBtn.disabled = currentPage === totalPages;
+    // Первый запуск
+    startTimerFresh();
 
-    currentMarker.textContent = `Страница ${currentPage}`;
-  }
+    // === Перезапуск при возврате «назад» / BFCache ===
+    function isBackForwardNav(){
+      try {
+        const nav = performance.getEntriesByType('navigation')[0];
+        return nav && nav.type === 'back_forward';
+      } catch { return false; }
+    }
 
-  function goToVariant(n){
-    // /ege/task4/variants/ + variantN/ege4_varN_1_prepare.html
-    const url = `${VARIANTS_BASE}variant${n}/ege4_var${n}_1_prepare.html`
-      .replace(/\/{2,}/g, '/')
-      .replace(':/', '://');
-    navigateOnce(url);
-  }
-
-  prevBtn.addEventListener('click', () => renderPage(currentPage - 1));
-  nextBtn.addEventListener('click', () => renderPage(currentPage + 1));
-
-  // Первый рендер
-  renderPage(1);
-
-  // Снять замок при возврате из BFCache
-  window.addEventListener('pageshow', () => { navigateOnce.lock = false; });
-</script>
+    window.addEventListener('pageshow', (e) => {
+      navigateOnce.lock = false;
+      if (e.persisted || isBackForwardNav()) {
+        startTimerFresh();
+      }
+    });
+  </script>
+</body>
+</html>

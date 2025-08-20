@@ -59,12 +59,12 @@
 
   <!-- Логика страницы -->
   <script type="module">
-    import { toggleThemeInit, startPrepareTimer, navigateOnce } from "../common.js";
+    import { toggleThemeInit, navigateOnce } from "../common.js";
 
     // Тема
     toggleThemeInit();
 
-    // Метки шага (как у тебя было)
+    // (необязательно) Метки шага — оставил как у тебя, но они не влияют на таймер
     try{
       sessionStorage.removeItem('ege4_audio_base64');
       sessionStorage.setItem('ege4_prepared','1');
@@ -74,27 +74,42 @@
       sessionStorage.setItem('ege4_meta', JSON.stringify(meta));
     }catch(_){}
 
-    // Переход на mic
+    // URL следующего шага (mic)
     const NEXT_URL = location.pathname.replace(/_1_prepare\.html$/i, '_2_mic.html');
 
-    // Кнопка всегда ведёт на mic
+    // Кнопка "Перейти" — всегда ведёт на mic
     document.getElementById('goBtn')?.addEventListener('click', () => {
       navigateOnce(NEXT_URL);
     });
 
-    // Таймер 2:30 — по дедлайну (не продлевается при возвратах)
-    const progressBar = document.getElementById('progressBarFixed');
-    const progressTime = document.getElementById('progressTime');
+    // Таймер 2:30 — локальный, без сохранения. При перезагрузке начинается заново.
+    const TOTAL_MS = 150_000; // 2.5 минуты
+    const endTs = performance.now() + TOTAL_MS;
 
-    startPrepareTimer({
-      barEl: progressBar,
-      timeEl: progressTime,
-      totalMs: 150_000,                 // 2.5 минуты
-      nextUrl: NEXT_URL,
-      key: 'ege4_var1_prepare_endtime'  // уникальный ключ для варианта
-    });
+    const barEl  = document.getElementById('progressBarFixed');
+    const timeEl = document.getElementById('progressTime');
 
-    // Сброс «замка» навигации при возврате из BFCache (чтобы кнопка снова работала)
+    function fmt(ms){
+      const s = Math.max(0, Math.floor(ms/1000));
+      const m = String(Math.floor(s/60)).padStart(2,'0');
+      const r = String(s%60).padStart(2,'0');
+      return `${m}:${r}`;
+    }
+
+    function tick(){
+      const left = Math.max(0, endTs - performance.now());
+      timeEl.textContent = fmt(left);
+      barEl.style.width = `${(left / TOTAL_MS) * 100}%`;
+      if (left <= 0){
+        navigateOnce(NEXT_URL);
+      } else {
+        requestAnimationFrame(tick);
+      }
+    }
+    requestAnimationFrame(tick);
+
+    // Если вернулись на страницу из BFCache (назад/вперёд), снимаем «замок» на переход,
+    // чтобы кнопка снова работала корректно.
     window.addEventListener('pageshow', () => { navigateOnce.lock = false; });
   </script>
 </body>

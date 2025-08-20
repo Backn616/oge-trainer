@@ -5,7 +5,9 @@
   <title>Task 4 — Preparation</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- Шрифт -->
+  <!-- Шрифт: ускорение загрузки -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
 
   <!-- Общие стили (фон, карточка, кнопка, фикс-бар) -->
@@ -59,12 +61,12 @@
 
   <!-- Логика страницы -->
   <script type="module">
-    import { toggleThemeInit, navigateOnce } from "../common.js";
+    import { toggleThemeInit, navigateOnce, startPrepareTimer, fmtTime } from "../common.js";
 
     // === Тема ===
     toggleThemeInit();
 
-    // (опционально) служебные метки — не влияют на таймер
+    // Служебные метки — не влияют на таймер
     try{
       sessionStorage.removeItem('ege4_audio_base64');
       sessionStorage.setItem('ege4_prepared','1');
@@ -73,52 +75,41 @@
     }catch{}
 
     // URL следующего шага (mic)
-    const NEXT_URL = location.pathname.replace(/_1_prepare\.html$/i, '_2_mic.html');
+    const NEXT_URL = /_1_prepare\.html$/i.test(location.pathname)
+      ? location.pathname.replace(/_1_prepare\.html$/i, '_2_mic.html')
+      : location.pathname.replace(/\.html$/i, '_2_mic.html');
 
     // Кнопка "Перейти"
     document.getElementById('goBtn')?.addEventListener('click', () => {
       navigateOnce(NEXT_URL);
     });
 
-    // === Таймер 2:30 без сохранения состояния ===
+    // === Таймер 2:30 через унифицированный rAF-таймер ===
     const TOTAL_MS = 150_000;
     const barEl  = document.getElementById('progressBarFixed');
     const timeEl = document.getElementById('progressTime');
+    // отключим CSS-инерцию ширины (см. style_common.css: #progressBarFixed.rAF)
+    barEl.classList.add('rAF');
 
-    let rafId = null;
-    let endTs = 0;
-
-    function fmt(ms){
-      const s = Math.max(0, Math.floor(ms/1000));
-      const m = String(Math.floor(s/60)).padStart(2,'0');
-      const r = String(s%60).padStart(2,'0');
-      return `${m}:${r}`;
-    }
-
-    function stopTick(){
-      if (rafId !== null) {
-        cancelAnimationFrame(rafId);
-        rafId = null;
-      }
-    }
-
-    function tick(){
-      const left = Math.max(0, endTs - performance.now());
-      timeEl.textContent = fmt(left);
-      barEl.style.width = `${(left / TOTAL_MS) * 100}%`;
-      if (left <= 0){
-        navigateOnce(NEXT_URL);
-      } else {
-        rafId = requestAnimationFrame(tick);
-      }
-    }
+    let stopTimer = null;
 
     function startTimerFresh(){
-      stopTick();
-      endTs = performance.now() + TOTAL_MS;   // всегда заново 02:30
-      timeEl.textContent = '02:30';
+      // Обновим стартовые значения
+      timeEl.textContent = fmtTime(TOTAL_MS);
       barEl.style.width = '100%';
-      rafId = requestAnimationFrame(tick);
+
+      // Запуск таймера: без сохранения endTime в sessionStorage (persist:false)
+      stopTimer?.();
+      stopTimer = startPrepareTimer({
+        barEl,
+        timeEl,
+        totalMs: TOTAL_MS,
+        nextUrl: NEXT_URL,
+        key: 'ege4_prepare_end',   // ключ нужен по API, но persist:false — так что хранить не будет
+        persist: false,
+        textEveryMs: 250,          // обновляем видимый текст не на каждом кадре
+        useRAF: true
+      });
     }
 
     // Первый запуск

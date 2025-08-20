@@ -5,8 +5,7 @@
   <title>Task 4 — Выполнение</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <!-- Шрифт -->
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
 
   <!-- Общие стили -->
@@ -17,25 +16,28 @@
     (function(){
       try{
         const saved = localStorage.getItem('pref-theme') || 'light';
-        if(saved === 'dark') document.documentElement.classList.add('dark');
+        if (saved === 'dark') document.documentElement.classList.add('dark');
       }catch(_){}
     })();
   </script>
 
   <style>
-    .timer {
-      font-size: 72px;
-      margin: 30px 0;
-      font-weight: 700;
-      color: var(--primary);
-      letter-spacing: 4px;
-      text-shadow: 0 4px 12px rgba(0,0,0,.25);
-      transition: transform .25s ease;
-      will-change: transform;
+    /* Небольшой визуал для отсчёта 3-2-1 */
+    .timer{
+      font-size:56px;             /* чуть меньше, чем 72 */
+      margin:30px 0;
+      font-weight:700;
+      color:var(--primary);
+      letter-spacing:4px;
+      text-shadow:0 4px 12px rgba(0,0,0,.25);
+      transition:transform .25s ease;
+      will-change:transform;
+      text-align:center;
     }
   </style>
 </head>
 <body>
+  <!-- Тумблер темы -->
   <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
 
   <div class="content-wrapper">
@@ -61,8 +63,10 @@
     <button class="button" id="endBtn" type="button" aria-label="Закончить запись" style="display:none">✅ Закончить</button>
   </div>
 
+  <!-- Проставка над фикс-баром -->
   <div style="height: calc(var(--footer-h) + 24px);"></div>
 
+  <!-- Фиксированный прогресс-бар снизу -->
   <div id="progressContainerFixed" role="timer" aria-live="polite" aria-label="Оставшееся время ответа" style="display:none">
     <div id="progressBarFixed">
       <span id="progressTime" class="progress-time">03:00</span>
@@ -72,8 +76,10 @@
   <script type="module">
     import { toggleThemeInit, navigateOnce, fmtTime } from '../common.js';
 
+    // Тема
     toggleThemeInit();
 
+    // DOM
     const timerEl        = document.getElementById('timer');
     const taskContainer  = document.getElementById('taskContainer');
     const imageContainer = document.getElementById('imageContainer');
@@ -82,13 +88,17 @@
     const progressBar    = document.getElementById('progressBarFixed');
     const progressTime   = document.getElementById('progressTime');
 
+    // Навигация
     const RESULT_URL = location.pathname.replace(/_3_task\.html$/i, '_4_result.html');
-    window.addEventListener('pageshow', () => { navigateOnce.lock = false; });
 
-    const TOTAL_MS = 180_000; // 3 минуты
-    let endTs = 0;
-    let rafId = 0;
+    // Снимаем «замок» для кнопок при возврате из BFCache
+    window.addEventListener('pageshow', (e) => {
+      navigateOnce.lock = false;
+      // Если вернулись из result назад (BFCache), перезапускаем страницу начисто
+      if (e.persisted) location.reload();
+    });
 
+    // ====== Микрофон и запись ======
     let mediaRecorder = null;
     let audioChunks   = [];
     let streamRef     = null;
@@ -99,7 +109,7 @@
       const candidates = [
         'audio/webm;codecs=opus',
         'audio/webm',
-        'audio/mp4',
+        'audio/mp4',            // Safari
         'audio/ogg;codecs=opus',
         'audio/ogg'
       ];
@@ -144,45 +154,63 @@
         startCountdown();
       }catch(err){
         alert('❌ Не удалось получить доступ к микрофону: ' + err.message);
+        mediaRecorder = null; // продолжим без записи
         startCountdown();
       }
     }
 
+    // ====== Отсчёт 3-2-1 и запуск задания ======
     let countdown = 3;
+    let cdInterval = 0;
+
     function startCountdown(){
-      const cd = setInterval(()=>{
+      timerEl.style.display = 'block';
+      timerEl.textContent = countdown;
+
+      cdInterval = setInterval(()=>{
         timerEl.style.color = (countdown > 1) ? '#2b6cff' : '#b30000';
         timerEl.textContent = countdown;
-        timerEl.style.transform = 'scale(1.25)';
-        setTimeout(()=>{ timerEl.style.transform = 'scale(1)'; }, 250);
+
+        // небольшой "пульс"
+        timerEl.style.transform = 'scale(1.2)';
+        setTimeout(()=>{ timerEl.style.transform = 'scale(1)'; }, 200);
 
         countdown--;
         if (countdown < 0){
-          clearInterval(cd);
+          clearInterval(cdInterval);
           startTask();
         }
       }, 1000);
     }
 
+    // ====== Таймер 3:00 ======
+    const TOTAL_MS = 180_000;
+    let endTs = 0;
+    let rafId = 0;
+
     function startTask(){
+      // UI
       taskContainer.style.display  = 'block';
       imageContainer.style.display = 'flex';
       endBtn.style.display         = 'inline-block';
       progressWrap.style.display   = 'block';
       timerEl.style.display        = 'none';
 
+      // запись
       audioChunks = [];
       try{ if (mediaRecorder && mediaRecorder.state !== 'recording') mediaRecorder.start(); }catch{}
 
-      endTs = Date.now() + TOTAL_MS;
+      // таймер
+      endTs = performance.now() + TOTAL_MS;
       progressTime.textContent = fmtTime(TOTAL_MS);
       tick();
 
+      // кнопка "закончить"
       endBtn.onclick = () => safeStopOrFinish();
     }
 
     function tick(){
-      const left = Math.max(0, endTs - Date.now());
+      const left = Math.max(0, endTs - performance.now());
       progressTime.textContent = fmtTime(left);
       progressBar.style.width  = `${(left / TOTAL_MS) * 100}%`;
 
@@ -210,13 +238,14 @@
       }
     }
 
+    // Очистка при уходе
     window.addEventListener('beforeunload', ()=>{
       try{ cancelAnimationFrame(rafId); }catch{}
       try{ if (mediaRecorder && mediaRecorder.state === 'recording') mediaRecorder.stop(); }catch{}
       try{ streamRef?.getTracks()?.forEach(t=>t.stop()); }catch{}
     });
 
-    // При возврате из result задача должна начинаться заново
+    // Старт
     window.onload = initMic;
   </script>
 </body>

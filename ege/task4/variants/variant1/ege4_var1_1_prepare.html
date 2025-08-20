@@ -59,58 +59,55 @@
 
   <!-- Логика страницы -->
   <script type="module">
-    import { toggleThemeInit, navigateOnce } from "../common.js";
+    import { toggleThemeInit, startPrepareTimer, navigateOnce } from "../common.js";
 
-    // Тема
+    // === Тема ===
     toggleThemeInit();
 
-    // (необязательно) Метки шага — оставил как у тебя, но они не влияют на таймер
-    try{
+    // Очистка старых данных и установка новых меток
+    try {
       sessionStorage.removeItem('ege4_audio_base64');
       sessionStorage.setItem('ege4_prepared','1');
-      const meta = JSON.parse(sessionStorage.getItem('ege4_meta')||'{}');
-      meta.preparedAt = Date.now();
-      meta.prepareDurationSec = 150;
+      const meta = { preparedAt: Date.now(), prepareDurationSec: 150 };
       sessionStorage.setItem('ege4_meta', JSON.stringify(meta));
-    }catch(_){}
+    } catch(_) {}
 
-    // URL следующего шага (mic)
+    // Переход на mic
     const NEXT_URL = location.pathname.replace(/_1_prepare\.html$/i, '_2_mic.html');
 
-    // Кнопка "Перейти" — всегда ведёт на mic
     document.getElementById('goBtn')?.addEventListener('click', () => {
       navigateOnce(NEXT_URL);
     });
 
-    // Таймер 2:30 — локальный, без сохранения. При перезагрузке начинается заново.
-    const TOTAL_MS = 150_000; // 2.5 минуты
-    const endTs = performance.now() + TOTAL_MS;
+    // Таймер 2:30
+    const progressBar = document.getElementById('progressBarFixed');
+    const progressTime = document.getElementById('progressTime');
 
-    const barEl  = document.getElementById('progressBarFixed');
-    const timeEl = document.getElementById('progressTime');
+    startPrepareTimer({
+      barEl: progressBar,
+      timeEl: progressTime,
+      totalMs: 150_000,                 
+      nextUrl: NEXT_URL,
+      key: 'ege4_var1_prepare_endtime'  
+    });
 
-    function fmt(ms){
-      const s = Math.max(0, Math.floor(ms/1000));
-      const m = String(Math.floor(s/60)).padStart(2,'0');
-      const r = String(s%60).padStart(2,'0');
-      return `${m}:${r}`;
+    // --- Обработка возврата из истории (BFCache/Back) ---
+    function isBackForwardNav(){
+      try {
+        const nav = performance.getEntriesByType('navigation')[0];
+        return nav && nav.type === 'back_forward';
+      } catch { return false; }
     }
 
-    function tick(){
-      const left = Math.max(0, endTs - performance.now());
-      timeEl.textContent = fmt(left);
-      barEl.style.width = `${(left / TOTAL_MS) * 100}%`;
-      if (left <= 0){
-        navigateOnce(NEXT_URL);
-      } else {
-        requestAnimationFrame(tick);
+    window.addEventListener('pageshow', (e) => {
+      // кнопка снова активна
+      navigateOnce.lock = false;
+
+      // если вернулись из BFCache или по кнопке "назад" → перезапуск страницы
+      if (e.persisted || isBackForwardNav()) {
+        location.replace(location.href);
       }
-    }
-    requestAnimationFrame(tick);
-
-    // Если вернулись на страницу из BFCache (назад/вперёд), снимаем «замок» на переход,
-    // чтобы кнопка снова работала корректно.
-    window.addEventListener('pageshow', () => { navigateOnce.lock = false; });
+    });
   </script>
 </body>
 </html>

@@ -29,7 +29,7 @@
   <div class="content-wrapper">
     <div class="task-container" aria-labelledby="taskTitle">
       <b id="taskTitle">4 Task. Imagine that you and your friend are doing a school project “Spending holidays: in the city or in the countryside”.</b>
-      You have found some photos to illustrate it but for technical reasons you cannot send them now. Leave a voice message to your friend explaining your choice of the photos and sharing some ideas about the project. In 2.5 minutes be ready to:
+      You have found some photos to illustrate it but for technical reasons you cannot send them now. Leave a voice message to your friend explaining your choice of the photos and sharing some ideas about the project. <strong>In 2.5 minutes</strong> be ready to:
       <ul>
         <li>explain the choice of the illustrations for the project by briefly describing them and noting the differences;</li>
         <li>mention the advantages (1–2) of the two ways of spending holidays;</li>
@@ -77,42 +77,61 @@
     try{
       sessionStorage.removeItem('ege4_audio_base64');
       sessionStorage.setItem('ege4_prepared','1');
-      sessionStorage.setItem('ege4_meta', JSON.stringify({
-        preparedAt: Date.now(),
-        prepareDurationSec: 150
-      }));
+      const meta = JSON.parse(sessionStorage.getItem('ege4_meta')||'{}');
+      meta.preparedAt = Date.now();
+      meta.prepareDurationSec = 150; // 2.5 минуты
+      sessionStorage.setItem('ege4_meta', JSON.stringify(meta));
     }catch(_){}
 
     // 3) Переход на следующий шаг (mic)
     const NEXT_URL = location.pathname.replace(/_1_prepare\.html$/i, '_2_mic.html');
-    let navigating = false;
-    function goNext(){
-      if (navigating) return;
-      navigating = true;
+    document.getElementById('goBtn')?.addEventListener('click', () => {
+      // сбрасываем дедлайн и идём дальше
+      try{ sessionStorage.removeItem('ege4_prepare_deadline'); }catch{}
       navigateOnce(NEXT_URL);
-    }
-    document.getElementById('goBtn')?.addEventListener('click', goNext);
+    });
 
-    // 4) Таймер 2:30 от фиксированного дедлайна (время течёт даже в фоне)
-    const TOTAL_MS = 150000;                      // 2.5 минуты
-    const deadline = Date.now() + TOTAL_MS;       // фикс-время окончания
+    // 4) Таймер 2:30 от фиксированного дедлайна (время течёт даже в фоне/при возврате)
+    const TOTAL_MS = 150_000; // 2.5 минуты
+    const DEADLINE_KEY = 'ege4_prepare_deadline';
+
+    let deadline = Number(sessionStorage.getItem(DEADLINE_KEY));
+    if (!deadline) {
+      deadline = Date.now() + TOTAL_MS;
+      try{ sessionStorage.setItem(DEADLINE_KEY, String(deadline)); }catch{}
+    }
 
     const bar = document.getElementById('progressBarFixed');
     const timeEl = document.getElementById('progressTime');
 
     function tick(){
+      // читаем актуальный дедлайн (на случай, если его обновили где-то ещё)
+      const stored = Number(sessionStorage.getItem(DEADLINE_KEY)) || deadline;
+      if (stored) deadline = stored;
+
       const left = Math.max(0, deadline - Date.now());
       timeEl.textContent = fmtTime(left);
       bar.style.width = `${(left / TOTAL_MS) * 100}%`;
+
       if (left <= 0) {
-        goNext();
+        try{ sessionStorage.removeItem(DEADLINE_KEY); }catch{}
+        navigateOnce(NEXT_URL);
       } else {
         requestAnimationFrame(tick);
       }
     }
     requestAnimationFrame(tick);
 
-    // ВАЖНО: никаких автопереходов при скрытии вкладки — время просто убывает по часам.
+    // 5) Возврат из BFCache: «разбудить» анимацию и сбросить возможный замок
+    window.addEventListener('pageshow', (e) => {
+      // снять замок, если он был поставлен до ухода вперёд
+      try{ navigateOnce.lock = false; }catch{}
+      if (e.persisted) {
+        requestAnimationFrame(tick);
+      }
+    });
+
+    // ВАЖНО: никаких автопереходов при скрытии вкладки — только дедлайн.
   </script>
 </body>
 </html>

@@ -11,7 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
 
   <!-- Общие стили (фон, карточка, кнопка, фикс-бар) -->
-  <link rel="stylesheet" href="../../style_common.css" />
+  <link rel="stylesheet" href="../../../style_common.css" />
 
   <!-- Анти-мигание темы -->
   <script>
@@ -61,7 +61,7 @@
 
   <!-- Логика страницы -->
   <script type="module">
-    import { toggleThemeInit, navigateOnce, startPrepareTimer, fmtTime } from "../../common.js";
+    import { toggleThemeInit, navigateOnce, startPrepareTimer, fmtTime } from "../../../common.js";
 
     // === Тема ===
     toggleThemeInit();
@@ -109,10 +109,9 @@
       });
     }
 
-    // Первый запуск
     startTimerFresh();
 
-    // === Перезапуск при возврате «назад» / BFCache ===
+    // Перезапуск при возврате назад / BFCache
     function isBackForwardNav(){
       try {
         const nav = performance.getEntriesByType('navigation')[0];

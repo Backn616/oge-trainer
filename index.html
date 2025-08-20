@@ -5,8 +5,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Тренажёр Говорения ОГЭ/ЕГЭ — демо</title>
   <meta name="description" content="Онлайн-тренажёр устной части ОГЭ и ЕГЭ по английскому: таймер, подсказки, запись голоса, задания ФИПИ." />
+
+  <!-- Шрифты + оба preconnect -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <!-- Анти-мигание темы -->
+  <script>
+    (function(){
+      try{
+        const saved = localStorage.getItem('pref-theme') || 'light';
+        if (saved === 'dark') document.documentElement.classList.add('dark');
+      }catch(_){}
+    })();
+  </script>
+
   <style>
     /* Светлая тема по умолчанию */
     :root {
@@ -38,12 +52,16 @@
     html,body{height:100%}
     body{
       margin:0; font-family:Inter, system-ui, Segoe UI, Roboto, Arial, sans-serif;
-      color:var(--text); 
-      background: radial-gradient(1200px 600px at 70% -10%, #29417a40, transparent),
-                  radial-gradient(900px 500px at -10% 10%, #344b9340, transparent),
-                  var(--bg);
+      color:var(--text);
+      background:
+        radial-gradient(1200px 600px at 70% -10%, #29417a40, transparent),
+        radial-gradient(900px 500px at -10% 10%, #344b9340, transparent),
+        var(--bg);
     }
     a{color:inherit}
+    /* Фокус-стиль как в общем стиле */
+    :focus-visible{ outline: none; box-shadow: 0 0 0 4px var(--ring); border-radius: 10px; }
+
     .wrap{max-width:1040px; margin:0 auto; padding:24px}
     header{
       display:flex; justify-content:space-between; align-items:center; gap:16px; padding:8px 0;
@@ -60,9 +78,11 @@
     .theme-toggle{
       border:1px solid #ffffff22; background:transparent; color:var(--text);
       padding:10px 14px; border-radius:10px; cursor:pointer;
-      transition: transform .08s ease;
+      transition: transform .08s ease, filter .2s ease;
     }
+    .theme-toggle:hover{ transform: translateY(-1px); filter: brightness(1.02); }
     .theme-toggle:active{transform: scale(.98)}
+
     main{padding:40px 0 24px}
     .hero{
       display:grid; grid-template-columns: 1.1fr .9fr; gap:28px; align-items:center;
@@ -87,15 +107,18 @@
       outline: none;
       background: linear-gradient(135deg, var(--primary), var(--primary-600));
       color:white; box-shadow: 0 10px 22px rgba(43,108,255,.3);
-      animation: pulse 1.5s infinite; /* Пульсация */
+      animation: pulse 1.5s infinite;
     }
     .btn:hover{transform: scale(1.05)}
 
-    /* Ключевые кадры для пульсации */
+    /* Пульсация (и уважение reduce-motion) */
     @keyframes pulse {
       0% { transform: scale(1); }
       50% { transform: scale(1.08); }
       100% { transform: scale(1); }
+    }
+    @media (prefers-reduced-motion: reduce){
+      .btn{ animation: none !important; }
     }
 
     .note{
@@ -115,7 +138,7 @@
 <body>
   <div class="wrap">
     <header>
-      <a class="brand" href="#">
+      <a class="brand" href="/" aria-label="На главную">
         <div class="logo">A</div>
         <div>
           <div class="brand-title">Онлайн-тренажёр «Говорение»</div>
@@ -130,40 +153,36 @@
         <div class="card">
           <h1 class="h1">Подготовь устную часть <span style="white-space:nowrap">ОГЭ и ЕГЭ</span> уверенно</h1>
           <p class="sub">Тренируй ответы с таймером, мини-подсказками и записью голоса. Основано на демо-материалах ФИПИ.</p>
-          <div class="cta">
-            <a href="oge/oge.html" class="btn btn-primary" aria-label="Перейти к тренажёру ОГЭ">
-              🎒 Перейти к ОГЭ
-            </a>
-            <a href="ege/ege.html" class="btn btn-primary" aria-label="Перейти к тренажёру ЕГЭ">
-              🎓 Перейти к ЕГЭ
-            </a>
+          <div class="cta" role="navigation" aria-label="Быстрые ссылки">
+            <a href="oge/oge.html" class="btn btn-primary" aria-label="Перейти к тренажёру ОГЭ">🎒 Перейти к ОГЭ</a>
+            <a href="ege/ege.html" class="btn btn-primary" aria-label="Перейти к тренажёру ЕГЭ">🎓 Перейти к ЕГЭ</a>
           </div>
         </div>
 
-        <div class="right-card">
+        <div class="right-card" aria-label="Преимущества">
           <div class="tile">
-            <div class="dot"></div>
+            <div class="dot" aria-hidden="true"></div>
             <div>
               <strong>Быстрый старт</strong><br>
               Открой раздел и начни говорить — без регистрации.
             </div>
           </div>
           <div class="tile">
-            <div style="font-size:20px">⏱</div>
+            <div style="font-size:20px" aria-hidden="true">⏱</div>
             <div>
               <strong>Таймер экзамена</strong><br>
               Реалистичный хронометраж заданий устной части, как на реальном экзамене.
             </div>
           </div>
           <div class="tile">
-            <div style="font-size:20px">🎙</div>
+            <div style="font-size:20px" aria-hidden="true">🎙</div>
             <div>
               <strong>Запись ответа</strong><br>
               Записывай и переслушивай, чтобы отслеживать прогресс, дикцию и темп.
             </div>
           </div>
           <div class="tile">
-            <div style="font-size:20px">🧩</div>
+            <div style="font-size:20px" aria-hidden="true">🧩</div>
             <div>
               <strong>Задания в стиле ФИПИ</strong><br>
               Карточки «Вопросы/Интервью/Фото», удобные планы ответов и критерии.
@@ -185,17 +204,12 @@
       const key = 'pref-theme';
       const html = document.documentElement;
 
-      const apply = (mode) => {
-        if(mode === 'dark'){
-          html.classList.add('dark');
-        } else {
-          html.classList.remove('dark');
-        }
+      function apply(mode){
+        html.classList.toggle('dark', mode === 'dark');
         localStorage.setItem(key, mode);
-      };
+      }
 
-      const saved = localStorage.getItem(key) || 'light';
-      apply(saved);
+      apply(localStorage.getItem(key) || 'light');
 
       btn.addEventListener('click', () => {
         const curr = localStorage.getItem(key) || 'light';

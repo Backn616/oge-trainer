@@ -17,7 +17,7 @@ html,body{ height:100% }
 body{
   font-family: 'Roboto', system-ui, sans-serif;
   margin:0;
-  padding:40px 30px 80px; /* 80px снизу, без проставок */
+  padding:40px 30px calc(80px + var(--footer-h)); /* 80px снизу, без проставок */
   color:var(--text);
   background:
     radial-gradient(1200px 600px at 70% -10%, #29417a40, transparent),

@@ -25,7 +25,7 @@
 body{
   font-family:'Roboto', system-ui, sans-serif;
   margin:0;
-  padding:40px 30px calc(80px + var(--footer-h) + env(safe-area-inset-bottom, 0px));
+  padding:40px 30px calc(60px + var(--footer-h) + env(safe-area-inset-bottom, 0px));
   color:var(--text);
   background:
     radial-gradient(1200px 600px at 70% -10%, #29417a40, transparent),

@@ -4,223 +4,74 @@
   <meta charset="UTF-8" />
   <title>Task 4 — Preparation</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Шрифт -->
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+
+  <!-- Подключаем общий стиль -->
+  <link rel="stylesheet" href="../../style_common.css">
 
   <!-- Анти-мигание темы -->
   <script>
     (function(){
-      try{
+      try {
         const saved = localStorage.getItem('pref-theme') || 'light';
-        if (saved === 'dark') document.documentElement.classList.add('dark');
-      }catch(_){}
+        if(saved === 'dark') document.documentElement.classList.add('dark');
+      } catch(_) {}
     })();
   </script>
-
-  <style>
-    :root{
-      --bg:#f7f9ff; --card:#ffffff; --text:#0b1020; --muted:#5a6475;
-      --primary:#2b6cff; --primary-600:#1f58d9; --ring:#bfd3ff;
-      --shadow:0 10px 25px rgba(17,24,39,.08);
-      --footer-h:32px; /* высота нижнего фикс-бара */
-    }
-    .dark{
-      --bg:#0b1020; --card:rgba(255,255,255,0.08); --text:#eaf0ff; --muted:#b9c2d3;
-      --primary:#6aa3ff; --primary-600:#4b8dff; --ring:#a9c6ff;
-      --shadow:0 10px 35px rgba(0,0,0,.35);
-    }
-
-    /* фон и отступ снизу: 80px + высота бара + safe-area */
-    body{
-      font-family:'Roboto', system-ui, sans-serif;
-      margin:0;
-      padding:40px 30px calc(80px + var(--footer-h) + env(safe-area-inset-bottom, 0px));
-      color:var(--text);
-      background:
-        radial-gradient(1200px 600px at 70% -10%, #29417a40, transparent),
-        radial-gradient(900px 500px at -10% 10%, #344b9340, transparent),
-        var(--bg);
-      display:flex; justify-content:center; text-align:center;
-    }
-    a,button{ color:inherit; text-decoration:none; }
-    :focus-visible{ outline:none; box-shadow:0 0 0 4px var(--ring) }
-
-    .content-wrapper{ max-width:1500px; width:100%; }
-
-    .task-container{
-      background:var(--card);
-      border-left:5px solid var(--primary);
-      padding:20px 30px 10px 30px;
-      margin-bottom:30px;
-      font-size:20px; line-height:1.7; text-align:left;
-      box-shadow:var(--shadow); border-radius:12px;
-    }
-    .task-container ul{ margin:10px 0 15px 20px; }
-    .task-container li{ margin-bottom:8px; }
-    .task-container .instruction{ font-weight:700; margin-top:10px; }
-
-    .images{
-      display:flex; justify-content:center; align-items:flex-start;
-      gap:30px; margin-bottom:30px;
-    }
-    .images img{
-      max-width:100%; height:auto; width:48%;
-      border-radius:12px; box-shadow:var(--shadow);
-    }
-
-    .button{
-      font-size:20px; padding:16px 32px;
-      background:linear-gradient(135deg, var(--primary), var(--primary-600));
-      color:#fff; border:none; border-radius:12px; cursor:pointer;
-      box-shadow:0 10px 22px rgba(43,108,255,.3);
-      transition: transform .06s ease, box-shadow .2s ease, filter .2s ease;
-      display:inline-block;
-    }
-    .button:hover{ transform: scale(1.05); filter: brightness(1.03); }
-
-    .theme-toggle{
-      position:fixed; top:16px; right:16px; z-index:10000;
-      border:1px solid #ffffff22; background:transparent; color:var(--text);
-      padding:10px 14px; border-radius:10px; cursor:pointer; backdrop-filter: blur(6px);
-      transition: transform .08s ease, filter .2s ease;
-    }
-    .theme-toggle:hover{ transform: translateY(-1px); filter: brightness(1.03); }
-
-    /* фиксированный прогресс-бар снизу */
-    #progressContainerFixed{
-      position:fixed; bottom:0; left:0; width:100%; height:var(--footer-h);
-      background:#eee; z-index:9999;
-    }
-    .dark #progressContainerFixed{ background:#222; }
-    #progressBarFixed{
-      height:100%; width:0%;
-      background: linear-gradient(to right, #0066ff, #00cfff);
-      position:relative;
-      transition: width .5s linear;
-    }
-    .progress-time{
-      position:absolute; right:14px; top:50%; transform:translateY(-50%);
-      color:#fff; font-weight:700; font-size:20px; user-select:none;
-      text-shadow:0 1px 2px rgba(0,0,0,.35);
-    }
-
-    @media (max-width:800px){
-      .images{ flex-direction:column; align-items:center; }
-      .images img{ width:100%; }
-    }
-  </style>
 </head>
 <body>
+
   <!-- Тумблер темы -->
   <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
 
   <div class="content-wrapper">
-    <div class="task-container" aria-labelledby="taskTitle">
-      <b id="taskTitle">4 Task. Imagine that you and your friend are doing a school project “Spending holidays: in the city or in the countryside”.</b>
-      You have found some photos to illustrate it but for technical reasons you cannot send them now. Leave a voice message to your friend explaining your choice of the photos and sharing some ideas about the project. <strong>In 2.5 minutes</strong> be ready to:
+    <div class="task-container">
+      <p><strong>Task 4.</strong> You are going to give a talk about …</p>
+      <p class="instruction">In 2.5 minutes be ready to:</p>
       <ul>
-        <li>explain the choice of the illustrations for the project by briefly describing them and noting the differences;</li>
-        <li>mention the advantages (1–2) of the two ways of spending holidays;</li>
-        <li>mention the disadvantages (1–2) of the two ways;</li>
-        <li>express your opinion on the subject of the project – which way of spending holidays presented in the pictures you would prefer and why.</li>
+        <li>talk about …</li>
+        <li>say what …</li>
+        <li>explain why …</li>
       </ul>
-      <div class="instruction">
-        You will speak for not more than 3 minutes (12–15 sentences). You have to talk continuously.
-      </div>
-    </div>
-
-    <div class="images" aria-label="Project illustrations">
-      <img src="photo1_city.png" alt="City holidays">
-      <img src="photo2_countryside.png" alt="Countryside holidays">
     </div>
 
     <div style="text-align:center; margin-bottom:30px;">
-      <button id="goBtn" class="button" aria-label="Перейти к выполнению">Перейти к выполнению</button>
+      <button id="goBtn" class="button">Перейти к выполнению</button>
     </div>
   </div>
 
-  <!-- Прогресс-бар снизу -->
-  <div id="progressContainerFixed" role="timer" aria-live="polite" aria-label="Оставшееся время подготовки">
+  <!-- Прогресс-бар -->
+  <div id="progressContainerFixed" role="timer" aria-live="polite">
     <div id="progressBarFixed">
       <span id="progressTime" class="progress-time">02:30</span>
     </div>
   </div>
 
-  <script>
-    /* === Тумблер темы === */
-    (function(){
-      const btn = document.getElementById('themeBtn');
-      const key = 'pref-theme';
-      const root = document.documentElement;
-      function apply(mode){
-        root.classList.toggle('dark', mode === 'dark');
-        try{ localStorage.setItem(key, mode); }catch(_){}
-      }
-      apply(localStorage.getItem(key) || 'light');
-      btn.addEventListener('click', ()=>{
-        const curr = localStorage.getItem(key) || 'light';
-        apply(curr === 'dark' ? 'light' : 'dark');
-      });
-    })();
+  <script type="module">
+    import { toggleThemeInit, fmtTime, navigateOnce } from "../../common.js";
 
-    /* === Метки шага === */
-    try{
-      sessionStorage.removeItem('ege4_audio_base64');
-      sessionStorage.setItem('ege4_prepared','1');
-      const meta = JSON.parse(sessionStorage.getItem('ege4_meta')||'{}');
-      meta.preparedAt = Date.now();
-      meta.prepareDurationSec = 150;
-      sessionStorage.setItem('ege4_meta', JSON.stringify(meta));
-    }catch(_){}
+    toggleThemeInit();
 
-    /* === Таймер 2:30 от дедлайна (устойчив к навигации) === */
-    const TOTAL_MS = 150000;
-    const DEADLINE_KEY = 'ege4_prepare_deadline';
-    const NEXT_URL = location.pathname.replace(/_1_prepare\.html$/i, '_2_mic.html');
+    const progressBar = document.getElementById("progressBarFixed");
+    const progressTime = document.getElementById("progressTime");
+    const NEXT_URL = location.pathname.replace(/_1_prepare\.html$/i, "_2_mic.html");
 
-    const bar = document.getElementById('progressBarFixed');
-    const timeEl = document.getElementById('progressTime');
-
-    // Кнопка ручного перехода
-    document.getElementById('goBtn')?.addEventListener('click', ()=>{
-      try{ sessionStorage.removeItem(DEADLINE_KEY); }catch(_){}
-      location.href = NEXT_URL;
-    });
-
-    let deadline = Number(sessionStorage.getItem(DEADLINE_KEY));
-    if (!deadline) {
-      deadline = Date.now() + TOTAL_MS;
-      try{ sessionStorage.setItem(DEADLINE_KEY, String(deadline)); }catch(_){}
-    }
-
-    function fmt(ms){
-      const s = Math.max(0, Math.floor(ms/1000));
-      const m = String(Math.floor(s/60)).padStart(2,'0');
-      const r = String(s%60).padStart(2,'0');
-      return `${m}:${r}`;
-    }
+    const totalMs = 150_000; // 2.5 минуты
+    const endTime = Date.now() + totalMs;
 
     function tick(){
-      // читаем актуальный дедлайн из sessionStorage на случай возврата
-      const stored = Number(sessionStorage.getItem(DEADLINE_KEY)) || deadline;
-      if (stored) deadline = stored;
-
-      const left = Math.max(0, deadline - Date.now());
-      timeEl.textContent = fmt(left);
-      bar.style.width = `${(left / TOTAL_MS) * 100}%`;
-
-      if (left <= 0){
-        try{ sessionStorage.removeItem(DEADLINE_KEY); }catch(_){}
-        location.href = NEXT_URL;
-      }else{
-        requestAnimationFrame(tick);
-      }
+      const left = Math.max(0, endTime - Date.now());
+      progressTime.textContent = fmtTime(left);
+      progressBar.style.width = `${(left / totalMs) * 100}%`;
+      if(left <= 0) navigateOnce(NEXT_URL);
     }
-    requestAnimationFrame(tick);
+    tick();
+    const timerId = setInterval(tick, 500);
 
-    // Возврат из BFCache: перезапустим анимацию
-    window.addEventListener('pageshow', (e) => {
-      if (e.persisted) requestAnimationFrame(tick);
-    });
+    document.getElementById("goBtn").addEventListener("click", ()=> navigateOnce(NEXT_URL));
+    window.addEventListener("beforeunload", ()=> clearInterval(timerId));
   </script>
 </body>
 </html>

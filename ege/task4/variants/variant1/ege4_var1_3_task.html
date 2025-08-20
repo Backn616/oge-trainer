@@ -5,8 +5,10 @@
   <title>Task 4 — Выполнение</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- Шрифт -->
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+
   <!-- Общие стили -->
   <link rel="stylesheet" href="../style_common.css" />
 
@@ -21,21 +23,19 @@
   </script>
 
   <style>
-    /* Небольшое усиление отсчёта перед стартом */
-    .timer{
-      font-size: 56px;           /* компактнее, как просил */
+    .timer {
+      font-size: 72px;
       margin: 30px 0;
       font-weight: 700;
       color: var(--primary);
-      letter-spacing: 2px;
-      text-shadow: 0 3px 10px rgba(0,0,0,.2);
+      letter-spacing: 4px;
+      text-shadow: 0 4px 12px rgba(0,0,0,.25);
       transition: transform .25s ease;
       will-change: transform;
     }
   </style>
 </head>
 <body>
-  <!-- Тумблер темы -->
   <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
 
   <div class="content-wrapper">
@@ -61,10 +61,8 @@
     <button class="button" id="endBtn" type="button" aria-label="Закончить запись" style="display:none">✅ Закончить</button>
   </div>
 
-  <!-- Проставка, чтобы кнопка не упиралась в фикс-бар -->
   <div style="height: calc(var(--footer-h) + 24px);"></div>
 
-  <!-- Фиксированный прогресс-бар -->
   <div id="progressContainerFixed" role="timer" aria-live="polite" aria-label="Оставшееся время ответа" style="display:none">
     <div id="progressBarFixed">
       <span id="progressTime" class="progress-time">03:00</span>
@@ -74,12 +72,8 @@
   <script type="module">
     import { toggleThemeInit, navigateOnce, fmtTime } from '../common.js';
 
-    // тема
     toggleThemeInit();
-    // чтобы после возврата Back кнопка снова работала
-    window.addEventListener('pageshow', () => { navigateOnce.lock = false; });
 
-    // DOM
     const timerEl        = document.getElementById('timer');
     const taskContainer  = document.getElementById('taskContainer');
     const imageContainer = document.getElementById('imageContainer');
@@ -88,30 +82,24 @@
     const progressBar    = document.getElementById('progressBarFixed');
     const progressTime   = document.getElementById('progressTime');
 
-    // Куда уходим по завершении
     const RESULT_URL = location.pathname.replace(/_3_task\.html$/i, '_4_result.html');
+    window.addEventListener('pageshow', () => { navigateOnce.lock = false; });
 
-    // Ключи состояния этого шага
-    const FIN_KEY  = 'ege4_task_finished';   // '1' если уже закончили (в том числе при возврате с result)
-    const LEFT_KEY = 'ege4_task_left_ms';    // сколько оставалось в момент стопа (для отображения)
-    const TOTAL_MS = 180_000;                // 3 минуты
-
-    // Рекордер
-    let mediaRecorder = null;
-    let audioChunks   = [];
-    let chosenMime    = '';
-    let streamRef     = null;
-    let hasStopped    = false;
-
-    // Таймер
+    const TOTAL_MS = 180_000; // 3 минуты
     let endTs = 0;
     let rafId = 0;
+
+    let mediaRecorder = null;
+    let audioChunks   = [];
+    let streamRef     = null;
+    let chosenMime    = '';
+    let hasStopped    = false;
 
     function pickMimeType(){
       const candidates = [
         'audio/webm;codecs=opus',
         'audio/webm',
-        'audio/mp4',            // Safari
+        'audio/mp4',
         'audio/ogg;codecs=opus',
         'audio/ogg'
       ];
@@ -119,21 +107,6 @@
         if (window.MediaRecorder?.isTypeSupported?.(t)) return t;
       }
       return '';
-    }
-
-    // «Замороженное» состояние, если уже закончили (возврат со страницы result)
-    function showEndedState(){
-      taskContainer.style.display  = 'block';
-      imageContainer.style.display = 'flex';
-      endBtn.style.display         = 'inline-block';
-      progressWrap.style.display   = 'block';
-      timerEl.style.display        = 'none';
-
-      const left = Math.max(0, parseInt(sessionStorage.getItem(LEFT_KEY)||'0', 10));
-      progressTime.textContent = fmtTime(left/1000);
-      progressBar.style.width  = `${(left / TOTAL_MS) * 100}%`;
-
-      endBtn.onclick = () => navigateOnce(RESULT_URL);
     }
 
     async function initMic(){
@@ -154,9 +127,7 @@
         mediaRecorder.onstop = () => {
           if (hasStopped) return;
           hasStopped = true;
-
           try{ streamRef?.getTracks()?.forEach(t=>t.stop()); }catch{}
-
           const blobType = chosenMime || mediaRecorder?.mimeType || 'audio/webm';
           const audioBlob = new Blob(audioChunks, { type: blobType });
           const reader = new FileReader();
@@ -164,10 +135,6 @@
             try{
               sessionStorage.setItem('ege4_audio_base64', reader.result);
               sessionStorage.setItem('ege4_audio_mime', blobType);
-              const meta = JSON.parse(sessionStorage.getItem('ege4_meta')||'{}');
-              meta.recordedAt = Date.now();
-              meta.actualDurationSec = Math.round((Date.now() - (meta.taskStartedAt||Date.now()))/1000);
-              sessionStorage.setItem('ege4_meta', JSON.stringify(meta));
             }catch{}
             navigateOnce(RESULT_URL);
           };
@@ -177,21 +144,17 @@
         startCountdown();
       }catch(err){
         alert('❌ Не удалось получить доступ к микрофону: ' + err.message);
-        mediaRecorder = null; // продолжаем без записи
         startCountdown();
       }
     }
 
-    // 3 → 2 → 1 → старт
     let countdown = 3;
     function startCountdown(){
       const cd = setInterval(()=>{
         timerEl.style.color = (countdown > 1) ? '#2b6cff' : '#b30000';
         timerEl.textContent = countdown;
-
-        // лёгкий «пульс»
-        timerEl.style.transform = 'scale(1.2)';
-        setTimeout(()=>{ timerEl.style.transform = 'scale(1)'; }, 200);
+        timerEl.style.transform = 'scale(1.25)';
+        setTimeout(()=>{ timerEl.style.transform = 'scale(1)'; }, 250);
 
         countdown--;
         if (countdown < 0){
@@ -202,37 +165,25 @@
     }
 
     function startTask(){
-      // показать интерфейс
       taskContainer.style.display  = 'block';
       imageContainer.style.display = 'flex';
       endBtn.style.display         = 'inline-block';
       progressWrap.style.display   = 'block';
       timerEl.style.display        = 'none';
 
-      // метаданные
-      try{
-        const meta = JSON.parse(sessionStorage.getItem('ege4_meta')||'{}');
-        meta.taskStartedAt = Date.now();
-        meta.limitSec = 180;
-        sessionStorage.setItem('ege4_meta', JSON.stringify(meta));
-      }catch{}
-
-      // старт записи
       audioChunks = [];
       try{ if (mediaRecorder && mediaRecorder.state !== 'recording') mediaRecorder.start(); }catch{}
 
-      // rAF-таймер по абсолютному времени
       endTs = Date.now() + TOTAL_MS;
-      progressTime.textContent = fmtTime(TOTAL_MS/1000);
+      progressTime.textContent = fmtTime(TOTAL_MS);
       tick();
 
-      // ручное завершение
       endBtn.onclick = () => safeStopOrFinish();
     }
 
     function tick(){
       const left = Math.max(0, endTs - Date.now());
-      progressTime.textContent = fmtTime(left/1000);
+      progressTime.textContent = fmtTime(left);
       progressBar.style.width  = `${(left / TOTAL_MS) * 100}%`;
 
       if (left <= 0){
@@ -243,15 +194,7 @@
     }
 
     function safeStopOrFinish(){
-      let leftForStore = 0;
-      try{ leftForStore = Math.max(0, endTs - Date.now()); }catch{}
-      try{
-        sessionStorage.setItem(FIN_KEY, '1');
-        sessionStorage.setItem(LEFT_KEY, String(Math.round(leftForStore)));
-      }catch{}
-
       try{ cancelAnimationFrame(rafId); }catch{}
-
       if (hasStopped) { navigateOnce(RESULT_URL); return; }
 
       try{
@@ -267,22 +210,14 @@
       }
     }
 
-    // НЕТ автопереходов при смене вкладки — считаем по Date.now()
     window.addEventListener('beforeunload', ()=>{
       try{ cancelAnimationFrame(rafId); }catch{}
       try{ if (mediaRecorder && mediaRecorder.state === 'recording') mediaRecorder.stop(); }catch{}
       try{ streamRef?.getTracks()?.forEach(t=>t.stop()); }catch{}
     });
 
-    // Если уже завершали (возврат с result) — показываем «замороженное» состояние
-    const alreadyFinished = sessionStorage.getItem(FIN_KEY) === '1';
-    if (alreadyFinished){
-      showEndedState();
-      endBtn.onclick = () => navigateOnce(RESULT_URL);
-      timerEl.style.display = 'none';
-    }else{
-      window.onload = initMic;
-    }
+    // При возврате из result задача должна начинаться заново
+    window.onload = initMic;
   </script>
 </body>
 </html>

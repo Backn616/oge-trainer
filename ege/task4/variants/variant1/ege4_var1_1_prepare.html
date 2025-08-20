@@ -9,10 +9,10 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
 
-  <!-- ЕДИНЫЙ СТИЛЬ (ege/style_common.css) -->
+  <!-- ЕДИНЫЙ СТИЛЬ -->
   <link rel="stylesheet" href="../../../style_common.css" />
 
-  <!-- Анти-мигание темы до загрузки модулей -->
+  <!-- Анти-мигание темы -->
   <script>
     (function(){
       try{
@@ -42,7 +42,6 @@
     </div>
 
     <div class="images" aria-label="Project illustrations">
-      <!-- Картинки лежат рядом с этим файлом -->
       <img src="photo1_city.png" alt="City holidays">
       <img src="photo2_countryside.png" alt="Countryside holidays">
     </div>
@@ -66,14 +65,14 @@
     </div>
   </div>
 
-  <!-- ЛОГИКА: ES-модуль с общими функциями -->
+  <!-- ЛОГИКА: ES-модуль -->
   <script type="module">
     import { toggleThemeInit, navigateOnce, fmtTime } from "../../../common.js";
 
-    // 1) Тумблер темы
+    // Тема
     toggleThemeInit();
 
-    // 2) sessionStorage метки
+    // Метки шага
     try{
       sessionStorage.removeItem('ege4_audio_base64');
       sessionStorage.setItem('ege4_prepared','1');
@@ -83,16 +82,15 @@
       sessionStorage.setItem('ege4_meta', JSON.stringify(meta));
     }catch(_){}
 
-    // 3) Переход на следующий шаг (mic)
+    // Переход на следующий шаг
     const NEXT_URL = location.pathname.replace(/_1_prepare\.html$/i, '_2_mic.html');
     document.getElementById('goBtn')?.addEventListener('click', () => {
-      // сбрасываем дедлайн и идём дальше
       try{ sessionStorage.removeItem('ege4_prepare_deadline'); }catch{}
       navigateOnce(NEXT_URL);
     });
 
-    // 4) Таймер 2:30 от фиксированного дедлайна (время течёт даже в фоне/при возврате)
-    const TOTAL_MS = 150_000; // 2.5 минуты
+    // Таймер 2:30 от фиксированного дедлайна (живёт при возврате назад)
+    const TOTAL_MS = 150_000;
     const DEADLINE_KEY = 'ege4_prepare_deadline';
 
     let deadline = Number(sessionStorage.getItem(DEADLINE_KEY));
@@ -105,7 +103,6 @@
     const timeEl = document.getElementById('progressTime');
 
     function tick(){
-      // читаем актуальный дедлайн (на случай, если его обновили где-то ещё)
       const stored = Number(sessionStorage.getItem(DEADLINE_KEY)) || deadline;
       if (stored) deadline = stored;
 
@@ -122,16 +119,13 @@
     }
     requestAnimationFrame(tick);
 
-    // 5) Возврат из BFCache: «разбудить» анимацию и сбросить возможный замок
+    // Возврат из BFCache: «разбудить» анимацию и снять возможный замок
     window.addEventListener('pageshow', (e) => {
-      // снять замок, если он был поставлен до ухода вперёд
       try{ navigateOnce.lock = false; }catch{}
-      if (e.persisted) {
-        requestAnimationFrame(tick);
-      }
+      if (e.persisted) requestAnimationFrame(tick);
     });
 
-    // ВАЖНО: никаких автопереходов при скрытии вкладки — только дедлайн.
+    // Никаких автопереходов при скрытии вкладки — считаем только по дедлайну.
   </script>
 </body>
 </html>

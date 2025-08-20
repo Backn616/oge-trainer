@@ -28,7 +28,7 @@ body{
   font-family:'Roboto', system-ui, sans-serif;
   margin:0;
   /* 40px «воздуха» + высота фикс-бара + safe-area */
-  padding:40px 30px calc(40px + var(--footer-h) + env(safe-area-inset-bottom, 0px));
+  padding:40px 30px calc(35px + var(--footer-h) + env(safe-area-inset-bottom, 0px));
   color:var(--text);
   background:
     radial-gradient(1200px 600px at 70% -10%, #29417a40, transparent),

@@ -24,7 +24,7 @@
   </script>
 
   <style>
-    /* Доп.стили только для этого файла */
+    /* Доп. стили только для этого файла */
     .timer{
       font-size:70px; margin:30px 0; font-weight:700; color:var(--primary);
       letter-spacing:4px; text-shadow:0 4px 12px rgba(0,0,0,.25);
@@ -32,11 +32,12 @@
     }
     @media (prefers-reduced-motion: reduce) { .timer{ transition:none; } }
 
+    /* Инструкция как в prepare */
     .instruction-box{
       max-width:2500px; width:95%; margin:0 auto 30px;
       font-size:22px; line-height:1.6; text-align:left;
-      border:2px solid var(--primary); padding:25px; border-radius:12px;
-      background:var(--card); box-shadow:var(--shadow);
+      border:2px solid var(--panel-border); padding:25px; border-radius:12px;
+      background:var(--panel-bg); box-shadow:var(--shadow);
     }
 
     .reading-box{
@@ -77,8 +78,9 @@ Scientists believe that studying bioluminescence can help develop new medical an
 Bioluminescence is not only beautiful — it is a powerful tool of survival and discovery. These glowing creatures remind us how much we still have to learn about the natural world. Their light, shining in the darkness, is both mysterious and meaningful.
     </div>
 
+    <!-- Кнопка: теперь как в result -->
     <div style="text-align:center; margin-bottom:30px;">
-      <button class="button" id="endBtn" type="button" aria-label="Закончить запись" style="display:none">✅ Закончить</button>
+      <button class="btn" id="endBtn" type="button" aria-label="Закончить запись" style="display:none">✅ Закончить</button>
     </div>
   </div>
 

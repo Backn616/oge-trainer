@@ -24,6 +24,18 @@
   </script>
 
   <style>
+    /* Переменные как в prepare */
+    :root{
+      --bg:#f7f9ff; --text:#0b1020; --muted:#5a6475; --card:#ffffff;
+      --primary:#2b6cff; --primary-600:#1f58d9; --shadow:0 10px 25px rgba(17,24,39,.08);
+      --panel-bg:#f9f9f9; --panel-border:#0077cc;
+    }
+    .dark{
+      --bg:#0b1020; --text:#eaf0ff; --muted:#b9c2d3; --card:rgba(255,255,255,.08);
+      --primary:#6aa3ff; --primary-600:#4b8dff; --shadow:0 10px 35px rgba(0,0,0,.35);
+      --panel-bg:rgba(255,255,255,.08); --panel-border:#4b8dff;
+    }
+
     /* Фон — как в «нравится» prepare */
     body{
       font-family: Inter, system-ui, Segoe UI, Roboto, Arial, sans-serif;
@@ -41,14 +53,15 @@
     }
     @media (prefers-reduced-motion: reduce) { .timer{ transition:none; } }
 
-    /* Широкая карточка-инструкция */
+    /* Инструкция — КАК В PREPARE */
     .instruction-box{
-      max-width:3000px; width:95%; margin:0 auto 30px; font-size:22px; line-height:1.6; text-align:left;
-      border:2px solid var(--panel-border); padding:25px; border-radius:12px; background:var(--panel-bg); box-shadow:var(--shadow);
+      max-width:3000px; width:95%; margin:0 auto 30px;
+      font-size:22px; line-height:1.6; text-align:left;
+      border:2px solid var(--panel-border); padding:25px; border-radius:12px;
+      background:var(--panel-bg); box-shadow:var(--shadow);
     }
 
-    /* Текст как в prepare: 32/1.9, padding 40, рамка/тень, БЕЗ pre-line.
-       ВАЖНО: текст в div начинается сразу после тега, без ведущего перевода строки. */
+    /* Текст как в prepare: 32/1.9/padding 40; БЕЗ pre-line; текст сразу после <div> */
     #textBox{
       max-width:3000px; width:95%; margin:0 auto 30px;
       font-size:32px; line-height:1.9; text-align:left;
@@ -64,10 +77,10 @@
 
   <div class="content-wrapper">
     <!-- Инструкция (покажется после отсчёта) -->
-    <div class="task-container" id="taskContainer" aria-labelledby="taskTitle" aria-describedby="inst" style="display:none">
-      <b id="taskTitle">Task 1. Imagine that you are preparing a project with your friend.</b>
+    <div class="instruction-box" id="instructionBox" aria-labelledby="taskTitle" aria-describedby="inst" style="display:none">
+      <p><strong id="taskTitle">Task 1.</strong> Imagine that you are preparing a project with your friend.
       You have found some interesting material for the presentation and you want to read this text to your friend.
-      You have 1.5 minutes to read the text silently, then be ready to read it out loud. You will not have more than 1.5 minutes to read it.
+      You have 1.5 minutes to read the text silently, then be ready to read it out loud. You will not have more than 1.5 minutes to read it.</p>
       <div class="instruction" id="inst">You will read the text aloud for not more than 1.5 minutes.</div>
     </div>
 
@@ -75,7 +88,7 @@
     <div id="timer" class="timer" aria-live="polite">3</div>
 
     <!-- Текст для чтения: БЕЗ <p>/<br>, начинается сразу после <div> -->
-    <div class="task-container" id="textBox" style="display:none">Bioluminescence is the ability of certain living organisms to produce light. This fascinating phenomenon can be observed in various species of deep-sea fish, jellyfish, fireflies, and even some fungi.
+    <div id="textBox" style="display:none">Bioluminescence is the ability of certain living organisms to produce light. This fascinating phenomenon can be observed in various species of deep-sea fish, jellyfish, fireflies, and even some fungi.
 
 The light is usually blue or green, which travels best through water. These organisms use light for different reasons. Some attract mates or prey, while others use it to confuse predators. For example, the anglerfish has a glowing lure to draw in its victims in the dark ocean depths.
 
@@ -83,14 +96,16 @@ Scientists believe that studying bioluminescence can help develop new medical an
 
 Bioluminescence is not only beautiful — it is a powerful tool of survival and discovery. These glowing creatures remind us how much we still have to learn about the natural world. Their light, shining in the darkness, is both mysterious and meaningful.</div>
 
-    <button class="button" id="endBtn" type="button" aria-label="Закончить запись" style="display:none">✅ Закончить</button>
+    <div style="text-align:center; margin-bottom:30px;">
+      <button class="button" id="endBtn" type="button" aria-label="Закончить запись" style="display:none">✅ Закончить</button>
+    </div>
   </div>
 
   <!-- Проставка над фикс‑баром -->
   <div style="height: calc(var(--footer-h) + 24px);"></div>
 
   <!-- Фиксированный прогресс‑бар на время ответа -->
-  <div id="progressContainerFixed" role="timer" aria-live="polite" aria-label="Оставшееся время ответа" style="display:none">
+  <div id="progressContainerFixed" role="timer" aria-live="polite" aria-atomic="true" aria-label="Оставшееся время ответа" style="display:none">
     <div id="progressBarFixed">
       <span id="progressTime" class="progress-time">01:30</span>
     </div>
@@ -103,13 +118,13 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
     toggleThemeInit();
 
     // DOM
-    const timerEl       = document.getElementById('timer');
-    const taskContainer = document.getElementById('taskContainer');
-    const textBox       = document.getElementById('textBox');
-    const endBtn        = document.getElementById('endBtn');
-    const progressWrap  = document.getElementById('progressContainerFixed');
-    const progressBar   = document.getElementById('progressBarFixed');
-    const progressTime  = document.getElementById('progressTime');
+    const timerEl        = document.getElementById('timer');
+    const instructionBox = document.getElementById('instructionBox');
+    const textBox        = document.getElementById('textBox');
+    const endBtn         = document.getElementById('endBtn');
+    const progressWrap   = document.getElementById('progressContainerFixed');
+    const progressBar    = document.getElementById('progressBarFixed');
+    const progressTime   = document.getElementById('progressTime');
 
     // Навигация → result
     const RESULT_URL = location.pathname.replace(/_3_task\.html$/i, '_4_result.html');
@@ -160,7 +175,7 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
         startCountdown();
       }catch(err){
         alert('❌ Не удалось получить доступ к микрофону: ' + (err?.message || err));
-        startCountdown(); // даже если микрофон не дали — даём пройти сценарий
+        startCountdown(); // продолжаем без записи, чтобы не блокировать сценарий
       }
     }
 
@@ -194,11 +209,11 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
     let lastAnnounce = 0;
 
     function startTask(){
-      taskContainer.style.display = 'block';
-      textBox.style.display       = 'block';
-      endBtn.style.display        = 'inline-block';
-      progressWrap.style.display  = 'block';
-      timerEl.style.display       = 'none';
+      instructionBox.style.display = 'block';
+      textBox.style.display        = 'block';
+      endBtn.style.display         = 'inline-block';
+      progressWrap.style.display   = 'block';
+      timerEl.style.display        = 'none';
 
       audioChunks = [];
       try{ if (mediaRecorder && mediaRecorder.state !== 'recording') mediaRecorder.start(); }catch{}
@@ -251,14 +266,14 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
       try { if (mediaRecorder?.state === 'recording') mediaRecorder.stop(); } catch {}
       try { streamRef?.getTracks()?.forEach(t => t.stop()); } catch {}
 
-      timerEl.style.display       = 'block';
-      timerEl.textContent         = '3';
-      taskContainer.style.display = 'none';
-      textBox.style.display       = 'none';
-      endBtn.style.display        = 'none';
-      progressWrap.style.display  = 'none';
-      progressBar.style.width     = '100%';
-      progressTime.textContent    = fmtTime(TOTAL_MS);
+      timerEl.style.display        = 'block';
+      timerEl.textContent          = '3';
+      instructionBox.style.display = 'none';
+      textBox.style.display        = 'none';
+      endBtn.style.display         = 'none';
+      progressWrap.style.display   = 'none';
+      progressBar.style.width      = '100%';
+      progressTime.textContent     = fmtTime(TOTAL_MS);
 
       audioChunks = [];
       hasStopped  = false;

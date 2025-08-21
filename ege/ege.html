@@ -36,7 +36,7 @@
     }
 
     .wrap{max-width:1040px; margin:0 auto; padding:24px; flex:1; display:flex; flex-direction:column}
-    header{display:flex; justify-content:space-between; align-items:center; gap:16px; padding:8px 0}
+    header[role="banner"]{display:flex; justify-content:space-between; align-items:center; gap:16px; padding:8px 0}
     .brand{display:flex; align-items:center; gap:12px; text-decoration:none}
     .logo{
       width:42px; height:42px; border-radius:12px;
@@ -50,7 +50,11 @@
     .theme-toggle:active{transform:scale(.98)}
     .theme-toggle:focus-visible{box-shadow:0 0 0 4px var(--ring); outline:none}
 
-    main{flex:1; display:flex; justify-content:center; align-items:center}
+    /* Кнопка "Назад на главную" как в ege_menu */
+    .back{border:1px dashed #ffffff28; padding:10px 14px; border-radius:10px; text-decoration:none}
+    .back:focus-visible{ box-shadow:0 0 0 4px var(--ring); outline:none }
+
+    main[role="main"]{flex:1; display:flex; justify-content:center; align-items:center}
     .card{background:var(--card); border:1px solid #ffffff1f; border-radius:20px; padding:40px; box-shadow:var(--shadow); backdrop-filter: blur(10px); text-align:center; max-width:500px; width:100%}
     h1{font-size:clamp(26px,5vw,36px); margin-bottom:32px}
     .btn{
@@ -67,15 +71,12 @@
 
     footer{padding:20px 0 10px; color:var(--muted); font-size:13px; text-align:center}
 
-    /* Уважение prefers-reduced-motion для будущих анимаций */
-    @media (prefers-reduced-motion: reduce) {
-      * { scroll-behavior: auto; }
-    }
+    @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto; } }
   </style>
 </head>
 <body>
   <div class="wrap">
-    <header>
+    <header role="banner">
       <a class="brand" href="../index.html" aria-label="На главную">
         <div class="logo">A</div>
         <div>
@@ -83,12 +84,16 @@
           <div class="badge">ЕГЭ по английскому</div>
         </div>
       </a>
-      <button class="theme-toggle" id="themeBtn" aria-label="Переключить тему">🌓 Тема</button>
+      <div style="display:flex; gap:10px; align-items:center">
+        <a class="back" href="../index.html" aria-label="Вернуться на главную">← На главную</a>
+        <button class="theme-toggle" id="themeBtn" aria-label="Переключить тему">🌓 Тема</button>
+      </div>
     </header>
 
-    <main>
-      <div class="card">
-        <h1>📝 Выберите формат тренировки</h1>
+    <main role="main">
+      <div class="card" role="region" aria-labelledby="title" aria-describedby="subtitle">
+        <h1 id="title">📝 Выберите формат тренировки</h1>
+        <p id="subtitle" class="visually-hidden">Выберите экзамен полностью или тренировку по заданиям.</p>
         <nav aria-label="Выбор режима">
           <a href="ege_full.html" class="btn">Экзамен полностью</a>
           <a href="ege_menu.html" class="btn">По заданиям</a>
@@ -106,18 +111,28 @@
     // Тема
     toggleThemeInit();
 
-    // Переходы: логотип и кнопки
-    document.querySelectorAll('.brand').forEach(a=>{
+    // Переходы: логотип + "На главную"
+    document.querySelectorAll('.brand, .back').forEach(a=>{
       const url = a.getAttribute('href') || '../index.html';
       a.addEventListener('click', (e)=>{ e.preventDefault(); navigateOnce(url); });
     });
+
+    // Кнопки режима
     document.querySelectorAll('.card .btn').forEach(a=>{
       const url = a.getAttribute('href');
       a.addEventListener('click', (e)=>{ e.preventDefault(); navigateOnce(url); });
     });
 
-    // BFCache: снимаем «замок» при возврате
+    // BFCache: снимаем «замок»
     window.addEventListener('pageshow', ()=>{ navigateOnce.lock = false; });
   </script>
+
+  <!-- helper для скрытого описания -->
+  <style>
+    .visually-hidden{
+      position:absolute !important; width:1px; height:1px; padding:0; margin:-1px;
+      overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0;
+    }
+  </style>
 </body>
 </html>

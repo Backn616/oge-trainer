@@ -5,12 +5,12 @@
   <title>Task 1 — Reading</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- Шрифт как в Prepare -->
+  <!-- Шрифт -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
-  <!-- Общие стили -->
+  <!-- Общие стили проекта (ширина 2500px, рамки, фон и пр.) -->
   <link rel="stylesheet" href="../../../style_common.css" />
 
   <!-- Анти-мигание темы -->
@@ -24,67 +24,13 @@
   </script>
 
   <style>
-    :root{
-      --bg:#f7f9ff; --text:#0b1020; --muted:#5a6475; --card:#ffffff;
-      --primary:#2b6cff; --primary-600:#1f58d9; --shadow:0 10px 25px rgba(17,24,39,.08);
-      --panel-bg:#f9f9f9; --panel-border:#0077cc;
-    }
-    .dark{
-      --bg:#0b1020; --text:#eaf0ff; --muted:#b9c2d3; --card:rgba(255,255,255,.08);
-      --primary:#6aa3ff; --primary-600:#4b8dff; --shadow:0 10px 35px rgba(0,0,0,.35);
-      --panel-bg:rgba(255,255,255,.08); --panel-border:#4b8dff;
-    }
-
-    /* фон как в Prepare */
-    body{
-      font-family: Inter, system-ui, Segoe UI, Roboto, Arial, sans-serif;
-      color:var(--text);
-      background:
-        radial-gradient(1200px 600px at 70% -10%, #29417a40, transparent),
-        radial-gradient(900px 500px at -10% 10%, #344b9340, transparent),
-        var(--bg);
-    }
-    .content-wrapper{ padding:40px 20px 0; }
-
-    /* ИНСТРУКЦИЯ — ВНЕШНЕ КАК В PREPARE */
-    .instruction-box{
-      max-width:3000px; width:95%;
-      margin:0 auto 30px;
-      font-size:22px; line-height:1.6; text-align:left;
-      border:2px solid var(--panel-border);
-      padding:25px; border-radius:12px;
-      background:var(--panel-bg);
-      box-shadow:var(--shadow);
-    }
-
-    /* ТЕКСТ — как в Prepare (без pre-line, текст сразу после <div>) */
-    .reading-box{
-      max-width:3000px; width:95%; margin:0 auto 30px;
-      background:var(--card); border:1px solid #ccc; border-radius:12px; box-shadow:var(--shadow);
-      padding:40px; text-align:left;
-      font-size:32px; line-height:1.9;
-    }
-    @media (max-width:900px){ .reading-box{ font-size:28px; } }
-
-    /* Отсчёт 3‑2‑1 */
+    /* Только то, чего нет в style_common: таймер и мелочи */
     .timer{
       font-size:70px; margin:30px 0; font-weight:700; color:var(--primary);
       letter-spacing:4px; text-shadow:0 4px 12px rgba(0,0,0,.25);
       transition:transform .25s ease; will-change:transform; text-align:center;
     }
     @media (prefers-reduced-motion: reduce){ .timer{ transition:none; } }
-
-    /* Фиксированный прогресс-бар */
-    #progressContainerFixed{
-      position:fixed; bottom:0; left:0; width:100%; height:32px; background:#eee; z-index:9999;
-    }
-    .dark #progressContainerFixed{ background:#222; }
-    #progressBarFixed{ height:100%; width:0%; background:linear-gradient(to right, #0066ff, #00cfff); position:relative; }
-    #progressBarFixed.rAF{ transition:none; }
-    .progress-time{
-      position:absolute; right:14px; top:50%; transform:translateY(-50%);
-      color:#fff; font-weight:700; font-size:20px; user-select:none; text-shadow:0 1px 2px rgba(0,0,0,.35);
-    }
   </style>
 </head>
 <body>
@@ -92,17 +38,15 @@
   <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
 
   <div class="content-wrapper">
-  <!-- Инструкция: СКРЫТА до конца отсчёта, оформлена КАК В PREPARE -->
-  <div class="instruction-box" id="instructionBox" style="display:none">
-    <p><strong>Task 1.</strong> Imagine that you are preparing a project with your friend.
-      You have found some interesting material for the presentation and you want to read this text to your friend.
-      You have 1.5 minutes to read the text silently, then be ready to read it out loud.
-      You will not have more than 1.5 minutes to read it.  
-      You will read the text aloud for not more than 1.5 minutes.
-    </p>
-  </div>
-</div>
-
+    <!-- Инструкция: СКРЫТА до конца отсчёта, оформлена КАК В PREPARE -->
+    <div class="instruction-box" id="instructionBox" style="display:none">
+      <p><strong>Task 1.</strong> Imagine that you are preparing a project with your friend.
+        You have found some interesting material for the presentation and you want to read this text to your friend.
+        You have 1.5 minutes to read the text silently, then be ready to read it out loud.
+        You will not have more than 1.5 minutes to read it.
+        You will read the text aloud for not more than 1.5 minutes.
+      </p>
+    </div>
 
     <!-- Отсчёт -->
     <div id="timer" class="timer" aria-live="polite">3</div>
@@ -121,10 +65,10 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
     </div>
   </div>
 
-  <!-- Хвост над фикс-баром -->
+  <!-- Проставка над фикс‑баром -->
   <div style="height: calc(var(--footer-h) + 24px);"></div>
 
-  <!-- Фиксированный прогресс-бар -->
+  <!-- Фиксированный прогресс‑бар -->
   <div id="progressContainerFixed" role="timer" aria-live="polite" aria-atomic="true" aria-label="Оставшееся время ответа" style="display:none">
     <div id="progressBarFixed">
       <span id="progressTime" class="progress-time">01:30</span>
@@ -133,8 +77,11 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
 
   <script type="module">
     import { toggleThemeInit, navigateOnce, fmtTime } from '../../../common.js';
+
+    // Тема
     toggleThemeInit();
 
+    // DOM
     const timerEl        = document.getElementById('timer');
     const instructionBox = document.getElementById('instructionBox');
     const textBox        = document.getElementById('textBox');
@@ -143,6 +90,7 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
     const progressBar    = document.getElementById('progressBarFixed');
     const progressTime   = document.getElementById('progressTime');
 
+    // Навигация → result
     const RESULT_URL = location.pathname.replace(/_3_task\.html$/i, '_4_result.html');
 
     // ===== Микрофон и запись =====
@@ -221,7 +169,7 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
     let lastAnnounce = 0;
 
     function startTask(){
-      instructionBox.style.display = 'block';  // показать инструкцию (как в Prepare по виду)
+      instructionBox.style.display = 'block';
       textBox.style.display        = 'block';
       endBtn.style.display         = 'inline-block';
       progressWrap.style.display   = 'block';

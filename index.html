@@ -5,8 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Тренажёр Говорения ОГЭ/ЕГЭ — демо</title>
   <meta name="description" content="Онлайн-тренажёр устной части ОГЭ и ЕГЭ по английскому: таймер, подсказки, запись голоса, задания ФИПИ." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <!-- Анти-мигание темы -->
+  <script>
+    (function(){
+      try{
+        const saved = localStorage.getItem('pref-theme') || 'light';
+        if (saved === 'dark') document.documentElement.classList.add('dark');
+      }catch(_){}
+    })();
+  </script>
+
   <style>
     /* Светлая тема по умолчанию */
     :root {
@@ -39,9 +52,10 @@
     body{
       margin:0; font-family:Inter, system-ui, Segoe UI, Roboto, Arial, sans-serif;
       color:var(--text); 
-      background: radial-gradient(1200px 600px at 70% -10%, #29417a40, transparent),
-                  radial-gradient(900px 500px at -10% 10%, #344b9340, transparent),
-                  var(--bg);
+      background:
+        radial-gradient(1200px 600px at 70% -10%, #29417a40, transparent),
+        radial-gradient(900px 500px at -10% 10%, #344b9340, transparent),
+        var(--bg);
     }
     a{color:inherit}
     .wrap{max-width:1040px; margin:0 auto; padding:24px}
@@ -98,6 +112,11 @@
       100% { transform: scale(1); }
     }
 
+    /* Уважение prefers-reduced-motion */
+    @media (prefers-reduced-motion: reduce) {
+      .btn { animation: none !important; }
+    }
+
     .note{
       margin-top:16px; font-size:13px; color:var(--muted)
     }
@@ -115,7 +134,7 @@
 <body>
   <div class="wrap">
     <header>
-      <a class="brand" href="#">
+      <a class="brand" href="#" aria-label="На главную">
         <div class="logo">A</div>
         <div>
           <div class="brand-title">Онлайн-тренажёр «Говорение»</div>
@@ -131,12 +150,8 @@
           <h1 class="h1">Подготовь устную часть <span style="white-space:nowrap">ОГЭ и ЕГЭ</span> уверенно</h1>
           <p class="sub">Тренируй ответы с таймером, мини-подсказками и записью голоса. Основано на демо-материалах ФИПИ.</p>
           <div class="cta">
-            <a href="oge/oge.html" class="btn btn-primary" aria-label="Перейти к тренажёру ОГЭ">
-              🎒 Перейти к ОГЭ
-            </a>
-            <a href="ege/ege.html" class="btn btn-primary" aria-label="Перейти к тренажёру ЕГЭ">
-              🎓 Перейти к ЕГЭ
-            </a>
+            <a href="oge/oge.html" class="btn btn-primary" aria-label="Перейти к тренажёру ОГЭ">🎒 Перейти к ОГЭ</a>
+            <a href="ege/ege.html" class="btn btn-primary" aria-label="Перейти к тренажёру ЕГЭ">🎓 Перейти к ЕГЭ</a>
           </div>
         </div>
 
@@ -179,29 +194,27 @@
     </footer>
   </div>
 
-  <script>
-    (function(){
-      const btn = document.getElementById('themeBtn');
-      const key = 'pref-theme';
-      const html = document.documentElement;
+  <!-- Общий модуль в корне -->
+  <script type="module">
+    import { toggleThemeInit, navigateOnce } from './common.js';
 
-      const apply = (mode) => {
-        if(mode === 'dark'){
-          html.classList.add('dark');
-        } else {
-          html.classList.remove('dark');
-        }
-        localStorage.setItem(key, mode);
-      };
+    // Тема
+    toggleThemeInit();
 
-      const saved = localStorage.getItem(key) || 'light';
-      apply(saved);
-
-      btn.addEventListener('click', () => {
-        const curr = localStorage.getItem(key) || 'light';
-        apply(curr === 'dark' ? 'light' : 'dark');
+    // Переходы: кнопки
+    document.querySelectorAll('.cta .btn').forEach(a=>{
+      const url = a.getAttribute('href');
+      a.addEventListener('click', (e)=>{
+        e.preventDefault();
+        navigateOnce(url);
       });
-    })();
+    });
+
+    // Логотип — остаёмся на этой же странице
+    document.querySelector('.brand')?.addEventListener('click', (e)=> e.preventDefault());
+
+    // BFCache: снять «замок»
+    window.addEventListener('pageshow', ()=>{ navigateOnce.lock = false; });
   </script>
 </body>
 </html>

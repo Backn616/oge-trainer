@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <title>Подготовка — Задание 1</title>
+  <title>Task 1 — Preparation</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <!-- Шрифт -->
@@ -34,7 +34,7 @@
       text-align: left;
       font-size: 28px;
       line-height: 1.8;
-      white-space: pre-line; /* сохраняет переносы строк */
+      white-space: pre-line; /* отображаем пустые строки как абзацы */
     }
     @media (max-width:900px){
       .reading-box{ font-size: 24px; }
@@ -46,14 +46,16 @@
   <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
 
   <div class="content-wrapper">
-    <div class="task-container">
-      <b>Task 1. Imagine that you are preparing a project with your friend.</b>
+    <!-- Карточка с инструкцией (как в 4-м) -->
+    <div class="task-container" aria-labelledby="taskTitle" aria-describedby="inst">
+      <b id="taskTitle">Task 1. Imagine that you are preparing a project with your friend.</b>
       You have found some interesting material for the presentation and you want to read this text to your friend.
       You have 1.5 minutes to read the text silently, then be ready to read it out loud.
-      <div class="instruction">You will read the text aloud for not more than 1.5 minutes.</div>
+      <div class="instruction" id="inst">You will read the text aloud for not more than 1.5 minutes.</div>
     </div>
 
-    <div class="reading-box">
+    <!-- Текст для чтения — без p/br, абзацы пустой строкой -->
+    <div class="reading-box" id="readingBox">
 Bioluminescence is the ability of certain living organisms to produce light. This fascinating phenomenon can be observed in various species of deep-sea fish, jellyfish, fireflies, and even some fungi.
 
 The light is usually blue or green, which travels best through water. These organisms use light for different reasons. Some attract mates or prey, while others use it to confuse predators. For example, the anglerfish has a glowing lure to draw in its victims in the dark ocean depths.
@@ -63,25 +65,91 @@ Scientists believe that studying bioluminescence can help develop new medical an
 Bioluminescence is not only beautiful — it is a powerful tool of survival and discovery. These glowing creatures remind us how much we still have to learn about the natural world. Their light, shining in the darkness, is both mysterious and meaningful.
     </div>
 
-    <!-- Кнопка "Далее" -->
-    <button class="button" id="nextBtn" aria-label="Перейти к записи">➡️ Начать запись</button>
+    <!-- Кнопка "Перейти к выполнению" -->
+    <div style="text-align:center; margin-bottom:30px;">
+      <button id="goBtn" class="button" type="button" aria-label="Перейти к выполнению">Перейти к выполнению</button>
+    </div>
   </div>
 
-  <script type="module">
-    import { toggleThemeInit, navigateOnce } from '../../../common.js';
+  <!-- Проставка над фикс-баром (как в 4-м), чтобы фон «уходил вниз» -->
+  <div style="height: calc(var(--footer-h) + 24px);"></div>
 
+  <!-- Фиксированный прогресс-бар снизу (как в 4-м) -->
+  <div id="progressContainerFixed" role="timer" aria-live="polite" aria-atomic="true" aria-label="Оставшееся время подготовки">
+    <div id="progressBarFixed">
+      <span id="progressTime" class="progress-time">01:30</span>
+    </div>
+  </div>
+
+  <!-- Логика страницы -->
+  <script type="module">
+    import { toggleThemeInit, navigateOnce, startPrepareTimer, fmtTime } from "../../../common.js";
+
+    // Тема
     toggleThemeInit();
 
-    const NEXT_URL = location.pathname.replace(/_1_prepare\.html$/i, '_2_mic.html');
-    const nextBtn  = document.getElementById('nextBtn');
+    // Следующий шаг (mic)
+    const NEXT_URL = /_1_prepare\.html$/i.test(location.pathname)
+      ? location.pathname.replace(/_1_prepare\.html$/i, '_2_mic.html')
+      : location.pathname.replace(/\.html$/i, '_2_mic.html');
 
-    // sessionStorage мета
-    sessionStorage.setItem('ege1_meta', JSON.stringify({
-      preparedAt: Date.now(),
-      prepareDurationSec: 90
-    }));
+    // Кнопка перехода
+    document.getElementById('goBtn')?.addEventListener('click', () => navigateOnce(NEXT_URL));
 
-    nextBtn.addEventListener('click', ()=> navigateOnce(NEXT_URL));
+    // Метаданные (как в эталоне, но для ege1)
+    try {
+      sessionStorage.removeItem('ege1_audio_base64');
+      sessionStorage.removeItem('ege1_audio_mime');
+      sessionStorage.setItem('ege1_prepared', '1');
+      sessionStorage.setItem('ege1_meta', JSON.stringify({
+        preparedAt: Date.now(),
+        prepareDurationSec: 90
+      }));
+    } catch {}
+
+    // === Таймер подготовки 1:30 через унифицированный rAF-таймер ===
+    const TOTAL_MS = 90_000;
+    const barEl  = document.getElementById('progressBarFixed');
+    const timeEl = document.getElementById('progressTime');
+    barEl.classList.add('rAF'); // отключаем CSS-инерцию ширины, работаем на rAF
+
+    let stopTimer = null;
+
+    function startTimerFresh(){
+      timeEl.textContent = fmtTime(TOTAL_MS);
+      barEl.style.width  = '100%';
+
+      // если раньше запускали — остановим
+      try { stopTimer && stopTimer(); } catch {}
+
+      // запуск как в 4-м
+      stopTimer = startPrepareTimer({
+        barEl,
+        timeEl,
+        totalMs: TOTAL_MS,
+        nextUrl: NEXT_URL,
+        key: 'ege1_prepare_end',
+        persist: false,
+        textEveryMs: 250,
+        useRAF: true
+      });
+    }
+
+    startTimerFresh();
+
+    // Перезапуск при возврате из BFCache (как в 4-м)
+    function isBackForwardNav(){
+      try {
+        const nav = performance.getEntriesByType('navigation')[0];
+        return nav && nav.type === 'back_forward';
+      } catch { return false; }
+    }
+    window.addEventListener('pageshow', (e) => {
+      try { navigateOnce.lock = false; } catch {}
+      if (e.persisted || isBackForwardNav()) {
+        startTimerFresh();
+      }
+    });
   </script>
 </body>
 </html>

@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>ЕГЭ — Выбор задания</title>
   <meta name="description" content="Меню тренажёра устной части ЕГЭ по английскому: задания 1–4, таймер, запись голоса." />
+
+  <!-- Шрифты + preconnect -->
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
@@ -60,6 +62,7 @@
       padding:10px 14px; border-radius:10px; cursor:pointer; transition: transform .08s ease;
     }
     .theme-toggle:active{transform: scale(.98)}
+    .theme-toggle:focus-visible{ box-shadow:0 0 0 4px var(--ring); outline:none }
 
     main{padding:40px 0 24px}
     .card{background:var(--card); border:1px solid #ffffff1f; border-radius:22px; padding:36px; box-shadow:var(--shadow); backdrop-filter: blur(10px)}
@@ -67,8 +70,10 @@
     .sub{color:var(--muted); font-size:16px; margin:0 0 20px}
 
     .button-frame{
-      --btn-scale: 1.35; border: 1px solid #ffffff22; border-radius: 20px;
-      padding: calc(18px * var(--btn-scale)); background: #ffffff06; backdrop-filter: blur(6px); margin-top: 12px;
+      --btn-scale: 1.35;
+      border: 1px solid #ffffff22; border-radius: 20px;
+      padding: calc(18px * var(--btn-scale));
+      background: #ffffff06; backdrop-filter: blur(6px); margin-top: 12px;
     }
     .grid{ display:grid; grid-template-columns: repeat(2, minmax(260px,1fr)); gap: calc(var(--grid-gap) * var(--btn-scale)); }
     @media (max-width:700px){ .grid{grid-template-columns:1fr} .button-frame{ --btn-scale: 1.22 } }
@@ -91,8 +96,6 @@
 
     footer{padding:26px 0 10px; color:var(--muted); font-size:13px; text-align:center}
     .back{border:1px dashed #ffffff28; padding:10px 14px; border-radius:10px}
-
-    .theme-toggle:focus-visible{ box-shadow:0 0 0 4px var(--ring); outline:none }
     .back:focus-visible{ box-shadow:0 0 0 4px var(--ring); outline:none }
   </style>
 </head>
@@ -130,25 +133,31 @@
       </section>
     </main>
 
-    <footer><div>© 2025 — Демо-версия тренажёра ЕГЭ.</div></footer>
+    <footer>
+      <div>© 2025 — Демо-версия тренажёра ЕГЭ.</div>
+    </footer>
   </div>
 
   <!-- ЕДИНЫЕ обработчики из /ege/common.js -->
   <script type="module">
     import { toggleThemeInit, navigateOnce } from './common.js';
 
+    // Тема
     toggleThemeInit();
 
+    // «На главную» — через navigateOnce
     document.querySelectorAll('.brand, .back').forEach(a=>{
       const url = a.getAttribute('href') || '../index.html';
       a.addEventListener('click', (e)=>{ e.preventDefault(); navigateOnce(url); });
     });
 
+    // Переходы к заданиям — тоже через navigateOnce
     document.querySelectorAll('nav.grid .btn').forEach(a=>{
       const url = a.getAttribute('href');
       a.addEventListener('click', (e)=>{ e.preventDefault(); navigateOnce(url); });
     });
 
+    // BFCache: снимаем «замок» при возврате
     window.addEventListener('pageshow', ()=>{ navigateOnce.lock = false; });
   </script>
 </body>

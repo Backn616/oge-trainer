@@ -12,7 +12,6 @@
 
   <!-- Общие стили -->
   <link rel="stylesheet" href="../../../style_common.css" />
-  <!-- ^ путь проверен: три уровня вверх до папки ege/style_common.css -->
 
   <!-- Анти-мигание темы -->
   <script>
@@ -116,8 +115,7 @@
   </div>
 
   <script type="module">
-    import { toggleThemeInit } from '../../../common.js';
-    // ^ путь проверен: три уровня вверх до ege/common.js
+    import { toggleThemeInit, navigateOnce } from '../../../common.js';
 
     toggleThemeInit();
 
@@ -135,24 +133,23 @@
     }
     const base = getEgeBase();
 
-    // ожидаем: /ege/task4/variants/variantN/ege4_varN_4_result.html
-    const toVariants = document.getElementById('toVariants');
-    const toTaskMenu = document.getElementById('toTaskMenu');
-    const toModeMenu = document.getElementById('toModeMenu');
-
-    if (toVariants) toVariants.href = path.replace(/\/variants\/variant\d+\/[^/]+$/i, `/variants/ege4.html`);
-    if (toTaskMenu) toTaskMenu.href = `${base}ege.html`;
-    if (toModeMenu) toModeMenu.href = `${base}ege_menu.html`;
+    if (document.getElementById('toVariants')) {
+      document.getElementById('toVariants').href =
+        path.replace(/\/variants\/variant\d+\/[^/]+$/i, `/variants/ege4.html`);
+    }
+    if (document.getElementById('toTaskMenu')) {
+      document.getElementById('toTaskMenu').href = `${base}ege.html`;
+    }
+    if (document.getElementById('toModeMenu')) {
+      document.getElementById('toModeMenu').href = `${base}ege_menu.html`;
+    }
 
     // --- Полная очистка состояния задания 4 (чтобы новый заход был «с нуля») ---
     function clearTask4State(){
       try{
-        // Удаляем все ключи, начинающиеся на ege4_
-        const keys = Object.keys(sessionStorage);
-        keys.forEach(k => {
+        Object.keys(sessionStorage).forEach(k => {
           if (k.startsWith('ege4_')) sessionStorage.removeItem(k);
         });
-        // На всякий случай: подчищаем возможные перс-ключи prepare по варианту
         if (varNum && /^\d+$/.test(varNum)) {
           sessionStorage.removeItem(`ege4_var${varNum}_prepare_endtime`);
         }
@@ -161,7 +158,7 @@
 
     function clearAndGo(url){
       clearTask4State();
-      location.href = url;
+      navigateOnce(url);
     }
 
     // «Повторить этот вариант» → на _1_prepare с обнулением
@@ -175,7 +172,7 @@
       });
     }
 
-    // Остальные «перейти к ...» — тоже с обнулением
+    // Остальные «перейти к ...» — тоже с navigateOnce
     document.querySelectorAll('.nav-btn').forEach(a=>{
       a.addEventListener('click', (e)=>{
         e.preventDefault();

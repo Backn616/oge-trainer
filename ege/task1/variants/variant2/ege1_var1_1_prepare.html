@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Task 1 — Preparation</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Шрифт Inter под конкретную страницу (общий css не трогаем) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <!-- Общие стили проекта (эталонные) -->
+  <link rel="stylesheet" href="../../../style_common.css" />
+
+  <!-- Анти-мигание темы -->
+  <script>
+    (function(){
+      try{
+        const saved = localStorage.getItem('pref-theme') || 'light';
+        if (saved === 'dark') document.documentElement.classList.add('dark');
+      }catch(_){}
+    })();
+  </script>
+
+  <style>
+    /* Локальная рамка для текста чтения (не конфликтует с эталоном) */
+    .reading-box{
+      background:var(--card);
+      border:1px solid #ccc;
+      border-radius:12px;
+      box-shadow:var(--shadow);
+      padding:40px;
+      text-align:left;
+      font-family: Inter, system-ui, Segoe UI, Roboto, Arial, sans-serif;
+      font-size:32px;
+      line-height:1.9;
+      margin-bottom:30px;
+    }
+    @media (max-width:900px){
+      .reading-box{ font-size:28px; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Тумблер темы (уже оформлен в style_common.css) -->
+  <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
+
+  <div class="content-wrapper">
+    <!-- Инструкция — используем общий .task-container -->
+    <div class="task-container" role="region" aria-labelledby="taskTitle">
+      <p id="taskTitle" style="margin-top:0;">
+        <strong>Task 1.</strong> Imagine that you are preparing a project with your friend.
+        You have found some interesting material for the presentation and you want to read this text to your friend.
+        You have <strong>1.5 minutes</strong> to read the text silently, then be ready to read it out loud.
+        You will not have more than <strong>1.5 minutes</strong> to read it.
+      </p>
+    </div>
+
+    <!-- Текст для чтения: БЕЗ <p>/<br>, текст сразу после <div> -->
+    <div class="reading-box" id="readingBox">Sherlock Holmes is a famous fictional character from British literature. He was created by Sir Arthur Conan Doyle. Holmes is a private detective who lives in London. Many people know him because of his great mind and amazing logical thinking. He solves difficult crimes that others cannot.
+
+In the stories, Holmes is usually described as tall and thin. He often wears a hat and smokes a pipe. He is very intelligent and notices the smallest details. He doesn’t talk much and prefers to work alone or with his friend Dr Watson. Holmes likes music and sometimes plays the violin.
+
+Although Holmes is not a real person, he has become a symbol of clever thinking and observation. People all over the world read stories about him and watch films and series. Many believe that Sherlock Holmes is the best detective character ever created.</div>
+
+    <div style="text-align:center; margin-bottom:30px;">
+      <button id="goBtn" class="button" type="button" aria-label="Перейти к выполнению">Перейти к выполнению</button>
+    </div>
+  </div>
+
+  <!-- Проставка над фикс‑баром (см. --footer-h в style_common.css) -->
+  <div style="height: calc(var(--footer-h) + 24px);"></div>
+
+  <!-- Фиксированный прогресс‑бар (оформление в style_common.css) -->
+  <div id="progressContainerFixed" role="timer" aria-live="polite" aria-atomic="true" aria-label="Оставшееся время подготовки">
+    <div id="progressBarFixed" class="rAF">
+      <span id="progressTime" class="progress-time">01:30</span>
+    </div>
+  </div>
+
+  <!-- Логика страницы -->
+  <script type="module">
+    import { toggleThemeInit, navigateOnce, startPrepareTimer, fmtTime } from "../../../common.js";
+
+    // Тема
+    toggleThemeInit();
+
+    // Следующий шаг (mic) — подставляем номер варианта из имени файла
+    const NEXT_URL = location.pathname.replace(/_1_prepare\.html$/i, '_2_mic.html');
+
+    // Кнопка перехода
+    document.getElementById('goBtn')?.addEventListener('click', () => navigateOnce(NEXT_URL));
+
+    // Метаданные + очистка прошлой записи
+    try{
+      sessionStorage.removeItem('ege1_audio_base64');
+      sessionStorage.removeItem('ege1_audio_mime');
+      sessionStorage.setItem('ege1_prepared', '1');
+      sessionStorage.setItem('ege1_meta', JSON.stringify({
+        preparedAt: Date.now(),
+        prepareDurationSec: 90
+      }));
+    }catch{}
+
+    // Таймер 1:30 на rAF (визуал берём из style_common.css)
+    const TOTAL_MS = 90_000;
+    const barEl  = document.getElementById('progressBarFixed');
+    const timeEl = document.getElementById('progressTime');
+
+    // Старт/рестарт
+    let stopTimer = null;
+    function startTimerFresh(){
+      timeEl.textContent = fmtTime(TOTAL_MS);
+      barEl.style.width  = '100%';
+      try { stopTimer?.(); } catch {}
+      stopTimer = startPrepareTimer({
+        barEl,
+        timeEl,
+        totalMs: TOTAL_MS,
+        nextUrl: NEXT_URL,
+        key: 'ege1_prepare_end',
+        persist: false,
+        textEveryMs: 250,
+        useRAF: true
+      });
+    }
+    startTimerFresh();
+
+    // BFCache: возврат со следующего шага → перезапуск таймера
+    function isBackForwardNav(){
+      try{
+        const nav = performance.getEntriesByType('navigation')[0];
+        return nav && nav.type === 'back_forward';
+      }catch{ return false; }
+    }
+    window.addEventListener('pageshow', (e)=>{
+      try { navigateOnce.lock = false; } catch {}
+      if (e.persisted || isBackForwardNav()) startTimerFresh();
+    });
+  </script>
+</body>
+</html>

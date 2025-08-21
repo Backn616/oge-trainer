@@ -2,10 +2,10 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <title>Task 1 — Preparation</title>
+  <title>Подготовка — Задание 1</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- Шрифт: ускорение загрузки (как в Task 4) -->
+  <!-- Шрифт -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
@@ -23,22 +23,22 @@
     })();
   </script>
 
-  <!-- Небольшой локальный оверрайд для блока текста чтения -->
   <style>
     .reading-box{
-  background:var(--card);
-  border-left:5px solid var(--primary);
-  padding:40px;
-  margin-bottom:30px;
-  box-shadow:var(--shadow);
-  border-radius:12px;
-  text-align:left;
-  font-size:28px;
-  line-height:1.8;
-}
-@media (max-width:900px){
-  .reading-box{ font-size:24px; }
-}
+      background: var(--card);
+      border-left: 5px solid var(--primary);
+      padding: 40px;
+      margin-bottom: 30px;
+      box-shadow: var(--shadow);
+      border-radius: 12px;
+      text-align: left;
+      font-size: 28px;
+      line-height: 1.8;
+      white-space: pre-line; /* сохраняет переносы строк */
+    }
+    @media (max-width:900px){
+      .reading-box{ font-size: 24px; }
+    }
   </style>
 </head>
 <body>
@@ -46,101 +46,42 @@
   <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
 
   <div class="content-wrapper">
-    <!-- Инструкция (карточка как в Task 4) -->
-    <div class="task-container" aria-labelledby="taskTitle" aria-describedby="inst">
-      <b id="taskTitle">Task 1.</b>
-      Imagine that you are preparing a project with your friend. You have found some interesting material for the presentation and you want to read this text to your friend. You have <strong>1.5 minutes</strong> to read the text silently, then be ready to read it out loud. You will not have more than <strong>1.5 minutes</strong> to read it.
-      <div class="instruction" id="inst">
-        Be ready to read the text aloud after preparation.
-      </div>
+    <div class="task-container">
+      <b>Task 1. Imagine that you are preparing a project with your friend.</b>
+      You have found some interesting material for the presentation and you want to read this text to your friend.
+      You have 1.5 minutes to read the text silently, then be ready to read it out loud.
+      <div class="instruction">You will read the text aloud for not more than 1.5 minutes.</div>
     </div>
 
-    <!-- Текст для чтения -->
     <div class="reading-box">
-      Bioluminescence is the ability of certain living organisms to produce light. This fascinating phenomenon can be observed in various species of deep-sea fish, jellyfish, fireflies, and even some fungi.
-      The light is usually blue or green, which travels best through water. These organisms use light for different reasons. Some attract mates or prey, while others use it to confuse predators. For example, the anglerfish has a glowing lure to draw in its victims in the dark ocean depths.
-    
-      Scientists believe that studying bioluminescence can help develop new medical and technological solutions. Special proteins from glowing jellyfish are already used in genetic research. These discoveries support innovation in areas like disease detection and cell tracking.
-    
-      Bioluminescence is not only beautiful — it is a powerful tool of survival and discovery. These glowing creatures remind us how much we still have to learn about the natural world. Their light, shining in the darkness, is both mysterious and meaningful.
+Bioluminescence is the ability of certain living organisms to produce light. This fascinating phenomenon can be observed in various species of deep-sea fish, jellyfish, fireflies, and even some fungi.
+
+The light is usually blue or green, which travels best through water. These organisms use light for different reasons. Some attract mates or prey, while others use it to confuse predators. For example, the anglerfish has a glowing lure to draw in its victims in the dark ocean depths.
+
+Scientists believe that studying bioluminescence can help develop new medical and technological solutions. Special proteins from glowing jellyfish are already used in genetic research. These discoveries support innovation in areas like disease detection and cell tracking.
+
+Bioluminescence is not only beautiful — it is a powerful tool of survival and discovery. These glowing creatures remind us how much we still have to learn about the natural world. Their light, shining in the darkness, is both mysterious and meaningful.
     </div>
 
-    <div style="text-align:center; margin-bottom:30px;">
-      <button id="goBtn" class="button" type="button" aria-label="Перейти к выполнению">
-        Перейти к выполнению
-      </button>
-    </div>
+    <!-- Кнопка "Далее" -->
+    <button class="button" id="nextBtn" aria-label="Перейти к записи">➡️ Начать запись</button>
   </div>
 
-  <!-- Фиксированный прогресс-бар снизу -->
-  <div id="progressContainerFixed" role="timer" aria-live="polite" aria-label="Оставшееся время подготовки">
-    <div id="progressBarFixed">
-      <span id="progressTime" class="progress-time">01:30</span>
-    </div>
-  </div>
-
-  <!-- Логика страницы -->
   <script type="module">
-    import { toggleThemeInit, navigateOnce, startPrepareTimer, fmtTime } from "../../../common.js";
+    import { toggleThemeInit, navigateOnce } from '../../../common.js';
 
-    // === Тема ===
     toggleThemeInit();
 
-    // Маркеры и метаданные подготовки (как в Task 4, но для ege1)
-    try{
-      sessionStorage.removeItem('ege1_audio_base64');
-      sessionStorage.removeItem('ege1_audio_mime');
-      sessionStorage.setItem('ege1_prepared','1');
-      const meta = { preparedAt: Date.now(), prepareDurationSec: 90 };
-      sessionStorage.setItem('ege1_meta', JSON.stringify(meta));
-    }catch{}
+    const NEXT_URL = location.pathname.replace(/_1_prepare\.html$/i, '_2_mic.html');
+    const nextBtn  = document.getElementById('nextBtn');
 
-    // URL следующего шага (mic) — автоподстановка номера варианта
-    const NEXT_URL = /_1_prepare\.html$/i.test(location.pathname)
-      ? location.pathname.replace(/_1_prepare\.html$/i, '_2_mic.html')
-      : location.pathname.replace(/\.html$/i, '_2_mic.html');
+    // sessionStorage мета
+    sessionStorage.setItem('ege1_meta', JSON.stringify({
+      preparedAt: Date.now(),
+      prepareDurationSec: 90
+    }));
 
-    // Кнопка "Перейти"
-    document.getElementById('goBtn')?.addEventListener('click', () => {
-      navigateOnce(NEXT_URL);
-    });
-
-    // === Таймер 1:30 через унифицированный rAF-таймер ===
-    const TOTAL_MS = 90_000;
-    const barEl  = document.getElementById('progressBarFixed');
-    const timeEl = document.getElementById('progressTime');
-    barEl.classList.add('rAF'); // отключаем CSS-инерцию ширины на этой странице
-
-    function startTimerFresh(){
-      timeEl.textContent = fmtTime(TOTAL_MS);
-      barEl.style.width = '100%';
-
-      startPrepareTimer({
-        barEl,
-        timeEl,
-        totalMs: TOTAL_MS,
-        nextUrl: NEXT_URL,
-        key: 'ege1_prepare_end',
-        persist: false,
-        textEveryMs: 250,
-        useRAF: true
-      });
-    }
-    startTimerFresh();
-
-    // Перезапуск при возврате (BFCache)
-    function isBackForwardNav(){
-      try {
-        const nav = performance.getEntriesByType('navigation')[0];
-        return nav && nav.type === 'back_forward';
-      } catch { return false; }
-    }
-    window.addEventListener('pageshow', (e) => {
-      navigateOnce.lock = false;
-      if (e.persisted || isBackForwardNav()) {
-        startTimerFresh();
-      }
-    });
+    nextBtn.addEventListener('click', ()=> navigateOnce(NEXT_URL));
   </script>
 </body>
 </html>

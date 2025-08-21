@@ -5,12 +5,12 @@
   <title>Результат — Задание 1</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- Шрифт -->
+  <!-- Шрифт как в prepare/task -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
-  <!-- Общие стили -->
+  <!-- Общие стили проекта -->
   <link rel="stylesheet" href="../../../style_common.css" />
 
   <!-- Анти-мигание темы -->
@@ -24,11 +24,21 @@
   </script>
 
   <style>
-    .wrap{ max-width:1500px; margin:0 auto; }
+    /* Фон — как в «нравится» prepare */
+    body{
+      font-family: Inter, system-ui, Segoe UI, Roboto, Arial, sans-serif;
+      background:
+        radial-gradient(1200px 600px at 70% -10%, #29417a40, transparent),
+        radial-gradient(900px 500px at -10% 10%, #344b9340, transparent),
+        var(--bg);
+    }
+
+    .wrap{ max-width: 1600px; width: 95%; margin: 0 auto; padding-top: 24px; }
     h1{ color:var(--primary); font-size:36px; margin:12px 0 6px; text-align:center; }
-    .status{ font-size:22px; color:#1f7a2e; text-align:center; margin:10px 0 26px; }
+    .status{ font-size:20px; color:#1f7a2e; text-align:center; margin:6px 0 26px; }
     .dark .status{ color:#5ee397; }
-    audio{ margin:20px auto; width:min(900px, 95%); display:block; }
+
+    audio{ margin:20px auto; width:min(900px,95%); display:block; }
 
     .btn{
       display:inline-block; padding:16px 32px; margin:12px;
@@ -38,10 +48,10 @@
       box-shadow:0 10px 22px rgba(43,108,255,.3);
       transition: transform .06s ease, filter .2s ease, box-shadow .2s ease;
     }
-    .btn:hover{ transform: scale(1.05); filter: brightness(1.03); }
+    .btn:hover{ transform: translateY(-1px); filter: brightness(1.03); }
     .btn:disabled{ opacity:.6; cursor:not-allowed; transform:none; }
 
-    /* Широкие рамки — инструкция/текст */
+    /* Инструкция и текст — шире (3000px) и как в prepare */
     .task-container{
       max-width:3000px; width:95%; margin:0 auto 30px;
       background:var(--card);
@@ -52,24 +62,26 @@
     }
     .reading-box{
       max-width:3000px; width:95%; margin:0 auto 30px;
-      background:var(--card); border:1px solid #ccc; border-left:5px solid var(--primary);
-      padding:40px; border-radius:12px; box-shadow:var(--shadow);
-      text-align:left; font-size:32px; line-height:1.9;
+      font-size:32px; line-height:1.9; text-align:left;
+      border:1px solid #ccc; padding:40px; border-radius:12px;
+      background:var(--card); box-shadow:var(--shadow);
     }
-    @media (max-width:900px){
+    @media (max-width: 900px){
       .reading-box{ font-size:28px; }
     }
   </style>
 </head>
 <body>
+  <!-- Тумблер темы -->
   <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
 
   <div class="wrap">
-    <h1 id="h1">Результат сохранён — Вариант <span id="varNum">?</span></h1>
+    <h1 id="h1">Результат — Вариант <span id="varNum">?</span></h1>
     <div class="status" id="statusText" aria-live="polite">
-      ✅ Вы успешно завершили задание. Вы можете прослушать или скачать запись ниже.
+      ✅ Запись готова. Вы можете прослушать её ниже или сохранить файл.
     </div>
 
+    <!-- Плеер -->
     <audio id="audio" controls></audio>
 
     <div style="text-align:center;">
@@ -78,7 +90,7 @@
       <a class="btn" id="repeatBtn" href="#" role="button" aria-label="Повторить этот вариант">🔁 Повторить этот вариант</a>
     </div>
 
-    <!-- Текст задания (широкая рамка) -->
+    <!-- Инструкция (для контекста, как в 4-м) -->
     <div class="task-container" aria-labelledby="taskTitle" aria-describedby="inst">
       <b id="taskTitle">Task 1. Imagine that you are preparing a project with your friend.</b>
       You have found some interesting material for the presentation and you want to read this text to your friend.
@@ -86,7 +98,7 @@
       <div class="instruction" id="inst">You will read the text aloud for not more than 1.5 minutes.</div>
     </div>
 
-    <!-- Текст для чтения (без p/br; начинается сразу) -->
+    <!-- Текст чтения — без p/br и без ведущего перевода строки -->
     <div class="reading-box" id="textBox">Bioluminescence is the ability of certain living organisms to produce light. This fascinating phenomenon can be observed in various species of deep-sea fish, jellyfish, fireflies, and even some fungi.
 
 The light is usually blue or green, which travels best through water. These organisms use light for different reasons. Some attract mates or prey, while others use it to confuse predators. For example, the anglerfish has a glowing lure to draw in its victims in the dark ocean depths.
@@ -96,26 +108,27 @@ Scientists believe that studying bioluminescence can help develop new medical an
 Bioluminescence is not only beautiful — it is a powerful tool of survival and discovery. These glowing creatures remind us how much we still have to learn about the natural world. Their light, shining in the darkness, is both mysterious and meaningful.</div>
 
     <div style="text-align:center;">
-      <a class="btn nav-btn" id="toVariants" href="#">Перейти к выбору варианта</a>
-      <a class="btn nav-btn" id="toModeMenu" href="#">Перейти к выбору задания</a>
-      <a class="btn nav-btn" id="toTaskMenu" href="#">Перейти к выбору режима</a>
-      <a class="btn nav-btn" id="toHome" href="#" role="button" aria-label="Перейти на главную">Перейти на главную</a>
+      <a class="btn nav-btn" id="toVariants" href="#" role="button">К вариантам</a>
+      <a class="btn nav-btn" id="toModeMenu" href="#" role="button">К выбору задания</a>
+      <a class="btn nav-btn" id="toTaskMenu" href="#" role="button">К выбору режима</a>
+      <a class="btn nav-btn" id="toHome"     href="#" role="button">На главную</a>
     </div>
   </div>
 
   <script type="module">
     import { toggleThemeInit, navigateOnce } from '../../../common.js';
 
+    // Тема
     toggleThemeInit();
 
-    // Номер варианта
+    // Вычисление номера варианта из пути
     const path = location.pathname;
     const m = path.match(/variant(\d+)/i);
     const varNum = m ? m[1] : '?';
     document.getElementById('varNum').textContent = varNum;
     document.title = `Результат — Задание 1 · Вариант ${varNum}`;
 
-    // Базы путей
+    // Базы путей (как в 4-м)
     function getBases(p){
       const i = p.indexOf('/ege/');
       if (i >= 0){
@@ -127,7 +140,7 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
     }
     const { ROOT_BASE, EGE_BASE } = getBases(path);
 
-    // Навигация
+    // Навигация (как в 4-м)
     const toVariants = document.getElementById('toVariants');
     if (toVariants){
       toVariants.href = path.replace(/\/variants\/variant\d+\/[^/]+$/i, '/variants/ege1.html');
@@ -136,7 +149,7 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
     document.getElementById('toTaskMenu').href = `${EGE_BASE}ege.html`;
     document.getElementById('toHome').href     = `${ROOT_BASE}index.html`;
 
-    // Очистка state
+    // Очистка state ege1_*
     function clearTask1State(){
       try{
         Object.keys(sessionStorage).forEach(k => { if (k.startsWith('ege1_')) sessionStorage.removeItem(k); });
@@ -145,7 +158,7 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
     }
     function clearAndGo(url){ clearTask1State(); navigateOnce(url); }
 
-    // Повторить
+    // Кнопка «Повторить»
     const repeat = document.getElementById('repeatBtn');
     if (repeat){
       const repeatHref = path.replace(/_4_result\.html$/i, '_1_prepare.html');
@@ -158,6 +171,7 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
       a.addEventListener('click', (e)=>{ e.preventDefault(); clearAndGo(a.href); });
     });
 
+    // Разблокировка navigateOnce после возврата
     window.addEventListener('pageshow', ()=>{ navigateOnce.lock = false; });
 
     // ===== Аудио =====
@@ -183,8 +197,8 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
       if (parts.length < 2) return null;
       const header = parts[0], b64 = parts[1];
       const type = (header.match(/data:(.*?);base64/) || [,'application/octet-stream'])[1];
-      const bin = atob(b64);
-      const bytes = new Uint8Array(bin.length);
+      const bin  = atob(b64);
+      const bytes= new Uint8Array(bin.length);
       for (let i=0;i<bin.length;i++) bytes[i] = bin.charCodeAt(i);
       return new Blob([bytes], { type });
     }

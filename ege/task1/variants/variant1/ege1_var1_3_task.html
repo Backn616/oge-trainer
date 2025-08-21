@@ -42,13 +42,10 @@
     @media (prefers-reduced-motion: reduce) { .timer{ transition:none; } }
 
     /* Широкая карточка-инструкция */
-    .task-container{
-  max-width:3000px; width:95%; margin:0 auto 30px;
-  font-size:22px; line-height:1.6; text-align:left;
-  border:2px solid var(--panel-border); padding:25px; border-radius:12px;
-  background:var(--panel-bg); box-shadow:var(--shadow);
-}
-
+    .instruction-box{
+      max-width:3000px; width:95%; margin:0 auto 30px; font-size:22px; line-height:1.6; text-align:left;
+      border:2px solid var(--panel-border); padding:25px; border-radius:12px; background:var(--panel-bg); box-shadow:var(--shadow);
+    }
 
     /* Текст как в prepare: 32/1.9, padding 40, рамка/тень, БЕЗ pre-line.
        ВАЖНО: текст в div начинается сразу после тега, без ведущего перевода строки. */

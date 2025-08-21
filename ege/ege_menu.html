@@ -95,7 +95,7 @@
 <body>
   <div class="wrap">
     <header>
-      <a class="brand back-home" href="../index.html" aria-label="На главную">
+      <a class="brand" href="../index.html" aria-label="На главную">
         <div class="logo">A</div>
         <div>
           <div class="brand-title">Онлайн-тренажёр «Говорение»</div>
@@ -103,7 +103,7 @@
         </div>
       </a>
       <div style="display:flex; gap:10px; align-items:center">
-        <a class="back back-home" href="../index.html">← На главную</a>
+        <a class="back" href="../index.html">← На главную</a>
         <button class="theme-toggle" id="themeBtn" aria-label="Переключить тему">🌓 Тема</button>
       </div>
     </header>
@@ -126,19 +126,30 @@
       </section>
     </main>
 
-    <footer><div>© 2025 — Демо-версия тренажёра ЕГЭ.</div></footer>
+    <footer>
+      <div>© 2025 — Демо-версия тренажёра ЕГЭ.</div>
+    </footer>
   </div>
 
-  <!-- Модуль в конце: путь из /ege/ к /common.js — на уровень вверх -->
+  <!-- Модуль: общий JS выше на уровень из /ege/ -->
   <script type="module">
     import { toggleThemeInit, navigateOnce } from '../common.js';
 
     // Тема
     toggleThemeInit();
 
-    // «На главную» — защита от двойного клика
-    document.querySelectorAll('.back-home').forEach(a=>{
+    // «На главную» — через navigateOnce
+    document.querySelectorAll('.brand, .back').forEach(a=>{
       const url = a.getAttribute('href') || '../index.html';
+      a.addEventListener('click', (e)=>{
+        e.preventDefault();
+        navigateOnce(url);
+      });
+    });
+
+    // Переходы к заданиям — тоже через navigateOnce
+    document.querySelectorAll('nav.grid .btn').forEach(a=>{
+      const url = a.getAttribute('href');
       a.addEventListener('click', (e)=>{
         e.preventDefault();
         navigateOnce(url);

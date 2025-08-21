@@ -64,6 +64,7 @@
       padding:10px 14px; border-radius:10px; cursor:pointer; transition:transform .08s ease;
     }
     .theme-toggle:active{transform:scale(.98)}
+    .theme-toggle:focus-visible{ box-shadow:0 0 0 4px var(--ring); outline:none; }
 
     main{padding:40px 0 24px}
     .card{
@@ -78,9 +79,20 @@
       background:#ffffff06; backdrop-filter: blur(6px);
       padding:22px; margin-top:12px;
     }
+
+    /* 3 → 2 → 1 колонки */
     .grid{
-      display:grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap: var(--grid-gap);
+      display:grid;
+      grid-template-columns: repeat(3, minmax(220px,1fr));
+      gap: var(--grid-gap);
     }
+    @media (max-width:900px){
+      .grid{ grid-template-columns: repeat(2, minmax(220px,1fr)); }
+    }
+    @media (max-width:580px){
+      .grid{ grid-template-columns: 1fr; }
+    }
+
     .variant{
       display:inline-flex; align-items:center; justify-content:center; gap:10px;
       font-size: var(--btn-fs); font-weight:600; padding: var(--btn-pad-y) var(--btn-pad-x);
@@ -110,6 +122,15 @@
     .visually-hidden{
       position:absolute !important; width:1px; height:1px; padding:0; margin:-1px;
       overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0;
+    }
+
+    /* noscript фолбэк, чтобы варианты были видны без JS */
+    noscript .grid a{
+      display:inline-flex; align-items:center; justify-content:center;
+      padding: var(--btn-pad-y) var(--btn-pad-x); min-height: var(--btn-minh);
+      border-radius: var(--btn-radius); background: linear-gradient(135deg, var(--btn-1), var(--btn-2));
+      color:var(--btn-text); text-decoration:none; font-weight:600;
+      box-shadow: 0 12px 24px rgba(75,141,255,.28);
     }
   </style>
 </head>
@@ -144,94 +165,133 @@
             <span id="currentPageMarker" class="visually-hidden" aria-current="page">Страница 1</span>
           </div>
         </div>
+
+        <!-- noscript fallback: 1 страница с 15 ссылками -->
+        <noscript>
+          <div class="frame">
+            <nav class="grid" aria-label="Варианты (без JS)">
+              <a href="./variant1/ege4_var1_1_prepare.html">Вариант 1</a>
+              <a href="./variant2/ege4_var2_1_prepare.html">Вариант 2</a>
+              <a href="./variant3/ege4_var3_1_prepare.html">Вариант 3</a>
+              <a href="./variant4/ege4_var4_1_prepare.html">Вариант 4</a>
+              <a href="./variant5/ege4_var5_1_prepare.html">Вариант 5</a>
+              <a href="./variant6/ege4_var6_1_prepare.html">Вариант 6</a>
+              <a href="./variant7/ege4_var7_1_prepare.html">Вариант 7</a>
+              <a href="./variant8/ege4_var8_1_prepare.html">Вариант 8</a>
+              <a href="./variant9/ege4_var9_1_prepare.html">Вариант 9</a>
+              <a href="./variant10/ege4_var10_1_prepare.html">Вариант 10</a>
+              <a href="./variant11/ege4_var11_1_prepare.html">Вариант 11</a>
+              <a href="./variant12/ege4_var12_1_prepare.html">Вариант 12</a>
+              <a href="./variant13/ege4_var13_1_prepare.html">Вариант 13</a>
+              <a href="./variant14/ege4_var14_1_prepare.html">Вариант 14</a>
+              <a href="./variant15/ege4_var15_1_prepare.html">Вариант 15</a>
+            </nav>
+          </div>
+        </noscript>
       </section>
     </main>
 
     <footer>© 2025 — Демо‑версия тренажёра ЕГЭ.</footer>
   </div>
 
-  <!-- ВАЖНО: модуль стоит в самом конце, чтобы DOM уже был -->
-  <script type="module">
-    // общий код в /ege/  (файл находится в /ege/task4/variants/ege4.html → до /ege/ два уровня)
-    import { toggleThemeInit, navigateOnce } from '../../common.js';
+  <!-- НЕ модульный скрипт с безопасным динамическим импортом -->
+  <script>
+    (async function(){
+      // Фолбэки на случай, если common.js недоступен
+      let navigateOnce = (url) => { location.href = url; };
+      let toggleThemeInit = () => {
+        const key = 'pref-theme';
+        const btn = document.getElementById('themeBtn');
+        const apply = (mode)=> {
+          document.documentElement.classList.toggle('dark', mode === 'dark');
+          try { localStorage.setItem(key, mode); } catch {}
+        };
+        apply((() => { try { return localStorage.getItem(key) || 'light'; } catch { return 'light'; } })());
+        btn?.addEventListener('click', () => {
+          const mode = (()=>{
+            try { return localStorage.getItem(key) || 'light'; } catch { return 'light'; }
+          })();
+          apply(mode === 'dark' ? 'light' : 'dark');
+        });
+      };
 
-    // Тема
-    toggleThemeInit();
-
-    // База /ege/ для ссылок «к выбору задания»
-    function getEgeBase() {
+      // Вычисляем /ege/ и пробуем импортировать общий модуль
       const parts = location.pathname.split('/').filter(Boolean);
-      const i = parts.indexOf('ege');
-      let base = (i !== -1) ? ('/' + parts.slice(0, i + 1).join('/') + '/') : '/ege/';
-      return base.replace(/\/{2,}/g, '/');
-    }
-    const EGE_BASE = getEgeBase();
-    document.querySelectorAll('.back-to-menu').forEach(a => {
-      const url = EGE_BASE + 'ege_menu.html';
-      a.href = url;
-      a.addEventListener('click', (e) => {
-        e.preventDefault();
-        navigateOnce(url); // защита от двойного клика
-      });
-    });
+      const idx = parts.indexOf('ege');
+      const egeBase = (idx !== -1) ? ('/' + parts.slice(0, idx + 1).join('/') + '/') : '/ege/';
+      const commonUrl = (egeBase + 'common.js').replace(/\/{2,}/g, '/');
 
-    // База текущей папки variants: /ege/task4/variants/
-    const VARIANTS_BASE = location.pathname.replace(/ege4\.html$/i, '');
-
-    // Пагинация
-    const TOTAL_VARIANTS = 60;
-    const PAGE_SIZE      = 15;
-
-    const variantsEl    = document.getElementById('variants');
-    const prevBtn       = document.getElementById('prevBtn');
-    const nextBtn       = document.getElementById('nextBtn');
-    const pagerInfo     = document.getElementById('pagerInfo');
-    const currentMarker = document.getElementById('currentPageMarker');
-
-    let currentPage = 1;
-    const totalPages = Math.ceil(TOTAL_VARIANTS / PAGE_SIZE);
-
-    function renderPage(page){
-      currentPage = Math.min(Math.max(1, page), totalPages);
-      variantsEl.innerHTML = '';
-
-      const start = (currentPage - 1) * PAGE_SIZE + 1;
-      const end   = Math.min(TOTAL_VARIANTS, start + PAGE_SIZE - 1);
-
-      const frag = document.createDocumentFragment();
-      for(let n = start; n <= end; n++){
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'variant';
-        btn.textContent = `Вариант ${n}`;
-        btn.setAttribute('aria-label', `Перейти к варианту ${n}`);
-        btn.addEventListener('click', () => goToVariant(n));
-        frag.appendChild(btn);
+      try {
+        const mod = await import(commonUrl);
+        if (typeof mod.navigateOnce === 'function') navigateOnce = mod.navigateOnce;
+        if (typeof mod.toggleThemeInit === 'function') toggleThemeInit = mod.toggleThemeInit;
+      } catch (e) {
+        console.warn('Не удалось импортировать common.js:', commonUrl, e);
       }
-      variantsEl.appendChild(frag);
 
-      pagerInfo.textContent = `Стр. ${currentPage} из ${totalPages} · ${start}–${end} из ${TOTAL_VARIANTS}`;
-      prevBtn.disabled = currentPage === 1;
-      nextBtn.disabled = currentPage === totalPages;
+      // Инициализируем тему в любом случае
+      try { toggleThemeInit(); } catch {}
 
-      currentMarker.textContent = `Страница ${currentPage}`;
-    }
+      // «Назад к меню»
+      document.querySelectorAll('.back-to-menu').forEach(a => {
+        const url = egeBase + 'ege_menu.html';
+        a.href = url;
+        a.addEventListener('click', (e) => { e.preventDefault(); navigateOnce(url); });
+      });
 
-    function goToVariant(n){
-      // /ege/task4/variants/ + variantN/ege4_varN_1_prepare.html
-      const url = `${VARIANTS_BASE}variant${n}/ege4_var${n}_1_prepare.html`
-        .replace(/\/{2,}/g, '/')
-        .replace(':/', '://');
-      navigateOnce(url);
-    }
+      // Рендер вариантов + пагинация
+      const VARIANTS_BASE = location.pathname.replace(/ege4\.html$/i, '');
+      const TOTAL_VARIANTS = 60;
+      const PAGE_SIZE      = 15;
 
-    prevBtn.addEventListener('click', () => renderPage(currentPage - 1));
-    nextBtn.addEventListener('click', () => renderPage(currentPage + 1));
+      const variantsEl    = document.getElementById('variants');
+      const prevBtn       = document.getElementById('prevBtn');
+      const nextBtn       = document.getElementById('nextBtn');
+      const pagerInfo     = document.getElementById('pagerInfo');
+      const currentMarker = document.getElementById('currentPageMarker');
 
-    renderPage(1);
+      let currentPage = 1;
+      const totalPages = Math.ceil(TOTAL_VARIANTS / PAGE_SIZE);
 
-    // BFCache: снять замок
-    window.addEventListener('pageshow', () => { navigateOnce.lock = false; });
+      function renderPage(page){
+        currentPage = Math.min(Math.max(1, page), totalPages);
+        variantsEl.innerHTML = '';
+
+        const start = (currentPage - 1) * PAGE_SIZE + 1;
+        const end   = Math.min(TOTAL_VARIANTS, start + PAGE_SIZE - 1);
+
+        const frag = document.createDocumentFragment();
+        for(let n = start; n <= end; n++){
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'variant';
+          btn.textContent = `Вариант ${n}`;
+          btn.setAttribute('aria-label', `Перейти к варианту ${n}`);
+          btn.addEventListener('click', () => {
+            const url = `${VARIANTS_BASE}variant${n}/ege4_var${n}_1_prepare.html`
+              .replace(/\/{2,}/g, '/').replace(':/', '://');
+            navigateOnce(url);
+          });
+          frag.appendChild(btn);
+        }
+        variantsEl.appendChild(frag);
+
+        pagerInfo.textContent = `Стр. ${currentPage} из ${totalPages} · ${start}–${end} из ${TOTAL_VARIANTS}`;
+        prevBtn.disabled = currentPage === 1;
+        nextBtn.disabled = currentPage === totalPages;
+        prevBtn.setAttribute('aria-disabled', String(prevBtn.disabled));
+        nextBtn.setAttribute('aria-disabled', String(nextBtn.disabled));
+        currentMarker.textContent = `Страница ${currentPage}`;
+      }
+
+      prevBtn.addEventListener('click', () => renderPage(currentPage - 1));
+      nextBtn.addEventListener('click', () => renderPage(currentPage + 1));
+
+      renderPage(1);
+
+      // BFCache: снять замок (если navigateOnce есть)
+      try { window.addEventListener('pageshow', () => { navigateOnce.lock = false; }); } catch {}
+    })();
   </script>
 </body>
 </html>

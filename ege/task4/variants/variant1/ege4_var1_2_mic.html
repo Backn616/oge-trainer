@@ -11,7 +11,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
 
   <!-- Общие стили (фон/карточка/кнопка) -->
-  <link rel="stylesheet" href="../../../style_common.css">
+  <link rel="stylesheet" href="../../../style_common.css" />
+  <!-- ^ путь проверен: три уровня вверх до ege/style_common.css -->
 
   <!-- Анти-мигание темы -->
   <script>
@@ -50,6 +51,7 @@
 
   <script type="module">
     import { toggleThemeInit, navigateOnce } from '../../../common.js';
+    // ^ путь проверен: три уровня вверх до ege/common.js
 
     // Тема
     toggleThemeInit();

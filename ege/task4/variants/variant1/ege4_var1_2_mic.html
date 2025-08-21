@@ -5,14 +5,13 @@
   <title>Предупреждение — доступ к микрофону</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- Шрифт: ускорение загрузки -->
+  <!-- Шрифт -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
 
-  <!-- Общие стили (фон/карточка/кнопка) -->
+  <!-- Общие стили -->
   <link rel="stylesheet" href="../../../style_common.css" />
-  <!-- ^ путь проверен: три уровня вверх до ege/style_common.css -->
 
   <!-- Анти-мигание темы -->
   <script>
@@ -29,7 +28,7 @@
   <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
 
   <main class="page-center">
-    <section class="card" role="dialog" aria-labelledby="warnTitle" aria-describedby="warnText">
+    <section class="card mic-card" role="dialog" aria-labelledby="warnTitle" aria-describedby="warnText">
       <h1 id="warnTitle">Внимание</h1>
       <p id="warnText">
         На следующем этапе тренажёр попытается получить доступ к микрофону.<br><br>
@@ -51,7 +50,6 @@
 
   <script type="module">
     import { toggleThemeInit, navigateOnce } from '../../../common.js';
-    // ^ путь проверен: три уровня вверх до ege/common.js
 
     // Тема
     toggleThemeInit();
@@ -63,9 +61,9 @@
 
     // Подготовка sessionStorage для задания 4
     try {
-      sessionStorage.removeItem('ege4_audio_base64'); // на всякий случай — старая запись
+      sessionStorage.removeItem('ege4_audio_base64');
       sessionStorage.removeItem('ege4_audio_mime');
-      sessionStorage.setItem('ege4_warned', '1');     // маркер показа предупреждения
+      sessionStorage.setItem('ege4_warned', '1');
       const meta = JSON.parse(sessionStorage.getItem('ege4_meta') || '{}');
       meta.warnedAt = Date.now();
       sessionStorage.setItem('ege4_meta', JSON.stringify(meta));
@@ -79,13 +77,10 @@
       navigateOnce(NEXT_URL);
     });
 
-    // Возврат по Back/Forward (BFCache): просто снимаем замок, чтобы кнопка снова работала
-    window.addEventListener('pageshow', () => {
-      navigateOnce.lock = false;
-    });
+    // Возврат по Back/Forward (BFCache): снять «замок»
+    window.addEventListener('pageshow', () => { navigateOnce.lock = false; });
 
-    // ВАЖНО: никаких автопереходов при сворачивании/уходе
-    // (никаких visibilitychange/pagehide/freeze)
+    // Никаких автопереходов при сворачивании/уходе
   </script>
 </body>
 </html>

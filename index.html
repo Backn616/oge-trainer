@@ -129,6 +129,9 @@
     }
     .dot{width:10px; height:10px; border-radius:50%; background: var(--success); box-shadow:0 0 0 4px #25c26e22}
     footer{padding:30px 0 10px; color:var(--muted); font-size:13px; text-align:center}
+
+    /* Доступность: видимый фокус для клавиатуры */
+    .btn:focus-visible{ box-shadow:0 0 0 4px var(--ring); outline: none; }
   </style>
 </head>
 <body>
@@ -149,10 +152,12 @@
         <div class="card">
           <h1 class="h1">Подготовь устную часть <span style="white-space:nowrap">ОГЭ и ЕГЭ</span> уверенно</h1>
           <p class="sub">Тренируй ответы с таймером, мини-подсказками и записью голоса. Основано на демо-материалах ФИПИ.</p>
-          <div class="cta">
+
+          <!-- Навигация по разделам -->
+          <nav class="cta" aria-label="Выбор тренажёра">
             <a href="oge/oge.html" class="btn btn-primary" aria-label="Перейти к тренажёру ОГЭ">🎒 Перейти к ОГЭ</a>
             <a href="ege/ege.html" class="btn btn-primary" aria-label="Перейти к тренажёру ЕГЭ">🎓 Перейти к ЕГЭ</a>
-          </div>
+          </nav>
         </div>
 
         <div class="right-card">

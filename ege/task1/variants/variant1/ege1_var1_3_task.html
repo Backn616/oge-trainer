@@ -39,6 +39,22 @@
     @media (prefers-reduced-motion: reduce) {
       .timer{ transition:none; }
     }
+
+    /* Текст задачи — как на prepare (чуть уменьшенный) */
+    #textBox{
+      background:var(--card);
+      border-left:5px solid var(--primary);
+      padding:40px;
+      margin-bottom:30px;
+      box-shadow:var(--shadow);
+      border-radius:12px;
+      text-align:left;
+      font-size:28px;
+      line-height:1.8;
+    }
+    @media (max-width:900px){
+      #textBox{ font-size:24px; }
+    }
   </style>
 </head>
 <body>
@@ -56,13 +72,13 @@
     <!-- Отсчёт -->
     <div id="timer" class="timer" aria-live="polite">3</div>
 
-    <!-- Текст -->
+    <!-- Текст для чтения -->
     <div class="task-container" id="textBox" style="display:none">
       Bioluminescence is the ability of certain living organisms to produce light. This fascinating phenomenon can be observed in various species of deep-sea fish, jellyfish, fireflies, and even some fungi.
       The light is usually blue or green, which travels best through water. These organisms use light for different reasons. Some attract mates or prey, while others use it to confuse predators. For example, the anglerfish has a glowing lure to draw in its victims in the dark ocean depths.
-    
+      <br><br>
       Scientists believe that studying bioluminescence can help develop new medical and technological solutions. Special proteins from glowing jellyfish are already used in genetic research. These discoveries support innovation in areas like disease detection and cell tracking.
-    
+      <br><br>
       Bioluminescence is not only beautiful — it is a powerful tool of survival and discovery. These glowing creatures remind us how much we still have to learn about the natural world. Their light, shining in the darkness, is both mysterious and meaningful.
     </div>
 

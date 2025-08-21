@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
-  <!-- Общие стили проекта -->
+  <!-- Общие стили -->
   <link rel="stylesheet" href="../../../style_common.css" />
 
   <!-- Анти-мигание темы -->
@@ -46,13 +46,18 @@
     }
     .content-wrapper{ padding:40px 20px 0; }
 
-    /* Инструкция — как в Prepare */
+    /* ИНСТРУКЦИЯ — ВНЕШНЕ КАК В PREPARE */
     .instruction-box{
-      max-width:3000px; width:95%; margin:0 auto 30px; font-size:22px; line-height:1.6; text-align:left;
-      border:2px solid var(--panel-border); padding:25px; border-radius:12px; background:var(--panel-bg); box-shadow:var(--shadow);
+      max-width:3000px; width:95%;
+      margin:0 auto 30px;
+      font-size:22px; line-height:1.6; text-align:left;
+      border:2px solid var(--panel-border);
+      padding:25px; border-radius:12px;
+      background:var(--panel-bg);
+      box-shadow:var(--shadow);
     }
 
-    /* Текст — как в Prepare (без pre-line, текст сразу после <div>) */
+    /* ТЕКСТ — как в Prepare (без pre-line, текст сразу после <div>) */
     .reading-box{
       max-width:3000px; width:95%; margin:0 auto 30px;
       background:var(--card); border:1px solid #ccc; border-radius:12px; box-shadow:var(--shadow);
@@ -69,7 +74,7 @@
     }
     @media (prefers-reduced-motion: reduce){ .timer{ transition:none; } }
 
-    /* Фиксированный прогресс-бар (визуал как в Prepare) */
+    /* Фиксированный прогресс-бар */
     #progressContainerFixed{
       position:fixed; bottom:0; left:0; width:100%; height:32px; background:#eee; z-index:9999;
     }
@@ -87,8 +92,8 @@
   <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
 
   <div class="content-wrapper">
-    <!-- Инструкция: скрыта до окончания отсчёта -->
-    <div class="instruction-box" id="instructionBox" aria-labelledby="taskTitle" aria-describedby="inst" style="display:none">
+    <!-- Инструкция: СКРЫТА до конца отсчёта, но оформлена КАК В PREPARE -->
+    <div class="instruction-box" id="instructionBox" style="display:none" aria-labelledby="taskTitle" aria-describedby="inst">
       <p><strong id="taskTitle">Task 1.</strong> Imagine that you are preparing a project with your friend.
         You have found some interesting material for the presentation and you want to read this text to your friend.
         You have 1.5 minutes to read the text silently, then be ready to read it out loud. You will not have more than 1.5 minutes to read it.
@@ -99,7 +104,7 @@
     <!-- Отсчёт -->
     <div id="timer" class="timer" aria-live="polite">3</div>
 
-    <!-- Текст чтения (появится после отсчёта) -->
+    <!-- Текст чтения (тоже скрыт до отсчёта) -->
     <div id="textBox" class="reading-box" style="display:none">Bioluminescence is the ability of certain living organisms to produce light. This fascinating phenomenon can be observed in various species of deep-sea fish, jellyfish, fireflies, and even some fungi.
 
 The light is usually blue or green, which travels best through water. These organisms use light for different reasons. Some attract mates or prey, while others use it to confuse predators. For example, the anglerfish has a glowing lure to draw in its victims in the dark ocean depths.
@@ -154,8 +159,10 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
       try{
         const stream = await navigator.mediaDevices.getUserMedia({ audio:true });
         streamRef = stream;
+
         chosenMime = pickMimeType();
         mediaRecorder = chosenMime ? new MediaRecorder(stream, { mimeType: chosenMime }) : new MediaRecorder(stream);
+
         mediaRecorder.ondataavailable = (e)=>{ if (e.data?.size) audioChunks.push(e.data); };
         mediaRecorder.onstop = () => {
           if (hasStopped) return;
@@ -173,6 +180,7 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
           };
           reader.readAsDataURL(audioBlob);
         };
+
         startCountdown();
       }catch(err){
         alert('❌ Не удалось получить доступ к микрофону: ' + (err?.message || err));
@@ -210,7 +218,7 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
     let lastAnnounce = 0;
 
     function startTask(){
-      instructionBox.style.display = 'block';
+      instructionBox.style.display = 'block';  // показать инструкцию (как в Prepare по виду)
       textBox.style.display        = 'block';
       endBtn.style.display         = 'inline-block';
       progressWrap.style.display   = 'block';

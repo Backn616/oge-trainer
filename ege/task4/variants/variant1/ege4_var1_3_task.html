@@ -46,7 +46,7 @@
   <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
 
   <div class="content-wrapper">
-    <div class="task-container" id="taskContainer" aria-labelledby="taskTitle" style="display:none">
+    <div class="task-container" id="taskContainer" aria-labelledby="taskTitle" aria-describedby="inst" style="display:none">
       <b id="taskTitle">4 Task. Imagine that you and your friend are doing a school project “Spending holidays: in the city or in the countryside”.</b>
       You have found some photos to illustrate it but for technical reasons you cannot send them now. Leave a voice message to your friend explaining your choice of the photos and sharing some ideas about the project. In 3 minutes be ready to:
       <ul>
@@ -55,14 +55,14 @@
         <li>mention the disadvantages (1–2) of the two ways;</li>
         <li>express your opinion on the subject of the project – which way of spending holidays presented in the pictures you would prefer and why.</li>
       </ul>
-      <div class="instruction">You will speak for not more than 3 minutes (12–15 sentences). You have to talk continuously.</div>
+      <div class="instruction" id="inst">You will speak for not more than 3 minutes (12–15 sentences). You have to talk continuously.</div>
     </div>
 
     <div id="timer" class="timer" aria-live="polite">3</div>
 
     <div class="images" id="imageContainer" aria-label="Project illustrations" style="display:none">
-      <img src="photo1_city.png" alt="City holidays">
-      <img src="photo2_countryside.png" alt="Countryside holidays">
+      <img src="photo1_city.png" alt="City holidays" loading="lazy">
+      <img src="photo2_countryside.png" alt="Countryside holidays" loading="lazy">
     </div>
 
     <button class="button" id="endBtn" type="button" aria-label="Закончить запись" style="display:none">✅ Закончить</button>
@@ -98,10 +98,10 @@
       ? location.pathname.replace(/_3_task\.html$/i, '_4_result.html')
       : location.pathname.replace(/\.html$/i, '_4_result.html');
 
-    // Снимаем «замок» для кнопок при возврате из BFCache
+    // Снимаем «замок» для кнопок при возврате из BFCache;
+    // если вернулись с result — перезапускаем страницу.
     window.addEventListener('pageshow', (e) => {
       navigateOnce.lock = false;
-      // Если вернулись из result назад (BFCache), перезапускаем страницу начисто
       if (e.persisted) location.reload();
     });
 
@@ -225,7 +225,7 @@
       endBtn.onclick = () => safeStopOrFinish();
     }
 
-    function tick(nowTs){
+    function tick(){
       const left = Math.max(0, endTs - performance.now());
 
       // ширина — каждый кадр

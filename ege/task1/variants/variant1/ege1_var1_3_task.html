@@ -5,7 +5,7 @@
   <title>Task 1 — Reading</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- Шрифт как в prepare -->
+  <!-- Шрифт как в Prepare -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
@@ -24,7 +24,6 @@
   </script>
 
   <style>
-    /* Переменные как в prepare */
     :root{
       --bg:#f7f9ff; --text:#0b1020; --muted:#5a6475; --card:#ffffff;
       --primary:#2b6cff; --primary-600:#1f58d9; --shadow:0 10px 25px rgba(17,24,39,.08);
@@ -36,13 +35,32 @@
       --panel-bg:rgba(255,255,255,.08); --panel-border:#4b8dff;
     }
 
-    /* Фон — как в «нравится» prepare */
+    /* фон как в Prepare */
     body{
       font-family: Inter, system-ui, Segoe UI, Roboto, Arial, sans-serif;
+      color:var(--text);
       background:
         radial-gradient(1200px 600px at 70% -10%, #29417a40, transparent),
         radial-gradient(900px 500px at -10% 10%, #344b9340, transparent),
         var(--bg);
+    }
+    .content-wrapper{ padding:40px 20px 0; }
+
+    /* Инструкция — как в Prepare */
+    .instruction-box{
+      max-width:3000px; width:95%; margin:0 auto 30px; font-size:22px; line-height:1.6; text-align:left;
+      border:2px solid var(--panel-border); padding:25px; border-radius:12px; background:var(--panel-bg); box-shadow:var(--shadow);
+    }
+
+    /* Текст — как в Prepare (без pre-line) */
+    .reading-box{
+      max-width:3000px; width:95%; margin:0 auto 30px;
+      background:var(--card); border:1px solid #ccc; border-radius:12px; box-shadow:var(--shadow);
+      padding:40px; text-align:left;
+      font-size:32px; line-height:1.9;
+    }
+    @media (max-width:900px){
+      .reading-box{ font-size:28px; }
     }
 
     /* Отсчёт 3‑2‑1 */
@@ -51,24 +69,21 @@
       letter-spacing:4px; text-shadow:0 4px 12px rgba(0,0,0,.25);
       transition:transform .25s ease; will-change:transform; text-align:center;
     }
-    @media (prefers-reduced-motion: reduce) { .timer{ transition:none; } }
+    @media (prefers-reduced-motion: reduce){ .timer{ transition:none; } }
 
-    /* Инструкция — КАК В PREPARE */
-    .instruction-box{
-      max-width:3000px; width:95%; margin:0 auto 30px;
-      font-size:22px; line-height:1.6; text-align:left;
-      border:2px solid var(--panel-border); padding:25px; border-radius:12px;
-      background:var(--panel-bg); box-shadow:var(--shadow);
+    /* Фиксированный прогресс-бар (визуал как в Prepare) */
+    #progressContainerFixed{
+      position:fixed; bottom:0; left:0; width:100%; height:32px; background:#eee; z-index:9999;
     }
-
-    /* Текст как в prepare: 32/1.9/padding 40; БЕЗ pre-line; текст сразу после <div> */
-    #textBox{
-      max-width:3000px; width:95%; margin:0 auto 30px;
-      font-size:32px; line-height:1.9; text-align:left;
-      border:1px solid #ccc; padding:40px; border-radius:12px;
-      background:var(--card); box-shadow:var(--shadow);
+    .dark #progressContainerFixed{ background:#222; }
+    #progressBarFixed{
+      height:100%; width:0%; background:linear-gradient(to right, #0066ff, #00cfff); position:relative;
     }
-    @media (max-width:900px){ #textBox{ font-size:28px; } }
+    #progressBarFixed.rAF{ transition:none; }
+    .progress-time{
+      position:absolute; right:14px; top:50%; transform:translateY(-50%);
+      color:#fff; font-weight:700; font-size:20px; user-select:none; text-shadow:0 1px 2px rgba(0,0,0,.35);
+    }
   </style>
 </head>
 <body>
@@ -87,8 +102,8 @@
     <!-- Отсчёт -->
     <div id="timer" class="timer" aria-live="polite">3</div>
 
-    <!-- Текст для чтения: БЕЗ <p>/<br>, начинается сразу после <div> -->
-    <div id="textBox" style="display:none">Bioluminescence is the ability of certain living organisms to produce light. This fascinating phenomenon can be observed in various species of deep-sea fish, jellyfish, fireflies, and even some fungi.
+    <!-- Текст чтения: БЕЗ <p>/<br>, начинается сразу после <div> -->
+    <div id="textBox" class="reading-box" style="display:none">Bioluminescence is the ability of certain living organisms to produce light. This fascinating phenomenon can be observed in various species of deep-sea fish, jellyfish, fireflies, and even some fungi.
 
 The light is usually blue or green, which travels best through water. These organisms use light for different reasons. Some attract mates or prey, while others use it to confuse predators. For example, the anglerfish has a glowing lure to draw in its victims in the dark ocean depths.
 
@@ -101,10 +116,10 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
     </div>
   </div>
 
-  <!-- Проставка над фикс‑баром -->
+  <!-- Хвост над фикс-баром -->
   <div style="height: calc(var(--footer-h) + 24px);"></div>
 
-  <!-- Фиксированный прогресс‑бар на время ответа -->
+  <!-- Фиксированный прогресс-бар -->
   <div id="progressContainerFixed" role="timer" aria-live="polite" aria-atomic="true" aria-label="Оставшееся время ответа" style="display:none">
     <div id="progressBarFixed">
       <span id="progressTime" class="progress-time">01:30</span>
@@ -114,10 +129,8 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
   <script type="module">
     import { toggleThemeInit, navigateOnce, fmtTime } from '../../../common.js';
 
-    // Тема
     toggleThemeInit();
 
-    // DOM
     const timerEl        = document.getElementById('timer');
     const instructionBox = document.getElementById('instructionBox');
     const textBox        = document.getElementById('textBox');
@@ -126,7 +139,6 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
     const progressBar    = document.getElementById('progressBarFixed');
     const progressTime   = document.getElementById('progressTime');
 
-    // Навигация → result
     const RESULT_URL = location.pathname.replace(/_3_task\.html$/i, '_4_result.html');
 
     // ===== Микрофон и запись =====
@@ -138,8 +150,7 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
 
     function pickMimeType(){
       const candidates = [
-        'audio/webm;codecs=opus','audio/webm','audio/mp4',
-        'audio/ogg;codecs=opus','audio/ogg'
+        'audio/webm;codecs=opus','audio/webm','audio/mp4','audio/ogg;codecs=opus','audio/ogg'
       ];
       for (const t of candidates){ if (window.MediaRecorder?.isTypeSupported?.(t)) return t; }
       return '';
@@ -151,8 +162,7 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
         streamRef = stream;
 
         chosenMime = pickMimeType();
-        mediaRecorder = chosenMime ? new MediaRecorder(stream, { mimeType: chosenMime })
-                                   : new MediaRecorder(stream);
+        mediaRecorder = chosenMime ? new MediaRecorder(stream, { mimeType: chosenMime }) : new MediaRecorder(stream);
 
         mediaRecorder.ondataavailable = (e)=>{ if (e.data?.size) audioChunks.push(e.data); };
         mediaRecorder.onstop = () => {
@@ -175,7 +185,7 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
         startCountdown();
       }catch(err){
         alert('❌ Не удалось получить доступ к микрофону: ' + (err?.message || err));
-        startCountdown(); // продолжаем без записи, чтобы не блокировать сценарий
+        startCountdown();
       }
     }
 
@@ -253,7 +263,7 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
       try{ streamRef?.getTracks()?.forEach(t=>t.stop()); }catch{}
     });
 
-    // --- BFCache: «назад» из result → заново отсчёт и запись ---
+    // --- BFCache reset: назад из result → заново ---
     function isBackForwardNav(){
       try {
         const nav = performance.getEntriesByType('navigation')[0];

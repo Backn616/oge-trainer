@@ -152,7 +152,7 @@
 
   <!-- ВАЖНО: модуль стоит в самом конце, чтобы DOM уже был -->
   <script type="module">
-    // общий код в /ege/
+    // общий код в /ege/  (файл находится в /ege/task4/variants/ege4.html → до /ege/ два уровня)
     import { toggleThemeInit, navigateOnce } from '../../common.js';
 
     // Тема
@@ -167,7 +167,12 @@
     }
     const EGE_BASE = getEgeBase();
     document.querySelectorAll('.back-to-menu').forEach(a => {
-      a.href = EGE_BASE + 'ege_menu.html';
+      const url = EGE_BASE + 'ege_menu.html';
+      a.href = url;
+      a.addEventListener('click', (e) => {
+        e.preventDefault();
+        navigateOnce(url); // защита от двойного клика
+      });
     });
 
     // База текущей папки variants: /ege/task4/variants/

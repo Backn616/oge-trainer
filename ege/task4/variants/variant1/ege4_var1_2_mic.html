@@ -28,7 +28,10 @@
   <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
 
   <main class="page-center">
-    <section class="card mic-card" role="dialog" aria-labelledby="warnTitle" aria-describedby="warnText">
+    <section class="card mic-card"
+             role="alertdialog"
+             aria-labelledby="warnTitle"
+             aria-describedby="warnText">
       <h1 id="warnTitle">Внимание</h1>
       <p id="warnText">
         На следующем этапе тренажёр попытается получить доступ к микрофону.<br><br>
@@ -40,9 +43,11 @@
       <!-- Ставим href (fallback без JS) и дублируем переход через JS с защитой -->
       <a id="nextLink"
          class="button"
+         type="button"
          href="#"
          role="button"
-         aria-label="Перейти к заданию с запросом доступа к микрофону">
+         aria-label="Перейти к заданию с запросом доступа к микрофону"
+         autofocus>
         ОК
       </a>
     </section>
@@ -77,10 +82,8 @@
       navigateOnce(NEXT_URL);
     });
 
-    // Возврат по Back/Forward (BFCache): снять «замок»
+    // BFCache: снять замок при возврате
     window.addEventListener('pageshow', () => { navigateOnce.lock = false; });
-
-    // Никаких автопереходов при сворачивании/уходе
   </script>
 </body>
 </html>

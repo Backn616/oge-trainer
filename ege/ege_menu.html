@@ -47,7 +47,7 @@
     }
     a{color:inherit; text-decoration:none}
     .wrap{max-width:1040px; margin:0 auto; padding:24px}
-    header{display:flex; justify-content:space-between; align-items:center; gap:16px; padding:8px 0;}
+    header[role="banner"]{display:flex; justify-content:space-between; align-items:center; gap:16px; padding:8px 0;}
     .brand{display:flex; align-items:center; gap:12px}
     .logo{
       width:42px; height:42px; border-radius:12px;
@@ -64,7 +64,7 @@
     .theme-toggle:active{transform: scale(.98)}
     .theme-toggle:focus-visible{ box-shadow:0 0 0 4px var(--ring); outline:none }
 
-    main{padding:40px 0 24px}
+    main[role="main"]{padding:40px 0 24px}
     .card{background:var(--card); border:1px solid #ffffff1f; border-radius:22px; padding:36px; box-shadow:var(--shadow); backdrop-filter: blur(10px)}
     .h1{font-size: clamp(26px, 5vw, 36px); line-height:1.15; margin:0 0 12px}
     .sub{color:var(--muted); font-size:16px; margin:0 0 20px}
@@ -101,7 +101,7 @@
 </head>
 <body>
   <div class="wrap">
-    <header>
+    <header role="banner">
       <a class="brand" href="../index.html" aria-label="На главную">
         <div class="logo">A</div>
         <div>
@@ -110,22 +110,23 @@
         </div>
       </a>
       <div style="display:flex; gap:10px; align-items:center">
-        <a class="back" href="../index.html">← На главную</a>
+        <!-- назад именно к ege.html -->
+        <a class="back" href="ege.html" aria-label="К выбору формата">← К выбору формата</a>
         <button class="theme-toggle" id="themeBtn" aria-label="Переключить тему">🌓 Тема</button>
       </div>
     </header>
 
-    <main>
-      <section class="card">
-        <h1 class="h1">ЕГЭ — выбери задание</h1>
-        <p class="sub">Тренируй каждое задание отдельно. Хронометраж и логика как на реальном экзамене.</p>
+    <main role="main">
+      <section class="card" role="region" aria-labelledby="title" aria-describedby="subtitle">
+        <h1 id="title" class="h1">ЕГЭ — выбери задание</h1>
+        <p id="subtitle" class="sub">Тренируй каждое задание отдельно. Хронометраж и логика как на реальном экзамене.</p>
 
         <div class="button-frame">
           <nav class="grid" aria-label="Список заданий ЕГЭ">
-            <a class="btn" href="task1/variants/ege1.html">📄 Задание 1</a>
-            <a class="btn" href="task2/variants/ege2.html">🎧 Задание 2</a>
-            <a class="btn" href="task3/variants/ege3.html">🗣 Задание 3</a>
-            <a class="btn" href="task4/variants/ege4.html">📷 Задание 4</a>
+            <a class="btn" href="task1/variants/ege1.html" aria-label="Перейти к заданию 1">📄 Задание 1</a>
+            <a class="btn" href="task2/variants/ege2.html" aria-label="Перейти к заданию 2">🎧 Задание 2</a>
+            <a class="btn" href="task3/variants/ege3.html" aria-label="Перейти к заданию 3">🗣 Задание 3</a>
+            <a class="btn" href="task4/variants/ege4.html" aria-label="Перейти к заданию 4">📷 Задание 4</a>
           </nav>
         </div>
 
@@ -145,13 +146,13 @@
     // Тема
     toggleThemeInit();
 
-    // «На главную» — через navigateOnce
+    // Логотип → на главную / кнопка «К выбору формата» → на ege.html
     document.querySelectorAll('.brand, .back').forEach(a=>{
-      const url = a.getAttribute('href') || '../index.html';
+      const url = a.getAttribute('href');
       a.addEventListener('click', (e)=>{ e.preventDefault(); navigateOnce(url); });
     });
 
-    // Переходы к заданиям — тоже через navigateOnce
+    // Переходы к заданиям — через navigateOnce
     document.querySelectorAll('nav.grid .btn').forEach(a=>{
       const url = a.getAttribute('href');
       a.addEventListener('click', (e)=>{ e.preventDefault(); navigateOnce(url); });

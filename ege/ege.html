@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>ЕГЭ — Начало</title>
 
+  <!-- Шрифты + preconnect -->
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
@@ -47,6 +48,7 @@
     .badge{font-size:12px; color:var(--muted)}
     .theme-toggle{border:1px solid #ffffff22; background:transparent; color:var(--text); padding:10px 14px; border-radius:10px; cursor:pointer; transition:transform .08s ease}
     .theme-toggle:active{transform:scale(.98)}
+    .theme-toggle:focus-visible{box-shadow:0 0 0 4px var(--ring); outline:none}
 
     main{flex:1; display:flex; justify-content:center; align-items:center}
     .card{background:var(--card); border:1px solid #ffffff1f; border-radius:20px; padding:40px; box-shadow:var(--shadow); backdrop-filter: blur(10px); text-align:center; max-width:500px; width:100%}
@@ -64,6 +66,11 @@
     .btn:focus-visible{box-shadow:0 0 0 4px var(--ring); outline:none}
 
     footer{padding:20px 0 10px; color:var(--muted); font-size:13px; text-align:center}
+
+    /* Уважение prefers-reduced-motion для будущих анимаций */
+    @media (prefers-reduced-motion: reduce) {
+      * { scroll-behavior: auto; }
+    }
   </style>
 </head>
 <body>
@@ -96,18 +103,20 @@
   <script type="module">
     import { toggleThemeInit, navigateOnce } from './common.js';
 
+    // Тема
     toggleThemeInit();
 
+    // Переходы: логотип и кнопки
     document.querySelectorAll('.brand').forEach(a=>{
       const url = a.getAttribute('href') || '../index.html';
       a.addEventListener('click', (e)=>{ e.preventDefault(); navigateOnce(url); });
     });
-
     document.querySelectorAll('.card .btn').forEach(a=>{
       const url = a.getAttribute('href');
       a.addEventListener('click', (e)=>{ e.preventDefault(); navigateOnce(url); });
     });
 
+    // BFCache: снимаем «замок» при возврате
     window.addEventListener('pageshow', ()=>{ navigateOnce.lock = false; });
   </script>
 </body>

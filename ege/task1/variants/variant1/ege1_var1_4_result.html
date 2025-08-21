@@ -2,220 +2,206 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <title id="pageTitle">Результат — Вариант</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title id="pageTitle">Результат — Задание 1</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Шрифт -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+
+  <!-- Общие стили -->
+  <link rel="stylesheet" href="../../../style_common.css" />
 
   <!-- Анти-мигание темы -->
   <script>
-    (function () {
-      try {
+    (function(){
+      try{
         const saved = localStorage.getItem('pref-theme') || 'light';
         if (saved === 'dark') document.documentElement.classList.add('dark');
-      } catch (_) {}
+      }catch(_){}
     })();
   </script>
 
   <style>
-    :root{
-      --bg:#f7f9ff; --text:#0b1020; --muted:#5a6475; --card:#ffffff;
-      --primary:#2b6cff; --primary-600:#1f58d9; --shadow:0 10px 25px rgba(17,24,39,.08);
-      --panel-bg:#f9f9f9; --panel-border:#0077cc;
-    }
-    .dark{
-      --bg:#0b1020; --text:#eaf0ff; --muted:#b9c2d3; --card:rgba(255,255,255,.08);
-      --primary:#6aa3ff; --primary-600:#4b8dff; --shadow:0 10px 35px rgba(0,0,0,.35);
-      --panel-bg:rgba(255,255,255,.08); --panel-border:#4b8dff;
-    }
-    body{
-      font-family: Inter, system-ui, Segoe UI, Roboto, Arial, sans-serif;
-      margin:0; padding:40px 20px 60px; color:var(--text); text-align:center;
-      background:
-        radial-gradient(1200px 600px at 70% -10%, #29417a40, transparent),
-        radial-gradient(900px 500px at -10% 10%, #344b9340, transparent),
-        var(--bg);
-    }
-    h1{ font-size:36px; color:var(--primary); margin:0 0 10px; }
-    .status{ font-size:22px; color:#1f7a2e; margin-bottom:26px; }
+    .wrap{ max-width:1500px; margin:0 auto; }
+    h1{ color:var(--primary); font-size:36px; margin:12px 0 6px; text-align:center; }
+    .status{ font-size:22px; color:#1f7a2e; text-align:center; margin:10px 0 26px; }
     .dark .status{ color:#5ee397; }
-    .instruction-box{
-      max-width:1600px; width:95%; margin:0 auto 30px; font-size:22px; line-height:1.6; text-align:left;
-      border:2px solid var(--panel-border); padding:25px; border-radius:12px; background:var(--panel-bg); box-shadow:var(--shadow);
-    }
-    .text-box{
-      max-width:1600px; width:95%; margin:0 auto 30px; font-size:32px; line-height:1.9; text-align:left;
-      border:1px solid #ccc; padding:40px; border-radius:12px; background:var(--card); box-shadow:var(--shadow);
-    }
-    .button{
-      font-size:20px; padding:16px 32px; background:linear-gradient(135deg, var(--primary), var(--primary-600));
-      color:#fff; border:none; border-radius:12px; cursor:pointer; text-decoration:none;
-      box-shadow:0 10px 22px rgba(43,108,255,.28); transition:transform .06s ease, filter .2s ease;
-      display:inline-block; margin:12px;
-    }
-    .button:hover{ transform:translateY(-1px); filter:brightness(1.03); }
-    .button:disabled{ opacity:.6; cursor:not-allowed; transform:none; }
-    .theme-toggle{
-      position:fixed; top:16px; right:16px; z-index:1000;
-      border:1px solid #ffffff22; background:transparent; color:var(--text);
-      padding:10px 14px; border-radius:10px; cursor:pointer; backdrop-filter: blur(6px);
-      transition:transform .08s ease, filter .2s ease;
-    }
-    .theme-toggle:hover{ transform:translateY(-1px); filter:brightness(1.03); }
     audio{ margin:20px auto; width:min(900px, 90%); display:block; }
+
+    .btn{
+      display:inline-block; padding:16px 32px; margin:12px;
+      font-size:20px; font-weight:600; color:#fff; text-decoration:none; cursor:pointer;
+      border:none; border-radius:12px;
+      background:linear-gradient(135deg, var(--primary), var(--primary-600));
+      box-shadow:0 10px 22px rgba(43,108,255,.3);
+      transition: transform .06s ease, filter .2s ease, box-shadow .2s ease;
+    }
+    .btn:hover{ transform: scale(1.05); filter: brightness(1.03); }
+    .btn:disabled{ opacity:.6; cursor:not-allowed; transform:none; }
+
+    .task-container{
+      background:var(--card);
+      border-left:5px solid var(--primary);
+      padding:20px 30px 10px 30px;
+      margin:0 auto 30px;
+      font-size:20px; line-height:1.7; text-align:left;
+      box-shadow:var(--shadow); border-radius:12px;
+    }
+    .instruction{ font-weight:700; margin-top:10px; }
   </style>
 </head>
 <body>
-
   <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
 
-  <h1 id="h1">Результат сохранён</h1>
-  <div id="statusText" class="status">✅ Вы успешно завершили задание. Вы можете прослушать или скачать запись ниже.</div>
+  <div class="wrap">
+    <h1 id="h1">Результат сохранён — Вариант <span id="varNum">?</span></h1>
+    <div class="status" id="statusText" aria-live="polite">
+      ✅ Вы успешно завершили задание. Вы можете прослушать или скачать запись ниже.
+    </div>
 
-  <audio id="audio" controls></audio>
+    <audio id="audio" controls></audio>
 
-  <div>
-    <button id="playBtn" class="button">▶️ Прослушать</button>
-    <button id="downloadBtn" class="button">⬇️ Скачать запись</button>
-    <a id="repeatBtn" class="button" href="#">🔁 Повторить этот вариант</a>
+    <div style="text-align:center;">
+      <button class="btn" id="playBtn" type="button" aria-label="Проиграть запись" disabled>▶️ Прослушать</button>
+      <button class="btn" id="downloadBtn" type="button" aria-label="Скачать запись" disabled>⬇️ Скачать запись</button>
+      <a class="btn" id="repeatBtn" href="#" role="button" aria-label="Повторить этот вариант">🔁 Повторить этот вариант</a>
+    </div>
+
+    <!-- Текст задания -->
+    <div class="task-container" aria-labelledby="taskTitle" aria-describedby="inst">
+      <b id="taskTitle">Task 1. Imagine that you are preparing a project with your friend.</b>
+      <p>You have found some interesting material for the presentation and you want to read this text to your friend. You have 1.5 minutes to read the text silently, then be ready to read it out loud. You will not have more than 1.5 minutes to read it.</p>
+      <div class="instruction" id="inst">You will read the text aloud for not more than 1.5 minutes.</div>
+    </div>
+
+    <div style="text-align:center;">
+      <a class="btn nav-btn" id="toVariants" href="#">Перейти к выбору варианта</a>
+      <a class="btn nav-btn" id="toModeMenu" href="#">Перейти к выбору задания</a>
+      <a class="btn nav-btn" id="toTaskMenu" href="#">Перейти к выбору режима</a>
+      <a class="btn nav-btn" id="toHome" href="#" role="button" aria-label="Перейти на главную">Перейти на главную</a>
+    </div>
   </div>
 
-  <div class="instruction-box">
-    <p><strong>Task 1.</strong> Imagine that you are preparing a project with your friend. You have found some interesting material for the presentation and you want to read this text to your friend.</p>
-  </div>
+  <script type="module">
+    import { toggleThemeInit, navigateOnce } from '../../../common.js';
 
-  <div class="text-box">
-    Bioluminescence is the ability of certain living organisms to produce light. This fascinating phenomenon can be observed in various species of deep-sea fish, jellyfish, fireflies, and even some fungi.
-The light is usually blue or green, which travels best through water. These organisms use light for different reasons. Some attract mates or prey, while others use it to confuse predators. For example, the anglerfish has a glowing lure to draw in its victims in the dark ocean depths.
+    // Тема
+    toggleThemeInit();
 
-Scientists believe that studying bioluminescence can help develop new medical and technological solutions. Special proteins from glowing jellyfish are already used in genetic research.These discoveries support innovation in areas like disease detection and cell tracking.
+    // Номер варианта
+    const path = location.pathname;
+    const m = path.match(/variant(\d+)/i);
+    const varNum = m ? m[1] : '?';
+    document.getElementById('varNum').textContent = varNum;
+    document.title = `Результат — Задание 1 · Вариант ${varNum}`;
 
-Bioluminescence is not only beautiful — it is a powerful tool of survival and discovery.These glowing creatures remind us how much we still have to learn about the natural world. Their light, shining in the darkness, is both mysterious and meaningful.
-  </div>
-
-  <div>
-    <a id="toVariants" class="button" href="#">Перейти к выбору варианта</a>
-    <a id="toModeMenu" class="button" href="#">Перейти к выбору задания</a>
-    <a id="toTaskMenu" class="button" href="#">Перейти к выбору режима</a>
-    <a id="toHome" class="button" href="/oge-trainer/index.html">Перейти на главную</a>
-  </div>
-
-  <script>
-    // ===== Тема =====
-    (function(){
-      const btn = document.getElementById('themeBtn');
-      const key = 'pref-theme';
-      const root = document.documentElement;
-      function apply(mode){
-        root.classList.toggle('dark', mode === 'dark');
-        localStorage.setItem(key, mode);
-      }
-      apply(localStorage.getItem(key) || 'light');
-      btn.addEventListener('click', () => {
-        const curr = localStorage.getItem(key) || 'light';
-        apply(curr === 'dark' ? 'light' : 'dark');
-      });
-    })();
-
-    // ===== Навигация (универсально) =====
-    // База до /ege/
-    function getEgeBase(){
-      const p = location.pathname;
+    // Базы путей
+    function getBases(p){
       const i = p.indexOf('/ege/');
-      return i >= 0 ? p.slice(0, i + 5) : '/ege/';
+      if (i >= 0){
+        const ROOT_BASE = p.slice(0, i + 1);
+        const EGE_BASE  = p.slice(0, i + 5);
+        return { ROOT_BASE, EGE_BASE };
+      }
+      return { ROOT_BASE: '/', EGE_BASE: '/ege/' };
+    }
+    const { ROOT_BASE, EGE_BASE } = getBases(path);
+
+    // Навигация
+    const toVariants = document.getElementById('toVariants');
+    if (toVariants){
+      toVariants.href = path.replace(/\/variants\/variant\d+\/[^/]+$/i, '/variants/ege1.html');
+    }
+    document.getElementById('toModeMenu').href = `${EGE_BASE}ege_menu.html`;
+    document.getElementById('toTaskMenu').href = `${EGE_BASE}ege.html`;
+    document.getElementById('toHome').href     = `${ROOT_BASE}index.html`;
+
+    // Очистка state
+    function clearTask1State(){
+      try{
+        Object.keys(sessionStorage).forEach(k => {
+          if (k.startsWith('ege1_')) sessionStorage.removeItem(k);
+        });
+        if (varNum && /^\d+$/.test(varNum)) {
+          sessionStorage.removeItem(`ege1_var${varNum}_prepare_endtime`);
+        }
+      }catch{}
+    }
+    function clearAndGo(url){
+      clearTask1State();
+      navigateOnce(url);
     }
 
-    (function initNav(){
-      const path = location.pathname;
-      const base = getEgeBase();
+    // Повторить
+    const repeat = document.getElementById('repeatBtn');
+    if (repeat){
+      const repeatHref = path.replace(/_4_result\.html$/i, '_1_prepare.html');
+      repeat.href = repeatHref;
+      repeat.addEventListener('click', (e)=>{ e.preventDefault(); clearAndGo(repeatHref); });
+    }
 
-      // /ege/task{t}/variants/variant{n}/ege{t}_var{n}_4_result.html
-      const m = path.match(/\/ege\/task(\d+)\/variants\/variant(\d+)\/ege\1_var\2_4_result\.html/i);
-      const task = m ? m[1] : '1';
-      const n    = m ? m[2] : '';
+    // Остальные навигационные кнопки
+    document.querySelectorAll('.nav-btn').forEach(a=>{
+      a.addEventListener('click', (e)=>{ e.preventDefault(); clearAndGo(a.href); });
+    });
 
-      // Заголовки
-      if (n){
-        document.getElementById('pageTitle').textContent = `Результат — Вариант ${n}`;
-        document.getElementById('h1').textContent = `Результат сохранён — Вариант ${n}`;
-      }
-
-      // Повторить этот же вариант (с начала)
-      document.getElementById('repeatBtn').href =
-        path.replace(/_4_result\.html$/i, '_1_prepare.html');
-
-      // ✅ К выбору ВАРИАНТА — обязательно сохраняем папку variants!
-      //    Хвост ".../variants/variantN/<file>" → ".../variants/ege{task}.html"
-      document.getElementById('toVariants').href =
-        path.replace(/\/variants\/variant\d+\/[^/]+$/i, `/variants/ege${task}.html`);
-
-      // ✅ К выбору ЗАДАНИЯ
-      document.getElementById('toTaskMenu').href = `${base}ege.html`;
-
-      // ✅ К выбору РЕЖИМА
-      document.getElementById('toModeMenu').href = `${base}ege_menu.html`;
-    })();
+    window.addEventListener('pageshow', ()=>{ navigateOnce.lock = false; });
 
     // ===== Аудио =====
-    const audioEl = document.getElementById('audio');
-    const statusText = document.getElementById('statusText');
-    const playBtn = document.getElementById('playBtn');
+    const audioEl     = document.getElementById('audio');
+    const playBtn     = document.getElementById('playBtn');
     const downloadBtn = document.getElementById('downloadBtn');
+    const statusText  = document.getElementById('statusText');
 
-    const base64 = sessionStorage.getItem('ege1_audio_base64');
+    const base64     = sessionStorage.getItem('ege1_audio_base64');
     const mimeStored = (sessionStorage.getItem('ege1_audio_mime') || 'audio/webm').toLowerCase();
 
     let objectURL = null;
-    let fileName = (function(){
-      const extByMime = {
-        'audio/webm': 'webm',
-        'audio/webm;codecs=opus': 'webm',
-        'audio/ogg': 'ogg',
-        'audio/ogg;codecs=opus': 'ogg',
-        'audio/mp4': 'm4a',
-        'audio/mpeg': 'mp3',
-        'audio/wav': 'wav'
-      };
-      const ext = extByMime[mimeStored] || 'webm';
-      return `ege1_variant${(location.pathname.match(/variant(\d+)/)||[])[1]||''}.${ext}`;
-    })();
+    const extByMime = {
+      'audio/webm':'webm','audio/webm;codecs=opus':'webm',
+      'audio/ogg':'ogg','audio/ogg;codecs=opus':'ogg',
+      'audio/mp4':'m4a','audio/mpeg':'mp3','audio/wav':'wav'
+    };
+    const fileExt  = extByMime[mimeStored] || 'webm';
+    const fileName = `ege1_variant${varNum}.${fileExt}`;
 
     function dataURLtoBlob(dataURL){
       const parts = (dataURL || '').split(',');
       if (parts.length < 2) return null;
-      const header = parts[0];
-      const b64 = parts[1];
+      const header = parts[0], b64 = parts[1];
       const type = (header.match(/data:(.*?);base64/) || [,'application/octet-stream'])[1];
       const bin = atob(b64);
-      const len = bin.length;
-      const bytes = new Uint8Array(len);
-      for (let i = 0; i < len; i++) bytes[i] = bin.charCodeAt(i);
+      const bytes = new Uint8Array(bin.length);
+      for (let i=0;i<bin.length;i++) bytes[i] = bin.charCodeAt(i);
       return new Blob([bytes], { type });
     }
-    function setButtonsEnabled(enabled){
-      playBtn.disabled = !enabled;
-      downloadBtn.disabled = !enabled;
+
+    function setButtonsEnabled(en){
+      playBtn.disabled = !en;
+      downloadBtn.disabled = !en;
     }
 
     (function initAudio(){
-      if (base64) {
-        try {
+      if (base64){
+        try{
           const blob = dataURLtoBlob(base64);
-          if (blob) {
-            objectURL = URL.createObjectURL(blob);
+          if (blob){
+            objectURL   = URL.createObjectURL(blob);
             audioEl.src = objectURL;
-            audioEl.type = blob.type || mimeStored;
-          } else {
+            audioEl.type= blob.type || mimeStored;
+          }else{
             audioEl.src = base64;
-            audioEl.type = mimeStored;
+            audioEl.type= mimeStored;
           }
           setButtonsEnabled(true);
-        } catch {
+        }catch{
           audioEl.src = base64;
-          audioEl.type = mimeStored;
+          audioEl.type= mimeStored;
           setButtonsEnabled(true);
         }
-      } else {
+      }else{
         statusText.textContent = '⚠️ Запись не найдена. Возможно, вы запретили доступ к микрофону или страница была закрыта до завершения.';
         setButtonsEnabled(false);
       }
@@ -229,6 +215,7 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
       a.download = fileName;
       a.click();
     });
+
     window.addEventListener('pagehide', ()=>{ if (objectURL) URL.revokeObjectURL(objectURL); });
     window.addEventListener('beforeunload', ()=>{ if (objectURL) URL.revokeObjectURL(objectURL); });
   </script>

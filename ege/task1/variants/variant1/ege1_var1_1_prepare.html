@@ -5,12 +5,12 @@
   <title>Task 1 — Preparation</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- Шрифт как в исходнике -->
+  <!-- Шрифт Inter под конкретную страницу (общий css не трогаем) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
-  <!-- Общие стили проекта -->
+  <!-- Общие стили проекта (эталонные) -->
   <link rel="stylesheet" href="../../../style_common.css" />
 
   <!-- Анти-мигание темы -->
@@ -24,95 +24,40 @@
   </script>
 
   <style>
-    :root{
-      /* те же переменные, что использовал твой первоначальный файл */
-      --bg:#f7f9ff; --text:#0b1020; --muted:#5a6475; --card:#ffffff;
-      --primary:#2b6cff; --primary-600:#1f58d9; --shadow:0 10px 25px rgba(17,24,39,.08);
-      --panel-bg:#f9f9f9; --panel-border:#0077cc;
-    }
-    .dark{
-      --bg:#0b1020; --text:#eaf0ff; --muted:#b9c2d3; --card:rgba(255,255,255,.08);
-      --primary:#6aa3ff; --primary-600:#4b8dff; --shadow:0 10px 35px rgba(0,0,0,.35);
-      --panel-bg:rgba(255,255,255,.08); --panel-border:#4b8dff;
-    }
-
-    /* фон — как в твоём исходнике */
-    body{
-      font-family: Inter, system-ui, Segoe UI, Roboto, Arial, sans-serif;
-      color:var(--text);
-      background:
-        radial-gradient(1200px 600px at 70% -10%, #29417a40, transparent),
-        radial-gradient(900px 500px at -10% 10%, #344b9340, transparent),
-        var(--bg);
-    }
-
-    .content-wrapper{ padding:40px 20px 0; }
-
-    /* карточка-инструкция в стиле исходника */
-    .instruction-box{
-      max-width:3000px; width:95%; margin:0 auto 30px; font-size:22px; line-height:1.6; text-align:left;
-      border:2px solid var(--panel-border); padding:25px; border-radius:12px; background:var(--panel-bg); box-shadow:var(--shadow);
-    }
-
-    /* блок текста — как в исходнике; ВАЖНО: без white-space: pre-line */
+    /* Локальная рамка для текста чтения (не конфликтует с эталоном) */
     .reading-box{
-      max-width:3000px; width:95%; margin:0 auto 30px;
-      background:var(--card); border:1px solid #ccc; border-radius:12px; box-shadow:var(--shadow);
-      padding:40px; text-align:left;
-      font-size:32px; line-height:1.9;
+      background:var(--card);
+      border:1px solid #ccc;
+      border-radius:12px;
+      box-shadow:var(--shadow);
+      padding:40px;
+      text-align:left;
+      font-family: Inter, system-ui, Segoe UI, Roboto, Arial, sans-serif;
+      font-size:32px;
+      line-height:1.9;
+      margin-bottom:30px;
     }
     @media (max-width:900px){
       .reading-box{ font-size:28px; }
     }
-
-    /* кнопка как в исходнике */
-    .button{
-      font-size:20px; padding:16px 32px; background:linear-gradient(135deg, var(--primary), var(--primary-600));
-      color:#fff; border:none; border-radius:12px; cursor:pointer;
-      box-shadow:0 10px 22px rgba(43,108,255,.28); transition:transform .06s ease, filter .2s ease;
-      display:inline-block;
-    }
-    .button:hover{ transform:translateY(-1px); filter:brightness(1.03); }
-
-    .theme-toggle{
-      position:fixed; top:16px; right:16px; z-index:1000; border:1px solid #ffffff22; background:transparent; color:var(--text);
-      padding:10px 14px; border-radius:10px; cursor:pointer; backdrop-filter: blur(6px); transition:transform .08s ease, filter .2s ease;
-    }
-    .theme-toggle:hover{ transform:translateY(-1px); filter:brightness(1.03); }
-
-    /* фиксированный прогресс-бар снизу — визуал как в исходнике,
-       но логика — из common.js (rAF) */
-    #progressContainerFixed{
-      position:fixed; bottom:0; left:0; width:100%; height:32px; background:#eee; z-index:9999;
-    }
-    .dark #progressContainerFixed{ background:#222; }
-    #progressBarFixed{
-      height:100%; width:0%;
-      background:linear-gradient(to right, #0066ff, #00cfff);
-      position:relative;
-    }
-    #progressBarFixed.rAF{ transition:none; } /* отключаем CSS-инерцию — управляем через rAF */
-    .progress-time{
-      position:absolute; right:14px; top:50%; transform:translateY(-50%);
-      color:#fff; font-weight:700; font-size:20px; user-select:none;
-      text-shadow:0 1px 2px rgba(0,0,0,.35);
-    }
   </style>
 </head>
 <body>
-  <!-- Тумблер темы -->
+  <!-- Тумблер темы (уже оформлен в style_common.css) -->
   <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
 
   <div class="content-wrapper">
-    <!-- Инструкция (как у тебя в первоначальном) -->
-    <div class="instruction-box">
-      <p><strong>Task 1.</strong> Imagine that you are preparing a project with your friend.
+    <!-- Инструкция — используем общий .task-container -->
+    <div class="task-container" role="region" aria-labelledby="taskTitle">
+      <p id="taskTitle" style="margin-top:0;">
+        <strong>Task 1.</strong> Imagine that you are preparing a project with your friend.
         You have found some interesting material for the presentation and you want to read this text to your friend.
-        You have 1.5 minutes to read the text silently, then be ready to read it out loud. You will not have more than 1.5 minutes to read it.
+        You have <strong>1.5 minutes</strong> to read the text silently, then be ready to read it out loud.
+        You will not have more than <strong>1.5 minutes</strong> to read it.
       </p>
     </div>
 
-    <!-- Текст: БЕЗ <p>/<br>, и БЕЗ начального перевода строки! (чтобы не было зазора сверху) -->
+    <!-- Текст для чтения: БЕЗ <p>/<br>, текст сразу после <div> -->
     <div class="reading-box" id="readingBox">Bioluminescence is the ability of certain living organisms to produce light. This fascinating phenomenon can be observed in various species of deep-sea fish, jellyfish, fireflies, and even some fungi.
 
 The light is usually blue or green, which travels best through water. These organisms use light for different reasons. Some attract mates or prey, while others use it to confuse predators. For example, the anglerfish has a glowing lure to draw in its victims in the dark ocean depths.
@@ -126,28 +71,31 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
     </div>
   </div>
 
-  <!-- Хвост над прогресс-баром, чтобы фон «уходил вниз» -->
+  <!-- Проставка над фикс‑баром (см. --footer-h в style_common.css) -->
   <div style="height: calc(var(--footer-h) + 24px);"></div>
 
-  <!-- Фиксированный прогресс-бар -->
+  <!-- Фиксированный прогресс‑бар (оформление в style_common.css) -->
   <div id="progressContainerFixed" role="timer" aria-live="polite" aria-atomic="true" aria-label="Оставшееся время подготовки">
-    <div id="progressBarFixed">
+    <div id="progressBarFixed" class="rAF">
       <span id="progressTime" class="progress-time">01:30</span>
     </div>
   </div>
 
-  <!-- Логика: общий модуль проекта -->
+  <!-- Логика страницы -->
   <script type="module">
     import { toggleThemeInit, navigateOnce, startPrepareTimer, fmtTime } from "../../../common.js";
 
+    // Тема
     toggleThemeInit();
 
-    // Следующий шаг (mic) — как в твоём первоначальном
+    // Следующий шаг (mic) — подставляем номер варианта из имени файла
     const NEXT_URL = location.pathname.replace(/_1_prepare\.html$/i, '_2_mic.html');
+
+    // Кнопка перехода
     document.getElementById('goBtn')?.addEventListener('click', () => navigateOnce(NEXT_URL));
 
-    // Метаданные
-    try {
+    // Метаданные + очистка прошлой записи
+    try{
       sessionStorage.removeItem('ege1_audio_base64');
       sessionStorage.removeItem('ege1_audio_mime');
       sessionStorage.setItem('ege1_prepared', '1');
@@ -155,14 +103,14 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
         preparedAt: Date.now(),
         prepareDurationSec: 90
       }));
-    } catch {}
+    }catch{}
 
-    // Таймер на rAF (как в задании 4)
+    // Таймер 1:30 на rAF (визуал берём из style_common.css)
     const TOTAL_MS = 90_000;
     const barEl  = document.getElementById('progressBarFixed');
     const timeEl = document.getElementById('progressTime');
-    barEl.classList.add('rAF');
 
+    // Старт/рестарт
     let stopTimer = null;
     function startTimerFresh(){
       timeEl.textContent = fmtTime(TOTAL_MS);
@@ -181,14 +129,14 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
     }
     startTimerFresh();
 
-    // BFCache перезапуск
+    // BFCache: возврат со следующего шага → перезапуск таймера
     function isBackForwardNav(){
-      try {
+      try{
         const nav = performance.getEntriesByType('navigation')[0];
         return nav && nav.type === 'back_forward';
-      } catch { return false; }
+      }catch{ return false; }
     }
-    window.addEventListener('pageshow', (e) => {
+    window.addEventListener('pageshow', (e)=>{
       try { navigateOnce.lock = false; } catch {}
       if (e.persisted || isBackForwardNav()) startTimerFresh();
     });

@@ -62,8 +62,8 @@
     .theme-toggle:active{transform: scale(.98)}
 
     main{padding:40px 0 24px}
-    .card{background:var(--card); border:1px solid #ffffff1f; border-radius:22px; padding:36px; box-shadow:var(--shadow); backdrop-filter: blur(10px);}
-    .h1{font-size: clamp(26px, 5vw, 36px); line-height:1.15; margin:0 0 12px;}
+    .card{background:var(--card); border:1px solid #ffffff1f; border-radius:22px; padding:36px; box-shadow:var(--shadow); backdrop-filter: blur(10px)}
+    .h1{font-size: clamp(26px, 5vw, 36px); line-height:1.15; margin:0 0 12px}
     .sub{color:var(--muted); font-size:16px; margin:0 0 20px}
 
     .button-frame{
@@ -71,7 +71,7 @@
       padding: calc(18px * var(--btn-scale)); background: #ffffff06; backdrop-filter: blur(6px); margin-top: 12px;
     }
     .grid{ display:grid; grid-template-columns: repeat(2, minmax(260px,1fr)); gap: calc(var(--grid-gap) * var(--btn-scale)); }
-    @media (max-width:700px){ .grid{grid-template-columns:1fr} .button-frame{ --btn-scale: 1.22; } }
+    @media (max-width:700px){ .grid{grid-template-columns:1fr} .button-frame{ --btn-scale: 1.22 } }
 
     .btn{
       display:inline-flex; align-items:center; justify-content:center; gap:10px;
@@ -92,9 +92,8 @@
     footer{padding:26px 0 10px; color:var(--muted); font-size:13px; text-align:center}
     .back{border:1px dashed #ffffff28; padding:10px 14px; border-radius:10px}
 
-    /* ДОБАВЛЕНО: видимый фокус для темы и «назад» */
-    .theme-toggle:focus-visible{ box-shadow:0 0 0 4px var(--ring); outline:none; }
-    .back:focus-visible{ box-shadow:0 0 0 4px var(--ring); outline:none; }
+    .theme-toggle:focus-visible{ box-shadow:0 0 0 4px var(--ring); outline:none }
+    .back:focus-visible{ box-shadow:0 0 0 4px var(--ring); outline:none }
   </style>
 </head>
 <body>
@@ -131,37 +130,25 @@
       </section>
     </main>
 
-    <footer>
-      <div>© 2025 — Демо-версия тренажёра ЕГЭ.</div>
-    </footer>
+    <footer><div>© 2025 — Демо-версия тренажёра ЕГЭ.</div></footer>
   </div>
 
-  <!-- Модуль: общий JS выше на уровень из /ege/ -->
+  <!-- ЕДИНЫЕ обработчики из /ege/common.js -->
   <script type="module">
-    import { toggleThemeInit, navigateOnce } from '../common.js';
+    import { toggleThemeInit, navigateOnce } from './common.js';
 
-    // Тема
     toggleThemeInit();
 
-    // «На главную» — через navigateOnce
     document.querySelectorAll('.brand, .back').forEach(a=>{
       const url = a.getAttribute('href') || '../index.html';
-      a.addEventListener('click', (e)=>{
-        e.preventDefault();
-        navigateOnce(url);
-      });
+      a.addEventListener('click', (e)=>{ e.preventDefault(); navigateOnce(url); });
     });
 
-    // Переходы к заданиям — тоже через navigateOnce
     document.querySelectorAll('nav.grid .btn').forEach(a=>{
       const url = a.getAttribute('href');
-      a.addEventListener('click', (e)=>{
-        e.preventDefault();
-        navigateOnce(url);
-      });
+      a.addEventListener('click', (e)=>{ e.preventDefault(); navigateOnce(url); });
     });
 
-    // BFCache: снимаем «замок» при возврате
     window.addEventListener('pageshow', ()=>{ navigateOnce.lock = false; });
   </script>
 </body>

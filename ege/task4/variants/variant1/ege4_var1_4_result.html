@@ -74,7 +74,7 @@
 
   <div class="wrap">
     <h1 id="h1">Результат сохранён — Вариант <span id="varNum">?</span></h1>
-    <div class="status" id="statusText">
+    <div class="status" id="statusText" aria-live="polite">
       ✅ Вы успешно завершили задание. Вы можете прослушать или скачать запись ниже.
     </div>
 
@@ -87,8 +87,8 @@
     </div>
 
     <!-- Контент задания -->
-    <div class="task-container">
-      <b>4 Task. Imagine that you and your friend are doing a school project “Spending holidays: in the city or in the countryside”.</b>
+    <div class="task-container" aria-labelledby="taskTitle" aria-describedby="inst">
+      <b id="taskTitle">4 Task. Imagine that you and your friend are doing a school project “Spending holidays: in the city or in the countryside”.</b>
       <p>You have found some photos to illustrate it but for technical reasons you cannot send them now. Leave a voice message to your friend explaining your choice of the photos and sharing some ideas about the project. In 2.5 minutes be ready to:</p>
       <ul>
         <li>explain the choice of the illustrations for the project by briefly describing them and noting the differences;</li>
@@ -96,55 +96,67 @@
         <li>mention the disadvantages (1–2) of the two ways;</li>
         <li>express your opinion on the subject of the project – which way of spending holidays presented in the pictures you would prefer and why.</li>
       </ul>
-      <div class="instruction">
+      <div class="instruction" id="inst">
         You will speak for not more than 3 minutes (12–15 sentences). You have to talk continuously.
       </div>
     </div>
 
-    <div class="images">
-      <img src="photo1_city.png" alt="City holidays">
-      <img src="photo2_countryside.png" alt="Countryside holidays">
+    <div class="images" aria-label="Project illustrations">
+      <img src="photo1_city.png" alt="City holidays" loading="lazy">
+      <img src="photo2_countryside.png" alt="Countryside holidays" loading="lazy">
     </div>
 
     <div style="text-align:center;">
       <a class="btn nav-btn" id="toVariants" href="#" role="button" aria-label="Перейти к выбору варианта">Перейти к выбору варианта</a>
       <a class="btn nav-btn" id="toModeMenu" href="#" role="button" aria-label="Перейти к выбору задания">Перейти к выбору задания</a>
       <a class="btn nav-btn" id="toTaskMenu" href="#" role="button" aria-label="Перейти к выбору режима">Перейти к выбору режима</a>
-      <a class="btn nav-btn" id="toHome" href="/oge-trainer/index.html" role="button" aria-label="Перейти на главную">Перейти на главную</a>
+      <a class="btn nav-btn" id="toHome" href="#" role="button" aria-label="Перейти на главную">Перейти на главную</a>
     </div>
   </div>
 
   <script type="module">
     import { toggleThemeInit, navigateOnce } from '../../../common.js';
 
+    // Тема
     toggleThemeInit();
 
-    // --- Вариант/заголовки ---
+    // ===== Заголовок/номер варианта =====
     const path = location.pathname;
     const m = path.match(/variant(\d+)/i);
     const varNum = m ? m[1] : '?';
     document.getElementById('varNum').textContent = varNum;
     document.title = `Результат — Задание 4 · Вариант ${varNum}`;
 
-    // --- Навигация: собрать корректные href'ы ---
-    function getEgeBase(){
-      const i = path.indexOf('/ege/');
-      return i >= 0 ? path.slice(0, i + 5) : '/ege/';
+    // ===== Базы путей =====
+    function getBases(p){
+      const i = p.indexOf('/ege/');
+      if (i >= 0){
+        const ROOT_BASE = p.slice(0, i + 1); // до слеша перед 'ege'
+        const EGE_BASE  = p.slice(0, i + 5); // включая 'ege/'
+        return { ROOT_BASE, EGE_BASE };
+      }
+      return { ROOT_BASE: '/', EGE_BASE: '/ege/' };
     }
-    const base = getEgeBase();
+    const { ROOT_BASE, EGE_BASE } = getBases(path);
 
-    if (document.getElementById('toVariants')) {
-      document.getElementById('toVariants').href =
-        path.replace(/\/variants\/variant\d+\/[^/]+$/i, `/variants/ege4.html`);
+    // «к вариантам»: .../ege/task4/variants/ege4.html
+    const toVariants = document.getElementById('toVariants');
+    if (toVariants){
+      toVariants.href = path.replace(/\/variants\/variant\d+\/[^/]+$/i, '/variants/ege4.html');
     }
-    if (document.getElementById('toTaskMenu')) {
-      document.getElementById('toTaskMenu').href = `${base}ege.html`;
-    }
-    if (document.getElementById('toModeMenu')) {
-      document.getElementById('toModeMenu').href = `${base}ege_menu.html`;
-    }
+    // «к выбору задания»: .../ege/ege_menu.html
+    const toModeMenu = document.getElementById('toModeMenu');
+    if (toModeMenu) toModeMenu.href = `${EGE_BASE}ege_menu.html`;
 
-    // --- Полная очистка состояния задания 4 (чтобы новый заход был «с нуля») ---
+    // «к выбору режима»: .../ege/ege.html
+    const toTaskMenu = document.getElementById('toTaskMenu');
+    if (toTaskMenu) toTaskMenu.href = `${EGE_BASE}ege.html`;
+
+    // «на главную»: корневой index.html относительно ROOT_BASE
+    const toHome = document.getElementById('toHome');
+    if (toHome) toHome.href = `${ROOT_BASE}index.html`;
+
+    // ===== Очистка состояния задания 4 =====
     function clearTask4State(){
       try{
         Object.keys(sessionStorage).forEach(k => {
@@ -155,7 +167,6 @@
         }
       }catch{}
     }
-
     function clearAndGo(url){
       clearTask4State();
       navigateOnce(url);
@@ -166,21 +177,18 @@
     if (repeat){
       const repeatHref = path.replace(/_4_result\.html$/i, '_1_prepare.html');
       repeat.href = repeatHref;
-      repeat.addEventListener('click', (e)=>{
-        e.preventDefault();
-        clearAndGo(repeatHref);
-      });
+      repeat.addEventListener('click', (e)=>{ e.preventDefault(); clearAndGo(repeatHref); });
     }
 
-    // Остальные «перейти к ...» — тоже с navigateOnce
+    // Остальные нав-кнопки — тоже через navigateOnce
     document.querySelectorAll('.nav-btn').forEach(a=>{
-      a.addEventListener('click', (e)=>{
-        e.preventDefault();
-        clearAndGo(a.href);
-      });
+      a.addEventListener('click', (e)=>{ e.preventDefault(); clearAndGo(a.href); });
     });
 
-    // --- Аудио ---
+    // Снимаем «замок» navigateOnce при возврате из BFCache
+    window.addEventListener('pageshow', ()=>{ navigateOnce.lock = false; });
+
+    // ===== Аудио =====
     const audioEl     = document.getElementById('audio');
     const playBtn     = document.getElementById('playBtn');
     const downloadBtn = document.getElementById('downloadBtn');

@@ -73,12 +73,12 @@
     <div id="timer" class="timer" aria-live="polite">3</div>
 
     <!-- Текст для чтения -->
-     <div class="reading-box">
+    <div class="task-container" id="textBox" style="display:none">
       Bioluminescence is the ability of certain living organisms to produce light. This fascinating phenomenon can be observed in various species of deep-sea fish, jellyfish, fireflies, and even some fungi.
       The light is usually blue or green, which travels best through water. These organisms use light for different reasons. Some attract mates or prey, while others use it to confuse predators. For example, the anglerfish has a glowing lure to draw in its victims in the dark ocean depths.
-    
+      <br><br>
       Scientists believe that studying bioluminescence can help develop new medical and technological solutions. Special proteins from glowing jellyfish are already used in genetic research. These discoveries support innovation in areas like disease detection and cell tracking.
-    
+      <br><br>
       Bioluminescence is not only beautiful — it is a powerful tool of survival and discovery. These glowing creatures remind us how much we still have to learn about the natural world. Their light, shining in the darkness, is both mysterious and meaningful.
     </div>
 
@@ -242,6 +242,53 @@
       try{ streamRef?.getTracks()?.forEach(t=>t.stop()); }catch{}
     });
 
+    // --- BFCache: «назад» из result → начинаем заново с отсчёта 3-2-1 ---
+    function isBackForwardNav(){
+      try {
+        const nav = performance.getEntriesByType('navigation')[0];
+        return nav && nav.type === 'back_forward';
+      } catch { return false; }
+    }
+
+    function resetAndRestart(){
+      // остановить всё текущее
+      try { cancelAnimationFrame(rafId); } catch {}
+      try { clearInterval(cdInterval); } catch {}
+      try {
+        if (mediaRecorder?.state === 'recording') mediaRecorder.stop();
+      } catch {}
+      try { streamRef?.getTracks()?.forEach(t => t.stop()); } catch {}
+
+      // сброс UI
+      timerEl.style.display       = 'block';
+      timerEl.textContent         = '3';
+      taskContainer.style.display = 'none';
+      textBox.style.display       = 'none';
+      endBtn.style.display        = 'none';
+      progressWrap.style.display  = 'none';
+      progressBar.style.width     = '100%';
+      progressTime.textContent    = fmtTime(TOTAL_MS);
+
+      // сброс состояний
+      audioChunks = [];
+      hasStopped  = false;
+      countdown   = 3;
+
+      // повторный запуск
+      initMic();
+    }
+
+    window.addEventListener('pageshow', (e) => {
+      // всегда снимаем «замок» navigateOnce
+      try { navigateOnce.lock = false; } catch {}
+
+      // если вернулись по «назад» и страница восстановлена из BFCache
+      if (e.persisted || isBackForwardNav()) {
+        resetAndRestart();
+      }
+    });
+
+    // Первичный запуск
     window.onload = initMic;
   </script>
 </body>

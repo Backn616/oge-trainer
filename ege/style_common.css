@@ -108,7 +108,7 @@ a,button{ color:inherit; text-decoration:none; }
   text-shadow:0 1px 2px rgba(0,0,0,.35);
 }
 
-/* === MIC-страницы: центрированная карточка предупреждения === */
+/* === MIC-страницы: центрированная карточка предупреждения (SCOPED) === */
 .page-center{
   min-height:100svh;
   width:100%;
@@ -117,7 +117,7 @@ a,button{ color:inherit; text-decoration:none; }
   justify-content:center;
 }
 
-/* ВНИМАНИЕ: был глобальный .card — теперь только для mic */
+/* было .card … — теперь только mic-card, чтобы не трогать меню/начало/и т.д. */
 .mic-card{
   background:var(--card);
   border-radius:16px;

@@ -24,7 +24,7 @@
   </script>
 
   <style>
-    /* Доп. стили только для этого файла */
+    /* Таймер-цифры 3‑2‑1 */
     .timer{
       font-size:70px; margin:30px 0; font-weight:700; color:var(--primary);
       letter-spacing:4px; text-shadow:0 4px 12px rgba(0,0,0,.25);
@@ -32,14 +32,7 @@
     }
     @media (prefers-reduced-motion: reduce) { .timer{ transition:none; } }
 
-    /* Инструкция как в prepare */
-    .instruction-box{
-      max-width:2500px; width:95%; margin:0 auto 30px;
-      font-size:22px; line-height:1.6; text-align:left;
-      border:2px solid var(--panel-border); padding:25px; border-radius:12px;
-      background:var(--panel-bg); box-shadow:var(--shadow);
-    }
-
+    /* Текст для чтения — как в prepare/result */
     .reading-box{
       max-width:2500px; width:95%; margin:0 auto 30px;
       background:var(--card); border:1px solid #ccc; border-radius:12px; box-shadow:var(--shadow);
@@ -47,6 +40,18 @@
       font-size:32px; line-height:1.9;
     }
     @media (max-width:900px){ .reading-box{ font-size:28px; } }
+
+    /* Единый стиль крупных кнопок (как в result и 4‑м эталоне) */
+    .btn{
+      display:inline-block; padding:16px 32px; margin:12px;
+      font-size:20px; font-weight:600; color:#fff; text-decoration:none; cursor:pointer;
+      border:none; border-radius:12px;
+      background:linear-gradient(135deg, var(--primary), var(--primary-600));
+      box-shadow:0 10px 22px rgba(43,108,255,.3);
+      transition: transform .06s ease, filter .2s ease, box-shadow .2s ease;
+    }
+    .btn:hover{ transform: translateY(-1px); filter: brightness(1.03); }
+    .btn:disabled{ opacity:.6; cursor:not-allowed; transform:none; }
   </style>
 </head>
 <body>
@@ -54,20 +59,18 @@
   <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
 
   <div class="content-wrapper">
-    <!-- Инструкция: скрыта до конца отсчёта -->
-    <div class="instruction-box" id="instructionBox" style="display:none">
-      <p><strong>Task 1.</strong> Imagine that you are preparing a project with your friend.
-        You have found some interesting material for the presentation and you want to read this text to your friend.
-        You have 1.5 minutes to read the text silently, then be ready to read it out loud.
-        You will not have more than 1.5 minutes to read it.
-        You will read the text aloud for not more than 1.5 minutes.
-      </p>
+    <!-- Формулировка задания: СКРЫТА до конца отсчёта. Рамка — как в result (.task-container) -->
+    <div class="task-container" id="instructionBox" style="display:none" aria-labelledby="taskTitle" aria-describedby="inst">
+      <b id="taskTitle">Task 1. Imagine that you are preparing a project with your friend.</b>
+      You have found some interesting material for the presentation and you want to read this text to your friend.
+      You have 1.5 minutes to read the text silently, then be ready to read it out loud. You will not have more than 1.5 minutes to read it.
+      <div class="instruction" id="inst">You will read the text aloud for not more than 1.5 minutes.</div>
     </div>
 
     <!-- Отсчёт -->
     <div id="timer" class="timer" aria-live="polite">3</div>
 
-    <!-- Текст: скрыт до конца отсчёта -->
+    <!-- Текст для чтения: скрыт до конца отсчёта -->
     <div class="reading-box" id="textBox" style="display:none">
 Bioluminescence is the ability of certain living organisms to produce light. This fascinating phenomenon can be observed in various species of deep-sea fish, jellyfish, fireflies, and even some fungi.
 
@@ -78,15 +81,16 @@ Scientists believe that studying bioluminescence can help develop new medical an
 Bioluminescence is not only beautiful — it is a powerful tool of survival and discovery. These glowing creatures remind us how much we still have to learn about the natural world. Their light, shining in the darkness, is both mysterious and meaningful.
     </div>
 
-    <!-- Кнопка: теперь как в result -->
+    <!-- Кнопка завершения — крупная .btn -->
     <div style="text-align:center; margin-bottom:30px;">
       <button class="btn" id="endBtn" type="button" aria-label="Закончить запись" style="display:none">✅ Закончить</button>
     </div>
   </div>
 
+  <!-- Проставка над фикс‑баром -->
   <div style="height: calc(var(--footer-h) + 24px);"></div>
 
-  <!-- Фиксированный прогресс-бар -->
+  <!-- Фиксированный прогресс-бар времени ответа -->
   <div id="progressContainerFixed" role="timer" aria-live="polite" aria-atomic="true"
        aria-label="Оставшееся время ответа" style="display:none">
     <div id="progressBarFixed">
@@ -109,6 +113,7 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
 
     const RESULT_URL = location.pathname.replace(/_3_task\.html$/i, '_4_result.html');
 
+    // ===== Захват микрофона и запись =====
     let mediaRecorder = null, audioChunks = [], streamRef = null;
     let chosenMime = '', hasStopped = false;
 
@@ -150,11 +155,11 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
         startCountdown();
       }catch(err){
         alert('❌ Не удалось получить доступ к микрофону: ' + (err?.message || err));
-        startCountdown();
+        startCountdown(); // не блокируем сценарий
       }
     }
 
-    // ===== Отсчёт 3-2-1 =====
+    // ===== Отсчёт 3‑2‑1 =====
     let countdown = 3;
     let cdInterval = 0;
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -191,7 +196,7 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
       audioChunks = [];
       try{ if (mediaRecorder && mediaRecorder.state !== 'recording') mediaRecorder.start(); }catch{}
 
-      progressBar.classList.add('rAF');
+      progressBar.classList.add('rAF');   // отключаем CSS-инерцию, управляем через rAF
       endTs = performance.now() + TOTAL_MS;
       progressTime.textContent = fmtTime(TOTAL_MS);
       progressBar.style.width  = '100%';
@@ -226,6 +231,7 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
       try{ streamRef?.getTracks()?.forEach(t=>t.stop()); }catch{}
     });
 
+    // --- BFCache: назад из result → заново отсчёт и запись ---
     function isBackForwardNav(){
       try {
         const nav = performance.getEntriesByType('navigation')[0];

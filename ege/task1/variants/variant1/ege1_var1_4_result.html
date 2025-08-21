@@ -5,12 +5,12 @@
   <title>Результат — Задание 1</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- Шрифт -->
+  <!-- Шрифт как в prepare/task -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
-  <!-- Общие стили -->
+  <!-- Общие стили проекта -->
   <link rel="stylesheet" href="../../../style_common.css" />
 
   <!-- Анти-мигание темы -->
@@ -32,39 +32,27 @@
         var(--bg);
     }
 
-    .wrap{ max-width:1600px; width:95%; margin:0 auto; padding-top:24px; }
+    .wrap{ max-width: 1600px; width: 95%; margin: 0 auto; padding-top: 24px; }
     h1{ color:var(--primary); font-size:36px; margin:12px 0 6px; text-align:center; }
     .status{ font-size:20px; color:#1f7a2e; text-align:center; margin:6px 0 26px; }
     .dark .status{ color:#5ee397; }
 
     audio{ margin:20px auto; width:min(900px,95%); display:block; }
 
-    /* кнопки — как в Task 4 Result */
     .btn{
-      display:inline-block;
-      padding:16px 32px;
-      margin:12px;
-      font-size:20px;
-      font-weight:600;
-      color:#fff;
-      cursor:pointer;
-      border:none;
-      border-radius:12px;
+      display:inline-block; padding:16px 32px; margin:12px;
+      font-size:20px; font-weight:600; color:#fff; text-decoration:none; cursor:pointer;
+      border:none; border-radius:12px;
       background:linear-gradient(135deg, var(--primary), var(--primary-600));
       box-shadow:0 10px 22px rgba(43,108,255,.3);
-      transition:transform .06s ease, filter .2s ease, box-shadow .2s ease;
-      text-decoration:none;
+      transition: transform .06s ease, filter .2s ease, box-shadow .2s ease;
     }
-    .btn:hover{ transform:translateY(-1px); filter:brightness(1.03); }
+    .btn:hover{ transform: translateY(-1px); filter: brightness(1.03); }
     .btn:disabled{ opacity:.6; cursor:not-allowed; transform:none; }
 
-    /* Инструкция и текст — ровно как в prepare/task */
     .instruction-box{
-      max-width:3000px; width:95%; margin:0 auto 30px;
-      font-size:22px; line-height:1.6; text-align:left;
-      border:2px solid var(--panel-border);
-      padding:25px; border-radius:12px;
-      background:var(--panel-bg); box-shadow:var(--shadow);
+      max-width:3000px; width:95%; margin:0 auto 30px; font-size:22px; line-height:1.6; text-align:left;
+      border:2px solid var(--panel-border); padding:25px; border-radius:12px; background:var(--panel-bg); box-shadow:var(--shadow);
     }
     .reading-box{
       max-width:3000px; width:95%; margin:0 auto 30px;
@@ -72,7 +60,7 @@
       border:1px solid #ccc; padding:40px; border-radius:12px;
       background:var(--card); box-shadow:var(--shadow);
     }
-    @media (max-width:900px){
+    @media (max-width: 900px){
       .reading-box{ font-size:28px; }
     }
   </style>
@@ -92,19 +80,19 @@
 
     <div style="text-align:center;">
       <button class="btn" id="playBtn" type="button" aria-label="Проиграть запись" disabled>▶️ Прослушать</button>
-      <button class="btn" id="downloadBtn" type="button" aria-label="Скачать запись" disabled>⬇️ Скачать</button>
-      <a class="btn" id="repeatBtn" href="#" role="button" aria-label="Повторить этот вариант">🔁 Повторить</a>
+      <button class="btn" id="downloadBtn" type="button" aria-label="Скачать запись" disabled>⬇️ Скачать запись</button>
+      <a class="btn" id="repeatBtn" href="#" role="button" aria-label="Повторить этот вариант">🔁 Повторить этот вариант</a>
     </div>
 
     <!-- Инструкция -->
-    <div class="instruction-box" aria-labelledby="taskTitle" aria-describedby="inst">
-      <p><strong id="taskTitle">Task 1.</strong> Imagine that you are preparing a project with your friend.
+    <div class="task-container" aria-labelledby="taskTitle" aria-describedby="inst">
+      <b id="taskTitle">Task 1. Imagine that you are preparing a project with your friend.</b>
       You have found some interesting material for the presentation and you want to read this text to your friend.
       You have 1.5 minutes to read the text silently, then be ready to read it out loud. You will not have more than 1.5 minutes to read it.
-      <br><br><span id="inst">You will read the text aloud for not more than 1.5 minutes.</span></p>
+      <div class="instruction" id="inst">You will read the text aloud for not more than 1.5 minutes.</div>
     </div>
 
-    <!-- Текст чтения -->
+    <!-- Текст -->
     <div class="reading-box" id="textBox">Bioluminescence is the ability of certain living organisms to produce light. This fascinating phenomenon can be observed in various species of deep-sea fish, jellyfish, fireflies, and even some fungi.
 
 The light is usually blue or green, which travels best through water. These organisms use light for different reasons. Some attract mates or prey, while others use it to confuse predators. For example, the anglerfish has a glowing lure to draw in its victims in the dark ocean depths.
@@ -114,10 +102,10 @@ Scientists believe that studying bioluminescence can help develop new medical an
 Bioluminescence is not only beautiful — it is a powerful tool of survival and discovery. These glowing creatures remind us how much we still have to learn about the natural world. Their light, shining in the darkness, is both mysterious and meaningful.</div>
 
     <div style="text-align:center;">
-      <a class="btn nav-btn" id="toVariants" href="#">К вариантам</a>
-      <a class="btn nav-btn" id="toModeMenu" href="#">К выбору задания</a>
-      <a class="btn nav-btn" id="toTaskMenu" href="#">К выбору режима</a>
-      <a class="btn nav-btn" id="toHome"     href="#">На главную</a>
+      <a class="btn nav-btn" id="toVariants" href="#" role="button" aria-label="Перейти к выбору варианта">Перейти к выбору варианта</a>
+      <a class="btn nav-btn" id="toModeMenu" href="#" role="button" aria-label="Перейти к выбору задания">Перейти к выбору задания</a>
+      <a class="btn nav-btn" id="toTaskMenu" href="#" role="button" aria-label="Перейти к выбору режима">Перейти к выбору режима</a>
+      <a class="btn nav-btn" id="toHome"     href="#" role="button" aria-label="Перейти на главную">Перейти на главную</a>
     </div>
   </div>
 
@@ -153,11 +141,8 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
 
     function clearTask1State(){
       try{
-        Object.keys(sessionStorage).forEach(k => {
-          if (k.startsWith('ege1_')) sessionStorage.removeItem(k);
-        });
-        if (varNum && /^\d+$/.test(varNum))
-          sessionStorage.removeItem(`ege1_var${varNum}_prepare_endtime`);
+        Object.keys(sessionStorage).forEach(k => { if (k.startsWith('ege1_')) sessionStorage.removeItem(k); });
+        if (varNum && /^\d+$/.test(varNum)) sessionStorage.removeItem(`ege1_var${varNum}_prepare_endtime`);
       }catch{}
     }
     function clearAndGo(url){ clearTask1State(); navigateOnce(url); }
@@ -166,20 +151,15 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
     if (repeat){
       const repeatHref = path.replace(/_4_result\.html$/i, '_1_prepare.html');
       repeat.href = repeatHref;
-      repeat.addEventListener('click', e=>{
-        e.preventDefault(); clearAndGo(repeatHref);
-      });
+      repeat.addEventListener('click', (e)=>{ e.preventDefault(); clearAndGo(repeatHref); });
     }
 
     document.querySelectorAll('.nav-btn').forEach(a=>{
-      a.addEventListener('click', e=>{
-        e.preventDefault(); clearAndGo(a.href);
-      });
+      a.addEventListener('click', (e)=>{ e.preventDefault(); clearAndGo(a.href); });
     });
 
     window.addEventListener('pageshow', ()=>{ navigateOnce.lock = false; });
 
-    // ===== Аудио =====
     const audioEl     = document.getElementById('audio');
     const playBtn     = document.getElementById('playBtn');
     const downloadBtn = document.getElementById('downloadBtn');

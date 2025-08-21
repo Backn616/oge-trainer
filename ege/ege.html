@@ -4,7 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>ЕГЭ — Начало</title>
+
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
   <!-- Анти-мигание темы -->
@@ -128,23 +130,33 @@
     </footer>
   </div>
 
-  <script>
-    (function () {
-      const btn = document.getElementById('themeBtn');
-      const key = 'pref-theme';
+  <!-- Общий модуль -->
+  <script type="module">
+    import { toggleThemeInit, navigateOnce } from '../common.js';
 
-      function apply(mode){
-        document.documentElement.classList.toggle('dark', mode === 'dark');
-        localStorage.setItem(key, mode);
-      }
+    // Тема (единая логика на всех страницах)
+    toggleThemeInit();
 
-      apply(localStorage.getItem(key) || 'light');
-
-      btn.addEventListener('click', () => {
-        const curr = localStorage.getItem(key) || 'light';
-        apply(curr === 'dark' ? 'light' : 'dark');
+    // «На главную» — через navigateOnce
+    document.querySelectorAll('.brand').forEach(a=>{
+      const url = a.getAttribute('href') || '../index.html';
+      a.addEventListener('click', (e)=>{
+        e.preventDefault();
+        navigateOnce(url);
       });
-    })();
+    });
+
+    // Кнопки выбора режима — тоже через navigateOnce
+    document.querySelectorAll('.card .btn').forEach(a=>{
+      const url = a.getAttribute('href');
+      a.addEventListener('click', (e)=>{
+        e.preventDefault();
+        navigateOnce(url);
+      });
+    });
+
+    // BFCache: снимаем «замок» при возврате
+    window.addEventListener('pageshow', ()=>{ navigateOnce.lock = false; });
   </script>
 </body>
 </html>

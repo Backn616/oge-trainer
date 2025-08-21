@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
-  <!-- Общие стили проекта (ширина 2500px, рамки, фон и пр.) -->
+  <!-- Общие стили проекта -->
   <link rel="stylesheet" href="../../../style_common.css" />
 
   <!-- Анти-мигание темы -->
@@ -24,13 +24,28 @@
   </script>
 
   <style>
-    /* Только то, чего нет в style_common: таймер и мелочи */
+    /* Доп.стили только для этого файла */
     .timer{
       font-size:70px; margin:30px 0; font-weight:700; color:var(--primary);
       letter-spacing:4px; text-shadow:0 4px 12px rgba(0,0,0,.25);
       transition:transform .25s ease; will-change:transform; text-align:center;
     }
-    @media (prefers-reduced-motion: reduce){ .timer{ transition:none; } }
+    @media (prefers-reduced-motion: reduce) { .timer{ transition:none; } }
+
+    .instruction-box{
+      max-width:2500px; width:95%; margin:0 auto 30px;
+      font-size:22px; line-height:1.6; text-align:left;
+      border:2px solid var(--primary); padding:25px; border-radius:12px;
+      background:var(--card); box-shadow:var(--shadow);
+    }
+
+    .reading-box{
+      max-width:2500px; width:95%; margin:0 auto 30px;
+      background:var(--card); border:1px solid #ccc; border-radius:12px; box-shadow:var(--shadow);
+      padding:40px; text-align:left;
+      font-size:32px; line-height:1.9;
+    }
+    @media (max-width:900px){ .reading-box{ font-size:28px; } }
   </style>
 </head>
 <body>
@@ -38,7 +53,7 @@
   <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
 
   <div class="content-wrapper">
-    <!-- Инструкция: СКРЫТА до конца отсчёта, оформлена КАК В PREPARE -->
+    <!-- Инструкция: скрыта до конца отсчёта -->
     <div class="instruction-box" id="instructionBox" style="display:none">
       <p><strong>Task 1.</strong> Imagine that you are preparing a project with your friend.
         You have found some interesting material for the presentation and you want to read this text to your friend.
@@ -51,25 +66,27 @@
     <!-- Отсчёт -->
     <div id="timer" class="timer" aria-live="polite">3</div>
 
-    <!-- Текст чтения (тоже скрыт до отсчёта) -->
-    <div id="textBox" class="reading-box" style="display:none">Bioluminescence is the ability of certain living organisms to produce light. This fascinating phenomenon can be observed in various species of deep-sea fish, jellyfish, fireflies, and even some fungi.
+    <!-- Текст: скрыт до конца отсчёта -->
+    <div class="reading-box" id="textBox" style="display:none">
+Bioluminescence is the ability of certain living organisms to produce light. This fascinating phenomenon can be observed in various species of deep-sea fish, jellyfish, fireflies, and even some fungi.
 
 The light is usually blue or green, which travels best through water. These organisms use light for different reasons. Some attract mates or prey, while others use it to confuse predators. For example, the anglerfish has a glowing lure to draw in its victims in the dark ocean depths.
 
 Scientists believe that studying bioluminescence can help develop new medical and technological solutions. Special proteins from glowing jellyfish are already used in genetic research. These discoveries support innovation in areas like disease detection and cell tracking.
 
-Bioluminescence is not only beautiful — it is a powerful tool of survival and discovery. These glowing creatures remind us how much we still have to learn about the natural world. Their light, shining in the darkness, is both mysterious and meaningful.</div>
+Bioluminescence is not only beautiful — it is a powerful tool of survival and discovery. These glowing creatures remind us how much we still have to learn about the natural world. Their light, shining in the darkness, is both mysterious and meaningful.
+    </div>
 
     <div style="text-align:center; margin-bottom:30px;">
       <button class="button" id="endBtn" type="button" aria-label="Закончить запись" style="display:none">✅ Закончить</button>
     </div>
   </div>
 
-  <!-- Проставка над фикс‑баром -->
   <div style="height: calc(var(--footer-h) + 24px);"></div>
 
-  <!-- Фиксированный прогресс‑бар -->
-  <div id="progressContainerFixed" role="timer" aria-live="polite" aria-atomic="true" aria-label="Оставшееся время ответа" style="display:none">
+  <!-- Фиксированный прогресс-бар -->
+  <div id="progressContainerFixed" role="timer" aria-live="polite" aria-atomic="true"
+       aria-label="Оставшееся время ответа" style="display:none">
     <div id="progressBarFixed">
       <span id="progressTime" class="progress-time">01:30</span>
     </div>
@@ -78,10 +95,8 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
   <script type="module">
     import { toggleThemeInit, navigateOnce, fmtTime } from '../../../common.js';
 
-    // Тема
     toggleThemeInit();
 
-    // DOM
     const timerEl        = document.getElementById('timer');
     const instructionBox = document.getElementById('instructionBox');
     const textBox        = document.getElementById('textBox');
@@ -90,19 +105,17 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
     const progressBar    = document.getElementById('progressBarFixed');
     const progressTime   = document.getElementById('progressTime');
 
-    // Навигация → result
     const RESULT_URL = location.pathname.replace(/_3_task\.html$/i, '_4_result.html');
 
-    // ===== Микрофон и запись =====
-    let mediaRecorder = null;
-    let audioChunks   = [];
-    let streamRef     = null;
-    let chosenMime    = '';
-    let hasStopped    = false;
+    let mediaRecorder = null, audioChunks = [], streamRef = null;
+    let chosenMime = '', hasStopped = false;
 
     function pickMimeType(){
-      const list = ['audio/webm;codecs=opus','audio/webm','audio/mp4','audio/ogg;codecs=opus','audio/ogg'];
-      for (const t of list){ if (window.MediaRecorder?.isTypeSupported?.(t)) return t; }
+      const candidates = [
+        'audio/webm;codecs=opus','audio/webm','audio/mp4',
+        'audio/ogg;codecs=opus','audio/ogg'
+      ];
+      for (const t of candidates){ if (window.MediaRecorder?.isTypeSupported?.(t)) return t; }
       return '';
     }
 
@@ -139,7 +152,7 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
       }
     }
 
-    // ===== Отсчёт 3‑2‑1 =====
+    // ===== Отсчёт 3-2-1 =====
     let countdown = 3;
     let cdInterval = 0;
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -164,9 +177,7 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
 
     // ===== Таймер ответа 1:30 на rAF =====
     const TOTAL_MS = 90_000;
-    let endTs = 0;
-    let rafId = 0;
-    let lastAnnounce = 0;
+    let endTs = 0, rafId = 0, lastAnnounce = 0;
 
     function startTask(){
       instructionBox.style.display = 'block';
@@ -213,12 +224,11 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
       try{ streamRef?.getTracks()?.forEach(t=>t.stop()); }catch{}
     });
 
-    // --- BFCache reset: назад из result → заново ---
     function isBackForwardNav(){
-      try{
+      try {
         const nav = performance.getEntriesByType('navigation')[0];
         return nav && nav.type === 'back_forward';
-      }catch{ return false; }
+      } catch { return false; }
     }
     function resetAndRestart(){
       try { cancelAnimationFrame(rafId); } catch {}
@@ -241,12 +251,11 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
 
       initMic();
     }
-    window.addEventListener('pageshow', (e)=>{
+    window.addEventListener('pageshow', (e) => {
       try { navigateOnce.lock = false; } catch {}
       if (e.persisted || isBackForwardNav()) resetAndRestart();
     });
 
-    // Старт
     window.onload = initMic;
   </script>
 </body>

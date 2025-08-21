@@ -202,17 +202,13 @@
       let toggleThemeInit = () => {
         const key = 'pref-theme';
         const btn = document.getElementById('themeBtn');
+        const get = () => { try { return localStorage.getItem(key) || 'light'; } catch { return 'light'; } };
         const apply = (mode)=> {
           document.documentElement.classList.toggle('dark', mode === 'dark');
           try { localStorage.setItem(key, mode); } catch {}
         };
-        apply((() => { try { return localStorage.getItem(key) || 'light'; } catch { return 'light'; } })());
-        btn?.addEventListener('click', () => {
-          const mode = (()=>{
-            try { return localStorage.getItem(key) || 'light'; } catch { return 'light'; }
-          })();
-          apply(mode === 'dark' ? 'light' : 'dark');
-        });
+        apply(get());
+        btn?.addEventListener('click', () => { const m = get(); apply(m === 'dark' ? 'light' : 'dark'); });
       };
 
       // Вычисляем /ege/ и пробуем импортировать общий модуль
@@ -229,7 +225,7 @@
         console.warn('Не удалось импортировать common.js:', commonUrl, e);
       }
 
-      // Инициализируем тему в любом случае
+      // Тема — инициализируем в любом случае
       try { toggleThemeInit(); } catch {}
 
       // «Назад к меню»
@@ -289,7 +285,7 @@
 
       renderPage(1);
 
-      // BFCache: снять замок (если navigateOnce есть)
+      // BFCache: снять «замок» (если navigateOnce есть)
       try { window.addEventListener('pageshow', () => { navigateOnce.lock = false; }); } catch {}
     })();
   </script>

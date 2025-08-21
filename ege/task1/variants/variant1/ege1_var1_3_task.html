@@ -8,7 +8,7 @@
   <!-- Шрифт -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
   <!-- Общие стили -->
   <link rel="stylesheet" href="../../../style_common.css" />
@@ -24,36 +24,26 @@
   </script>
 
   <style>
+    /* Отсчёт 3-2-1 */
     .timer{
-      font-size:70px;
-      margin:30px 0;
-      font-weight:700;
-      color:var(--primary);
-      letter-spacing:4px;
-      text-shadow:0 4px 12px rgba(0,0,0,.25);
-      transition:transform .25s ease;
-      will-change:transform;
-      text-align:center;
+      font-size:70px; margin:30px 0; font-weight:700; color:var(--primary);
+      letter-spacing:4px; text-shadow:0 4px 12px rgba(0,0,0,.25);
+      transition:transform .25s ease; will-change:transform; text-align:center;
     }
-    @media (prefers-reduced-motion: reduce) {
-      .timer{ transition:none; }
-    }
+    @media (prefers-reduced-motion: reduce) { .timer{ transition:none; } }
 
+    /* Широкие рамки (инструкция + текст) */
+    .task-container.wide{
+      max-width:3000px; width:95%; margin:0 auto 30px;
+    }
+    /* Текст — как в prepare: большие кегли, без pre-line, старт сразу у верхней кромки */
     #textBox{
-      background: var(--card);
-      border-left: 5px solid var(--primary);
-      padding: 40px;
-      margin-bottom: 30px;
-      box-shadow: var(--shadow);
-      border-radius: 12px;
-      text-align: left;
-      font-size: 28px;
-      line-height: 1.8;
-      white-space: pre-line; /* переносы строк */
+      max-width:3000px; width:95%; margin:0 auto 30px;
+      background:var(--card); border:1px solid #ccc; border-left:5px solid var(--primary);
+      padding:40px; border-radius:12px; box-shadow:var(--shadow);
+      text-align:left; font-size:32px; line-height:1.9;
     }
-    @media (max-width:900px){
-      #textBox{ font-size: 24px; }
-    }
+    @media (max-width:900px){ #textBox{ font-size:28px; } }
   </style>
 </head>
 <body>
@@ -62,7 +52,7 @@
 
   <div class="content-wrapper">
     <!-- Инструкция -->
-    <div class="task-container" id="taskContainer" aria-labelledby="taskTitle" aria-describedby="inst" style="display:none">
+    <div class="task-container wide" id="taskContainer" aria-labelledby="taskTitle" aria-describedby="inst" style="display:none">
       <b id="taskTitle">Task 1. Imagine that you are preparing a project with your friend.</b>
       You have found some interesting material for the presentation and you want to read this text to your friend.
       You have 1.5 minutes to read the text silently, then be ready to read it out loud. You will not have more than 1.5 minutes to read it.
@@ -72,22 +62,22 @@
     <!-- Отсчёт -->
     <div id="timer" class="timer" aria-live="polite">3</div>
 
-    <!-- Текст -->
-    <div class="task-container" id="textBox" style="display:none">
-Bioluminescence is the ability of certain living organisms to produce light. This fascinating phenomenon can be observed in various species of deep-sea fish, jellyfish, fireflies, and even some fungi.
+    <!-- Текст (без <p>/<br>, начинается сразу после <div>) -->
+    <div class="task-container" id="textBox" style="display:none">Bioluminescence is the ability of certain living organisms to produce light. This fascinating phenomenon can be observed in various species of deep-sea fish, jellyfish, fireflies, and even some fungi.
 
 The light is usually blue or green, which travels best through water. These organisms use light for different reasons. Some attract mates or prey, while others use it to confuse predators. For example, the anglerfish has a glowing lure to draw in its victims in the dark ocean depths.
 
 Scientists believe that studying bioluminescence can help develop new medical and technological solutions. Special proteins from glowing jellyfish are already used in genetic research. These discoveries support innovation in areas like disease detection and cell tracking.
 
-Bioluminescence is not only beautiful — it is a powerful tool of survival and discovery. These glowing creatures remind us how much we still have to learn about the natural world. Their light, shining in the darkness, is both mysterious and meaningful.
-    </div>
+Bioluminescence is not only beautiful — it is a powerful tool of survival and discovery. These glowing creatures remind us how much we still have to learn about the natural world. Their light, shining in the darkness, is both mysterious and meaningful.</div>
 
     <button class="button" id="endBtn" type="button" aria-label="Закончить запись" style="display:none">✅ Закончить</button>
   </div>
 
+  <!-- Проставка над фикс-баром -->
   <div style="height: calc(var(--footer-h) + 24px);"></div>
 
+  <!-- Фиксированный прогресс-бар -->
   <div id="progressContainerFixed" role="timer" aria-live="polite" aria-label="Оставшееся время ответа" style="display:none">
     <div id="progressBarFixed">
       <span id="progressTime" class="progress-time">01:30</span>
@@ -117,15 +107,10 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
 
     function pickMimeType(){
       const candidates = [
-        'audio/webm;codecs=opus',
-        'audio/webm',
-        'audio/mp4',
-        'audio/ogg;codecs=opus',
-        'audio/ogg'
+        'audio/webm;codecs=opus','audio/webm','audio/mp4',
+        'audio/ogg;codecs=opus','audio/ogg'
       ];
-      for (const t of candidates){
-        if (window.MediaRecorder?.isTypeSupported?.(t)) return t;
-      }
+      for (const t of candidates){ if (window.MediaRecorder?.isTypeSupported?.(t)) return t; }
       return '';
     }
 
@@ -135,8 +120,7 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
         streamRef = stream;
 
         chosenMime = pickMimeType();
-        mediaRecorder = chosenMime ? new MediaRecorder(stream, { mimeType: chosenMime })
-                                   : new MediaRecorder(stream);
+        mediaRecorder = chosenMime ? new MediaRecorder(stream, { mimeType: chosenMime }) : new MediaRecorder(stream);
 
         mediaRecorder.ondataavailable = (e)=>{ if (e.data?.size) audioChunks.push(e.data); };
         mediaRecorder.onstop = () => {
@@ -241,13 +225,10 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
         return nav && nav.type === 'back_forward';
       } catch { return false; }
     }
-
     function resetAndRestart(){
       try { cancelAnimationFrame(rafId); } catch {}
       try { clearInterval(cdInterval); } catch {}
-      try {
-        if (mediaRecorder?.state === 'recording') mediaRecorder.stop();
-      } catch {}
+      try { if (mediaRecorder?.state === 'recording') mediaRecorder.stop(); } catch {}
       try { streamRef?.getTracks()?.forEach(t => t.stop()); } catch {}
 
       timerEl.style.display       = 'block';
@@ -265,12 +246,9 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
 
       initMic();
     }
-
     window.addEventListener('pageshow', (e) => {
       try { navigateOnce.lock = false; } catch {}
-      if (e.persisted || isBackForwardNav()) {
-        resetAndRestart();
-      }
+      if (e.persisted || isBackForwardNav()) resetAndRestart();
     });
 
     window.onload = initMic;

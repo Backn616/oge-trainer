@@ -2,146 +2,172 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Подготовка — Задание 2</title>
+  <title>Task 2 — Preparation</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Шрифт -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+
+  <!-- Общие стили проекта -->
+  <link rel="stylesheet" href="../../../style_common.css" />
+
+  <!-- Локальная раскладка под макет «текст слева — фото справа» -->
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #ffffff;
-      text-align: center;
-      padding: 40px;
+    .ad-layout{
+      display:grid;
+      grid-template-columns: 1.05fr 0.95fr; /* чуть больше места под текст */
+      gap:32px;
+      align-items:start;
     }
-    .task-wrapper {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 40px;
-      max-width: 1600px;
-      margin: 0 auto;
-      text-align: left;
+    .ad-side{
+      text-align:center;
     }
-    .task-left {
-      flex: 1.5;
+    .ad-title{
+      font-weight:800;
+      font-size:26px;
+      margin:0 0 14px;
     }
-    .task-number {
-      float: left;
-      font-size: 40px;
-      background-color: #009fe3;
-      color: white;
-      border-radius: 50%;
-      width: 50px;
-      height: 50px;
-      line-height: 50px;
-      text-align: center;
-      margin-right: 15px;
-      font-weight: bold;
+    .ad-figure img{
+      width:100%;
+      height:auto;
+      border-radius:12px;
+      box-shadow:var(--shadow);
     }
-    .task-text {
-      overflow: hidden;
-      font-size: 20px;
-      line-height: 1.6;
+    /* немного притопим отступы в карточке текста, чтобы походило на скрин */
+    .task-container h1, .task-container b#taskTitle{
+      display:block;
+      margin-bottom:10px;
+      font-size:24px;
     }
-    .task-text b {
-      font-weight: bold;
+    .task-container .instruction{
+      margin-top:20px;
     }
-    .image-block {
-      flex: 1;
-      text-align: right;
-    }
-    .image-block img {
-      max-width: 100%;
-      max-height: 400px;
-      height: auto;
-      border: 1px solid #ccc;
-    }
-    .reading-timer {
-      font-size: 56px;
-      color: #b30000;
-      margin-top: 20px;
-    }
-    .progress-container {
-      width: 90%;
-      background-color: #eee;
-      border-radius: 25px;
-      margin: 30px auto 20px;
-      height: 30px;
-      box-shadow: inset 0 1px 3px rgba(0,0,0,.2);
-    }
-    .progress-bar {
-      height: 100%;
-      width: 100%;
-      background: linear-gradient(to right, #4facfe, #00f2fe);
-      transition: width 1s linear;
-      border-radius: 25px 0 0 25px;
-    }
-    .button {
-      margin-top: 30px;
-      padding: 16px 32px;
-      font-size: 20px;
-      border: none;
-      border-radius: 8px;
-      background-color: #0077cc;
-      color: white;
-      cursor: pointer;
-    }
-    .button:hover {
-      background-color: #005fa3;
+
+    @media (max-width: 1100px){
+      .ad-layout{ grid-template-columns: 1fr; }
+      .ad-side{ order:2; }
     }
   </style>
+
+  <!-- Анти-мигание темы -->
+  <script>
+    (function(){
+      try{
+        const saved = localStorage.getItem('pref-theme') || 'light';
+        if (saved === 'dark') document.documentElement.classList.add('dark');
+      }catch(_){}
+    })();
+  </script>
 </head>
 <body>
+  <!-- Тумблер темы -->
+  <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
 
-  <div class="task-wrapper">
-    <div class="task-left">
-      <div class="task-number">2</div>
-      <div class="task-text">
-        <b>Task 2.</b> Study the advertisement.<br/>
-        You are considering joining the photo club and now you’d like to get more information.
-        In 1.5 minutes you are to ask four direct questions to find out about the following:<br/><br/>
-        1) location;<br/>
-        2) activities offered;<br/>
-        3) photo contests;<br/>
-        4) membership fee.<br/><br/>
-        <b>You have 20 seconds to ask each question.</b><br/><br/>
-        <b>Join our photo club!</b><br/>
-        Learn to take stunning pictures and meet fellow photo lovers.<br/>
-        Exciting activities, contests, and masterclasses every month!
-      </div>
+  <div class="content-wrapper ad-layout">
+    <!-- ЛЕВАЯ КОЛОНКА: текст задания -->
+    <div class="task-container" aria-labelledby="taskTitle" aria-describedby="inst">
+      <b id="taskTitle">Task 2. Study the advertisement.</b>
+      <b>You are considering joining the bike club and now you’d like to get more information.
+      In 1.5 minutes you are to ask four direct questions to find out about the following:</b>
+      <ul>
+        <li>minimum age;</li>
+        <li>special clothes;</li>
+        <li>bicycle rental;</li>
+        <li>competitions.</li>
+      </ul>
+      <div class="instruction" id="inst"><b>You have 20 seconds to ask each question.</b></div>
     </div>
-    <div class="image-block">
-      <img src="photo_club.png" alt="Join our photo club">
+
+    <!-- ПРАВАЯ КОЛОНКА: заголовок объявления + фото -->
+    <aside class="ad-side" aria-label="Advertisement">
+      <h2 class="ad-title">Join our bike club!</h2>
+      <figure class="ad-figure">
+        <!-- Место для фото -->
+        <img src="task2_bike.jpg" alt="Bike club advertisement image" loading="lazy">
+      </figure>
+    </aside>
+  </div>
+
+  <!-- Кнопка перехода дальше (логика как в Task 4) -->
+  <div style="text-align:center; margin: 20px 0 30px;">
+    <button id="goBtn" class="button" type="button" aria-label="Перейти к выполнению">Перейти к выполнению</button>
+  </div>
+
+  <!-- Фиксированный прогресс-бар снизу -->
+  <div id="progressContainerFixed" role="timer" aria-live="polite" aria-label="Оставшееся время подготовки">
+    <div id="progressBarFixed">
+      <span id="progressTime" class="progress-time">01:30</span>
     </div>
   </div>
 
-  <div class="reading-timer" id="reading-timer">01:30</div>
-  <div class="progress-container">
-    <div class="progress-bar" id="progress-bar"></div>
-  </div>
+  <!-- ЛОГИКА страницы (полностью совместима с prepare из Task 4) -->
+  <script type="module">
+    import { toggleThemeInit, navigateOnce, startPrepareTimer, fmtTime } from "../../../common.js";
 
-  <button class="button" onclick="window.location.href='ege2_read2_q1.html'">Приступить к выполнению</button>
+    // Тема
+    toggleThemeInit();
 
-  <script>
-    let totalSeconds = 90;
-    const progressBar = document.getElementById("progress-bar");
-    const timerEl = document.getElementById("reading-timer");
+    // Служебные метки
+    try{
+      sessionStorage.removeItem('ege2_audio_base64');
+      sessionStorage.setItem('ege2_prepared','1');
+      const meta = { preparedAt: Date.now(), prepareDurationSec: 90 };
+      sessionStorage.setItem('ege2_meta', JSON.stringify(meta));
+    }catch{}
 
-    function updateTimer() {
-      const minutes = String(Math.floor(totalSeconds / 60)).padStart(2, '0');
-      const seconds = String(totalSeconds % 60).padStart(2, '0');
-      timerEl.textContent = `${minutes}:${seconds}`;
-      progressBar.style.width = (totalSeconds / 90 * 100) + "%";
+    // URL следующего шага (mic)
+    const NEXT_URL = /_1_prepare\.html$/i.test(location.pathname)
+      ? location.pathname.replace(/_1_prepare\.html$/i, '_2_mic.html')
+      : location.pathname.replace(/\.html$/i, '_2_mic.html');
+
+    // Кнопка "Перейти"
+    document.getElementById('goBtn')?.addEventListener('click', () => {
+      navigateOnce(NEXT_URL);
+    });
+
+    // Таймер 1:30 (rAF)
+    const TOTAL_MS = 90_000;
+    const barEl  = document.getElementById('progressBarFixed');
+    const timeEl = document.getElementById('progressTime');
+    barEl.classList.add('rAF');
+
+    let stopTimer = null;
+
+    function startTimerFresh(){
+      timeEl.textContent = fmtTime(TOTAL_MS);
+      barEl.style.width = '100%';
+
+      stopTimer?.();
+      stopTimer = startPrepareTimer({
+        barEl,
+        timeEl,
+        totalMs: TOTAL_MS,
+        nextUrl: NEXT_URL,
+        key: 'ege2_prepare_end',
+        persist: false,
+        textEveryMs: 250,
+        useRAF: true
+      });
     }
 
-    const interval = setInterval(() => {
-      totalSeconds--;
-      updateTimer();
-      if (totalSeconds <= 0) {
-        clearInterval(interval);
-        window.location.href = "ege2_read2_q1.html";
-      }
-    }, 1000);
+    startTimerFresh();
 
-    updateTimer();
+    // Перезапуск при возврате назад / BFCache
+    function isBackForwardNav(){
+      try {
+        const nav = performance.getEntriesByType('navigation')[0];
+        return nav && nav.type === 'back_forward';
+      } catch { return false; }
+    }
+
+    window.addEventListener('pageshow', (e) => {
+      navigateOnce.lock = false;
+      if (e.persisted || isBackForwardNav()) {
+        startTimerFresh();
+      }
+    });
   </script>
 </body>
 </html>

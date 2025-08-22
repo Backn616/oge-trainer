@@ -4,9 +4,24 @@
   <meta charset="UTF-8" />
   <title>Task 2 — Questions</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Шрифты (как в эталоне) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+
+  <!-- Общие стили (фон и фирменный стиль) -->
   <link rel="stylesheet" href="../../../style_common.css" />
+
   <style>
-    .q-layout{ display:grid; grid-template-columns:1.05fr 0.95fr; gap:28px 36px; align-items:start; max-width:1500px; margin-inline:auto; }
+    .q-layout{
+      display:grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap:28px 36px;
+      align-items:start;
+      max-width:1500px;
+      margin-inline:auto;
+    }
     .q-left h2{ margin:0 0 10px; font-size:28px; line-height:1.2; }
     .q-left p{ font-size:22px; line-height:1.55; margin:0 0 10px; }
     .ad-title{ font-weight:800; font-size:30px; margin:6px 0 12px; text-align:center; }
@@ -14,18 +29,38 @@
     .ad-figure>img{ width:100%; height:100%; object-fit:cover; object-position:center; display:block; }
     .actions{ grid-column:1 / -1; text-align:center; margin-top:10px; margin-bottom:6px; }
     @media (max-width:1100px){ .q-layout{ grid-template-columns:1fr; gap:22px; } }
-    .timer{ font-size:70px; margin:30px 0; font-weight:700; color:var(--primary); letter-spacing:4px; text-shadow:0 4px 12px rgba(0,0,0,.25); text-align:center; }
+
+    /* Большой «3–2–1» */
+    .timer{
+      font-size:70px;
+      margin:30px 0;
+      font-weight:700;
+      color:var(--primary);
+      letter-spacing:4px;
+      text-shadow:0 4px 12px rgba(0,0,0,.25);
+      text-align:center;
+    }
   </style>
+
+  <!-- Анти-мигание темы -->
   <script>
-    (function(){ try{ const s=localStorage.getItem('pref-theme')||'light'; if(s==='dark')document.documentElement.classList.add('dark'); }catch(_){}})();
+    (function(){
+      try{
+        const saved = localStorage.getItem('pref-theme') || 'light';
+        if (saved === 'dark') document.documentElement.classList.add('dark');
+      }catch(_){}
+    })();
   </script>
 </head>
 <body>
+  <!-- Тумблер темы -->
   <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
 
   <div class="content-wrapper">
+    <!-- Отсчёт -->
     <div id="timer" class="timer" aria-live="polite">3</div>
 
+    <!-- Вопросы -->
     <div id="qWrap" class="q-layout" style="display:none">
       <section class="q-left" aria-live="polite">
         <h2 id="qTitle">Question 1.</h2>
@@ -45,6 +80,7 @@
     </div>
   </div>
 
+  <!-- Прогресс-бар (как в эталоне) -->
   <div id="progressContainerFixed" role="timer" aria-live="polite" style="display:none">
     <div id="progressBarFixed" class="rAF">
       <span id="progressTime" class="progress-time">00:20</span>
@@ -55,10 +91,10 @@
     import { toggleThemeInit, navigateOnce, fmtTime } from "../../../common.js";
     toggleThemeInit();
 
-    // ——— Жёсткий сброс на перезагрузке
+    // --- Жёсткий сброс при загрузке (перезагрузке) ---
     try{ sessionStorage.removeItem('ege2_audio_parts'); }catch{}
 
-    // ——— Тексты
+    // ===== Тексты =====
     const QUESTIONS = [
       { title: "Question 1.", line: "1) Ask a direct question about the following: <b>minimum age.</b>" },
       { title: "Question 2.", line: "2) Ask a direct question about the following: <b>special clothes.</b>" },
@@ -66,7 +102,7 @@
       { title: "Question 4.", line: "4) Ask a direct question about the following: <b>competitions.</b>" }
     ];
 
-    // ——— DOM
+    // ===== DOM =====
     const timerEl  = document.getElementById('timer');
     const qWrap    = document.getElementById('qWrap');
     const qTitleEl = document.getElementById('qTitle');
@@ -77,44 +113,24 @@
     const timeEl   = document.getElementById('progressTime');
     const RESULT_URL = location.pathname.replace(/_3_task\.html$/i, '_4_result.html');
 
-    // ——— TTS: надёжная озвучка
-    let voicesReady = false;
-    function ensureVoices(timeoutMs = 1500){
-      return new Promise(resolve=>{
-        const ok = () => { voicesReady = true; resolve(); };
-        const have = () => (speechSynthesis.getVoices()||[]).length > 0;
-        if (have()) return ok();
-        const onv = () => { if (have()){ speechSynthesis.removeEventListener('voiceschanged', onv); ok(); } };
-        speechSynthesis.addEventListener('voiceschanged', onv);
-        setTimeout(()=>{ speechSynthesis.removeEventListener('voiceschanged', onv); ok(); }, timeoutMs);
-      });
-    }
-    function pickVoice(){
-      const vs = speechSynthesis.getVoices()||[];
-      return vs.find(v=>/en-GB/i.test(v.lang)) || vs.find(v=>/en-US/i.test(v.lang)) || vs[0] || null;
-    }
-    async function speakQuestion(num){
+    // ===== Озвучка (как раньше) =====
+    function speakQuestion(num){
       try{
-        await ensureVoices();
-        speechSynthesis.resume(); // на случай паузы после перезагрузки
-        speechSynthesis.cancel(); // очистить очередь
+        // простая и надёжная схема: отменить очередь, сказать фразу, ждать onend
+        speechSynthesis.cancel();
         const u = new SpeechSynthesisUtterance("Question " + num);
-        const v = pickVoice(); if (v) u.voice = v;
-        u.lang = (v?.lang || "en-US"); u.rate = 1.0; u.pitch = 1.0;
+        u.lang = "en-US"; u.rate = 1.0; u.pitch = 1.0;
         return new Promise(res=>{
-          const to = setTimeout(res, 1500);
+          const to = setTimeout(res, 1500);   // фолбэк на случай странностей
           u.onend = () => { clearTimeout(to); res(); };
           u.onerror = () => { clearTimeout(to); res(); };
+          try { speechSynthesis.resume(); } catch {}
           speechSynthesis.speak(u);
         });
-      }catch{ return; }
+      }catch{ return Promise.resolve(); }
     }
-    // Дополнительно «разблокируем» TTS на первом пользовательском действии
-    const unlockTTS = () => { try{ speechSynthesis.resume(); }catch{} window.removeEventListener('click', unlockTTS); window.removeEventListener('touchstart', unlockTTS); };
-    window.addEventListener('click', unlockTTS, { passive:true });
-    window.addEventListener('touchstart', unlockTTS, { passive:true });
 
-    // ——— Микрофон
+    // ===== Микрофон (параллельно, без блокировки) =====
     let streamRef=null, recorder=null, chunks=[];
     let chosenMime='';
     function pickMimeType(){
@@ -131,9 +147,9 @@
         recorder.onstop = handleStop;
       }catch{ recorder=null; }
     }
-    let micReadyPromise = initMic(); // параллельно
+    let micReadyPromise = initMic(); // не ждём — отсчёт идёт сразу
 
-    // ——— Отсчёт
+    // ===== Отсчёт 3‑2‑1 =====
     let countdown=3;
     function startCountdown(){
       timerEl.style.display='block';
@@ -149,7 +165,7 @@
       },1000);
     }
 
-    // ——— Таймер (устойчивый)
+    // ===== Таймер (устойчивый) =====
     const QUESTION_MS=20000;
     let qIdx=0, startedAt=0, deadlineMs=0;
     let rafId=0,intId=0,hardTO=0,finishing=false;
@@ -159,6 +175,7 @@
       qTitleEl.textContent=q.title;
       qLineEl.innerHTML=q.line;
     }
+
     function startFlow(){
       qWrap.style.display='grid';
       barWrap.style.display='block';
@@ -168,20 +185,27 @@
     }
 
     async function beginSegment(){
+      // 1) озвучка номера вопроса
       await speakQuestion(qIdx+1);
+
+      // 2) микрофон — если доступен
       try{ await micReadyPromise; }catch{}
-      timeEl.textContent=fmtTime(QUESTION_MS);
-      barEl.style.width='100%';
       chunks=[];
       try{ if(recorder && recorder.state!=='recording') recorder.start(); }catch{}
+
+      // 3) UI и жёсткий дедлайн
+      timeEl.textContent=fmtTime(QUESTION_MS);
+      barEl.style.width='100%';
       startedAt=performance.now();
       deadlineMs=startedAt+QUESTION_MS;
       finishing=false;
+
       stopClocks();
       tickRaf();
       intId=setInterval(tickWall,250);
       hardTO=setTimeout(()=>{ if(!finishing) finishSegment(); },QUESTION_MS+1500);
     }
+
     function tickRaf(){
       const left=Math.max(0,deadlineMs-performance.now());
       barEl.style.width=(left/QUESTION_MS*100)+'%';
@@ -197,27 +221,30 @@
       if(left<=0) finishSegment();
       else timeEl.textContent=fmtTime(Math.max(0,left));
     }
-    function stopClocks(){ if(rafId){cancelAnimationFrame(rafId);rafId=0;} if(intId){clearInterval(intId);intId=0;} if(hardTO){clearTimeout(hardTO);hardTO=0;} }
+    function stopClocks(){
+      if(rafId){cancelAnimationFrame(rafId);rafId=0;}
+      if(intId){clearInterval(intId);intId=0;}
+      if(hardTO){clearTimeout(hardTO);hardTO=0;}
+    }
 
+    // ===== Завершение сегмента (по таймеру/кнопке) =====
     function finishSegment(){
       if(finishing) return;
       finishing=true;
       stopClocks();
       nextBtn.disabled=true;
+
       try{
         if(recorder && recorder.state==='recording'){ recorder.stop(); return; }
       }catch{}
-      handleStop();
+      handleStop(); // если записи нет — идём дальше сами
     }
+
     function handleStop(){
-      const blobType=(recorder?.mimeType||chosenMime||'audio/webm');
-      const blob=new Blob(chunks||[],{type:blobType});
-      // пропускаем FileReader, если пусто
-      if(!blob.size){ proceedNext(); return; }
-      const reader=new FileReader();
-      reader.onloadend=()=>{ proceedNext(); };
-      reader.readAsDataURL(blob);
+      // Здесь могла бы быть упаковка аудио в base64 — опущено по договорённости.
+      proceedNext();
     }
+
     function proceedNext(){
       qIdx++;
       if(qIdx<QUESTIONS.length){
@@ -230,14 +257,17 @@
       }
     }
 
+    // Кнопка «Далее»
     nextBtn.addEventListener('click', finishSegment);
+
+    // Автодобив при возвращении на вкладку
     document.addEventListener('visibilitychange',()=>{
       if(document.visibilityState==='visible'&&!finishing){
         if(performance.now()>=deadlineMs) finishSegment();
       }
     });
 
-    // ——— Старт: сразу отсчёт (перезагрузка всегда с начала)
+    // Старт всегда с 3‑2‑1
     startCountdown();
   </script>
 </body>

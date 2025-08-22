@@ -48,7 +48,7 @@
     .btn:hover{ transform:scale(1.045); filter:brightness(1.04); }
     .btn:disabled{ opacity:.6; cursor:not-allowed; transform:none; }
 
-    /* ===== ЧАСТЬ 2 — задание в 2 колонки (как в prepare, рамка справа) ===== */
+    /* ===== ЧАСТЬ 2 — как в prepare: шапка на всю ширину, ниже 2 колонки ===== */
     .ad-layout{
       display:grid;
       grid-template-columns: 1.05fr 0.95fr;
@@ -57,37 +57,32 @@
       max-width:1500px;
       margin:18px auto 0;
     }
-    .left-free{ font-size:22px; line-height:1.55; text-align:left; }
-    .plain-list{ list-style:none; margin:0 0 24px 0; padding:0; }
-    .plain-list li{ margin:10px 0; }
-
-    /* Правая колонка — карточка‑шапка + подпись + фото стопкой */
-    .ad-right{ display:flex; flex-direction:column; gap:12px; }
-
     .task-header.card{
       background:var(--card);
       border-left:5px solid var(--primary);
       box-shadow:var(--shadow);
       border-radius:12px;
       padding:20px 24px;
+      grid-column:1 / -1; /* вытянутая шапка */
       text-align:center;
       font-size:20px; line-height:1.7;
     }
-    .task-header.card b{ display:block; }
+    .task-header b{ display:block; }
 
+    .left-free{ font-size:22px; line-height:1.55; text-align:left; }
+    .plain-list{ list-style:none; margin:0 0 24px 0; padding:0; }
+    .plain-list li{ margin:10px 0; }
+
+    /* Правая колонка: подпись и фото — как в prepare */
     .ad-title{ font-weight:800; font-size:30px; margin:6px 0 12px; text-align:center; }
-    .ad-figure{
-      width:100%; aspect-ratio:3/2;
-      border-radius:12px; overflow:hidden;
-      box-shadow:var(--shadow); background:#ddd;
-    }
+    .ad-figure{ width:100%; aspect-ratio:3/2; border-radius:12px; overflow:hidden; box-shadow:var(--shadow); background:#ddd; }
     .ad-figure>img{ width:100%; height:100%; object-fit:cover; object-position:center; display:block; }
 
     @media (max-width:1100px){
       .ad-layout{ grid-template-columns:1fr; gap:22px; }
     }
 
-    /* ===== ЧАСТЬ 3 — нижние 4 кнопки ===== */
+    /* ===== ЧАСТЬ 3 — нижние нав‑кнопки ===== */
     .nav-row{ text-align:center; margin:16px 0 24px; }
 
     /* Проставка у низа */
@@ -113,9 +108,18 @@
       <a class="btn" id="repeatBtn" href="#" role="button" aria-label="Повторить этот вариант">🔁 Повторить</a>
     </div>
 
-    <!-- ===== ЧАСТЬ 2 — задание: слева пункты, справа рамка + фото ===== -->
+    <!-- ===== ЧАСТЬ 2 — верстка, как в prepare ===== -->
     <div class="ad-layout" aria-labelledby="taskTitle">
-      <!-- слева — пункты -->
+      <!-- Ряд 1: вытянутая шапка -->
+      <section class="task-header card">
+        <b id="taskTitle">Task 2. Study the advertisement.</b>
+        <b>
+          You are considering joining the bike club and now you’d like to get more information.
+          In 1.5 minutes you are to ask four direct questions to find out about the following:
+        </b>
+      </section>
+
+      <!-- Ряд 2: слева список -->
       <div class="left-free">
         <ol class="plain-list">
           <li>1) minimum age;</li>
@@ -126,22 +130,13 @@
         <p><b>You have 20 seconds to ask each question.</b></p>
       </div>
 
-      <!-- справа — карточка‑шапка + подпись + фото (как в prepare) -->
-      <div class="ad-right">
-        <section class="task-header card">
-          <b id="taskTitle">Task 2. Study the advertisement.</b>
-          <b>
-            You are considering joining the bike club and now you’d like to get more information.
-            In 1.5 minutes you are to ask four direct questions to find out about the following:
-          </b>
-        </section>
-
-        <h3 class="ad-title">Join our bike club!</h3>
+      <!-- Ряд 2: справа фото -->
+      <aside aria-label="Advertisement">
+        <h2 class="ad-title">Join our bike club!</h2>
         <figure class="ad-figure">
-          <!-- Место для твоего изображения -->
           <img src="task2_bike.jpg" alt="Bike club advertisement image" loading="lazy">
         </figure>
-      </div>
+      </aside>
     </div>
 
     <!-- ===== ЧАСТЬ 3 — навигация ===== -->
@@ -186,14 +181,12 @@
     }
     const toModeMenu = document.getElementById('toModeMenu');  // «к выбору задания»
     if (toModeMenu) toModeMenu.href = `${EGE_BASE}ege_menu.html`;
-
     const toTaskMenu = document.getElementById('toTaskMenu');  // «к выбору режима»
     if (toTaskMenu) toTaskMenu.href = `${EGE_BASE}ege.html`;
-
     const toHome = document.getElementById('toHome');          // «на главную»
     if (toHome) toHome.href = `${ROOT_BASE}index.html`;
 
-    // ===== Очистка состояния Task 2 и рестарт при уходе =====
+    // ===== Очистка состояния Task 2 и флаг рестарта при уходе =====
     function clearTask2State(){
       try{
         Object.keys(sessionStorage).forEach(k => {
@@ -217,13 +210,13 @@
       repeat.addEventListener('click', (e)=>{ e.preventDefault(); clearAndGo(repeatHref); });
     }
 
-    // Если пользователь уходит (в т.ч. «Назад»), помечаем, что task должен стартовать с отсчёта
+    // Если уходим (даже кнопкой Назад) — просим Task начать с 3‑2‑1
     window.addEventListener('pagehide', () => {
       try{ sessionStorage.setItem('ege2_force_restart','1'); }catch{}
     });
     window.addEventListener('pageshow', ()=>{ navigateOnce.lock = false; });
 
-    // ===== АУДИО: ждём одно целое dataURL в ege2_audio_base64 =====
+    // ===== АУДИО: одно целое dataURL в ege2_audio_base64 =====
     const audioEl     = document.getElementById('audio');
     const playBtn     = document.getElementById('playBtn');
     const downloadBtn = document.getElementById('downloadBtn');

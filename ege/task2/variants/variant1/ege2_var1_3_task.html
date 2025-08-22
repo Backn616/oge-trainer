@@ -96,6 +96,7 @@
 
     toggleThemeInit();
 
+    // ===== Тексты вопросов =====
     const QUESTIONS = [
       { title: "Question 1.", line: "1) Ask a direct question about the following: <b>minimum age.</b>" },
       { title: "Question 2.", line: "2) Ask a direct question about the following: <b>special clothes.</b>" },
@@ -103,6 +104,7 @@
       { title: "Question 4.", line: "4) Ask a direct question about the following: <b>competitions.</b>" }
     ];
 
+    // ===== DOM / Ключи =====
     const META_KEY  = 'ege2_meta';
     const PARTS_KEY = 'ege2_audio_parts';
 
@@ -114,136 +116,207 @@
     const barWrap  = document.getElementById('progressContainerFixed');
     const barEl    = document.getElementById('progressBarFixed');
     const timeEl   = document.getElementById('progressTime');
-
     const RESULT_URL = location.pathname.replace(/_3_task\.html$/i, '_4_result.html');
 
+    // ===== SpeechSynthesis: озвучка номера вопроса =====
+    function speakQuestion(num){
+      try{
+        speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance("Question " + num);
+        u.lang = "en-US"; u.rate = 1.0; u.pitch = 1.0;
+        return new Promise(resolve=>{
+          const to = setTimeout(resolve, 1500);
+          u.onend = () => { clearTimeout(to); resolve(); };
+          u.onerror = () => { clearTimeout(to); resolve(); };
+          speechSynthesis.speak(u);
+        });
+      }catch{ return Promise.resolve(); }
+    }
+
+    // ===== Микрофон (инициализируем ПАРАЛЛЕЛЬНО) =====
     let streamRef=null, recorder=null, chunks=[];
     let chosenMime='';
+    let micReadyPromise = null;
+
     function pickMimeType(){
-      const cands=['audio/webm;codecs=opus','audio/webm','audio/mp4','audio/ogg;codecs=opus','audio/ogg'];
-      for(const t of cands) if(window.MediaRecorder?.isTypeSupported?.(t)) return t;
+      const cands = ['audio/webm;codecs=opus','audio/webm','audio/mp4','audio/ogg;codecs=opus','audio/ogg'];
+      for (const t of cands) if (window.MediaRecorder?.isTypeSupported?.(t)) return t;
       return '';
     }
+
     async function initMic(){
-      streamRef = await navigator.mediaDevices.getUserMedia({ audio:true });
-      chosenMime = pickMimeType();
-      recorder = chosenMime ? new MediaRecorder(streamRef,{mimeType:chosenMime}) : new MediaRecorder(streamRef);
-      recorder.ondataavailable=e=>{ if(e.data&&e.data.size) chunks.push(e.data); };
-      recorder.onstop=handleStop;
+      try{
+        streamRef = await navigator.mediaDevices.getUserMedia({ audio:true });
+        chosenMime = pickMimeType();
+        try{
+          recorder = chosenMime ? new MediaRecorder(streamRef, { mimeType: chosenMime })
+                                : new MediaRecorder(streamRef);
+        }catch{
+          recorder = new MediaRecorder(streamRef);
+          chosenMime = recorder.mimeType || '';
+        }
+        recorder.ondataavailable = e => { if (e.data && e.data.size) chunks.push(e.data); };
+        recorder.onstop = handleStop;
+      }catch(err){
+        // если отказ — всё равно дадим пройти вопросы, просто без записи
+        console.warn('Mic init failed:', err);
+        recorder = null;
+      }
     }
 
-    // Озвучка
-    function speakQuestion(num){
-      speechSynthesis.cancel();
-      const utter=new SpeechSynthesisUtterance("Question " + num);
-      utter.lang="en-US"; 
-      utter.rate=1.0; utter.pitch=1.0;
-      return new Promise(res=>{
-        const to=setTimeout(res,1500);
-        utter.onend=()=>{clearTimeout(to);res();};
-        utter.onerror=()=>{clearTimeout(to);res();};
-        speechSynthesis.speak(utter);
-      });
-    }
-
-    // Отсчёт
-    let countdown=3;
+    // ===== Отсчёт 3-2-1 (не блокируем initMic) =====
+    let countdown = 3;
+    const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     function startCountdown(){
-      timerEl.style.display='block';
-      timerEl.textContent=countdown;
-      const id=setInterval(()=>{
-        timerEl.textContent=countdown;
+      timerEl.style.display = 'block';
+      timerEl.textContent = countdown;
+      const id = setInterval(()=>{
+        timerEl.style.color = (countdown > 1) ? '#2b6cff' : '#b30000';
+        if (!reduceMotion){
+          timerEl.style.transform = 'scale(1.2)';
+          setTimeout(()=>{ timerEl.style.transform = 'scale(1)'; }, 180);
+        }
+        timerEl.textContent = countdown;
         countdown--;
-        if(countdown<0){
+        if (countdown < 0){
           clearInterval(id);
-          timerEl.style.display='none';
+          timerEl.style.display = 'none';
           startQuestionFlow();
         }
-      },1000);
+      }, 1000);
     }
 
-    const QUESTION_MS=20000;
-    let qIdx=0, startedAt=0, rafId=0;
+    // ===== Устойчивый таймер (rAF + setInterval + deadline) =====
+    const QUESTION_MS = 20_000;
+    let qIdx = 0;
+    let startedAt = 0;
+    let deadlineMs = 0;
+    let rafId = 0, intId = 0, hardTO = 0;
+    let finishing = false;
 
     function renderQuestion(){
-      const q=QUESTIONS[qIdx];
-      qTitleEl.textContent=q.title;
-      qLineEl.innerHTML=q.line;
+      const q = QUESTIONS[qIdx];
+      qTitleEl.textContent = q.title;
+      qLineEl.innerHTML = q.line;
     }
 
     function startQuestionFlow(){
-      qWrap.style.display='grid';
-      barWrap.style.display='block';
-      qIdx=0;
+      qWrap.style.display = 'grid';
+      barWrap.style.display = 'block';
+      qIdx = 0;
       renderQuestion();
       beginSegment();
     }
 
     async function beginSegment(){
-      await speakQuestion(qIdx+1);
-      timeEl.textContent=fmtTime(QUESTION_MS);
-      barEl.style.width='100%';
-      startedAt=performance.now();
-      chunks=[];
-      try{ if(recorder&&recorder.state!=='recording') recorder.start(); }catch{}
-      tick();
+      // Озвучка
+      await speakQuestion(qIdx + 1);
+
+      // ждём готовность микрофона (если есть) — но не блокируем навсегда
+      if (!micReadyPromise) micReadyPromise = initMic();
+      try{ await micReadyPromise; }catch{}
+
+      // UI
+      timeEl.textContent = fmtTime(QUESTION_MS);
+      barEl.style.width = '100%';
+
+      // Запись (если доступна)
+      chunks = [];
+      try { if (recorder && recorder.state !== 'recording') recorder.start(); } catch {}
+
+      // Дедлайн + запуск «двигателей»
+      startedAt = performance.now();
+      deadlineMs = startedAt + QUESTION_MS;
+      finishing = false;
+
+      stopClocks();
+      tickRaf();
+      intId = setInterval(tickWall, 250);
+      hardTO = setTimeout(()=>{ if (!finishing) finishSegment(); }, QUESTION_MS + 2000);
     }
 
-    function tick(){
-      const left=Math.max(0,QUESTION_MS-(performance.now()-startedAt));
-      barEl.style.width=(left/QUESTION_MS*100)+'%';
-      if(!tick._last||performance.now()-tick._last>=250){
-        timeEl.textContent=fmtTime(left);
-        tick._last=performance.now();
+    function tickRaf(){
+      const left = Math.max(0, deadlineMs - performance.now());
+      barEl.style.width = (left / QUESTION_MS * 100) + '%';
+      if (!tickRaf._last || performance.now() - tickRaf._last >= 250){
+        timeEl.textContent = fmtTime(left);
+        tickRaf._last = performance.now();
       }
-      if(left<=0) finishSegment();
-      else rafId=requestAnimationFrame(tick);
+      if (left <= 0) finishSegment();
+      else rafId = requestAnimationFrame(tickRaf);
     }
 
-    function stopRaf(){ if(rafId){cancelAnimationFrame(rafId);rafId=0;} }
+    function tickWall(){
+      const left = deadlineMs - performance.now();
+      if (left <= 0) finishSegment();
+      else timeEl.textContent = fmtTime(Math.max(0, left));
+    }
+
+    function stopClocks(){
+      if (rafId) { cancelAnimationFrame(rafId); rafId = 0; }
+      if (intId) { clearInterval(intId); intId = 0; }
+      if (hardTO){ clearTimeout(hardTO); hardTO = 0; }
+    }
 
     function finishSegment(){
-      stopRaf();
-      try{ if(recorder&&recorder.state==='recording') recorder.stop(); }
-      catch{ handleStop(); }
-      nextBtn.disabled=true;
+      if (finishing) return;
+      finishing = true;
+
+      stopClocks();
+      try { if (recorder && recorder.state === 'recording') recorder.stop(); }
+      catch { handleStop(); }
+      nextBtn.disabled = true;
     }
 
+    // Автодобив при возврате на вкладку
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible' && !finishing) {
+        if (performance.now() >= deadlineMs) finishSegment();
+      }
+    });
+
     function handleStop(){
-      const blobType=(recorder?.mimeType||chosenMime||'audio/webm');
-      const blob=new Blob(chunks,{type:blobType});
-      const durationMs=Math.min(QUESTION_MS,performance.now()-startedAt);
-      const reader=new FileReader();
-      reader.onloadend=()=>{
-        const b64=(reader.result||'').toString().split(',')[1]||'';
-        const parts=JSON.parse(sessionStorage.getItem(PARTS_KEY)||'[]');
-        parts[qIdx]={mime:blobType,b64,durationMs,qIdx};
-        sessionStorage.setItem(PARTS_KEY,JSON.stringify(parts));
+      const blobType = (recorder?.mimeType || chosenMime || 'audio/webm');
+      const blob = new Blob(chunks, { type: blobType });
+      const durationMs = Math.min(QUESTION_MS, performance.now() - startedAt);
+
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        try{
+          const b64 = (reader.result || '').toString().split(',')[1] || '';
+          const parts = JSON.parse(sessionStorage.getItem(PARTS_KEY) || '[]');
+          parts[qIdx] = { mime: blobType, b64, durationMs, qIdx };
+          sessionStorage.setItem(PARTS_KEY, JSON.stringify(parts));
+        }catch{}
+
         qIdx++;
-        if(qIdx<QUESTIONS.length){
+        if (qIdx < QUESTIONS.length){
           renderQuestion();
-          nextBtn.disabled=false;
+          nextBtn.disabled = false;
           beginSegment();
         } else {
-          try{streamRef?.getTracks()?.forEach(t=>t.stop());}catch{}
+          try{ streamRef?.getTracks()?.forEach(t=>t.stop()); }catch{}
           navigateOnce(RESULT_URL);
         }
       };
       reader.readAsDataURL(blob);
     }
 
-    nextBtn.addEventListener('click',finishSegment);
+    // «Далее» — досрочно завершает сегмент
+    nextBtn.addEventListener('click', finishSegment);
 
-    (async function init(){
-      await initMic();
+    // ===== Старт: микрофон в ПАРАЛЛЕЛЬ, отсчёт СРАЗУ =====
+    (function init(){
+      micReadyPromise = initMic(); // не await!
       startCountdown();
     })();
 
-    window.addEventListener('pageshow',()=>{ navigateOnce.lock=false; });
-    window.addEventListener('beforeunload',()=>{
-      try{stopRaf();}catch{}
-      try{if(recorder&&recorder.state==='recording')recorder.stop();}catch{}
-      try{streamRef?.getTracks()?.forEach(t=>t.stop());}catch{}
+    // BFCache и очистка
+    window.addEventListener('pageshow', () => { navigateOnce.lock = false; });
+    window.addEventListener('beforeunload', ()=>{
+      try{ stopClocks(); }catch{}
+      try{ if (recorder && recorder.state === 'recording') recorder.stop(); }catch{}
+      try{ streamRef?.getTracks()?.forEach(t=>t.stop()); }catch{}
     });
   </script>
 </body>

@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 
-  <!-- Общие стили -->
+  <!-- Общие стили (фон, кнопки и т.д.) -->
   <link rel="stylesheet" href="../../../style_common.css" />
 
   <!-- Анти-мигание темы -->
@@ -24,32 +24,14 @@
   </script>
 
   <style>
-    .wrap{ max-width:1500px; margin:0 auto; padding-bottom:24px; }
+    .wrap{ max-width:1500px; margin:0 auto; }
 
-    /* Карточка задания (как на prepare) */
-    .task-card{ padding:20px 24px; border-left:5px solid var(--primary); }
-    .task-intro{ font-size:20px; line-height:1.7; margin:8px 0 10px; }
-    .task-points{ margin:8px 0 14px 18px; }
-    .task-points li{ margin-bottom:6px; }
-    .note{ font-weight:700; margin:10px 0 6px; }
-    .ad-title{ font-weight:800; font-size:22px; text-align:center; margin:10px 0 10px; }
-    .ad-figure{ width:100%; aspect-ratio:3/2; background:#ddd; border-radius:12px; overflow:hidden; box-shadow:var(--shadow); }
-    .ad-figure>img{ width:100%; height:100%; object-fit:cover; object-position:center; display:block; }
+    /* ===== ЧАСТЬ 1 — заголовок, плеер, 3 кнопки ===== */
+    h1{ color:var(--primary); font-size:36px; margin:12px 0 6px; text-align:center; }
+    .status{ font-size:20px; color:#1f7a2e; text-align:center; margin:10px 0 18px; }
+    .dark .status{ color:#5ee397; }
+    audio{ margin:10px auto 0; width:min(900px, 90%); display:block; }
 
-    /* Карточка результатов */
-    .result-card{ padding:20px 24px; border-left:5px solid var(--primary); margin-top:20px; }
-    .list{ margin: 0 auto 10px; }
-    .row{
-      display:grid; grid-template-columns: 140px 1fr auto; gap:14px; align-items:center;
-      padding:14px 0; border-bottom:1px dashed var(--border);
-    }
-    .row:last-child{ border-bottom:none; }
-    .row h3{ margin:0; font-size:20px; }
-    .row .meta{ font-size:14px; color:var(--muted); }
-    .row audio{ width:100%; display:block; }
-
-    /* Кнопки */
-    .buttons { text-align:center; margin:18px 0 8px; }
     .btn{
       display:inline-block; padding:14px 28px; margin:10px 8px;
       font-size:18px; font-weight:600; color:#fff; text-decoration:none; cursor:pointer;
@@ -61,71 +43,111 @@
     .btn:hover{ transform: scale(1.04); filter: brightness(1.03); }
     .btn:disabled{ opacity:.6; cursor:not-allowed; transform:none; }
 
-    /* Заголовки/статус */
-    h1{ color:var(--primary); font-size:36px; margin:12px 0 6px; text-align:center; }
-    .status{ font-size:20px; color:#1f7a2e; text-align:center; margin:10px 0 26px; }
-    .dark .status{ color:#5ee397; }
-    .empty{
-      padding:18px; text-align:center; color:var(--muted);
-      border:1px dashed var(--border); border-radius:12px; margin:10px 0 14px;
+    /* ===== ЧАСТЬ 2 — задание в 2 колонки (как в prepare) ===== */
+    .ad-layout{
+      display:grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap:28px 36px;
+      align-items:start;
+      max-width:1500px;
+      margin:18px auto 0;
+    }
+    .task-header.card{
+      background:var(--card);
+      border-left:5px solid var(--primary);
+      box-shadow:var(--shadow);
+      border-radius:12px;
+      padding:20px 24px;
+      grid-column:1 / -1;
+      text-align:center;
+      font-size:20px; line-height:1.7;
+    }
+    .task-header b{ display:block; }
+    .left-free{
+      font-size:22px; line-height:1.55; text-align:left;
+    }
+    .plain-list{ list-style:none; margin:0 0 24px 0; padding:0; }
+    .plain-list li{ margin:10px 0; }
+
+    .ad-title{ font-weight:800; font-size:30px; margin:6px 0 12px; text-align:center; }
+    .ad-figure{
+      width:100%; aspect-ratio:3/2;
+      border-radius:12px; overflow:hidden;
+      box-shadow:var(--shadow); background:#ddd;
+    }
+    .ad-figure>img{ width:100%; height:100%; object-fit:cover; object-position:center; display:block; }
+
+    @media (max-width:1100px){
+      .ad-layout{ grid-template-columns:1fr; gap:22px; }
     }
 
-    @media (max-width:900px){
-      .row{ grid-template-columns: 120px 1fr; }
-      .row > div:last-child{ grid-column: 1 / -1; text-align:right; }
-    }
+    /* ===== ЧАСТЬ 3 — нижние 4 кнопки ===== */
+    .nav-row{ text-align:center; margin:16px 0 24px; }
+
+    /* Проставка, чтобы низ не перекрывался футером/фикс‑элементами */
+    .spacer{ height: calc(var(--footer-h, 72px) + 16px); }
   </style>
 </head>
 <body>
   <!-- Переключатель темы -->
   <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
 
-  <div class="wrap page-center">
+  <div class="wrap">
+    <!-- ===== ЧАСТЬ 1 ===== -->
     <h1 id="h1">Результат — Вариант <span id="varNum">?</span></h1>
     <div class="status" id="statusText" aria-live="polite">
-      ✅ Вы завершили задание 2. Ниже — записи по каждому вопросу (если сохранены).
+      ✅ Вы завершили задание 2. Ниже вы можете прослушать и скачать запись.
     </div>
 
-    <!-- Карточка задания: как на prepare -->
-    <section class="card task-card" aria-labelledby="taskTitle" aria-describedby="inst">
-      <h2 id="taskTitle">Task 2. Study the advertisement.</h2>
-      <p class="task-intro">
-        You are considering joining the bike club and now you’d like to get more information.
-        In 1.5 minutes you are to ask four direct questions to find out about the following:
-      </p>
-      <ul class="task-points">
-        <li>minimum age;</li>
-        <li>special clothes;</li>
-        <li>bicycle rental;</li>
-        <li>competitions.</li>
-      </ul>
-      <p class="note" id="inst">You have 20 seconds to ask each question.</p>
+    <audio id="audio" controls></audio>
 
-      <p class="ad-title">Join our bike club!</p>
-      <figure class="ad-figure">
-        <!-- Место для изображения объявления -->
-        <img src="task2_bike.jpg" alt="Bike club advertisement image">
-      </figure>
-    </section>
+    <div style="text-align:center;">
+      <button class="btn" id="playBtn" type="button" aria-label="Проиграть запись" disabled>▶️ Прослушать</button>
+      <button class="btn" id="downloadBtn" type="button" aria-label="Скачать запись" disabled>⬇️ Скачать</button>
+      <a class="btn" id="repeatBtn" href="#" role="button" aria-label="Повторить этот вариант">🔁 Повторить</a>
+    </div>
 
-    <!-- Карточка результатов -->
-    <section class="card result-card">
-      <h2 style="margin:0 0 10px;">Ваши записи</h2>
-      <div class="list" id="list"></div>
+    <!-- ===== ЧАСТЬ 2 — Задание как в prepare ===== -->
+    <div class="ad-layout" aria-labelledby="taskTitle">
+      <!-- вытянутая шапка -->
+      <section class="task-header card">
+        <b id="taskTitle">Task 2. Study the advertisement.</b>
+        <b>
+          You are considering joining the bike club and now you’d like to get more information.
+          In 1.5 minutes you are to ask four direct questions to find out about the following:
+        </b>
+      </section>
 
-      <!-- Главная кнопка — по центру -->
-      <div class="buttons">
-        <a class="btn" id="repeatBtn" href="#" role="button">🔁 Повторить этот вариант</a>
+      <!-- слева — пункты -->
+      <div class="left-free">
+        <ol class="plain-list">
+          <li>1) minimum age;</li>
+          <li>2) special clothes;</li>
+          <li>3) bicycle rental;</li>
+          <li>4) competitions.</li>
+        </ol>
+        <p><b>You have 20 seconds to ask each question.</b></p>
       </div>
 
-      <!-- Навигация — вторым блоком, по центру -->
-      <div class="buttons">
-        <a class="btn nav-btn" id="toVariants" href="#" role="button">К выбору варианта</a>
-        <a class="btn nav-btn" id="toTaskMenu" href="#" role="button">К выбору режима</a>
-        <a class="btn nav-btn" id="toModeMenu" href="#" role="button">К выбору задания</a>
-        <a class="btn nav-btn" id="toHome" href="#" role="button">На главную</a>
-      </div>
-    </section>
+      <!-- справа — надпись над фото и фото (ровно как в prepare) -->
+      <aside aria-label="Advertisement">
+        <h3 class="ad-title">Join our bike club!</h3>
+        <figure class="ad-figure">
+          <!-- Место для твоего изображения -->
+          <img src="task2_bike.jpg" alt="Bike club advertisement image" loading="lazy">
+        </figure>
+      </aside>
+    </div>
+
+    <!-- ===== ЧАСТЬ 3 — навигация ===== -->
+    <div class="nav-row">
+      <a class="btn nav-btn" id="toVariants" href="#" role="button">Перейти к выбору варианта</a>
+      <a class="btn nav-btn" id="toModeMenu" href="#" role="button">Перейти к выбору задания</a>
+      <a class="btn nav-btn" id="toTaskMenu" href="#" role="button">Перейти к выбору режима</a>
+      <a class="btn nav-btn" id="toHome" href="#" role="button">Перейти на главную</a>
+    </div>
+
+    <div class="spacer"></div>
   </div>
 
   <script type="module">
@@ -152,19 +174,21 @@
     const { ROOT_BASE, EGE_BASE } = getBases(path);
 
     // Навигация
-    // .../ege/task2/variants/variantX/ege2_varX_4_result.html -> .../ege/task2/variants/ege2.html
     const toVariants = document.getElementById('toVariants');
     if (toVariants){
+      // .../ege/task2/variants/variantX/ege2_varX_4_result.html -> .../ege/task2/variants/ege2.html
       toVariants.href = path.replace(/\/variants\/variant\d+\/[^/]+$/i, '/variants/ege2.html');
     }
-    const toModeMenu = document.getElementById('toModeMenu');
+    const toModeMenu = document.getElementById('toModeMenu');  // «к выбору задания»
     if (toModeMenu) toModeMenu.href = `${EGE_BASE}ege_menu.html`;
-    const toTaskMenu = document.getElementById('toTaskMenu');
+
+    const toTaskMenu = document.getElementById('toTaskMenu');  // «к выбору режима»
     if (toTaskMenu) toTaskMenu.href = `${EGE_BASE}ege.html`;
-    const toHome = document.getElementById('toHome');
+
+    const toHome = document.getElementById('toHome');          // «на главную»
     if (toHome) toHome.href = `${ROOT_BASE}index.html`;
 
-    // ===== Очистка состояния Task 2 при уходе =====
+    // ===== Очистка состояния Task 2 =====
     function clearTask2State(){
       try{
         Object.keys(sessionStorage).forEach(k => {
@@ -180,7 +204,7 @@
       a.addEventListener('click', (e)=>{ e.preventDefault(); clearAndGo(a.href); });
     });
 
-    // «Повторить этот вариант» → на _1_prepare с очисткой
+    // «Повторить этот вариант» -> на _1_prepare
     const repeat = document.getElementById('repeatBtn');
     if (repeat){
       const repeatHref = path.replace(/_4_result\.html$/i, '_1_prepare.html');
@@ -188,115 +212,77 @@
       repeat.addEventListener('click', (e)=>{ e.preventDefault(); clearAndGo(repeatHref); });
     }
 
-    // Снимаем «замок» navigateOnce при возврате из BFCache
     window.addEventListener('pageshow', ()=>{ navigateOnce.lock = false; });
 
-    // ===== Рендер записей =====
-    const listEl = document.getElementById('list');
+    // ===== АУДИО: ждём одно целое dataURL в ege2_audio_base64 (как в Task 4) =====
+    const audioEl     = document.getElementById('audio');
+    const playBtn     = document.getElementById('playBtn');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const statusText  = document.getElementById('statusText');
 
-    function msToText(ms){
-      const s = Math.max(0, Math.round(ms/1000));
-      const mm = String(Math.floor(s/60)).padStart(2,'0');
-      const ss = String(s%60).padStart(2,'0');
-      return `${mm}:${ss}`;
+    const base64     = sessionStorage.getItem('ege2_audio_base64');
+    const mimeStored = (sessionStorage.getItem('ege2_audio_mime') || 'audio/webm').toLowerCase();
+
+    let objectURL = null;
+    const extByMime = {
+      'audio/webm':'webm','audio/webm;codecs=opus':'webm',
+      'audio/ogg':'ogg','audio/ogg;codecs=opus':'ogg',
+      'audio/mp4':'m4a','audio/mpeg':'mp3','audio/wav':'wav'
+    };
+    const fileExt  = extByMime[mimeStored] || 'webm';
+    const fileName = `ege2_variant${varNum}.${fileExt}`;
+
+    function dataURLtoBlob(dataURL){
+      const parts = (dataURL || '').split(',');
+      if (parts.length < 2) return null;
+      const header = parts[0], b64 = parts[1];
+      const type = (header.match(/data:(.*?);base64/) || [,'application/octet-stream'])[1];
+      const bin = atob(b64);
+      const bytes = new Uint8Array(bin.length);
+      for (let i=0;i<bin.length;i++) bytes[i] = bin.charCodeAt(i);
+      return new Blob([bytes], { type });
+    }
+    function setButtonsEnabled(en){
+      playBtn.disabled = !en;
+      downloadBtn.disabled = !en;
     }
 
-    function buildRow({ idx, blobURL, mime, durationMs }){
-      const row = document.createElement('div');
-      row.className = 'row';
-
-      const left = document.createElement('div');
-      left.innerHTML = `<h3>Question ${idx+1}</h3><div class="meta">${msToText(durationMs||0)}</div>`;
-
-      const audioWrap = document.createElement('div');
-      const audio = document.createElement('audio');
-      audio.controls = true;
-      audio.src = blobURL;
-      if (mime) audio.type = mime;
-      audioWrap.appendChild(audio);
-
-      const right = document.createElement('div');
-      const btn = document.createElement('button');
-      btn.className = 'btn';
-      btn.textContent = '⬇️ Скачать';
-      btn.addEventListener('click', ()=>{
-        const a = document.createElement('a');
-        a.href = blobURL;
-        const ext = (mime && mime.includes('ogg')) ? 'ogg'
-                   : (mime && mime.includes('mp4')) ? 'm4a'
-                   : (mime && mime.includes('mpeg'))? 'mp3'
-                   : (mime && mime.includes('wav')) ? 'wav'
-                   : 'webm';
-        a.download = `ege2_variant${varNum}_q${idx+1}.${ext}`;
-        a.click();
-      });
-      right.appendChild(btn);
-
-      row.appendChild(left);
-      row.appendChild(audioWrap);
-      row.appendChild(right);
-      return row;
-    }
-
-    function b64ToBlobUrl(b64, mime){
-      try{
-        const bin = atob(b64 || '');
-        const bytes = new Uint8Array(bin.length);
-        for (let i=0;i<bin.length;i++) bytes[i] = bin.charCodeAt(i);
-        const blob = new Blob([bytes], { type: mime || 'audio/webm' });
-        return URL.createObjectURL(blob);
-      }catch{
-        return null;
-      }
-    }
-
-    (function render(){
-      let parts = [];
-      try{
-        parts = JSON.parse(sessionStorage.getItem('ege2_audio_parts') || '[]');
-      }catch{ parts = []; }
-
-      const valid = (parts || []).map((p,i)=>({ ...p, idx: p?.qIdx ?? i }))
-        .filter(p => (p && typeof p === 'object'));
-
-      if (!valid.length){
-        const empty = document.createElement('div');
-        empty.className = 'empty';
-        empty.textContent = 'Записей не найдено. Возможно, вы запретили доступ к микрофону или страница была обновлена до завершения записей.';
-        listEl.appendChild(empty);
-        return;
-      }
-
-      valid.sort((a,b)=>(a.idx)-(b.idx));
-      valid.forEach(p=>{
-        const mime = (p.mime || 'audio/webm').toLowerCase();
-        const url  = p.b64 ? b64ToBlobUrl(p.b64, mime) : null;
-        if (url){
-          listEl.appendChild(buildRow({
-            idx: p.idx,
-            blobURL: url,
-            mime,
-            durationMs: p.durationMs || 0
-          }));
+    (function initAudio(){
+      if (base64){
+        try{
+          const blob = dataURLtoBlob(base64);
+          if (blob){
+            objectURL   = URL.createObjectURL(blob);
+            audioEl.src = objectURL;
+            audioEl.type= blob.type || mimeStored;
+          }else{
+            audioEl.src = base64;
+            audioEl.type= mimeStored;
+          }
+          setButtonsEnabled(true);
+        }catch{
+          audioEl.src = base64;
+          audioEl.type= mimeStored;
+          setButtonsEnabled(true);
         }
-      });
-
-      if (!listEl.children.length){
-        const empty = document.createElement('div');
-        empty.className = 'empty';
-        empty.textContent = 'Записи отсутствуют или повреждены.';
-        listEl.appendChild(empty);
+      }else{
+        statusText.textContent = '⚠️ Запись не найдена. Возможно, доступ к микрофону был запрещён или страница обновлена до завершения.';
+        setButtonsEnabled(false);
       }
     })();
 
-    // освобождаем blob-url-ы
-    window.addEventListener('pagehide', ()=>{
-      listEl.querySelectorAll('audio').forEach(a=>{
-        try{ a.pause(); }catch{}
-        const url = a.src;
-        if (url && url.startsWith('blob:')) URL.revokeObjectURL(url);
-      });
+    playBtn.addEventListener('click', ()=>{ if (audioEl.src) audioEl.play(); });
+    downloadBtn.addEventListener('click', ()=>{
+      if (!audioEl.src) return;
+      const a = document.createElement('a');
+      a.href = objectURL || base64;
+      a.download = fileName;
+      a.click();
     });
+
+    // Очистка blob‑URL
+    window.addEventListener('pagehide', ()=>{ if (objectURL) URL.revokeObjectURL(objectURL); });
+    window.addEventListener('beforeunload', ()=>{ if (objectURL) URL.revokeObjectURL(objectURL); });
   </script>
 </body>
 </html>

@@ -40,6 +40,14 @@
       text-shadow:0 4px 12px rgba(0,0,0,.25);
       text-align:center;
     }
+
+    /* Подсказка про звук (показывается только при блокировке TTS) */
+    .tts-hint{
+      position:fixed; left:50%; bottom:20px; transform:translateX(-50%);
+      background:var(--card-bg,#fff); color:var(--text,#111); border:1px solid var(--border,#e5e7eb);
+      border-radius:12px; padding:10px 14px; box-shadow:var(--shadow,0 8px 24px rgba(0,0,0,.12));
+      font-size:14px; z-index:9999;
+    }
   </style>
 
   <!-- Анти-мигание темы -->
@@ -70,6 +78,7 @@
       <aside aria-label="Advertisement">
         <h3 class="ad-title">Join our bike club!</h3>
         <figure class="ad-figure">
+          <!-- Место для фото -->
           <img src="task2_bike.jpg" alt="Bike club advertisement image" loading="lazy">
         </figure>
       </aside>
@@ -78,9 +87,12 @@
         <button id="nextBtn" class="button" type="button">Далее</button>
       </div>
     </div>
+
+    <!-- Проставка, чтобы фикс‑бар не наезжал на контент (как в эталоне) -->
+    <div style="height: calc(var(--footer-h, 72px) + 24px);"></div>
   </div>
 
-  <!-- Прогресс-бар (как в эталоне) -->
+  <!-- Фиксированный прогресс-бар (как в эталоне) -->
   <div id="progressContainerFixed" role="timer" aria-live="polite" style="display:none">
     <div id="progressBarFixed" class="rAF">
       <span id="progressTime" class="progress-time">00:20</span>
@@ -113,21 +125,37 @@
     const timeEl   = document.getElementById('progressTime');
     const RESULT_URL = location.pathname.replace(/_3_task\.html$/i, '_4_result.html');
 
+    // ===== Подсказка TTS при блокировке =====
+    function showTtsHint(){
+      if (document.querySelector('.tts-hint')) return;
+      const el = document.createElement('div');
+      el.className = 'tts-hint';
+      el.textContent = '🔊 Click anywhere to enable sound';
+      document.body.appendChild(el);
+      const remove = () => { el.remove(); window.removeEventListener('click', remove); window.removeEventListener('touchstart', remove); try{ speechSynthesis.resume(); }catch{} };
+      window.addEventListener('click', remove, { passive:true });
+      window.addEventListener('touchstart', remove, { passive:true });
+    }
+
     // ===== Озвучка (как раньше) =====
-    function speakQuestion(num){
+    async function speakQuestion(num){
       try{
-        // простая и надёжная схема: отменить очередь, сказать фразу, ждать onend
         speechSynthesis.cancel();
         const u = new SpeechSynthesisUtterance("Question " + num);
         u.lang = "en-US"; u.rate = 1.0; u.pitch = 1.0;
-        return new Promise(res=>{
-          const to = setTimeout(res, 1500);   // фолбэк на случай странностей
-          u.onend = () => { clearTimeout(to); res(); };
-          u.onerror = () => { clearTimeout(to); res(); };
-          try { speechSynthesis.resume(); } catch {}
+        const said = await new Promise(res=>{
+          let finished = false;
+          const to = setTimeout(()=>{ if(!finished){ finished=true; res(false); } }, 1500);
+          u.onend = () => { if(!finished){ finished=true; clearTimeout(to); res(true); } };
+          u.onerror = () => { if(!finished){ finished=true; clearTimeout(to); res(false); } };
+          try{ speechSynthesis.resume(); }catch{}
           speechSynthesis.speak(u);
         });
-      }catch{ return Promise.resolve(); }
+        // если не озвучилось (автоблокировка) — покажем подсказку
+        if (!said) showTtsHint();
+      }catch{
+        // молча игнорируем, подсказку не показываем
+      }
     }
 
     // ===== Микрофон (параллельно, без блокировки) =====
@@ -241,7 +269,6 @@
     }
 
     function handleStop(){
-      // Здесь могла бы быть упаковка аудио в base64 — опущено по договорённости.
       proceedNext();
     }
 

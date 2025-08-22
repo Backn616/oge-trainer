@@ -30,25 +30,33 @@
     h1{ color:var(--primary); font-size:36px; margin:12px 0 6px; text-align:center; }
     .status{ font-size:20px; color:#1f7a2e; text-align:center; margin:10px 0 18px; }
     .dark .status{ color:#5ee397; }
-    audio{ margin:10px auto 0; width:min(900px, 90%); display:block; }
 
-    /* Крупные кнопки — как в эталоне */
+    /* Плеер + волна */
+    audio{ margin:10px auto 0; width:min(900px, 90%); display:block; }
+    .wave-wrap{ width:min(900px, 90%); margin:8px auto 16px; display:none; }
+    .wave {
+      width:100%; height:48px; display:block;
+      background: #e9edf7; border-radius:10px; box-shadow: var(--shadow);
+    }
+    .dark .wave{ background:#1f2a3d; }
+
+    /* Крупные кнопки — как в эталоне (ege1) */
     .btn{
       display:inline-block;
-      padding:16px 34px;
-      margin:10px 10px;
-      font-size:20px;
-      font-weight:700;
+      padding:16px 32px;             /* эталон */
+      margin:12px;                   /* эталон */
+      font-size:20px;                /* эталон */
+      font-weight:600;
       color:#fff; text-decoration:none; cursor:pointer;
-      border:none; border-radius:14px;
+      border:none; border-radius:12px;
       background:linear-gradient(135deg, var(--primary), var(--primary-600));
-      box-shadow:0 14px 28px rgba(43,108,255,.35);
+      box-shadow:0 10px 22px rgba(43,108,255,.3);
       transition: transform .06s ease, filter .2s ease, box-shadow .2s ease;
     }
-    .btn:hover{ transform:scale(1.045); filter:brightness(1.04); }
+    .btn:hover{ transform: translateY(-1px); filter: brightness(1.03); }
     .btn:disabled{ opacity:.6; cursor:not-allowed; transform:none; }
 
-    /* ===== ЧАСТЬ 2 — как в prepare: шапка на всю ширину, ниже 2 колонки ===== */
+    /* ===== ЧАСТЬ 2 — задание как в prepare ===== */
     .ad-layout{
       display:grid;
       grid-template-columns: 1.05fr 0.95fr;
@@ -63,29 +71,30 @@
       box-shadow:var(--shadow);
       border-radius:12px;
       padding:20px 24px;
-      grid-column:1 / -1; /* вытянутая шапка */
+      grid-column:1 / -1;
       text-align:center;
       font-size:20px; line-height:1.7;
     }
     .task-header b{ display:block; }
-
     .left-free{ font-size:22px; line-height:1.55; text-align:left; }
     .plain-list{ list-style:none; margin:0 0 24px 0; padding:0; }
     .plain-list li{ margin:10px 0; }
 
-    /* Правая колонка: подпись и фото — как в prepare */
     .ad-title{ font-weight:800; font-size:30px; margin:6px 0 12px; text-align:center; }
-    .ad-figure{ width:100%; aspect-ratio:3/2; border-radius:12px; overflow:hidden; box-shadow:var(--shadow); background:#ddd; }
+    .ad-figure{
+      width:100%; aspect-ratio:3/2;
+      border-radius:12px; overflow:hidden;
+      box-shadow:var(--shadow); background:#ddd;
+    }
     .ad-figure>img{ width:100%; height:100%; object-fit:cover; object-position:center; display:block; }
 
     @media (max-width:1100px){
       .ad-layout{ grid-template-columns:1fr; gap:22px; }
     }
 
-    /* ===== ЧАСТЬ 3 — нижние нав‑кнопки ===== */
+    /* ===== ЧАСТЬ 3 — нижние 4 кнопки ===== */
     .nav-row{ text-align:center; margin:16px 0 24px; }
 
-    /* Проставка у низа */
     .spacer{ height: calc(var(--footer-h, 72px) + 16px); }
   </style>
 </head>
@@ -101,6 +110,9 @@
     </div>
 
     <audio id="audio" controls></audio>
+    <div id="waveWrap" class="wave-wrap">
+      <canvas id="wave" class="wave"></canvas>
+    </div>
 
     <div style="text-align:center;">
       <button class="btn" id="playBtn" type="button" aria-label="Проиграть запись" disabled>▶️ Прослушать</button>
@@ -108,9 +120,8 @@
       <a class="btn" id="repeatBtn" href="#" role="button" aria-label="Повторить этот вариант">🔁 Повторить</a>
     </div>
 
-    <!-- ===== ЧАСТЬ 2 — верстка, как в prepare ===== -->
+    <!-- ===== ЧАСТЬ 2 — Задание как в prepare ===== -->
     <div class="ad-layout" aria-labelledby="taskTitle">
-      <!-- Ряд 1: вытянутая шапка -->
       <section class="task-header card">
         <b id="taskTitle">Task 2. Study the advertisement.</b>
         <b>
@@ -119,7 +130,6 @@
         </b>
       </section>
 
-      <!-- Ряд 2: слева список -->
       <div class="left-free">
         <ol class="plain-list">
           <li>1) minimum age;</li>
@@ -130,9 +140,8 @@
         <p><b>You have 20 seconds to ask each question.</b></p>
       </div>
 
-      <!-- Ряд 2: справа фото -->
       <aside aria-label="Advertisement">
-        <h2 class="ad-title">Join our bike club!</h2>
+        <h3 class="ad-title">Join our bike club!</h3>
         <figure class="ad-figure">
           <img src="task2_bike.jpg" alt="Bike club advertisement image" loading="lazy">
         </figure>
@@ -165,8 +174,8 @@
     function getBases(p){
       const i = p.indexOf('/ege/');
       if (i >= 0){
-        const ROOT_BASE = p.slice(0, i + 1); // до слеша перед 'ege'
-        const EGE_BASE  = p.slice(0, i + 5); // включая 'ege/'
+        const ROOT_BASE = p.slice(0, i + 1);
+        const EGE_BASE  = p.slice(0, i + 5);
         return { ROOT_BASE, EGE_BASE };
       }
       return { ROOT_BASE: '/', EGE_BASE: '/ege/' };
@@ -176,28 +185,22 @@
     // Навигация
     const toVariants = document.getElementById('toVariants');
     if (toVariants){
-      // .../ege/task2/variants/variantX/ege2_varX_4_result.html -> .../ege/task2/variants/ege2.html
       toVariants.href = path.replace(/\/variants\/variant\d+\/[^/]+$/i, '/variants/ege2.html');
     }
-    const toModeMenu = document.getElementById('toModeMenu');  // «к выбору задания»
+    const toModeMenu = document.getElementById('toModeMenu');
     if (toModeMenu) toModeMenu.href = `${EGE_BASE}ege_menu.html`;
-    const toTaskMenu = document.getElementById('toTaskMenu');  // «к выбору режима»
+    const toTaskMenu = document.getElementById('toTaskMenu');
     if (toTaskMenu) toTaskMenu.href = `${EGE_BASE}ege.html`;
-    const toHome = document.getElementById('toHome');          // «на главную»
+    const toHome = document.getElementById('toHome');
     if (toHome) toHome.href = `${ROOT_BASE}index.html`;
 
-    // ===== Очистка состояния Task 2 и флаг рестарта при уходе =====
+    // ===== Очистка состояния Task 2 =====
     function clearTask2State(){
       try{
-        Object.keys(sessionStorage).forEach(k => {
-          if (k.startsWith('ege2_')) sessionStorage.removeItem(k);
-        });
+        Object.keys(sessionStorage).forEach(k => { if (k.startsWith('ege2_')) sessionStorage.removeItem(k); });
       }catch{}
     }
-    function clearAndGo(url){
-      clearTask2State();
-      navigateOnce(url);
-    }
+    function clearAndGo(url){ clearTask2State(); navigateOnce(url); }
     document.querySelectorAll('.nav-btn').forEach(a=>{
       a.addEventListener('click', (e)=>{ e.preventDefault(); clearAndGo(a.href); });
     });
@@ -210,10 +213,6 @@
       repeat.addEventListener('click', (e)=>{ e.preventDefault(); clearAndGo(repeatHref); });
     }
 
-    // Если уходим (даже кнопкой Назад) — просим Task начать с 3‑2‑1
-    window.addEventListener('pagehide', () => {
-      try{ sessionStorage.setItem('ege2_force_restart','1'); }catch{}
-    });
     window.addEventListener('pageshow', ()=>{ navigateOnce.lock = false; });
 
     // ===== АУДИО: одно целое dataURL в ege2_audio_base64 =====
@@ -221,6 +220,8 @@
     const playBtn     = document.getElementById('playBtn');
     const downloadBtn = document.getElementById('downloadBtn');
     const statusText  = document.getElementById('statusText');
+    const waveWrap    = document.getElementById('waveWrap');
+    const waveCanvas  = document.getElementById('wave');
 
     const base64     = sessionStorage.getItem('ege2_audio_base64');
     const mimeStored = (sessionStorage.getItem('ege2_audio_mime') || 'audio/webm').toLowerCase();
@@ -249,27 +250,29 @@
       downloadBtn.disabled = !en;
     }
 
-    (function initAudio(){
-      if (base64){
-        try{
-          const blob = dataURLtoBlob(base64);
-          if (blob){
-            objectURL   = URL.createObjectURL(blob);
-            audioEl.src = objectURL;
-            audioEl.type= blob.type || mimeStored;
-          }else{
-            audioEl.src = base64;
-            audioEl.type= mimeStored;
-          }
-          setButtonsEnabled(true);
-        }catch{
-          audioEl.src = base64;
-          audioEl.type= mimeStored;
-          setButtonsEnabled(true);
-        }
-      }else{
+    (async function initAudio(){
+      if (!base64){
         statusText.textContent = '⚠️ Запись не найдена. Возможно, доступ к микрофону был запрещён или страница обновлена до завершения.';
         setButtonsEnabled(false);
+        return;
+      }
+      try{
+        const blob = dataURLtoBlob(base64);
+        if (blob){
+          objectURL   = URL.createObjectURL(blob);
+          audioEl.src = objectURL;
+          audioEl.type= blob.type || mimeStored;
+          await initWaveformFromURL(objectURL);
+        }else{
+          audioEl.src = base64;
+          audioEl.type= mimeStored;
+          await initWaveformFromURL(base64);
+        }
+        setButtonsEnabled(true);
+      }catch{
+        audioEl.src = base64;
+        audioEl.type= mimeStored;
+        setButtonsEnabled(true);
       }
     })();
 
@@ -283,7 +286,130 @@
     });
 
     // Очистка blob‑URL
+    window.addEventListener('pagehide', ()=>{ if (objectURL) URL.revokeObjectURL(objectURL); });
     window.addEventListener('beforeunload', ()=>{ if (objectURL) URL.revokeObjectURL(objectURL); });
+
+    // ===== ВОЛНОВОЙ БЕГУНОК =====
+    async function initWaveformFromURL(url){
+      try{
+        // Получаем бинарные данные
+        const resp = await fetch(url);
+        const buf  = await resp.arrayBuffer();
+
+        // Декодируем и строим пики
+        const AC = window.AudioContext || window.webkitAudioContext;
+        const ctx = new AC();
+        const audioBuf = await ctx.decodeAudioData(buf);
+
+        const peaks = buildPeaks(audioBuf, 1000); // ~1000 столбиков
+        drawWave(peaks, 0);
+
+        // Показать и привязать события
+        waveWrap.style.display = 'block';
+
+        // Обновление прогресса
+        let raf;
+        function progressLoop(){
+          const p = audioEl.currentTime / (audioBuf.duration || 1);
+          drawWave(peaks, p);
+          raf = requestAnimationFrame(progressLoop);
+        }
+        audioEl.addEventListener('play', ()=>{ cancelAnimationFrame(raf); progressLoop(); });
+        audioEl.addEventListener('pause', ()=>{ cancelAnimationFrame(raf); drawWave(peaks, audioEl.currentTime/(audioBuf.duration||1)); });
+        audioEl.addEventListener('ended', ()=>{ cancelAnimationFrame(raf); drawWave(peaks, 1); });
+
+        // Перемотка по клику
+        waveCanvas.addEventListener('pointerdown', (e)=>{
+          const rect = waveCanvas.getBoundingClientRect();
+          const x = Math.max(0, Math.min(1, (e.clientX - rect.left)/rect.width));
+          audioEl.currentTime = x * audioBuf.duration;
+          drawWave(peaks, x);
+        }, {passive:true});
+      }catch(err){
+        // Если что-то пошло не так — просто скрываем волновой бар
+        console.warn('Waveform init failed:', err);
+        waveWrap.style.display = 'none';
+      }
+    }
+
+    // Сэмплируем максимум/среднее по окнам
+    function buildPeaks(audioBuf, width){
+      const ch0 = audioBuf.getChannelData(0);
+      const ch1 = audioBuf.numberOfChannels>1 ? audioBuf.getChannelData(1) : null;
+      const total = ch0.length;
+      const block = Math.floor(total / width) || 1;
+      const peaks = new Array(width);
+      for (let i=0;i<width;i++){
+        const start = i*block;
+        const end   = Math.min(total, start+block);
+        let min=1, max=-1;
+        for (let j=start;j<end;j++){
+          const s = ch1 ? (ch0[j]+ch1[j])*0.5 : ch0[j];
+          if (s<min) min=s;
+          if (s>max) max=s;
+        }
+        peaks[i] = [min, max];
+      }
+      return peaks;
+    }
+
+    function drawWave(peaks, progress){
+      const c = waveCanvas;
+      const dpr = Math.max(1, Math.floor(window.devicePixelRatio || 1));
+      const cssW = c.clientWidth || 600;
+      const cssH = c.clientHeight || 48;
+      if (c.width !== cssW*dpr) c.width = cssW*dpr;
+      if (c.height!== cssH*dpr) c.height= cssH*dpr;
+      const ctx = c.getContext('2d');
+      ctx.scale(dpr, dpr);
+
+      // Цвета
+      const cs = getComputedStyle(document.documentElement);
+      const primary = cs.getPropertyValue('--primary').trim() || '#2b6cff';
+      const fillAll = cs.getPropertyValue('--panel-bg')?.trim() || '#e9edf7';
+      const progCol = primary;
+
+      // Фон
+      ctx.clearRect(0,0,cssW,cssH);
+      ctx.fillStyle = fillAll;
+      ctx.fillRect(0,0,cssW,cssH);
+
+      // Волна (светлая)
+      const mid = cssH/2;
+      ctx.fillStyle = '#00000022';
+      for (let i=0;i<peaks.length;i++){
+        const x = i/peaks.length*cssW;
+        const [min,max] = peaks[i];
+        const hTop = Math.abs(max)*mid;
+        const hBot = Math.abs(min)*mid;
+        ctx.fillRect(x, mid-hTop, 1, hTop+hBot || 1);
+      }
+
+      // Прогресс‑оверлей
+      const progW = Math.max(0, Math.min(cssW, progress*cssW));
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(0,0,progW,cssH);
+      ctx.clip();
+
+      ctx.fillStyle = progCol + 'CC'; // чуть насыщеннее
+      for (let i=0;i<peaks.length;i++){
+        const x = i/peaks.length*cssW;
+        const [min,max] = peaks[i];
+        const hTop = Math.abs(max)*mid;
+        const hBot = Math.abs(min)*mid;
+        ctx.fillRect(x, mid-hTop, 1, hTop+hBot || 1);
+      }
+      ctx.restore();
+
+      // Маленькие тайм‑метки (00:0x — xx:xx)
+      ctx.fillStyle = '#fff';
+      ctx.font = '10px Roboto, system-ui, sans-serif';
+      ctx.textBaseline = 'top';
+      ctx.fillText('0:00', 6, 4);
+      ctx.textAlign = 'right';
+      ctx.fillText('', cssW-6, 4); // можно добавить длительность, если нужно
+    }
   </script>
 </body>
 </html>

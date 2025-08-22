@@ -31,23 +31,16 @@
     .status{ font-size:20px; color:#1f7a2e; text-align:center; margin:10px 0 18px; }
     .dark .status{ color:#5ee397; }
 
-    /* Плеер + волна */
-    audio{ margin:10px auto 0; width:min(900px, 90%); display:block; }
-    .wave-wrap{ width:min(900px, 90%); margin:8px auto 16px; display:none; }
-    .wave {
-      width:100%; height:48px; display:block;
-      background: #e9edf7; border-radius:10px; box-shadow: var(--shadow);
-    }
+    /* обычный плеер + волна */
+    audio{ margin:20px auto; width:min(900px,95%); display:block; }
+    .wave-wrap{ width:min(900px,95%); margin:-6px auto 12px; display:none; }
+    .wave{ width:100%; height:48px; display:block; background:#e9edf7; border-radius:10px; box-shadow:var(--shadow); }
     .dark .wave{ background:#1f2a3d; }
 
-    /* Крупные кнопки — как в эталоне (ege1) */
+    /* КНОПКИ — как в ege1 */
     .btn{
-      display:inline-block;
-      padding:16px 32px;             /* эталон */
-      margin:12px;                   /* эталон */
-      font-size:20px;                /* эталон */
-      font-weight:600;
-      color:#fff; text-decoration:none; cursor:pointer;
+      display:inline-block; padding:16px 32px; margin:12px;
+      font-size:20px; font-weight:600; color:#fff; text-decoration:none; cursor:pointer;
       border:none; border-radius:12px;
       background:linear-gradient(135deg, var(--primary), var(--primary-600));
       box-shadow:0 10px 22px rgba(43,108,255,.3);
@@ -81,18 +74,12 @@
     .plain-list li{ margin:10px 0; }
 
     .ad-title{ font-weight:800; font-size:30px; margin:6px 0 12px; text-align:center; }
-    .ad-figure{
-      width:100%; aspect-ratio:3/2;
-      border-radius:12px; overflow:hidden;
-      box-shadow:var(--shadow); background:#ddd;
-    }
+    .ad-figure{ width:100%; aspect-ratio:3/2; border-radius:12px; overflow:hidden; box-shadow:var(--shadow); background:#ddd; }
     .ad-figure>img{ width:100%; height:100%; object-fit:cover; object-position:center; display:block; }
 
-    @media (max-width:1100px){
-      .ad-layout{ grid-template-columns:1fr; gap:22px; }
-    }
+    @media (max-width:1100px){ .ad-layout{ grid-template-columns:1fr; gap:22px; } }
 
-    /* ===== ЧАСТЬ 3 — нижние 4 кнопки ===== */
+    /* ===== ЧАСТЬ 3 — нижние нав-кнопки ===== */
     .nav-row{ text-align:center; margin:16px 0 24px; }
 
     .spacer{ height: calc(var(--footer-h, 72px) + 16px); }
@@ -116,11 +103,11 @@
 
     <div style="text-align:center;">
       <button class="btn" id="playBtn" type="button" aria-label="Проиграть запись" disabled>▶️ Прослушать</button>
-      <button class="btn" id="downloadBtn" type="button" aria-label="Скачать запись" disabled>⬇️ Скачать</button>
-      <a class="btn" id="repeatBtn" href="#" role="button" aria-label="Повторить этот вариант">🔁 Повторить</a>
+      <button class="btn" id="downloadBtn" type="button" aria-label="Скачать запись" disabled>⬇️ Скачать запись</button>
+      <a class="btn" id="repeatBtn" href="#" role="button" aria-label="Повторить этот вариант">🔁 Повторить этот вариант</a>
     </div>
 
-    <!-- ===== ЧАСТЬ 2 — Задание как в prepare ===== -->
+    <!-- ===== ЧАСТЬ 2 — задание как в prepare ===== -->
     <div class="ad-layout" aria-labelledby="taskTitle">
       <section class="task-header card">
         <b id="taskTitle">Task 2. Study the advertisement.</b>
@@ -148,7 +135,7 @@
       </aside>
     </div>
 
-    <!-- ===== ЧАСТЬ 3 — навигация ===== -->
+    <!-- ===== ЧАСТЬ 3 ===== -->
     <div class="nav-row">
       <a class="btn nav-btn" id="toVariants" href="#" role="button">Перейти к выбору варианта</a>
       <a class="btn nav-btn" id="toModeMenu" href="#" role="button">Перейти к выбору задания</a>
@@ -163,14 +150,14 @@
     import { toggleThemeInit, navigateOnce } from '../../../common.js';
     toggleThemeInit();
 
-    // ===== Заголовок/номер варианта =====
+    // ===== Номер варианта в заголовке
     const path = location.pathname;
     const m = path.match(/variant(\d+)/i);
     const varNum = m ? m[1] : '?';
     document.getElementById('varNum').textContent = varNum;
     document.title = `Результат — Задание 2 · Вариант ${varNum}`;
 
-    // ===== Базы путей =====
+    // ===== Базы путей
     function getBases(p){
       const i = p.indexOf('/ege/');
       if (i >= 0){
@@ -187,35 +174,27 @@
     if (toVariants){
       toVariants.href = path.replace(/\/variants\/variant\d+\/[^/]+$/i, '/variants/ege2.html');
     }
-    const toModeMenu = document.getElementById('toModeMenu');
-    if (toModeMenu) toModeMenu.href = `${EGE_BASE}ege_menu.html`;
-    const toTaskMenu = document.getElementById('toTaskMenu');
-    if (toTaskMenu) toTaskMenu.href = `${EGE_BASE}ege.html`;
-    const toHome = document.getElementById('toHome');
-    if (toHome) toHome.href = `${ROOT_BASE}index.html`;
+    document.getElementById('toModeMenu').href = `${EGE_BASE}ege_menu.html`;
+    document.getElementById('toTaskMenu').href = `${EGE_BASE}ege.html`;
+    document.getElementById('toHome').href     = `${ROOT_BASE}index.html`;
 
-    // ===== Очистка состояния Task 2 =====
+    // Очистка состояния Task2 при уходе по кнопкам
     function clearTask2State(){
-      try{
-        Object.keys(sessionStorage).forEach(k => { if (k.startsWith('ege2_')) sessionStorage.removeItem(k); });
-      }catch{}
+      try{ Object.keys(sessionStorage).forEach(k => { if (k.startsWith('ege2_')) sessionStorage.removeItem(k); }); }catch{}
     }
     function clearAndGo(url){ clearTask2State(); navigateOnce(url); }
     document.querySelectorAll('.nav-btn').forEach(a=>{
       a.addEventListener('click', (e)=>{ e.preventDefault(); clearAndGo(a.href); });
     });
-
-    // «Повторить этот вариант» -> на _1_prepare
     const repeat = document.getElementById('repeatBtn');
     if (repeat){
       const repeatHref = path.replace(/_4_result\.html$/i, '_1_prepare.html');
       repeat.href = repeatHref;
       repeat.addEventListener('click', (e)=>{ e.preventDefault(); clearAndGo(repeatHref); });
     }
-
     window.addEventListener('pageshow', ()=>{ navigateOnce.lock = false; });
 
-    // ===== АУДИО: одно целое dataURL в ege2_audio_base64 =====
+    // ===== АУДИО + волна
     const audioEl     = document.getElementById('audio');
     const playBtn     = document.getElementById('playBtn');
     const downloadBtn = document.getElementById('downloadBtn');
@@ -240,8 +219,8 @@
       if (parts.length < 2) return null;
       const header = parts[0], b64 = parts[1];
       const type = (header.match(/data:(.*?);base64/) || [,'application/octet-stream'])[1];
-      const bin = atob(b64);
-      const bytes = new Uint8Array(bin.length);
+      const bin  = atob(b64);
+      const bytes= new Uint8Array(bin.length);
       for (let i=0;i<bin.length;i++) bytes[i] = bin.charCodeAt(i);
       return new Blob([bytes], { type });
     }
@@ -259,19 +238,19 @@
       try{
         const blob = dataURLtoBlob(base64);
         if (blob){
-          objectURL   = URL.createObjectURL(blob);
+          objectURL = URL.createObjectURL(blob);
           audioEl.src = objectURL;
-          audioEl.type= blob.type || mimeStored;
+          audioEl.type = blob.type || mimeStored;
           await initWaveformFromURL(objectURL);
         }else{
           audioEl.src = base64;
-          audioEl.type= mimeStored;
+          audioEl.type = mimeStored;
           await initWaveformFromURL(base64);
         }
         setButtonsEnabled(true);
       }catch{
         audioEl.src = base64;
-        audioEl.type= mimeStored;
+        audioEl.type = mimeStored;
         setButtonsEnabled(true);
       }
     })();
@@ -284,55 +263,43 @@
       a.download = fileName;
       a.click();
     });
-
-    // Очистка blob‑URL
     window.addEventListener('pagehide', ()=>{ if (objectURL) URL.revokeObjectURL(objectURL); });
     window.addEventListener('beforeunload', ()=>{ if (objectURL) URL.revokeObjectURL(objectURL); });
 
-    // ===== ВОЛНОВОЙ БЕГУНОК =====
+    // ===== Волновой бегунок
     async function initWaveformFromURL(url){
       try{
-        // Получаем бинарные данные
         const resp = await fetch(url);
         const buf  = await resp.arrayBuffer();
-
-        // Декодируем и строим пики
-        const AC = window.AudioContext || window.webkitAudioContext;
-        const ctx = new AC();
+        const AC   = window.AudioContext || window.webkitAudioContext;
+        const ctx  = new AC();
         const audioBuf = await ctx.decodeAudioData(buf);
 
-        const peaks = buildPeaks(audioBuf, 1000); // ~1000 столбиков
+        const peaks = buildPeaks(audioBuf, 1000); // количество «столбиков»
         drawWave(peaks, 0);
-
-        // Показать и привязать события
         waveWrap.style.display = 'block';
 
-        // Обновление прогресса
         let raf;
-        function progressLoop(){
+        const tick = ()=>{
           const p = audioEl.currentTime / (audioBuf.duration || 1);
           drawWave(peaks, p);
-          raf = requestAnimationFrame(progressLoop);
-        }
-        audioEl.addEventListener('play', ()=>{ cancelAnimationFrame(raf); progressLoop(); });
+          raf = requestAnimationFrame(tick);
+        };
+        audioEl.addEventListener('play', ()=>{ cancelAnimationFrame(raf); tick(); });
         audioEl.addEventListener('pause', ()=>{ cancelAnimationFrame(raf); drawWave(peaks, audioEl.currentTime/(audioBuf.duration||1)); });
         audioEl.addEventListener('ended', ()=>{ cancelAnimationFrame(raf); drawWave(peaks, 1); });
 
-        // Перемотка по клику
         waveCanvas.addEventListener('pointerdown', (e)=>{
-          const rect = waveCanvas.getBoundingClientRect();
-          const x = Math.max(0, Math.min(1, (e.clientX - rect.left)/rect.width));
+          const r = waveCanvas.getBoundingClientRect();
+          const x = Math.max(0, Math.min(1, (e.clientX - r.left)/r.width));
           audioEl.currentTime = x * audioBuf.duration;
           drawWave(peaks, x);
         }, {passive:true});
       }catch(err){
-        // Если что-то пошло не так — просто скрываем волновой бар
         console.warn('Waveform init failed:', err);
         waveWrap.style.display = 'none';
       }
     }
-
-    // Сэмплируем максимум/среднее по окнам
     function buildPeaks(audioBuf, width){
       const ch0 = audioBuf.getChannelData(0);
       const ch1 = audioBuf.numberOfChannels>1 ? audioBuf.getChannelData(1) : null;
@@ -340,19 +307,16 @@
       const block = Math.floor(total / width) || 1;
       const peaks = new Array(width);
       for (let i=0;i<width;i++){
-        const start = i*block;
-        const end   = Math.min(total, start+block);
+        const start = i*block, end = Math.min(total, start+block);
         let min=1, max=-1;
         for (let j=start;j<end;j++){
           const s = ch1 ? (ch0[j]+ch1[j])*0.5 : ch0[j];
-          if (s<min) min=s;
-          if (s>max) max=s;
+          if (s<min) min=s; if (s>max) max=s;
         }
-        peaks[i] = [min, max];
+        peaks[i] = [min,max];
       }
       return peaks;
     }
-
     function drawWave(peaks, progress){
       const c = waveCanvas;
       const dpr = Math.max(1, Math.floor(window.devicePixelRatio || 1));
@@ -361,20 +325,17 @@
       if (c.width !== cssW*dpr) c.width = cssW*dpr;
       if (c.height!== cssH*dpr) c.height= cssH*dpr;
       const ctx = c.getContext('2d');
-      ctx.scale(dpr, dpr);
+      ctx.setTransform(dpr,0,0,dpr,0,0);
 
-      // Цвета
       const cs = getComputedStyle(document.documentElement);
       const primary = cs.getPropertyValue('--primary').trim() || '#2b6cff';
-      const fillAll = cs.getPropertyValue('--panel-bg')?.trim() || '#e9edf7';
-      const progCol = primary;
+      const bg = getComputedStyle(c).backgroundColor;
 
-      // Фон
+      // фон
       ctx.clearRect(0,0,cssW,cssH);
-      ctx.fillStyle = fillAll;
-      ctx.fillRect(0,0,cssW,cssH);
+      ctx.fillStyle = bg; ctx.fillRect(0,0,cssW,cssH);
 
-      // Волна (светлая)
+      // волна (серые столбики)
       const mid = cssH/2;
       ctx.fillStyle = '#00000022';
       for (let i=0;i<peaks.length;i++){
@@ -385,14 +346,10 @@
         ctx.fillRect(x, mid-hTop, 1, hTop+hBot || 1);
       }
 
-      // Прогресс‑оверлей
+      // прогресс — той же палитрой, что кнопки
       const progW = Math.max(0, Math.min(cssW, progress*cssW));
-      ctx.save();
-      ctx.beginPath();
-      ctx.rect(0,0,progW,cssH);
-      ctx.clip();
-
-      ctx.fillStyle = progCol + 'CC'; // чуть насыщеннее
+      ctx.save(); ctx.beginPath(); ctx.rect(0,0,progW,cssH); ctx.clip();
+      ctx.fillStyle = primary + 'CC';
       for (let i=0;i<peaks.length;i++){
         const x = i/peaks.length*cssW;
         const [min,max] = peaks[i];
@@ -402,13 +359,10 @@
       }
       ctx.restore();
 
-      // Маленькие тайм‑метки (00:0x — xx:xx)
-      ctx.fillStyle = '#fff';
-      ctx.font = '10px Roboto, system-ui, sans-serif';
+      // отметка начала
+      ctx.fillStyle = '#fff'; ctx.font = '10px Roboto, system-ui, sans-serif';
       ctx.textBaseline = 'top';
       ctx.fillText('0:00', 6, 4);
-      ctx.textAlign = 'right';
-      ctx.fillText('', cssW-6, 4); // можно добавить длительность, если нужно
     }
   </script>
 </body>

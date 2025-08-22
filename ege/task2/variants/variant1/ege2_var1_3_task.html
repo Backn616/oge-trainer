@@ -14,6 +14,7 @@
   <link rel="stylesheet" href="../../../style_common.css" />
 
   <style>
+    /* Грид внутри карточки */
     .q-layout{
       display:grid;
       grid-template-columns: 1.05fr 0.95fr;
@@ -30,7 +31,7 @@
     .actions{ grid-column:1 / -1; text-align:center; margin-top:10px; margin-bottom:6px; }
     @media (max-width:1100px){ .q-layout{ grid-template-columns:1fr; gap:22px; } }
 
-    /* Большой «3–2–1» */
+    /* Большой «3–2–1» (до карточки) */
     .timer{
       font-size:70px;
       margin:30px 0;
@@ -41,7 +42,7 @@
       text-align:center;
     }
 
-    /* Подсказка про звук (показывается только при блокировке TTS) */
+    /* Подсказка про звук, если TTS заблокирован */
     .tts-hint{
       position:fixed; left:50%; bottom:20px; transform:translateX(-50%);
       background:var(--card-bg,#fff); color:var(--text,#111); border:1px solid var(--border,#e5e7eb);
@@ -64,49 +65,57 @@
   <!-- Тумблер темы -->
   <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
 
-  <div class="content-wrapper">
-    <!-- Отсчёт -->
+  <!-- ВЕРХНИЙ БЛОК: только отсчёт (как раньше) -->
+  <div class="content-wrapper" id="countdownWrap">
     <div id="timer" class="timer" aria-live="polite">3</div>
-
-    <!-- Вопросы -->
-    <div id="qWrap" class="q-layout" style="display:none">
-      <section class="q-left" aria-live="polite">
-        <h2 id="qTitle">Question 1.</h2>
-        <p id="qLine">1) Ask a direct question about the following: <b>minimum age.</b></p>
-      </section>
-
-      <aside aria-label="Advertisement">
-        <h3 class="ad-title">Join our bike club!</h3>
-        <figure class="ad-figure">
-          <!-- Место для фото -->
-          <img src="task2_bike.jpg" alt="Bike club advertisement image" loading="lazy">
-        </figure>
-      </aside>
-
-      <div class="actions">
-        <button id="nextBtn" class="button" type="button">Далее</button>
-      </div>
-    </div>
-
-    <!-- Проставка, чтобы фикс‑бар не наезжал на контент (как в эталоне) -->
-    <div style="height: calc(var(--footer-h, 72px) + 24px);"></div>
   </div>
 
-  <!-- Фиксированный прогресс-бар (как в эталоне) -->
+  <!-- ОСНОВНОЙ БЛОК КАК В ЭТАЛОНЕ: карточка внутри page-center -->
+  <main class="page-center" id="mainWrap" style="display:none">
+    <section class="card task-card">
+      <div id="qWrap" class="q-layout">
+        <!-- Слева — текст вопроса -->
+        <section class="q-left" aria-live="polite">
+          <h2 id="qTitle">Question 1.</h2>
+          <p id="qLine">1) Ask a direct question about the following: <b>minimum age.</b></p>
+        </section>
+
+        <!-- Справа — заголовок над фото + фото -->
+        <aside aria-label="Advertisement">
+          <h3 class="ad-title">Join our bike club!</h3>
+          <figure class="ad-figure">
+            <!-- Место для твоего фото -->
+            <img src="task2_bike.jpg" alt="Bike club advertisement image" loading="lazy">
+          </figure>
+        </aside>
+
+        <!-- Кнопка -->
+        <div class="actions">
+          <button id="nextBtn" class="button" type="button">Далее</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Проставка, чтобы фикс‑бар не наезжал на контент (как в эталоне) -->
+  <div style="height: calc(var(--footer-h, 72px) + 24px);"></div>
+
+  <!-- ФИКСИРОВАННЫЙ ПРОГРЕСС‑БАР (как в эталоне) -->
   <div id="progressContainerFixed" role="timer" aria-live="polite" style="display:none">
     <div id="progressBarFixed" class="rAF">
       <span id="progressTime" class="progress-time">00:20</span>
     </div>
   </div>
 
+  <!-- ЛОГИКА -->
   <script type="module">
     import { toggleThemeInit, navigateOnce, fmtTime } from "../../../common.js";
     toggleThemeInit();
 
-    // --- Жёсткий сброс при загрузке (перезагрузке) ---
+    // ——— Жёсткий сброс на загрузке
     try{ sessionStorage.removeItem('ege2_audio_parts'); }catch{}
 
-    // ===== Тексты =====
+    // ——— Тексты
     const QUESTIONS = [
       { title: "Question 1.", line: "1) Ask a direct question about the following: <b>minimum age.</b>" },
       { title: "Question 2.", line: "2) Ask a direct question about the following: <b>special clothes.</b>" },
@@ -114,9 +123,11 @@
       { title: "Question 4.", line: "4) Ask a direct question about the following: <b>competitions.</b>" }
     ];
 
-    // ===== DOM =====
+    // ——— DOM
+    const countdownWrap = document.getElementById('countdownWrap');
+    const mainWrap = document.getElementById('mainWrap');
+
     const timerEl  = document.getElementById('timer');
-    const qWrap    = document.getElementById('qWrap');
     const qTitleEl = document.getElementById('qTitle');
     const qLineEl  = document.getElementById('qLine');
     const nextBtn  = document.getElementById('nextBtn');
@@ -125,7 +136,7 @@
     const timeEl   = document.getElementById('progressTime');
     const RESULT_URL = location.pathname.replace(/_3_task\.html$/i, '_4_result.html');
 
-    // ===== Подсказка TTS при блокировке =====
+    // ——— Подсказка TTS при блокировке
     function showTtsHint(){
       if (document.querySelector('.tts-hint')) return;
       const el = document.createElement('div');
@@ -137,7 +148,7 @@
       window.addEventListener('touchstart', remove, { passive:true });
     }
 
-    // ===== Озвучка (как раньше) =====
+    // ——— Озвучка (как раньше)
     async function speakQuestion(num){
       try{
         speechSynthesis.cancel();
@@ -151,14 +162,11 @@
           try{ speechSynthesis.resume(); }catch{}
           speechSynthesis.speak(u);
         });
-        // если не озвучилось (автоблокировка) — покажем подсказку
         if (!said) showTtsHint();
-      }catch{
-        // молча игнорируем, подсказку не показываем
-      }
+      }catch{}
     }
 
-    // ===== Микрофон (параллельно, без блокировки) =====
+    // ——— Микрофон (параллельно)
     let streamRef=null, recorder=null, chunks=[];
     let chosenMime='';
     function pickMimeType(){
@@ -175,25 +183,26 @@
         recorder.onstop = handleStop;
       }catch{ recorder=null; }
     }
-    let micReadyPromise = initMic(); // не ждём — отсчёт идёт сразу
+    let micReadyPromise = initMic();
 
-    // ===== Отсчёт 3‑2‑1 =====
+    // ——— Отсчёт 3‑2‑1 (на верхнем фоне)
     let countdown=3;
     function startCountdown(){
-      timerEl.style.display='block';
       timerEl.textContent=countdown;
       const id=setInterval(()=>{
         timerEl.textContent=countdown;
         countdown--;
         if(countdown<0){
           clearInterval(id);
-          timerEl.style.display='none';
+          // Прячем верхний блок, показываем карточку (фон как в эталоне)
+          countdownWrap.style.display = 'none';
+          mainWrap.style.display = 'block';
           startFlow();
         }
       },1000);
     }
 
-    // ===== Таймер (устойчивый) =====
+    // ——— Таймер (устойчивый)
     const QUESTION_MS=20000;
     let qIdx=0, startedAt=0, deadlineMs=0;
     let rafId=0,intId=0,hardTO=0,finishing=false;
@@ -205,7 +214,6 @@
     }
 
     function startFlow(){
-      qWrap.style.display='grid';
       barWrap.style.display='block';
       qIdx=0;
       renderQuestion();
@@ -213,15 +221,15 @@
     }
 
     async function beginSegment(){
-      // 1) озвучка номера вопроса
+      // 1) Озвучка
       await speakQuestion(qIdx+1);
 
-      // 2) микрофон — если доступен
+      // 2) Микрофон (если доступен)
       try{ await micReadyPromise; }catch{}
       chunks=[];
       try{ if(recorder && recorder.state!=='recording') recorder.start(); }catch{}
 
-      // 3) UI и жёсткий дедлайн
+      // 3) UI и дедлайн
       timeEl.textContent=fmtTime(QUESTION_MS);
       barEl.style.width='100%';
       startedAt=performance.now();
@@ -255,7 +263,7 @@
       if(hardTO){clearTimeout(hardTO);hardTO=0;}
     }
 
-    // ===== Завершение сегмента (по таймеру/кнопке) =====
+    // ——— Завершение сегмента
     function finishSegment(){
       if(finishing) return;
       finishing=true;
@@ -268,9 +276,7 @@
       handleStop(); // если записи нет — идём дальше сами
     }
 
-    function handleStop(){
-      proceedNext();
-    }
+    function handleStop(){ proceedNext(); }
 
     function proceedNext(){
       qIdx++;
@@ -287,14 +293,14 @@
     // Кнопка «Далее»
     nextBtn.addEventListener('click', finishSegment);
 
-    // Автодобив при возвращении на вкладку
+    // Автодобив при возврате на вкладку
     document.addEventListener('visibilitychange',()=>{
       if(document.visibilityState==='visible'&&!finishing){
         if(performance.now()>=deadlineMs) finishSegment();
       }
     });
 
-    // Старт всегда с 3‑2‑1
+    // Старт: сначала верхний фон + отсчёт, затем карточка-эталон
     startCountdown();
   </script>
 </body>

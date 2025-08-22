@@ -4,24 +4,9 @@
   <meta charset="UTF-8" />
   <title>Task 2 — Questions</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-  <!-- Шрифты -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
-
-  <!-- Общие стили -->
   <link rel="stylesheet" href="../../../style_common.css" />
-
   <style>
-    .q-layout{
-      display:grid;
-      grid-template-columns: 1.05fr 0.95fr;
-      gap:28px 36px;
-      align-items:start;
-      max-width:1500px;
-      margin-inline:auto;
-    }
+    .q-layout{ display:grid; grid-template-columns:1.05fr 0.95fr; gap:28px 36px; align-items:start; max-width:1500px; margin-inline:auto; }
     .q-left h2{ margin:0 0 10px; font-size:28px; line-height:1.2; }
     .q-left p{ font-size:22px; line-height:1.55; margin:0 0 10px; }
     .ad-title{ font-weight:800; font-size:30px; margin:6px 0 12px; text-align:center; }
@@ -29,41 +14,18 @@
     .ad-figure>img{ width:100%; height:100%; object-fit:cover; object-position:center; display:block; }
     .actions{ grid-column:1 / -1; text-align:center; margin-top:10px; margin-bottom:6px; }
     @media (max-width:1100px){ .q-layout{ grid-template-columns:1fr; gap:22px; } }
-
-    /* Большой «3–2–1» */
-    .timer{
-      font-size:70px;
-      margin:30px 0;
-      font-weight:700;
-      color:var(--primary);
-      letter-spacing:4px;
-      text-shadow:0 4px 12px rgba(0,0,0,.25);
-      transition:transform .25s ease;
-      will-change:transform;
-      text-align:center;
-    }
-    @media (prefers-reduced-motion: reduce){ .timer{ transition:none; } }
+    .timer{ font-size:70px; margin:30px 0; font-weight:700; color:var(--primary); letter-spacing:4px; text-shadow:0 4px 12px rgba(0,0,0,.25); text-align:center; }
   </style>
-
-  <!-- Анти-мигание темы -->
   <script>
-    (function(){
-      try{
-        const saved = localStorage.getItem('pref-theme') || 'light';
-        if (saved === 'dark') document.documentElement.classList.add('dark');
-      }catch(_){}
-    })();
+    (function(){ try{ const s=localStorage.getItem('pref-theme')||'light'; if(s==='dark')document.documentElement.classList.add('dark'); }catch(_){}})();
   </script>
 </head>
 <body>
-  <!-- Тумблер темы -->
   <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
 
   <div class="content-wrapper">
-    <!-- Отсчёт -->
     <div id="timer" class="timer" aria-live="polite">3</div>
 
-    <!-- Вопросы -->
     <div id="qWrap" class="q-layout" style="display:none">
       <section class="q-left" aria-live="polite">
         <h2 id="qTitle">Question 1.</h2>
@@ -83,25 +45,20 @@
     </div>
   </div>
 
-  <!-- Прогресс-бар -->
   <div id="progressContainerFixed" role="timer" aria-live="polite" style="display:none">
     <div id="progressBarFixed" class="rAF">
       <span id="progressTime" class="progress-time">00:20</span>
     </div>
   </div>
 
-  <!-- ЛОГИКА -->
   <script type="module">
     import { toggleThemeInit, navigateOnce, fmtTime } from "../../../common.js";
-
     toggleThemeInit();
 
-    // --- Жёсткий сброс прогресса при обновлении ---
-    try {
-      sessionStorage.removeItem('ege2_audio_parts');
-    } catch {}
+    // ——— Жёсткий сброс на перезагрузке
+    try{ sessionStorage.removeItem('ege2_audio_parts'); }catch{}
 
-    // ===== Вопросы =====
+    // ——— Тексты
     const QUESTIONS = [
       { title: "Question 1.", line: "1) Ask a direct question about the following: <b>minimum age.</b>" },
       { title: "Question 2.", line: "2) Ask a direct question about the following: <b>special clothes.</b>" },
@@ -109,7 +66,7 @@
       { title: "Question 4.", line: "4) Ask a direct question about the following: <b>competitions.</b>" }
     ];
 
-    // ===== DOM =====
+    // ——— DOM
     const timerEl  = document.getElementById('timer');
     const qWrap    = document.getElementById('qWrap');
     const qTitleEl = document.getElementById('qTitle');
@@ -120,43 +77,63 @@
     const timeEl   = document.getElementById('progressTime');
     const RESULT_URL = location.pathname.replace(/_3_task\.html$/i, '_4_result.html');
 
-    // ===== Озвучка =====
-    function speakQuestion(num){
+    // ——— TTS: надёжная озвучка
+    let voicesReady = false;
+    function ensureVoices(timeoutMs = 1500){
+      return new Promise(resolve=>{
+        const ok = () => { voicesReady = true; resolve(); };
+        const have = () => (speechSynthesis.getVoices()||[]).length > 0;
+        if (have()) return ok();
+        const onv = () => { if (have()){ speechSynthesis.removeEventListener('voiceschanged', onv); ok(); } };
+        speechSynthesis.addEventListener('voiceschanged', onv);
+        setTimeout(()=>{ speechSynthesis.removeEventListener('voiceschanged', onv); ok(); }, timeoutMs);
+      });
+    }
+    function pickVoice(){
+      const vs = speechSynthesis.getVoices()||[];
+      return vs.find(v=>/en-GB/i.test(v.lang)) || vs.find(v=>/en-US/i.test(v.lang)) || vs[0] || null;
+    }
+    async function speakQuestion(num){
       try{
-        speechSynthesis.cancel();
+        await ensureVoices();
+        speechSynthesis.resume(); // на случай паузы после перезагрузки
+        speechSynthesis.cancel(); // очистить очередь
         const u = new SpeechSynthesisUtterance("Question " + num);
-        u.lang = "en-US"; u.rate = 1.0; u.pitch = 1.0;
-        return new Promise(resolve=>{
-          const to=setTimeout(resolve,1200);
-          u.onend=()=>{clearTimeout(to);resolve();};
-          u.onerror=()=>{clearTimeout(to);resolve();};
+        const v = pickVoice(); if (v) u.voice = v;
+        u.lang = (v?.lang || "en-US"); u.rate = 1.0; u.pitch = 1.0;
+        return new Promise(res=>{
+          const to = setTimeout(res, 1500);
+          u.onend = () => { clearTimeout(to); res(); };
+          u.onerror = () => { clearTimeout(to); res(); };
           speechSynthesis.speak(u);
         });
-      }catch{ return Promise.resolve(); }
+      }catch{ return; }
     }
+    // Дополнительно «разблокируем» TTS на первом пользовательском действии
+    const unlockTTS = () => { try{ speechSynthesis.resume(); }catch{} window.removeEventListener('click', unlockTTS); window.removeEventListener('touchstart', unlockTTS); };
+    window.addEventListener('click', unlockTTS, { passive:true });
+    window.addEventListener('touchstart', unlockTTS, { passive:true });
 
-    // ===== Микрофон =====
+    // ——— Микрофон
     let streamRef=null, recorder=null, chunks=[];
     let chosenMime='';
-
     function pickMimeType(){
       const cands=['audio/webm;codecs=opus','audio/webm','audio/ogg;codecs=opus','audio/ogg'];
-      for(const t of cands) if(window.MediaRecorder?.isTypeSupported?.(t)) return t;
+      for (const t of cands) if (window.MediaRecorder?.isTypeSupported?.(t)) return t;
       return '';
     }
-
     async function initMic(){
       try{
         streamRef = await navigator.mediaDevices.getUserMedia({ audio:true });
         chosenMime = pickMimeType();
         recorder = chosenMime ? new MediaRecorder(streamRef,{mimeType:chosenMime}) : new MediaRecorder(streamRef);
-        recorder.ondataavailable=e=>{ if(e.data&&e.data.size) chunks.push(e.data); };
-        recorder.onstop=handleStop;
-      }catch(err){ recorder=null; }
+        recorder.ondataavailable = e => { if (e.data && e.data.size) chunks.push(e.data); };
+        recorder.onstop = handleStop;
+      }catch{ recorder=null; }
     }
-    let micReadyPromise = initMic();
+    let micReadyPromise = initMic(); // параллельно
 
-    // ===== Отсчёт =====
+    // ——— Отсчёт
     let countdown=3;
     function startCountdown(){
       timerEl.style.display='block';
@@ -172,7 +149,7 @@
       },1000);
     }
 
-    // ===== Таймер =====
+    // ——— Таймер (устойчивый)
     const QUESTION_MS=20000;
     let qIdx=0, startedAt=0, deadlineMs=0;
     let rafId=0,intId=0,hardTO=0,finishing=false;
@@ -182,7 +159,6 @@
       qTitleEl.textContent=q.title;
       qLineEl.innerHTML=q.line;
     }
-
     function startFlow(){
       qWrap.style.display='grid';
       barWrap.style.display='block';
@@ -206,7 +182,6 @@
       intId=setInterval(tickWall,250);
       hardTO=setTimeout(()=>{ if(!finishing) finishSegment(); },QUESTION_MS+1500);
     }
-
     function tickRaf(){
       const left=Math.max(0,deadlineMs-performance.now());
       barEl.style.width=(left/QUESTION_MS*100)+'%';
@@ -222,11 +197,7 @@
       if(left<=0) finishSegment();
       else timeEl.textContent=fmtTime(Math.max(0,left));
     }
-    function stopClocks(){
-      if(rafId){cancelAnimationFrame(rafId);rafId=0;}
-      if(intId){clearInterval(intId);intId=0;}
-      if(hardTO){clearTimeout(hardTO);hardTO=0;}
-    }
+    function stopClocks(){ if(rafId){cancelAnimationFrame(rafId);rafId=0;} if(intId){clearInterval(intId);intId=0;} if(hardTO){clearTimeout(hardTO);hardTO=0;} }
 
     function finishSegment(){
       if(finishing) return;
@@ -238,16 +209,15 @@
       }catch{}
       handleStop();
     }
-
     function handleStop(){
       const blobType=(recorder?.mimeType||chosenMime||'audio/webm');
       const blob=new Blob(chunks||[],{type:blobType});
+      // пропускаем FileReader, если пусто
       if(!blob.size){ proceedNext(); return; }
       const reader=new FileReader();
       reader.onloadend=()=>{ proceedNext(); };
       reader.readAsDataURL(blob);
     }
-
     function proceedNext(){
       qIdx++;
       if(qIdx<QUESTIONS.length){
@@ -267,7 +237,7 @@
       }
     });
 
-    // ===== Старт =====
+    // ——— Старт: сразу отсчёт (перезагрузка всегда с начала)
     startCountdown();
   </script>
 </body>

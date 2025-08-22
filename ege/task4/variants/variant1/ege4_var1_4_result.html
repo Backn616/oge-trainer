@@ -29,7 +29,24 @@
     h1{ color:var(--primary); font-size:36px; margin:12px 0 6px; text-align:center; }
     .status{ font-size:22px; color:#1f7a2e; text-align:center; margin:10px 0 26px; }
     .dark .status{ color:#5ee397; }
-    audio{ margin:20px auto; width:min(900px, 90%); display:block; }
+
+    /* Плеер + волна (как в задании 2) */
+    audio{ margin:20px auto 10px; width:min(900px, 90%); display:block; }
+    .wave-wrap{ width:min(900px,90%); margin:0 auto 18px; display:none; }
+    .wave{ width:100%; height:48px; display:block; background:#e9edf7; border-radius:10px; box-shadow:var(--shadow); }
+    .dark .wave{ background:#1f2a3d; }
+
+    /* Цвета волны для светлой/тёмной темы */
+    :root{
+      --wave-base: rgba(0,0,0,.28);      /* незаполненная часть */
+      --wave-prog: var(--primary);       /* цвет прогресса */
+      --wave-glow: rgba(43,108,255,.45); /* свечение прогресса */
+    }
+    html.dark{
+      --wave-base: rgba(255,255,255,.52);
+      --wave-prog: #5bb8ff;
+      --wave-glow: rgba(91,184,255,.65);
+    }
 
     .btn{
       display:inline-block; padding:16px 32px; margin:12px;
@@ -79,6 +96,10 @@
     </div>
 
     <audio id="audio" controls></audio>
+    <!-- ВОЛНА -->
+    <div id="waveWrap" class="wave-wrap">
+      <canvas id="wave" class="wave"></canvas>
+    </div>
 
     <div style="text-align:center;">
       <button class="btn" id="playBtn" type="button" aria-label="Проиграть запись" disabled>▶️ Прослушать</button>
@@ -191,8 +212,13 @@
     // ===== Аудио =====
     const audioEl     = document.getElementById('audio');
     const playBtn     = document.getElementById('playBtn');
+    the
     const downloadBtn = document.getElementById('downloadBtn');
     const statusText  = document.getElementById('statusText');
+
+    // Волна
+    const waveWrap    = document.getElementById('waveWrap');
+    const waveCanvas  = document.getElementById('wave');
 
     const base64     = sessionStorage.getItem('ege4_audio_base64');
     const mimeStored = (sessionStorage.getItem('ege4_audio_mime') || 'audio/webm').toLowerCase();
@@ -222,27 +248,30 @@
       downloadBtn.disabled = !en;
     }
 
-    (function initAudio(){
-      if (base64){
-        try{
-          const blob = dataURLtoBlob(base64);
-          if (blob){
-            objectURL   = URL.createObjectURL(blob);
-            audioEl.src = objectURL;
-            audioEl.type= blob.type || mimeStored;
-          }else{
-            audioEl.src = base64;
-            audioEl.type= mimeStored;
-          }
-          setButtonsEnabled(true);
-        }catch{
-          audioEl.src = base64;
-          audioEl.type= mimeStored;
-          setButtonsEnabled(true);
-        }
-      }else{
+    // === Инициализация аудио + волны
+    (async function initAudio(){
+      if (!base64){
         statusText.textContent = '⚠️ Запись не найдена. Возможно, вы запретили доступ к микрофону или страница была закрыта до завершения.';
         setButtonsEnabled(false);
+        return;
+      }
+      try{
+        const blob = dataURLtoBlob(base64);
+        if (blob){
+          objectURL   = URL.createObjectURL(blob);
+          audioEl.src = objectURL;
+          audioEl.type= blob.type || mimeStored;
+          await initWaveformFromURL(objectURL);
+        }else{
+          audioEl.src = base64;
+          audioEl.type= mimeStored;
+          await initWaveformFromURL(base64);
+        }
+        setButtonsEnabled(true);
+      }catch{
+        audioEl.src = base64;
+        audioEl.type= mimeStored;
+        setButtonsEnabled(true);
       }
     })();
 
@@ -255,9 +284,116 @@
       a.click();
     });
 
-    // Очистка ресурсов
     window.addEventListener('pagehide', ()=>{ if (objectURL) URL.revokeObjectURL(objectURL); });
     window.addEventListener('beforeunload', ()=>{ if (objectURL) URL.revokeObjectURL(objectURL); });
+
+    // ===== Волновой бегунок (как в Task 2)
+    async function initWaveformFromURL(url){
+      try{
+        const resp = await fetch(url);
+        const buf  = await resp.arrayBuffer();
+        const AC   = window.AudioContext || window.webkitAudioContext;
+        const ctx  = new AC();
+        const audioBuf = await ctx.decodeAudioData(buf);
+
+        const peaks = buildPeaks(audioBuf, 1000);
+        drawWave(peaks, 0);
+        waveWrap.style.display = 'block';
+
+        let raf;
+        const tick = ()=>{
+          const p = audioEl.currentTime / (audioBuf.duration || 1);
+          drawWave(peaks, p);
+          raf = requestAnimationFrame(tick);
+        };
+        audioEl.addEventListener('play', ()=>{ cancelAnimationFrame(raf); tick(); });
+        audioEl.addEventListener('pause', ()=>{ cancelAnimationFrame(raf); drawWave(peaks, audioEl.currentTime/(audioBuf.duration||1)); });
+        audioEl.addEventListener('ended', ()=>{ cancelAnimationFrame(raf); drawWave(peaks, 1); });
+
+        waveCanvas.addEventListener('pointerdown', (e)=>{
+          const r = waveCanvas.getBoundingClientRect();
+          const x = Math.max(0, Math.min(1, (e.clientX - r.left)/r.width));
+          audioEl.currentTime = x * audioBuf.duration;
+          drawWave(peaks, x);
+        }, {passive:true});
+      }catch(err){
+        console.warn('Waveform init failed:', err);
+        waveWrap.style.display = 'none';
+      }
+    }
+
+    function buildPeaks(audioBuf, width){
+      const ch0 = audioBuf.getChannelData(0);
+      const ch1 = audioBuf.numberOfChannels>1 ? audioBuf.getChannelData(1) : null;
+      const total = ch0.length;
+      const block = Math.floor(total / width) || 1;
+      const peaks = new Array(width);
+      for (let i=0;i<width;i++){
+        const start = i*block, end = Math.min(total, start+block);
+        let min=1, max=-1;
+        for (let j=start;j<end;j++){
+          const s = ch1 ? (ch0[j]+ch1[j])*0.5 : ch0[j];
+          if (s<min) min=s; if (s>max) max=s;
+        }
+        peaks[i] = [min,max];
+      }
+      return peaks;
+    }
+
+    function drawWave(peaks, progress){
+      const c = waveCanvas;
+      const dpr = Math.max(1, Math.floor(window.devicePixelRatio || 1));
+      const cssW = c.clientWidth || 600;
+      const cssH = c.clientHeight || 48;
+      if (c.width !== cssW*dpr) c.width = cssW*dpr;
+      if (c.height!== cssH*dpr) c.height= cssH*dpr;
+      const ctx = c.getContext('2d');
+      ctx.setTransform(dpr,0,0,dpr,0,0);
+
+      // цвета зависят от темы (из CSS-переменных)
+      const rs = getComputedStyle(document.documentElement);
+      const waveBase = (rs.getPropertyValue('--wave-base') || 'rgba(0,0,0,.28)').trim();
+      const waveProg = (rs.getPropertyValue('--wave-prog') || '#2b6cff').trim();
+      const waveGlow = (rs.getPropertyValue('--wave-glow') || 'rgba(43,108,255,.45)').trim();
+
+      // фон канваса (.wave / .dark .wave)
+      const bg = getComputedStyle(c).backgroundColor;
+
+      // фон
+      ctx.clearRect(0,0,cssW,cssH);
+      ctx.fillStyle = bg; ctx.fillRect(0,0,cssW,cssH);
+
+      const mid = cssH/2;
+
+      // незаполненная часть (столбики)
+      ctx.fillStyle = waveBase;
+      for (let i=0;i<peaks.length;i++){
+        const x = i/peaks.length*cssW;
+        const [min,max] = peaks[i];
+        const hTop = Math.abs(max)*mid;
+        const hBot = Math.abs(min)*mid;
+        ctx.fillRect(x, mid-hTop, 1, hTop+hBot || 1);
+      }
+
+      // прогресс — цветной, с мягким glow
+      const progW = Math.max(0, Math.min(cssW, progress*cssW));
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(0,0,progW,cssH);
+      ctx.clip();
+
+      ctx.fillStyle = waveProg;
+      ctx.shadowColor = waveGlow;
+      ctx.shadowBlur  = 8;
+      for (let i=0;i<peaks.length;i++){
+        const x = i/peaks.length*cssW;
+        const [min,max] = peaks[i];
+        const hTop = Math.abs(max)*mid;
+        const hBot = Math.abs(min)*mid;
+        ctx.fillRect(x, mid-hTop, 1, hTop+hBot || 1);
+      }
+      ctx.restore();
+    }
   </script>
 </body>
 </html>

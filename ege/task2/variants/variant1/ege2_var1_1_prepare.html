@@ -10,51 +10,71 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
 
-  <!-- Общие стили проекта -->
+  <!-- Общие стили -->
   <link rel="stylesheet" href="../../../style_common.css" />
 
-  <!-- Локальная раскладка «текст слева — фото справа» + управляемое фото -->
   <style>
-    .ad-layout{
-      display:grid;
-      grid-template-columns: 1.1fr 0.9fr; /* как на скрине — тексту чуть больше места */
-      gap:32px;
-      align-items:start;
+    /* ===== 1) Фон с плавным уходом в белый (перекрываем фон из общего файла только на этой странице) */
+    body.page-fade{
+      background:
+        radial-gradient(1200px 600px at 70% -10%, #29417a40, transparent),
+        radial-gradient(900px 500px at -10% 10%, #344b9340, transparent),
+        /* нижний слой — линейный градиент в белый */
+        linear-gradient(to bottom, var(--bg) 0%, #fff 72%);
     }
 
-    /* Правая колонка (заголовок объявления + фото) */
+    /* ===== 2) Компоновка */
+    .ad-layout{
+      display:grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap:36px;
+      align-items:start;
+      max-width:1500px;
+      margin-inline:auto;
+    }
     .ad-side{ text-align:center; }
     .ad-title{
       font-weight:800; font-size:26px;
-      margin:0 0 12px;
+      margin:0 0 14px;
     }
 
-    /* Контейнер фото с управляемым аспектом и кропом */
+    /* Карточка задания визуально «равна» блоку с фото */
+    .task-container{
+      margin:0; /* убираем нижний отступ: кнопка будет отдельно и по центру */
+    }
+
+    /* Фото: управляемый контейнер + кроп */
     .ad-figure{
       width:100%;
-      /* === КЛЮЧЕВОЕ: соотношение сторон === */
-      aspect-ratio: 16 / 9;         /* при желании поменяй на 3/2, 4/3 и т.д. */
+      aspect-ratio: 16 / 9;     /* при необходимости: 3/2, 4/3 и т.д. */
       border-radius:12px;
-      overflow:hidden;               /* чтобы кроп работал по рамке */
+      overflow:hidden;
       box-shadow:var(--shadow);
-      background:#ddd;               /* серый плейсхолдер если фото ещё не подгрузилось */
+      background:#ddd;
     }
     .ad-figure > img{
       width:100%; height:100%;
-      object-fit: cover;             /* заполняем область без сплющивания */
-      object-position: center;       /* центр кадра; можно менять на 'top'/'left 30%' и т.д. */
+      object-fit:cover;
+      object-position:center;
       display:block;
     }
 
-    /* Кнопка должна быть под заданием слева: добавим отступ сверху */
-    .task-actions{ margin-top:14px; }
+    /* ===== 3) Кнопка строго по центру под обоими столбцами */
+    .actions{
+      grid-column: 1 / -1;     /* растянуть на обе колонки */
+      text-align:center;
+      margin-top:18px;
+      margin-bottom:6px;
+    }
 
-    /* Чуть плотнее заголовок в карточке */
+    /* Мелкие правки типографики для близости к скрину */
     .task-container b#taskTitle{ display:block; margin-bottom:10px; font-size:24px; }
+    .task-container ul{ margin-top:10px; }
+    .task-container .instruction{ margin-top:18px; }
 
-    @media (max-width: 1100px){
-      .ad-layout{ grid-template-columns: 1fr; }
-      .ad-side{ order:2; }
+    @media (max-width:1100px){
+      .ad-layout{ grid-template-columns: 1fr; gap:22px; }
+      .actions{ margin-top:8px; }
     }
   </style>
 
@@ -68,58 +88,53 @@
     })();
   </script>
 </head>
-<body>
+<body class="page-fade">
   <!-- Тумблер темы -->
   <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
 
   <div class="content-wrapper ad-layout">
-    <!-- ЛЕВАЯ КОЛОНКА: текст задания -->
-    <div>
-      <div class="task-container" aria-labelledby="taskTitle" aria-describedby="inst">
-        <b id="taskTitle">Task 2. Study the advertisement.</b>
-        <b>You are considering joining the bike club and now you’d like to get more information.
-        In 1.5 minutes you are to ask four direct questions to find out about the following:</b>
-        <ul>
-          <li>minimum age;</li>
-          <li>special clothes;</li>
-          <li>bicycle rental;</li>
-          <li>competitions.</li>
-        </ul>
-        <div class="instruction" id="inst"><b>You have 20 seconds to ask each question.</b></div>
-      </div>
-
-      <!-- КНОПКА ПОД ЗАДАНИЕМ (как ты просил) -->
-      <div class="task-actions">
-        <button id="goBtn" class="button" type="button" aria-label="Перейти к выполнению">Перейти к выполнению</button>
-      </div>
+    <!-- ЛЕВО: текст задания -->
+    <div class="task-container" aria-labelledby="taskTitle" aria-describedby="inst">
+      <b id="taskTitle">Task 2. Study the advertisement.</b>
+      <b>You are considering joining the bike club and now you’d like to get more information.
+      In 1.5 minutes you are to ask four direct questions to find out about the following:</b>
+      <ul>
+        <li>minimum age;</li>
+        <li>special clothes;</li>
+        <li>bicycle rental;</li>
+        <li>competitions.</li>
+      </ul>
+      <div class="instruction" id="inst"><b>You have 20 seconds to ask each question.</b></div>
     </div>
 
-    <!-- ПРАВАЯ КОЛОНКА: заголовок объявления + фото -->
+    <!-- ПРАВО: заголовок объявления + фото -->
     <aside class="ad-side" aria-label="Advertisement">
       <h2 class="ad-title">Join our bike club!</h2>
-
-      <!-- Место для фото. Подставь свой файл в src -->
+      <!-- Место для фото -->
       <figure class="ad-figure">
-        <img src="photo_club.png" alt="Bike club advertisement image" loading="lazy">
+        <img src="task2_bike.jpg" alt="Bike club advertisement image" loading="lazy">
       </figure>
     </aside>
+
+    <!-- КНОПКА ПО ЦЕНТРУ ПОД ОБОИМИ КОЛОНКАМИ -->
+    <div class="actions">
+      <button id="goBtn" class="button" type="button">Перейти к выполнению</button>
+    </div>
   </div>
 
-  <!-- Фиксированный прогресс-бар снизу -->
+  <!-- Фиксированный прогресс-бар -->
   <div id="progressContainerFixed" role="timer" aria-live="polite" aria-label="Оставшееся время подготовки">
     <div id="progressBarFixed">
       <span id="progressTime" class="progress-time">01:30</span>
     </div>
   </div>
 
-  <!-- ЛОГИКА страницы (как в prepare из Task 4) -->
+  <!-- ЛОГИКА как в prepare из Task 4 -->
   <script type="module">
     import { toggleThemeInit, navigateOnce, startPrepareTimer, fmtTime } from "../../../common.js";
 
-    // Тема
     toggleThemeInit();
 
-    // Служебные метки
     try{
       sessionStorage.removeItem('ege2_audio_base64');
       sessionStorage.setItem('ege2_prepared','1');
@@ -127,32 +142,26 @@
       sessionStorage.setItem('ege2_meta', JSON.stringify(meta));
     }catch{}
 
-    // Куда переходим дальше
     const NEXT_URL = /_1_prepare\.html$/i.test(location.pathname)
       ? location.pathname.replace(/_1_prepare\.html$/i, '_2_mic.html')
       : location.pathname.replace(/\.html$/i, '_2_mic.html');
 
-    // Кнопка "Перейти"
     document.getElementById('goBtn')?.addEventListener('click', () => {
       navigateOnce(NEXT_URL);
     });
 
-    // Таймер 1:30
     const TOTAL_MS = 90_000;
     const barEl  = document.getElementById('progressBarFixed');
     const timeEl = document.getElementById('progressTime');
     barEl.classList.add('rAF');
 
     let stopTimer = null;
-
     function startTimerFresh(){
       timeEl.textContent = fmtTime(TOTAL_MS);
       barEl.style.width = '100%';
-
       stopTimer?.();
       stopTimer = startPrepareTimer({
-        barEl,
-        timeEl,
+        barEl, timeEl,
         totalMs: TOTAL_MS,
         nextUrl: NEXT_URL,
         key: 'ege2_prepare_end',
@@ -161,22 +170,17 @@
         useRAF: true
       });
     }
-
     startTimerFresh();
 
-    // Перезапуск при возврате назад / BFCache
     function isBackForwardNav(){
       try {
         const nav = performance.getEntriesByType('navigation')[0];
         return nav && nav.type === 'back_forward';
       } catch { return false; }
     }
-
     window.addEventListener('pageshow', (e) => {
       navigateOnce.lock = false;
-      if (e.persisted || isBackForwardNav()) {
-        startTimerFresh();
-      }
+      if (e.persisted || isBackForwardNav()) startTimerFresh();
     });
   </script>
 </body>

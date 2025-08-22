@@ -10,11 +10,11 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
 
-  <!-- Общие стили проекта -->
+  <!-- Общие стили -->
   <link rel="stylesheet" href="../../../style_common.css" />
 
   <style>
-    /* Фон «уходит» в белый, как просили */
+    /* Плавный фон в белый */
     body.page-fade{
       background:
         radial-gradient(1200px 600px at 70% -10%, #29417a40, transparent),
@@ -22,70 +22,60 @@
         linear-gradient(to bottom, var(--bg) 0%, #fff 72%);
     }
 
-    /* Двухколоночная сетка */
+    /* Сетка страницы */
     .ad-layout{
       display:grid;
-      grid-template-columns: 1.1fr 0.9fr;
-      gap:36px;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap:28px 36px;           /* row-gap | col-gap */
       align-items:start;
       max-width:1500px;
       margin-inline:auto;
     }
 
-    /* Левая колонка: карточка (только «шапка») + блок без рамки */
-    .task-container{ margin:0; }
+    /* Верхняя «шапка» — на всю ширину */
+    .header-card{
+      grid-column: 1 / -1;     /* тянем карточку на обе колонки */
+      margin:0;
+    }
+    #taskTitle{ display:block; margin-bottom:8px; font-size:24px; }
+
+    /* Левая колонка второго ряда — без рамки */
     .left-free{
-      margin-top:18px;
-      font-size:22px;          /* крупнее, как на скрине */
+      font-size:22px;
       line-height:1.55;
       text-align:left;
+      margin-top:6px;
     }
-
-    /* Нумерация строго в виде 1) 2) 3) 4) с точными знаками препинания */
     .plain-list{
-      list-style:none;
-      margin:0 0 26px 0;
-      padding:0;
+      list-style:none; margin:0 0 24px 0; padding:0;
     }
-    .plain-list li{
-      margin:10px 0;
-    }
+    .plain-list li{ margin:10px 0; }
 
-    /* Правая колонка — заголовок над фото + фото нужной пропорции */
+    /* Правая колонка второго ряда — заголовок + фото */
     .ad-title{
-      font-weight:800;
-      font-size:30px;
-      margin:0 0 12px;
-      text-align:center;
+      font-weight:800; font-size:30px;
+      margin:6px 0 12px; text-align:center;
     }
     .ad-figure{
       width:100%;
-      aspect-ratio: 3 / 2;     /* как на образце; можно сменить при необходимости */
-      border-radius:12px;
-      overflow:hidden;
-      box-shadow:var(--shadow);
-      background:#ddd;
+      aspect-ratio: 3 / 2;      /* как на образце */
+      border-radius:12px; overflow:hidden;
+      box-shadow:var(--shadow); background:#ddd;
     }
-    .ad-figure > img{
-      width:100%; height:100%;
-      object-fit:cover;        /* без искажений, при необходимости кропим */
-      object-position:center;
-      display:block;
+    .ad-figure>img{
+      width:100%; height:100%; object-fit:cover; object-position:center; display:block;
     }
 
-    /* Кнопка по центру под всей сеткой (оставляем логику перехода) */
+    /* Кнопка по центру под всей сеткой */
     .actions{
       grid-column:1 / -1;
       text-align:center;
-      margin-top:22px;
+      margin-top:8px;
       margin-bottom:6px;
     }
 
-    /* Чуть плотнее заголовок в рамке */
-    #taskTitle{ display:block; margin-bottom:8px; font-size:24px; }
-
     @media (max-width:1100px){
-      .ad-layout{ grid-template-columns:1fr; gap:22px; }
+      .ad-layout{ grid-template-columns: 1fr; gap:22px; }
     }
   </style>
 
@@ -104,30 +94,27 @@
   <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
 
   <div class="content-wrapper ad-layout">
-    <!-- ЛЕВАЯ КОЛОНКА -->
-    <div>
-      <!-- В РАМКЕ — только шапка -->
-      <div class="task-container" aria-labelledby="taskTitle">
-        <b id="taskTitle">Task 2. Study the advertisement.</b>
-        <b>
-          You are considering joining the bike club and now you’d like to get more information.
-          In 1.5 minutes you are to ask four direct questions to find out about the following:
-        </b>
-      </div>
-
-      <!-- БЕЗ РАМКИ — список и последняя строка (как на образце) -->
-      <div class="left-free">
-        <ol class="plain-list">
-          <li>1) minimum age;</li>
-          <li>2) special clothes;</li>
-          <li>3) bicycle rental;</li>
-          <li>4) competitions.</li>
-        </ol>
-        <p><b>You have 20 seconds to ask each question.</b></p>
-      </div>
+    <!-- Ряд 1: вытянутая карточка на всю ширину -->
+    <div class="task-container header-card" aria-labelledby="taskTitle">
+      <b id="taskTitle">Task 2. Study the advertisement.</b>
+      <b>
+        You are considering joining the bike club and now you’d like to get more information.
+        In 1.5 minutes you are to ask four direct questions to find out about the following:
+      </b>
     </div>
 
-    <!-- ПРАВАЯ КОЛОНКА -->
+    <!-- Ряд 2: слева список и финальная строка (без рамки) -->
+    <div class="left-free">
+      <ol class="plain-list">
+        <li>1) minimum age;</li>
+        <li>2) special clothes;</li>
+        <li>3) bicycle rental;</li>
+        <li>4) competitions.</li>
+      </ol>
+      <p><b>You have 20 seconds to ask each question.</b></p>
+    </div>
+
+    <!-- Ряд 2: справа заголовок + фото -->
     <aside aria-label="Advertisement">
       <h2 class="ad-title">Join our bike club!</h2>
       <!-- Место для фото -->
@@ -136,7 +123,7 @@
       </figure>
     </aside>
 
-    <!-- Кнопка перехода дальше (оставляем) -->
+    <!-- Кнопка по центру ниже -->
     <div class="actions">
       <button id="goBtn" class="button" type="button">Перейти к выполнению</button>
     </div>
@@ -149,10 +136,9 @@
     </div>
   </div>
 
-  <!-- Логика страницы (как в prepare из Task 4) -->
+  <!-- Логика (как в prepare из Task 4) -->
   <script type="module">
     import { toggleThemeInit, navigateOnce, startPrepareTimer, fmtTime } from "../../../common.js";
-
     toggleThemeInit();
 
     try{

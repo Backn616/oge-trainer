@@ -5,16 +5,15 @@
   <title>Task 2 — Questions</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- Шрифты (как в эталоне) -->
+  <!-- Шрифты -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 
-  <!-- Общие стили (фон и фирменный стиль) -->
+  <!-- Общие стили -->
   <link rel="stylesheet" href="../../../style_common.css" />
 
   <style>
-    /* Грид внутри карточки */
     .q-layout{
       display:grid;
       grid-template-columns: 1.05fr 0.95fr;
@@ -25,28 +24,26 @@
     }
     .q-left h2{ margin:0 0 10px; font-size:28px; line-height:1.2; }
     .q-left p{ font-size:22px; line-height:1.55; margin:0 0 10px; }
+
     .ad-title{ font-weight:800; font-size:30px; margin:6px 0 12px; text-align:center; }
     .ad-figure{ width:100%; aspect-ratio:3/2; border-radius:12px; overflow:hidden; box-shadow:var(--shadow); background:#ddd; }
     .ad-figure>img{ width:100%; height:100%; object-fit:cover; object-position:center; display:block; }
+
     .actions{ grid-column:1 / -1; text-align:center; margin-top:10px; margin-bottom:6px; }
     @media (max-width:1100px){ .q-layout{ grid-template-columns:1fr; gap:22px; } }
 
-    /* Большой «3–2–1» (до карточки) */
+    /* Большой 3‑2‑1 */
     .timer{
-      font-size:70px;
-      margin:30px 0;
-      font-weight:700;
-      color:var(--primary);
-      letter-spacing:4px;
-      text-shadow:0 4px 12px rgba(0,0,0,.25);
+      font-size:70px; margin:30px 0; font-weight:700;
+      color:var(--primary); letter-spacing:4px; text-shadow:0 4px 12px rgba(0,0,0,.25);
       text-align:center;
     }
 
-    /* Подсказка про звук, если TTS заблокирован */
+    /* Подсказка про звук */
     .tts-hint{
       position:fixed; left:50%; bottom:20px; transform:translateX(-50%);
-      background:var(--card-bg,#fff); color:var(--text,#111); border:1px solid var(--border,#e5e7eb);
-      border-radius:12px; padding:10px 14px; box-shadow:var(--shadow,0 8px 24px rgba(0,0,0,.12));
+      background:var(--card); color:var(--text); border:1px solid var(--border);
+      border-radius:12px; padding:10px 14px; box-shadow:var(--shadow);
       font-size:14px; z-index:9999;
     }
   </style>
@@ -65,12 +62,12 @@
   <!-- Тумблер темы -->
   <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
 
-  <!-- ВЕРХНИЙ БЛОК: только отсчёт (как раньше) -->
+  <!-- Верх: только отсчёт -->
   <div class="content-wrapper" id="countdownWrap">
     <div id="timer" class="timer" aria-live="polite">3</div>
   </div>
 
-  <!-- ОСНОВНОЙ БЛОК КАК В ЭТАЛОНЕ: карточка внутри page-center -->
+  <!-- Основной блок как в эталоне -->
   <main class="page-center" id="mainWrap" style="display:none">
     <section class="card task-card">
       <div id="qWrap" class="q-layout">
@@ -84,7 +81,6 @@
         <aside aria-label="Advertisement">
           <h3 class="ad-title">Join our bike club!</h3>
           <figure class="ad-figure">
-            <!-- Место для твоего фото -->
             <img src="task2_bike.jpg" alt="Bike club advertisement image" loading="lazy">
           </figure>
         </aside>
@@ -97,10 +93,10 @@
     </section>
   </main>
 
-  <!-- Проставка, чтобы фикс‑бар не наезжал на контент (как в эталоне) -->
+  <!-- Проставка, чтобы фикс‑бар не наезжал -->
   <div style="height: calc(var(--footer-h, 72px) + 24px);"></div>
 
-  <!-- ФИКСИРОВАННЫЙ ПРОГРЕСС‑БАР (как в эталоне) -->
+  <!-- Фиксированный прогресс‑бар снизу -->
   <div id="progressContainerFixed" role="timer" aria-live="polite" style="display:none">
     <div id="progressBarFixed" class="rAF">
       <span id="progressTime" class="progress-time">00:20</span>
@@ -112,10 +108,19 @@
     import { toggleThemeInit, navigateOnce, fmtTime } from "../../../common.js";
     toggleThemeInit();
 
-    // ——— Жёсткий сброс на загрузке
-    try{ sessionStorage.removeItem('ege2_audio_parts'); }catch{}
+    // ===== Константы/маршруты =====
+    const RESULT_URL = location.pathname.replace(/_3_task\.html$/i, '_4_result.html');
+    const QUESTION_MS = 20_000;
 
-    // ——— Тексты
+    // ===== Хранилище: чистый старт и флаг «форс‑рестарт» от result =====
+    const FORCE_KEY = 'ege2_force_restart';
+    try{ sessionStorage.removeItem('ege2_audio_parts'); }catch{}
+    const forceRestart = sessionStorage.getItem(FORCE_KEY) === '1';
+    if (forceRestart) {
+      try{ sessionStorage.removeItem(FORCE_KEY); }catch{}
+    }
+
+    // ===== Тексты вопросов =====
     const QUESTIONS = [
       { title: "Question 1.", line: "1) Ask a direct question about the following: <b>minimum age.</b>" },
       { title: "Question 2.", line: "2) Ask a direct question about the following: <b>special clothes.</b>" },
@@ -123,7 +128,7 @@
       { title: "Question 4.", line: "4) Ask a direct question about the following: <b>competitions.</b>" }
     ];
 
-    // ——— DOM
+    // ===== DOM =====
     const countdownWrap = document.getElementById('countdownWrap');
     const mainWrap = document.getElementById('mainWrap');
 
@@ -134,39 +139,37 @@
     const barWrap  = document.getElementById('progressContainerFixed');
     const barEl    = document.getElementById('progressBarFixed');
     const timeEl   = document.getElementById('progressTime');
-    const RESULT_URL = location.pathname.replace(/_3_task\.html$/i, '_4_result.html');
 
-    // ——— Подсказка TTS при блокировке
+    // ===== Подсказка про звук (если TTS заблокирован) =====
     function showTtsHint(){
       if (document.querySelector('.tts-hint')) return;
       const el = document.createElement('div');
       el.className = 'tts-hint';
-      el.textContent = '🔊 Click anywhere to enable sound';
+      el.textContent = '🔊 Нажмите на страницу, чтобы включить звук';
       document.body.appendChild(el);
       const remove = () => { el.remove(); window.removeEventListener('click', remove); window.removeEventListener('touchstart', remove); try{ speechSynthesis.resume(); }catch{} };
       window.addEventListener('click', remove, { passive:true });
       window.addEventListener('touchstart', remove, { passive:true });
     }
 
-    // ——— Озвучка (как раньше)
+    // ===== Озвучка «Question N» =====
     async function speakQuestion(num){
       try{
         speechSynthesis.cancel();
         const u = new SpeechSynthesisUtterance("Question " + num);
         u.lang = "en-US"; u.rate = 1.0; u.pitch = 1.0;
         const said = await new Promise(res=>{
-          let finished = false;
-          const to = setTimeout(()=>{ if(!finished){ finished=true; res(false); } }, 1500);
-          u.onend = () => { if(!finished){ finished=true; clearTimeout(to); res(true); } };
-          u.onerror = () => { if(!finished){ finished=true; clearTimeout(to); res(false); } };
+          let done=false; const to=setTimeout(()=>{ if(!done){done=true;res(false);} },1500);
+          u.onend=()=>{ if(!done){done=true;clearTimeout(to);res(true);} };
+          u.onerror=()=>{ if(!done){done=true;clearTimeout(to);res(false);} };
           try{ speechSynthesis.resume(); }catch{}
           speechSynthesis.speak(u);
         });
-        if (!said) showTtsHint();
+        if(!said) showTtsHint();
       }catch{}
     }
 
-    // ——— Микрофон (параллельно)
+    // ===== Микрофон =====
     let streamRef=null, recorder=null, chunks=[];
     let chosenMime='';
     function pickMimeType(){
@@ -185,27 +188,9 @@
     }
     let micReadyPromise = initMic();
 
-    // ——— Отсчёт 3‑2‑1 (на верхнем фоне)
-    let countdown=3;
-    function startCountdown(){
-      timerEl.textContent=countdown;
-      const id=setInterval(()=>{
-        timerEl.textContent=countdown;
-        countdown--;
-        if(countdown<0){
-          clearInterval(id);
-          // Прячем верхний блок, показываем карточку (фон как в эталоне)
-          countdownWrap.style.display = 'none';
-          mainWrap.style.display = 'block';
-          startFlow();
-        }
-      },1000);
-    }
-
-    // ——— Таймер (устойчивый)
-    const QUESTION_MS=20000;
+    // ===== Состояние таймера/вопросов =====
     let qIdx=0, startedAt=0, deadlineMs=0;
-    let rafId=0,intId=0,hardTO=0,finishing=false;
+    let rafId=0, intId=0, hardTO=0, finishing=false;
 
     function renderQuestion(){
       const q=QUESTIONS[qIdx];
@@ -213,79 +198,76 @@
       qLineEl.innerHTML=q.line;
     }
 
-    function startFlow(){
-      barWrap.style.display='block';
-      qIdx=0;
-      renderQuestion();
-      beginSegment();
-    }
-
+    // ===== Старт вопроса =====
     async function beginSegment(){
-      // 1) Озвучка
+      // Озвучка
       await speakQuestion(qIdx+1);
 
-      // 2) Микрофон (если доступен)
+      // Микрофон
       try{ await micReadyPromise; }catch{}
       chunks=[];
       try{ if(recorder && recorder.state!=='recording') recorder.start(); }catch{}
 
-      // 3) UI и дедлайн
-      timeEl.textContent=fmtTime(QUESTION_MS);
-      barEl.style.width='100%';
-      startedAt=performance.now();
-      deadlineMs=startedAt+QUESTION_MS;
+      // UI/дедлайн
+      timeEl.textContent = fmtTime(QUESTION_MS);
+      barEl.style.width = '100%';
+      startedAt = performance.now();
+      deadlineMs = startedAt + QUESTION_MS;
       finishing=false;
 
       stopClocks();
       tickRaf();
-      intId=setInterval(tickWall,250);
-      hardTO=setTimeout(()=>{ if(!finishing) finishSegment(); },QUESTION_MS+1500);
+      intId = setInterval(tickWall, 250);
+      hardTO = setTimeout(()=>{ if(!finishing) finishSegment(); }, QUESTION_MS + 1500);
     }
 
     function tickRaf(){
-      const left=Math.max(0,deadlineMs-performance.now());
-      barEl.style.width=(left/QUESTION_MS*100)+'%';
-      if(!tickRaf._last||performance.now()-tickRaf._last>=250){
-        timeEl.textContent=fmtTime(left);
-        tickRaf._last=performance.now();
+      const left = Math.max(0, deadlineMs - performance.now());
+      barEl.style.width = (left/QUESTION_MS*100)+'%';
+      if (!tickRaf._last || performance.now()-tickRaf._last>=250){
+        timeEl.textContent = fmtTime(left);
+        tickRaf._last = performance.now();
       }
-      if(left<=0) finishSegment();
-      else rafId=requestAnimationFrame(tickRaf);
+      if (left<=0) finishSegment();
+      else rafId = requestAnimationFrame(tickRaf);
     }
     function tickWall(){
-      const left=deadlineMs-performance.now();
-      if(left<=0) finishSegment();
-      else timeEl.textContent=fmtTime(Math.max(0,left));
+      const left = deadlineMs - performance.now();
+      if (left<=0) finishSegment();
+      else timeEl.textContent = fmtTime(Math.max(0,left));
     }
     function stopClocks(){
-      if(rafId){cancelAnimationFrame(rafId);rafId=0;}
-      if(intId){clearInterval(intId);intId=0;}
-      if(hardTO){clearTimeout(hardTO);hardTO=0;}
+      if (rafId){ cancelAnimationFrame(rafId); rafId=0; }
+      if (intId){ clearInterval(intId); intId=0; }
+      if (hardTO){ clearTimeout(hardTO); hardTO=0; }
     }
 
-    // ——— Завершение сегмента
+    // ===== Завершение сегмента =====
     function finishSegment(){
-      if(finishing) return;
-      finishing=true;
+      if (finishing) return;
+      finishing = true;
       stopClocks();
-      nextBtn.disabled=true;
+      nextBtn.disabled = true;
 
       try{
-        if(recorder && recorder.state==='recording'){ recorder.stop(); return; }
+        if (recorder && recorder.state==='recording'){
+          recorder.stop();  // после onstop → handleStop → proceedNext
+          return;
+        }
       }catch{}
-      handleStop(); // если записи нет — идём дальше сами
+      handleStop(); // если записывающего устройства нет
     }
 
     function handleStop(){ proceedNext(); }
 
     function proceedNext(){
       qIdx++;
-      if(qIdx<QUESTIONS.length){
+      if (qIdx < QUESTIONS.length){
         renderQuestion();
-        nextBtn.disabled=false;
+        nextBtn.disabled = false;
         beginSegment();
       }else{
-        try{streamRef?.getTracks()?.forEach(t=>t.stop());}catch{}
+        try{ streamRef?.getTracks()?.forEach(t=>t.stop()); }catch{}
         navigateOnce(RESULT_URL);
       }
     }
@@ -293,15 +275,75 @@
     // Кнопка «Далее»
     nextBtn.addEventListener('click', finishSegment);
 
-    // Автодобив при возврате на вкладку
-    document.addEventListener('visibilitychange',()=>{
-      if(document.visibilityState==='visible'&&!finishing){
-        if(performance.now()>=deadlineMs) finishSegment();
+    // Если вернулись на вкладку и дедлайн прошёл — добиваем сегмент
+    document.addEventListener('visibilitychange', ()=>{
+      if (document.visibilityState==='visible' && !finishing){
+        if (performance.now() >= deadlineMs) finishSegment();
       }
     });
 
-    // Старт: сначала верхний фон + отсчёт, затем карточка-эталон
-    startCountdown();
+    // ===== Отсчёт 3‑2‑1 и переход к карточке =====
+    function showCard(){
+      countdownWrap.style.display = 'none';
+      mainWrap.style.display = 'block';
+      barWrap.style.display = 'block';
+      qIdx = 0;
+      renderQuestion();
+      beginSegment();
+    }
+    function startCountdown(){
+      let n = 3;
+      timerEl.textContent = n;
+      const id = setInterval(()=>{
+        timerEl.textContent = n;
+        n--;
+        if (n < 0){
+          clearInterval(id);
+          showCard();
+        }
+      }, 1000);
+    }
+
+    // ===== Инициализация/рестарт =====
+    function freshStart(){
+      // сброс UI
+      countdownWrap.style.display = 'block';
+      mainWrap.style.display = 'none';
+      barWrap.style.display = 'none';
+      nextBtn.disabled = false;
+
+      // перезапуск микрофона (на случай BFCache)
+      micReadyPromise = initMic();
+
+      // старт отсчёта
+      startCountdown();
+    }
+
+    // Первичный запуск
+    freshStart();
+
+    // Если вернулись Back/Forward (BFCache) — всегда начинаем заново
+    function isBackForwardNav(){
+      try{
+        const nav = performance.getEntriesByType('navigation')[0];
+        return nav && nav.type === 'back_forward';
+      }catch{ return false; }
+    }
+    window.addEventListener('pageshow', (e)=>{
+      // снимаем замок навигации
+      navigateOnce.lock = false;
+
+      if (e.persisted || isBackForwardNav() || forceRestart){
+        freshStart();
+      }
+    });
+
+    // Очистка ресурсов
+    window.addEventListener('beforeunload', ()=>{
+      try{ stopClocks(); }catch{}
+      try{ if (recorder && recorder.state==='recording') recorder.stop(); }catch{}
+      try{ streamRef?.getTracks()?.forEach(t=>t.stop()); }catch{}
+    });
   </script>
 </body>
 </html>

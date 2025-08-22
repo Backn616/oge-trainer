@@ -2,16 +2,40 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <title>Task 1 — Reading</title>
+  <title>Task 2 — Questions</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <!-- Шрифт -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
 
-  <!-- Общие стили проекта -->
+  <!-- Общие стили -->
   <link rel="stylesheet" href="../../../style_common.css" />
+
+  <style>
+    .q-layout{
+      display:grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap:28px 36px;
+      align-items:start;
+      max-width:1500px;
+      margin-inline:auto;
+    }
+    .q-left{ text-align:left; }
+    .q-left h2{
+      margin:0 0 10px 0; font-size:28px; line-height:1.2;
+    }
+    .q-left p{ font-size:22px; line-height:1.55; margin:0 0 10px 0; }
+    .ad-title{ font-weight:800; font-size:30px; margin:6px 0 12px; text-align:center; }
+    .ad-figure{ width:100%; aspect-ratio: 3 / 2; border-radius:12px; overflow:hidden; box-shadow:var(--shadow); background:#ddd; }
+    .ad-figure>img{ width:100%; height:100%; object-fit:cover; object-position:center; display:block; }
+
+    .actions{ grid-column:1 / -1; text-align:center; margin-top:10px; margin-bottom:6px; }
+    .hint{ color:var(--muted); font-size:16px; margin-top:6px; }
+
+    @media (max-width:1100px){ .q-layout{ grid-template-columns:1fr; gap:22px; } }
+  </style>
 
   <!-- Анти-мигание темы -->
   <script>
@@ -22,249 +46,191 @@
       }catch(_){}
     })();
   </script>
-
-  <style>
-    /* Таймер-цифры 3‑2‑1 */
-    .timer{
-      font-size:70px; margin:30px 0; font-weight:700; color:var(--primary);
-      letter-spacing:4px; text-shadow:0 4px 12px rgba(0,0,0,.25);
-      transition:transform .25s ease; will-change:transform; text-align:center;
-    }
-    @media (prefers-reduced-motion: reduce) { .timer{ transition:none; } }
-
-    /* Текст для чтения — как в prepare/result */
-    .reading-box{
-      max-width:2500px; width:95%; margin:0 auto 30px;
-      background:var(--card); border:1px solid #ccc; border-radius:12px; box-shadow:var(--shadow);
-      padding:40px; text-align:left;
-      font-size:32px; line-height:1.9;
-    }
-    @media (max-width:900px){ .reading-box{ font-size:28px; } }
-
-    /* Единый стиль крупных кнопок (как в result и 4‑м эталоне) */
-    .btn{
-      display:inline-block; padding:16px 32px; margin:12px;
-      font-size:20px; font-weight:600; color:#fff; text-decoration:none; cursor:pointer;
-      border:none; border-radius:12px;
-      background:linear-gradient(135deg, var(--primary), var(--primary-600));
-      box-shadow:0 10px 22px rgba(43,108,255,.3);
-      transition: transform .06s ease, filter .2s ease, box-shadow .2s ease;
-    }
-    .btn:hover{ transform: translateY(-1px); filter: brightness(1.03); }
-    .btn:disabled{ opacity:.6; cursor:not-allowed; transform:none; }
-  </style>
 </head>
 <body>
   <!-- Тумблер темы -->
   <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
 
-  <div class="content-wrapper">
-    <!-- Формулировка задания: СКРЫТА до конца отсчёта. Рамка — как в result (.task-container) -->
-    <div class="task-container" id="instructionBox" style="display:none" aria-labelledby="taskTitle" aria-describedby="inst">
-      <b id="taskTitle">Task 1. Imagine that you are preparing a project with your friend.</b>
-      You have found some interesting material for the presentation and you want to read this text to your friend.
-      You have 1.5 minutes to read the text silently, then be ready to read it out loud. You will not have more than 1.5 minutes to read it.
-      <div class="instruction" id="inst">You will read the text aloud for not more than 1.5 minutes.</div>
-    </div>
+  <div class="content-wrapper q-layout">
+    <!-- Слева — текст вопроса -->
+    <section class="q-left" aria-live="polite">
+      <h2 id="qTitle">Question 1.</h2>
+      <p id="qLine">1) Ask a direct question about the following: <b>minimum age.</b></p>
+      <p class="hint">Скажи свой вопрос. У тебя 20 секунд. Можно нажать «Далее», если закончил раньше.</p>
+    </section>
 
-    <!-- Отсчёт -->
-    <div id="timer" class="timer" aria-live="polite">3</div>
+    <!-- Справа — заголовок над фото + фото -->
+    <aside aria-label="Advertisement">
+      <h3 class="ad-title">Join our bike club!</h3>
+      <figure class="ad-figure">
+        <!-- Место для фото -->
+        <img src="task2_bike.jpg" alt="Bike club advertisement image" loading="lazy">
+      </figure>
+    </aside>
 
-    <!-- Текст для чтения: скрыт до конца отсчёта -->
-    <div class="reading-box" id="textBox" style="display:none">
-Bioluminescence is the ability of certain living organisms to produce light. This fascinating phenomenon can be observed in various species of deep-sea fish, jellyfish, fireflies, and even some fungi.
-
-The light is usually blue or green, which travels best through water. These organisms use light for different reasons. Some attract mates or prey, while others use it to confuse predators. For example, the anglerfish has a glowing lure to draw in its victims in the dark ocean depths.
-
-Scientists believe that studying bioluminescence can help develop new medical and technological solutions. Special proteins from glowing jellyfish are already used in genetic research. These discoveries support innovation in areas like disease detection and cell tracking.
-
-Bioluminescence is not only beautiful — it is a powerful tool of survival and discovery. These glowing creatures remind us how much we still have to learn about the natural world. Their light, shining in the darkness, is both mysterious and meaningful.
-    </div>
-
-    <!-- Кнопка завершения — крупная .btn -->
-    <div style="text-align:center; margin-bottom:30px;">
-      <button class="btn" id="endBtn" type="button" aria-label="Закончить запись" style="display:none">✅ Закончить</button>
+    <!-- Кнопки действия -->
+    <div class="actions">
+      <button id="nextBtn" class="button" type="button" aria-label="Перейти к следующему вопросу">Далее</button>
     </div>
   </div>
 
-  <!-- Проставка над фикс‑баром -->
-  <div style="height: calc(var(--footer-h) + 24px);"></div>
-
-  <!-- Фиксированный прогресс-бар времени ответа -->
-  <div id="progressContainerFixed" role="timer" aria-live="polite" aria-atomic="true"
-       aria-label="Оставшееся время ответа" style="display:none">
-    <div id="progressBarFixed">
-      <span id="progressTime" class="progress-time">01:30</span>
+  <!-- Фиксированный прогресс-бар снизу (20 сек на каждый вопрос) -->
+  <div id="progressContainerFixed" role="timer" aria-live="polite" aria-label="Оставшееся время текущего вопроса">
+    <div id="progressBarFixed" class="rAF">
+      <span id="progressTime" class="progress-time">00:20</span>
     </div>
   </div>
 
+  <!-- ЛОГИКА -->
   <script type="module">
-    import { toggleThemeInit, navigateOnce, fmtTime } from '../../../common.js';
+    import { toggleThemeInit, navigateOnce, fmtTime } from "../../../common.js";
 
     toggleThemeInit();
 
-    const timerEl        = document.getElementById('timer');
-    const instructionBox = document.getElementById('instructionBox');
-    const textBox        = document.getElementById('textBox');
-    const endBtn         = document.getElementById('endBtn');
-    const progressWrap   = document.getElementById('progressContainerFixed');
-    const progressBar    = document.getElementById('progressBarFixed');
-    const progressTime   = document.getElementById('progressTime');
+    const QUESTIONS = [
+      { title: "Question 1.", line: "1) Ask a direct question about the following: <b>minimum age.</b>" },
+      { title: "Question 2.", line: "2) Ask a direct question about the following: <b>special clothes.</b>" },
+      { title: "Question 3.", line: "3) Ask a direct question about the following: <b>bicycle rental.</b>" },
+      { title: "Question 4.", line: "4) Ask a direct question about the following: <b>competitions.</b>" }
+    ];
 
-    const RESULT_URL = location.pathname.replace(/_3_task\.html$/i, '_4_result.html');
+    // Ключи для sessionStorage
+    const META_KEY = 'ege2_meta';
+    const PARTS_KEY = 'ege2_audio_parts';  // массив {mime,b64,durationMs, qIdx}
+    const WARNED_KEY = 'ege2_warned';
 
-    // ===== Захват микрофона и запись =====
-    let mediaRecorder = null, audioChunks = [], streamRef = null;
-    let chosenMime = '', hasStopped = false;
+    // UI
+    const qTitleEl = document.getElementById('qTitle');
+    const qLineEl  = document.getElementById('qLine');
+    const nextBtn  = document.getElementById('nextBtn');
+    const barEl    = document.getElementById('progressBarFixed');
+    const timeEl   = document.getElementById('progressTime');
 
-    function pickMimeType(){
-      const candidates = [
-        'audio/webm;codecs=opus','audio/webm','audio/mp4',
-        'audio/ogg;codecs=opus','audio/ogg'
-      ];
-      for (const t of candidates){ if (window.MediaRecorder?.isTypeSupported?.(t)) return t; }
-      return '';
+    // Таймер вопроса
+    const QUESTION_MS = 20_000;
+    let qIdx = 0;
+    let mediaStream = null;
+    let recorder = null;
+    let chunks = [];
+    let timerRaf = null;
+    let qStartedAt = 0;
+
+    // Обновление текста
+    function renderQuestion() {
+      const q = QUESTIONS[qIdx];
+      qTitleEl.textContent = q.title;
+      qLineEl.innerHTML = q.line;
     }
 
-    async function initMic(){
-      try{
-        const stream = await navigator.mediaDevices.getUserMedia({ audio:true });
-        streamRef = stream;
-
-        chosenMime = pickMimeType();
-        mediaRecorder = chosenMime ? new MediaRecorder(stream, { mimeType: chosenMime }) : new MediaRecorder(stream);
-
-        mediaRecorder.ondataavailable = (e)=>{ if (e.data?.size) audioChunks.push(e.data); };
-        mediaRecorder.onstop = () => {
-          if (hasStopped) return;
-          hasStopped = true;
-          try{ streamRef?.getTracks()?.forEach(t=>t.stop()); }catch{}
-          const blobType = chosenMime || mediaRecorder.mimeType || 'audio/webm';
-          const audioBlob = new Blob(audioChunks, { type: blobType });
-          const reader = new FileReader();
-          reader.onloadend = () => {
-            try{
-              sessionStorage.setItem('ege1_audio_base64', reader.result);
-              sessionStorage.setItem('ege1_audio_mime', blobType);
-            }catch{}
-            navigateOnce(RESULT_URL);
-          };
-          reader.readAsDataURL(audioBlob);
-        };
-
-        startCountdown();
-      }catch(err){
-        alert('❌ Не удалось получить доступ к микрофону: ' + (err?.message || err));
-        startCountdown(); // не блокируем сценарий
+    // Старт записи одного вопроса
+    async function startRecording() {
+      // Готовим поток (повторно используем, если есть)
+      if (!mediaStream) {
+        try {
+          mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        } catch (err) {
+          alert('Не удалось получить доступ к микрофону. Проверьте разрешение.');
+          return;
+        }
       }
-    }
+      chunks = [];
+      recorder = new MediaRecorder(mediaStream);
+      recorder.ondataavailable = e => { if (e.data && e.data.size) chunks.push(e.data); };
+      recorder.onstop = handleStop;
+      recorder.start();
 
-    // ===== Отсчёт 3‑2‑1 =====
-    let countdown = 3;
-    let cdInterval = 0;
-    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-    function startCountdown(){
-      timerEl.style.display = 'block';
-      timerEl.textContent = countdown;
-      cdInterval = setInterval(()=>{
-        timerEl.style.color = (countdown > 1) ? '#2b6cff' : '#b30000';
-        timerEl.textContent = countdown;
-        if (!reduceMotion){
-          timerEl.style.transform = 'scale(1.2)';
-          setTimeout(()=>{ timerEl.style.transform = 'scale(1)'; }, 200);
-        }
-        countdown--;
-        if (countdown < 0){
-          clearInterval(cdInterval);
-          startTask();
-        }
-      },1000);
-    }
-
-    // ===== Таймер ответа 1:30 на rAF =====
-    const TOTAL_MS = 90_000;
-    let endTs = 0, rafId = 0, lastAnnounce = 0;
-
-    function startTask(){
-      instructionBox.style.display = 'block';
-      textBox.style.display        = 'block';
-      endBtn.style.display         = 'inline-block';
-      progressWrap.style.display   = 'block';
-      timerEl.style.display        = 'none';
-
-      audioChunks = [];
-      try{ if (mediaRecorder && mediaRecorder.state !== 'recording') mediaRecorder.start(); }catch{}
-
-      progressBar.classList.add('rAF');   // отключаем CSS-инерцию, управляем через rAF
-      endTs = performance.now() + TOTAL_MS;
-      progressTime.textContent = fmtTime(TOTAL_MS);
-      progressBar.style.width  = '100%';
-
+      // Таймер 20 сек
+      qStartedAt = performance.now();
+      barEl.style.width = '100%';
       tick();
-      endBtn.onclick = ()=> safeStopOrFinish();
     }
 
-    function tick(){
-      const left = Math.max(0, endTs - performance.now());
-      progressBar.style.width = `${(left / TOTAL_MS) * 100}%`;
-      if (!lastAnnounce || performance.now() - lastAnnounce > 250){
-        progressTime.textContent = fmtTime(left);
-        lastAnnounce = performance.now();
+    function tick(nowTs) {
+      const now = performance.now();
+      const elapsed = now - qStartedAt;
+      const left = Math.max(0, QUESTION_MS - elapsed);
+      const pct = (left / QUESTION_MS) * 100;
+      barEl.style.width = pct + '%';
+      timeEl.textContent = fmtTime(left);
+
+      if (left <= 0) {
+        finishSegment(); // авто-переход
+      } else {
+        timerRaf = requestAnimationFrame(tick);
       }
-      if (left <= 0){ safeStopOrFinish(); }
-      else { rafId = requestAnimationFrame(tick); }
     }
 
-    function safeStopOrFinish(){
-      try{ cancelAnimationFrame(rafId); }catch{}
-      if (hasStopped){ navigateOnce(RESULT_URL); return; }
-      try{
-        if (mediaRecorder?.state === 'recording'){ mediaRecorder.stop(); }
-        else { streamRef?.getTracks()?.forEach(t=>t.stop()); navigateOnce(RESULT_URL); }
-      }catch{ navigateOnce(RESULT_URL); }
+    function stopTimer() {
+      if (timerRaf != null) {
+        cancelAnimationFrame(timerRaf);
+        timerRaf = null;
+      }
     }
 
-    window.addEventListener('beforeunload', ()=>{
-      try{ cancelAnimationFrame(rafId); }catch{}
-      try{ if (mediaRecorder?.state === 'recording') mediaRecorder.stop(); }catch{}
-      try{ streamRef?.getTracks()?.forEach(t=>t.stop()); }catch{}
-    });
+    // Завершить сегмент (по кнопке «Далее» или по таймеру)
+    function finishSegment() {
+      stopTimer();
+      try { recorder && recorder.state !== 'inactive' && recorder.stop(); } catch {}
+      nextBtn.disabled = true; // защитимся от дабл-кликов
+    }
 
-    // --- BFCache: назад из result → заново отсчёт и запись ---
-    function isBackForwardNav(){
+    // Сохранение сегмента в sessionStorage
+    function handleStop() {
+      const blob = new Blob(chunks, { type: recorder.mimeType || 'audio/webm' });
+      const durationMs = Math.min(QUESTION_MS, performance.now() - qStartedAt);
+
+      const fr = new FileReader();
+      fr.onloadend = () => {
+        try {
+          const b64 = (fr.result || '').toString().split(',')[1] || '';
+          const parts = JSON.parse(sessionStorage.getItem(PARTS_KEY) || '[]');
+          parts[qIdx] = { mime: blob.type, b64, durationMs, qIdx };
+          sessionStorage.setItem(PARTS_KEY, JSON.stringify(parts));
+
+          // meta
+          const meta = JSON.parse(sessionStorage.getItem(META_KEY) || '{}');
+          meta.taskStartedAt ??= Date.now();
+          meta[`q${qIdx+1}EndedAt`] = Date.now();
+          sessionStorage.setItem(META_KEY, JSON.stringify(meta));
+        } catch {}
+
+        // Следующий вопрос или результат
+        qIdx++;
+        if (qIdx < QUESTIONS.length) {
+          // подготовка следующего вопроса
+          renderQuestion();
+          nextBtn.disabled = false;
+          timeEl.textContent = '00:20';
+          barEl.style.width = '100%';
+          startRecording();
+        } else {
+          // Переход на результат
+          const NEXT_URL = location.pathname.replace(/_3_task\.html$/i, '_4_result.html');
+          navigateOnce(NEXT_URL);
+        }
+      };
+      fr.readAsDataURL(blob);
+    }
+
+    // Кнопка «Далее» — завершает текущий сегмент досрочно
+    nextBtn.addEventListener('click', () => finishSegment());
+
+    // Init
+    (function init(){
+      // Пометка, что мы перешли на task
       try {
-        const nav = performance.getEntriesByType('navigation')[0];
-        return nav && nav.type === 'back_forward';
-      } catch { return false; }
-    }
-    function resetAndRestart(){
-      try { cancelAnimationFrame(rafId); } catch {}
-      try { clearInterval(cdInterval); } catch {}
-      try { if (mediaRecorder?.state === 'recording') mediaRecorder.stop(); } catch {}
-      try { streamRef?.getTracks()?.forEach(t => t.stop()); } catch {}
+        const meta = JSON.parse(sessionStorage.getItem(META_KEY) || '{}');
+        meta.taskPageAt = Date.now();
+        sessionStorage.setItem(META_KEY, JSON.stringify(meta));
+        // если заход без шага mic, всё равно попробуем продолжить
+      } catch {}
 
-      timerEl.style.display        = 'block';
-      timerEl.textContent          = '3';
-      instructionBox.style.display = 'none';
-      textBox.style.display        = 'none';
-      endBtn.style.display         = 'none';
-      progressWrap.style.display   = 'none';
-      progressBar.style.width      = '100%';
-      progressTime.textContent     = fmtTime(TOTAL_MS);
+      renderQuestion();
+      startRecording();
+    })();
 
-      audioChunks = [];
-      hasStopped  = false;
-      countdown   = 3;
-
-      initMic();
-    }
-    window.addEventListener('pageshow', (e) => {
-      try { navigateOnce.lock = false; } catch {}
-      if (e.persisted || isBackForwardNav()) resetAndRestart();
-    });
-
-    window.onload = initMic;
+    // BFCache: снять замок
+    window.addEventListener('pageshow', () => { navigateOnce.lock = false; });
   </script>
 </body>
 </html>

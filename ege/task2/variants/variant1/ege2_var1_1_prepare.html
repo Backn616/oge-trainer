@@ -14,16 +14,15 @@
   <link rel="stylesheet" href="../../../style_common.css" />
 
   <style>
-    /* ===== 1) Фон с плавным уходом в белый (перекрываем фон из общего файла только на этой странице) */
+    /* фон с плавным уходом в белый */
     body.page-fade{
       background:
         radial-gradient(1200px 600px at 70% -10%, #29417a40, transparent),
         radial-gradient(900px 500px at -10% 10%, #344b9340, transparent),
-        /* нижний слой — линейный градиент в белый */
         linear-gradient(to bottom, var(--bg) 0%, #fff 72%);
     }
 
-    /* ===== 2) Компоновка */
+    /* сетка */
     .ad-layout{
       display:grid;
       grid-template-columns: 1.1fr 0.9fr;
@@ -32,21 +31,29 @@
       max-width:1500px;
       margin-inline:auto;
     }
-    .ad-side{ text-align:center; }
+
+    /* левая карточка */
+    .task-container{ margin:0; }
+
+    /* правая колонка теперь тоже «карточка» */
+    .ad-card{
+      background:var(--card);
+      border-left:5px solid var(--primary);
+      padding:20px 30px;
+      border-radius:12px;
+      box-shadow:var(--shadow);
+    }
     .ad-title{
-      font-weight:800; font-size:26px;
-      margin:0 0 14px;
+      font-weight:800;
+      font-size:30px; /* увеличили заголовок */
+      margin:0 0 16px;
+      text-align:center;
     }
 
-    /* Карточка задания визуально «равна» блоку с фото */
-    .task-container{
-      margin:0; /* убираем нижний отступ: кнопка будет отдельно и по центру */
-    }
-
-    /* Фото: управляемый контейнер + кроп */
+    /* фото с новым aspect-ratio */
     .ad-figure{
       width:100%;
-      aspect-ratio: 16 / 9;     /* при необходимости: 3/2, 4/3 и т.д. */
+      aspect-ratio: 3 / 2;    /* заменили на 3:2 */
       border-radius:12px;
       overflow:hidden;
       box-shadow:var(--shadow);
@@ -59,22 +66,18 @@
       display:block;
     }
 
-    /* ===== 3) Кнопка строго по центру под обоими столбцами */
     .actions{
-      grid-column: 1 / -1;     /* растянуть на обе колонки */
+      grid-column: 1 / -1;
       text-align:center;
-      margin-top:18px;
+      margin-top:22px;
       margin-bottom:6px;
     }
 
-    /* Мелкие правки типографики для близости к скрину */
     .task-container b#taskTitle{ display:block; margin-bottom:10px; font-size:24px; }
-    .task-container ul{ margin-top:10px; }
     .task-container .instruction{ margin-top:18px; }
 
     @media (max-width:1100px){
       .ad-layout{ grid-template-columns: 1fr; gap:22px; }
-      .actions{ margin-top:8px; }
     }
   </style>
 
@@ -93,7 +96,7 @@
   <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
 
   <div class="content-wrapper ad-layout">
-    <!-- ЛЕВО: текст задания -->
+    <!-- ЛЕВО -->
     <div class="task-container" aria-labelledby="taskTitle" aria-describedby="inst">
       <b id="taskTitle">Task 2. Study the advertisement.</b>
       <b>You are considering joining the bike club and now you’d like to get more information.
@@ -107,32 +110,30 @@
       <div class="instruction" id="inst"><b>You have 20 seconds to ask each question.</b></div>
     </div>
 
-    <!-- ПРАВО: заголовок объявления + фото -->
-    <aside class="ad-side" aria-label="Advertisement">
+    <!-- ПРАВО: теперь карточка -->
+    <aside class="ad-card" aria-label="Advertisement">
       <h2 class="ad-title">Join our bike club!</h2>
-      <!-- Место для фото -->
       <figure class="ad-figure">
         <img src="task2_bike.jpg" alt="Bike club advertisement image" loading="lazy">
       </figure>
     </aside>
 
-    <!-- КНОПКА ПО ЦЕНТРУ ПОД ОБОИМИ КОЛОНКАМИ -->
+    <!-- кнопка по центру -->
     <div class="actions">
       <button id="goBtn" class="button" type="button">Перейти к выполнению</button>
     </div>
   </div>
 
-  <!-- Фиксированный прогресс-бар -->
+  <!-- прогресс-бар -->
   <div id="progressContainerFixed" role="timer" aria-live="polite" aria-label="Оставшееся время подготовки">
     <div id="progressBarFixed">
       <span id="progressTime" class="progress-time">01:30</span>
     </div>
   </div>
 
-  <!-- ЛОГИКА как в prepare из Task 4 -->
+  <!-- логика -->
   <script type="module">
     import { toggleThemeInit, navigateOnce, startPrepareTimer, fmtTime } from "../../../common.js";
-
     toggleThemeInit();
 
     try{

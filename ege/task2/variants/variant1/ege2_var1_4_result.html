@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 
-  <!-- Общие стили (фон, кнопки и т.д.) -->
+  <!-- Общие стили -->
   <link rel="stylesheet" href="../../../style_common.css" />
 
   <!-- Анти-мигание темы -->
@@ -32,18 +32,23 @@
     .dark .status{ color:#5ee397; }
     audio{ margin:10px auto 0; width:min(900px, 90%); display:block; }
 
+    /* Крупные кнопки — как в эталоне */
     .btn{
-      display:inline-block; padding:14px 28px; margin:10px 8px;
-      font-size:18px; font-weight:600; color:#fff; text-decoration:none; cursor:pointer;
-      border:none; border-radius:12px;
+      display:inline-block;
+      padding:16px 34px;
+      margin:10px 10px;
+      font-size:20px;
+      font-weight:700;
+      color:#fff; text-decoration:none; cursor:pointer;
+      border:none; border-radius:14px;
       background:linear-gradient(135deg, var(--primary), var(--primary-600));
-      box-shadow:0 10px 22px rgba(43,108,255,.3);
+      box-shadow:0 14px 28px rgba(43,108,255,.35);
       transition: transform .06s ease, filter .2s ease, box-shadow .2s ease;
     }
-    .btn:hover{ transform: scale(1.04); filter: brightness(1.03); }
+    .btn:hover{ transform:scale(1.045); filter:brightness(1.04); }
     .btn:disabled{ opacity:.6; cursor:not-allowed; transform:none; }
 
-    /* ===== ЧАСТЬ 2 — задание в 2 колонки (как в prepare) ===== */
+    /* ===== ЧАСТЬ 2 — задание в 2 колонки (как в prepare, рамка справа) ===== */
     .ad-layout{
       display:grid;
       grid-template-columns: 1.05fr 0.95fr;
@@ -52,22 +57,23 @@
       max-width:1500px;
       margin:18px auto 0;
     }
+    .left-free{ font-size:22px; line-height:1.55; text-align:left; }
+    .plain-list{ list-style:none; margin:0 0 24px 0; padding:0; }
+    .plain-list li{ margin:10px 0; }
+
+    /* Правая колонка — карточка‑шапка + подпись + фото стопкой */
+    .ad-right{ display:flex; flex-direction:column; gap:12px; }
+
     .task-header.card{
       background:var(--card);
       border-left:5px solid var(--primary);
       box-shadow:var(--shadow);
       border-radius:12px;
       padding:20px 24px;
-      grid-column:1 / -1;
       text-align:center;
       font-size:20px; line-height:1.7;
     }
-    .task-header b{ display:block; }
-    .left-free{
-      font-size:22px; line-height:1.55; text-align:left;
-    }
-    .plain-list{ list-style:none; margin:0 0 24px 0; padding:0; }
-    .plain-list li{ margin:10px 0; }
+    .task-header.card b{ display:block; }
 
     .ad-title{ font-weight:800; font-size:30px; margin:6px 0 12px; text-align:center; }
     .ad-figure{
@@ -84,7 +90,7 @@
     /* ===== ЧАСТЬ 3 — нижние 4 кнопки ===== */
     .nav-row{ text-align:center; margin:16px 0 24px; }
 
-    /* Проставка, чтобы низ не перекрывался футером/фикс‑элементами */
+    /* Проставка у низа */
     .spacer{ height: calc(var(--footer-h, 72px) + 16px); }
   </style>
 </head>
@@ -107,17 +113,8 @@
       <a class="btn" id="repeatBtn" href="#" role="button" aria-label="Повторить этот вариант">🔁 Повторить</a>
     </div>
 
-    <!-- ===== ЧАСТЬ 2 — Задание как в prepare ===== -->
+    <!-- ===== ЧАСТЬ 2 — задание: слева пункты, справа рамка + фото ===== -->
     <div class="ad-layout" aria-labelledby="taskTitle">
-      <!-- вытянутая шапка -->
-      <section class="task-header card">
-        <b id="taskTitle">Task 2. Study the advertisement.</b>
-        <b>
-          You are considering joining the bike club and now you’d like to get more information.
-          In 1.5 minutes you are to ask four direct questions to find out about the following:
-        </b>
-      </section>
-
       <!-- слева — пункты -->
       <div class="left-free">
         <ol class="plain-list">
@@ -129,14 +126,22 @@
         <p><b>You have 20 seconds to ask each question.</b></p>
       </div>
 
-      <!-- справа — надпись над фото и фото (ровно как в prepare) -->
-      <aside aria-label="Advertisement">
+      <!-- справа — карточка‑шапка + подпись + фото (как в prepare) -->
+      <div class="ad-right">
+        <section class="task-header card">
+          <b id="taskTitle">Task 2. Study the advertisement.</b>
+          <b>
+            You are considering joining the bike club and now you’d like to get more information.
+            In 1.5 minutes you are to ask four direct questions to find out about the following:
+          </b>
+        </section>
+
         <h3 class="ad-title">Join our bike club!</h3>
         <figure class="ad-figure">
           <!-- Место для твоего изображения -->
           <img src="task2_bike.jpg" alt="Bike club advertisement image" loading="lazy">
         </figure>
-      </aside>
+      </div>
     </div>
 
     <!-- ===== ЧАСТЬ 3 — навигация ===== -->
@@ -165,8 +170,8 @@
     function getBases(p){
       const i = p.indexOf('/ege/');
       if (i >= 0){
-        const ROOT_BASE = p.slice(0, i + 1);
-        const EGE_BASE  = p.slice(0, i + 5);
+        const ROOT_BASE = p.slice(0, i + 1); // до слеша перед 'ege'
+        const EGE_BASE  = p.slice(0, i + 5); // включая 'ege/'
         return { ROOT_BASE, EGE_BASE };
       }
       return { ROOT_BASE: '/', EGE_BASE: '/ege/' };
@@ -188,7 +193,7 @@
     const toHome = document.getElementById('toHome');          // «на главную»
     if (toHome) toHome.href = `${ROOT_BASE}index.html`;
 
-    // ===== Очистка состояния Task 2 =====
+    // ===== Очистка состояния Task 2 и рестарт при уходе =====
     function clearTask2State(){
       try{
         Object.keys(sessionStorage).forEach(k => {
@@ -212,9 +217,13 @@
       repeat.addEventListener('click', (e)=>{ e.preventDefault(); clearAndGo(repeatHref); });
     }
 
+    // Если пользователь уходит (в т.ч. «Назад»), помечаем, что task должен стартовать с отсчёта
+    window.addEventListener('pagehide', () => {
+      try{ sessionStorage.setItem('ege2_force_restart','1'); }catch{}
+    });
     window.addEventListener('pageshow', ()=>{ navigateOnce.lock = false; });
 
-    // ===== АУДИО: ждём одно целое dataURL в ege2_audio_base64 (как в Task 4) =====
+    // ===== АУДИО: ждём одно целое dataURL в ege2_audio_base64 =====
     const audioEl     = document.getElementById('audio');
     const playBtn     = document.getElementById('playBtn');
     const downloadBtn = document.getElementById('downloadBtn');
@@ -281,7 +290,6 @@
     });
 
     // Очистка blob‑URL
-    window.addEventListener('pagehide', ()=>{ if (objectURL) URL.revokeObjectURL(objectURL); });
     window.addEventListener('beforeunload', ()=>{ if (objectURL) URL.revokeObjectURL(objectURL); });
   </script>
 </body>

@@ -24,7 +24,6 @@
   </script>
 
   <style>
-    /* Немного локальных стилей под образец */
     .wrap{ max-width:1500px; margin:0 auto; }
     h1{ color:var(--primary); font-size:36px; margin:12px 0 6px; text-align:center; }
     .status{ font-size:22px; color:#1f7a2e; text-align:center; margin:10px 0 26px; }
@@ -38,9 +37,9 @@
 
     /* Цвета волны для светлой/тёмной темы */
     :root{
-      --wave-base: rgba(0,0,0,.28);      /* незаполненная часть */
-      --wave-prog: var(--primary);       /* цвет прогресса */
-      --wave-glow: rgba(43,108,255,.45); /* свечение прогресса */
+      --wave-base: rgba(0,0,0,.28);
+      --wave-prog: var(--primary);
+      --wave-glow: rgba(43,108,255,.45);
     }
     html.dark{
       --wave-base: rgba(255,255,255,.52);
@@ -59,7 +58,6 @@
     .btn:hover{ transform: scale(1.05); filter: brightness(1.03); }
     .btn:disabled{ opacity:.6; cursor:not-allowed; transform:none; }
 
-    /* Карточка и изображения — как на других страницах */
     .task-container{
       background:var(--card);
       border-left:5px solid var(--primary);
@@ -86,7 +84,6 @@
   </style>
 </head>
 <body>
-  <!-- Переключатель темы -->
   <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
 
   <div class="wrap">
@@ -107,7 +104,6 @@
       <a class="btn" id="repeatBtn" href="#" role="button" aria-label="Повторить этот вариант">🔁 Повторить этот вариант</a>
     </div>
 
-    <!-- Контент задания -->
     <div class="task-container" aria-labelledby="taskTitle" aria-describedby="inst">
       <b id="taskTitle">4 Task. Imagine that you and your friend are doing a school project “Spending holidays: in the city or in the countryside”.</b>
       <p>You have found some photos to illustrate it but for technical reasons you cannot send them now. Leave a voice message to your friend explaining your choice of the photos and sharing some ideas about the project. In 2.5 minutes be ready to:</p>
@@ -137,8 +133,6 @@
 
   <script type="module">
     import { toggleThemeInit, navigateOnce } from '../../../common.js';
-
-    // Тема
     toggleThemeInit();
 
     // ===== Заголовок/номер варианта =====
@@ -152,71 +146,47 @@
     function getBases(p){
       const i = p.indexOf('/ege/');
       if (i >= 0){
-        const ROOT_BASE = p.slice(0, i + 1); // до слеша перед 'ege'
-        const EGE_BASE  = p.slice(0, i + 5); // включая 'ege/'
+        const ROOT_BASE = p.slice(0, i + 1);
+        const EGE_BASE  = p.slice(0, i + 5);
         return { ROOT_BASE, EGE_BASE };
       }
       return { ROOT_BASE: '/', EGE_BASE: '/ege/' };
     }
     const { ROOT_BASE, EGE_BASE } = getBases(path);
 
-    // «к вариантам»: .../ege/task4/variants/ege4.html
     const toVariants = document.getElementById('toVariants');
     if (toVariants){
       toVariants.href = path.replace(/\/variants\/variant\d+\/[^/]+$/i, '/variants/ege4.html');
     }
-    // «к выбору задания»: .../ege/ege_menu.html
-    const toModeMenu = document.getElementById('toModeMenu');
-    if (toModeMenu) toModeMenu.href = `${EGE_BASE}ege_menu.html`;
+    document.getElementById('toModeMenu').href = `${EGE_BASE}ege_menu.html`;
+    document.getElementById('toTaskMenu').href = `${EGE_BASE}ege.html`;
+    document.getElementById('toHome').href     = `${ROOT_BASE}index.html`;
 
-    // «к выбору режима»: .../ege/ege.html
-    const toTaskMenu = document.getElementById('toTaskMenu');
-    if (toTaskMenu) toTaskMenu.href = `${EGE_BASE}ege.html`;
-
-    // «на главную»: корневой index.html относительно ROOT_BASE
-    const toHome = document.getElementById('toHome');
-    if (toHome) toHome.href = `${ROOT_BASE}index.html`;
-
-    // ===== Очистка состояния задания 4 =====
     function clearTask4State(){
       try{
-        Object.keys(sessionStorage).forEach(k => {
-          if (k.startsWith('ege4_')) sessionStorage.removeItem(k);
-        });
-        if (varNum && /^\d+$/.test(varNum)) {
-          sessionStorage.removeItem(`ege4_var${varNum}_prepare_endtime`);
-        }
+        Object.keys(sessionStorage).forEach(k => { if (k.startsWith('ege4_')) sessionStorage.removeItem(k); });
+        if (varNum && /^\d+$/.test(varNum)) sessionStorage.removeItem(`ege4_var${varNum}_prepare_endtime`);
       }catch{}
     }
-    function clearAndGo(url){
-      clearTask4State();
-      navigateOnce(url);
-    }
+    function clearAndGo(url){ clearTask4State(); navigateOnce(url); }
 
-    // «Повторить этот вариант» → на _1_prepare с обнулением
     const repeat = document.getElementById('repeatBtn');
     if (repeat){
       const repeatHref = path.replace(/_4_result\.html$/i, '_1_prepare.html');
       repeat.href = repeatHref;
       repeat.addEventListener('click', (e)=>{ e.preventDefault(); clearAndGo(repeatHref); });
     }
-
-    // Остальные нав-кнопки — тоже через navigateOnce
     document.querySelectorAll('.nav-btn').forEach(a=>{
       a.addEventListener('click', (e)=>{ e.preventDefault(); clearAndGo(a.href); });
     });
-
-    // Снимаем «замок» navigateOnce при возврате из BFCache
     window.addEventListener('pageshow', ()=>{ navigateOnce.lock = false; });
 
-    // ===== Аудио =====
+    // ===== Аудио + волна
     const audioEl     = document.getElementById('audio');
     const playBtn     = document.getElementById('playBtn');
-    the
     const downloadBtn = document.getElementById('downloadBtn');
     const statusText  = document.getElementById('statusText');
 
-    // Волна
     const waveWrap    = document.getElementById('waveWrap');
     const waveCanvas  = document.getElementById('wave');
 
@@ -237,18 +207,13 @@
       if (parts.length < 2) return null;
       const header = parts[0], b64 = parts[1];
       const type = (header.match(/data:(.*?);base64/) || [,'application/octet-stream'])[1];
-      const bin = atob(b64);
-      const bytes = new Uint8Array(bin.length);
+      const bin  = atob(b64);
+      const bytes= new Uint8Array(bin.length);
       for (let i=0;i<bin.length;i++) bytes[i] = bin.charCodeAt(i);
       return new Blob([bytes], { type });
     }
+    function setButtonsEnabled(en){ playBtn.disabled = !en; downloadBtn.disabled = !en; }
 
-    function setButtonsEnabled(en){
-      playBtn.disabled = !en;
-      downloadBtn.disabled = !en;
-    }
-
-    // === Инициализация аудио + волны
     (async function initAudio(){
       if (!base64){
         statusText.textContent = '⚠️ Запись не найдена. Возможно, вы запретили доступ к микрофону или страница была закрыта до завершения.';
@@ -261,8 +226,9 @@
           objectURL   = URL.createObjectURL(blob);
           audioEl.src = objectURL;
           audioEl.type= blob.type || mimeStored;
-          await initWaveformFromURL(objectURL);
+          await initWaveformFromBlob(blob);   // <-- декодируем напрямую из Blob
         }else{
+          // если blob не собрался — используем data URL
           audioEl.src = base64;
           audioEl.type= mimeStored;
           await initWaveformFromURL(base64);
@@ -287,39 +253,41 @@
     window.addEventListener('pagehide', ()=>{ if (objectURL) URL.revokeObjectURL(objectURL); });
     window.addEventListener('beforeunload', ()=>{ if (objectURL) URL.revokeObjectURL(objectURL); });
 
-    // ===== Волновой бегунок (как в Task 2)
+    // ===== Волновой бегунок
+    async function initWaveformFromBlob(blob){
+      const arr = await blob.arrayBuffer();
+      await renderWave(arr);
+    }
     async function initWaveformFromURL(url){
-      try{
-        const resp = await fetch(url);
-        const buf  = await resp.arrayBuffer();
-        const AC   = window.AudioContext || window.webkitAudioContext;
-        const ctx  = new AC();
-        const audioBuf = await ctx.decodeAudioData(buf);
+      const resp = await fetch(url);
+      const arr  = await resp.arrayBuffer();
+      await renderWave(arr);
+    }
+    async function renderWave(arrayBuffer){
+      const AC   = window.AudioContext || window.webkitAudioContext;
+      const ctxA = new AC();
+      const audioBuf = await ctxA.decodeAudioData(arrayBuffer);
 
-        const peaks = buildPeaks(audioBuf, 1000);
-        drawWave(peaks, 0);
-        waveWrap.style.display = 'block';
+      const peaks = buildPeaks(audioBuf, 1000);
+      drawWave(peaks, 0);
+      waveWrap.style.display = 'block';
 
-        let raf;
-        const tick = ()=>{
-          const p = audioEl.currentTime / (audioBuf.duration || 1);
-          drawWave(peaks, p);
-          raf = requestAnimationFrame(tick);
-        };
-        audioEl.addEventListener('play', ()=>{ cancelAnimationFrame(raf); tick(); });
-        audioEl.addEventListener('pause', ()=>{ cancelAnimationFrame(raf); drawWave(peaks, audioEl.currentTime/(audioBuf.duration||1)); });
-        audioEl.addEventListener('ended', ()=>{ cancelAnimationFrame(raf); drawWave(peaks, 1); });
+      let raf;
+      const tick = ()=>{
+        const p = audioEl.currentTime / (audioBuf.duration || 1);
+        drawWave(peaks, p);
+        raf = requestAnimationFrame(tick);
+      };
+      audioEl.addEventListener('play', ()=>{ cancelAnimationFrame(raf); tick(); });
+      audioEl.addEventListener('pause', ()=>{ cancelAnimationFrame(raf); drawWave(peaks, audioEl.currentTime/(audioBuf.duration||1)); });
+      audioEl.addEventListener('ended', ()=>{ cancelAnimationFrame(raf); drawWave(peaks, 1); });
 
-        waveCanvas.addEventListener('pointerdown', (e)=>{
-          const r = waveCanvas.getBoundingClientRect();
-          const x = Math.max(0, Math.min(1, (e.clientX - r.left)/r.width));
-          audioEl.currentTime = x * audioBuf.duration;
-          drawWave(peaks, x);
-        }, {passive:true});
-      }catch(err){
-        console.warn('Waveform init failed:', err);
-        waveWrap.style.display = 'none';
-      }
+      waveCanvas.addEventListener('pointerdown', (e)=>{
+        const r = waveCanvas.getBoundingClientRect();
+        const x = Math.max(0, Math.min(1, (e.clientX - r.left)/r.width));
+        audioEl.currentTime = x * audioBuf.duration;
+        drawWave(peaks, x);
+      }, {passive:true});
     }
 
     function buildPeaks(audioBuf, width){
@@ -350,22 +318,16 @@
       const ctx = c.getContext('2d');
       ctx.setTransform(dpr,0,0,dpr,0,0);
 
-      // цвета зависят от темы (из CSS-переменных)
       const rs = getComputedStyle(document.documentElement);
       const waveBase = (rs.getPropertyValue('--wave-base') || 'rgba(0,0,0,.28)').trim();
       const waveProg = (rs.getPropertyValue('--wave-prog') || '#2b6cff').trim();
       const waveGlow = (rs.getPropertyValue('--wave-glow') || 'rgba(43,108,255,.45)').trim();
-
-      // фон канваса (.wave / .dark .wave)
       const bg = getComputedStyle(c).backgroundColor;
 
-      // фон
       ctx.clearRect(0,0,cssW,cssH);
       ctx.fillStyle = bg; ctx.fillRect(0,0,cssW,cssH);
 
       const mid = cssH/2;
-
-      // незаполненная часть (столбики)
       ctx.fillStyle = waveBase;
       for (let i=0;i<peaks.length;i++){
         const x = i/peaks.length*cssW;
@@ -375,16 +337,9 @@
         ctx.fillRect(x, mid-hTop, 1, hTop+hBot || 1);
       }
 
-      // прогресс — цветной, с мягким glow
       const progW = Math.max(0, Math.min(cssW, progress*cssW));
-      ctx.save();
-      ctx.beginPath();
-      ctx.rect(0,0,progW,cssH);
-      ctx.clip();
-
-      ctx.fillStyle = waveProg;
-      ctx.shadowColor = waveGlow;
-      ctx.shadowBlur  = 8;
+      ctx.save(); ctx.beginPath(); ctx.rect(0,0,progW,cssH); ctx.clip();
+      ctx.fillStyle = waveProg; ctx.shadowColor = waveGlow; ctx.shadowBlur = 8;
       for (let i=0;i<peaks.length;i++){
         const x = i/peaks.length*cssW;
         const [min,max] = peaks[i];

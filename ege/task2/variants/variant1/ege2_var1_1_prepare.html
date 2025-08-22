@@ -13,37 +13,44 @@
   <!-- Общие стили проекта -->
   <link rel="stylesheet" href="../../../style_common.css" />
 
-  <!-- Локальная раскладка под макет «текст слева — фото справа» -->
+  <!-- Локальная раскладка «текст слева — фото справа» + управляемое фото -->
   <style>
     .ad-layout{
       display:grid;
-      grid-template-columns: 1.05fr 0.95fr; /* чуть больше места под текст */
+      grid-template-columns: 1.1fr 0.9fr; /* как на скрине — тексту чуть больше места */
       gap:32px;
       align-items:start;
     }
-    .ad-side{
-      text-align:center;
-    }
+
+    /* Правая колонка (заголовок объявления + фото) */
+    .ad-side{ text-align:center; }
     .ad-title{
-      font-weight:800;
-      font-size:26px;
-      margin:0 0 14px;
+      font-weight:800; font-size:26px;
+      margin:0 0 12px;
     }
-    .ad-figure img{
+
+    /* Контейнер фото с управляемым аспектом и кропом */
+    .ad-figure{
       width:100%;
-      height:auto;
+      /* === КЛЮЧЕВОЕ: соотношение сторон === */
+      aspect-ratio: 16 / 9;         /* при желании поменяй на 3/2, 4/3 и т.д. */
       border-radius:12px;
+      overflow:hidden;               /* чтобы кроп работал по рамке */
       box-shadow:var(--shadow);
+      background:#ddd;               /* серый плейсхолдер если фото ещё не подгрузилось */
     }
-    /* немного притопим отступы в карточке текста, чтобы походило на скрин */
-    .task-container h1, .task-container b#taskTitle{
+    .ad-figure > img{
+      width:100%; height:100%;
+      object-fit: cover;             /* заполняем область без сплющивания */
+      object-position: center;       /* центр кадра; можно менять на 'top'/'left 30%' и т.д. */
       display:block;
-      margin-bottom:10px;
-      font-size:24px;
     }
-    .task-container .instruction{
-      margin-top:20px;
-    }
+
+    /* Кнопка должна быть под заданием слева: добавим отступ сверху */
+    .task-actions{ margin-top:14px; }
+
+    /* Чуть плотнее заголовок в карточке */
+    .task-container b#taskTitle{ display:block; margin-bottom:10px; font-size:24px; }
 
     @media (max-width: 1100px){
       .ad-layout{ grid-template-columns: 1fr; }
@@ -67,32 +74,35 @@
 
   <div class="content-wrapper ad-layout">
     <!-- ЛЕВАЯ КОЛОНКА: текст задания -->
-    <div class="task-container" aria-labelledby="taskTitle" aria-describedby="inst">
-      <b id="taskTitle">Task 2. Study the advertisement.</b>
-      <b>You are considering joining the bike club and now you’d like to get more information.
-      In 1.5 minutes you are to ask four direct questions to find out about the following:</b>
-      <ul>
-        <li>minimum age;</li>
-        <li>special clothes;</li>
-        <li>bicycle rental;</li>
-        <li>competitions.</li>
-      </ul>
-      <div class="instruction" id="inst"><b>You have 20 seconds to ask each question.</b></div>
+    <div>
+      <div class="task-container" aria-labelledby="taskTitle" aria-describedby="inst">
+        <b id="taskTitle">Task 2. Study the advertisement.</b>
+        <b>You are considering joining the bike club and now you’d like to get more information.
+        In 1.5 minutes you are to ask four direct questions to find out about the following:</b>
+        <ul>
+          <li>minimum age;</li>
+          <li>special clothes;</li>
+          <li>bicycle rental;</li>
+          <li>competitions.</li>
+        </ul>
+        <div class="instruction" id="inst"><b>You have 20 seconds to ask each question.</b></div>
+      </div>
+
+      <!-- КНОПКА ПОД ЗАДАНИЕМ (как ты просил) -->
+      <div class="task-actions">
+        <button id="goBtn" class="button" type="button" aria-label="Перейти к выполнению">Перейти к выполнению</button>
+      </div>
     </div>
 
     <!-- ПРАВАЯ КОЛОНКА: заголовок объявления + фото -->
     <aside class="ad-side" aria-label="Advertisement">
       <h2 class="ad-title">Join our bike club!</h2>
+
+      <!-- Место для фото. Подставь свой файл в src -->
       <figure class="ad-figure">
-        <!-- Место для фото -->
         <img src="photo_club.png" alt="Bike club advertisement image" loading="lazy">
       </figure>
     </aside>
-  </div>
-
-  <!-- Кнопка перехода дальше (логика как в Task 4) -->
-  <div style="text-align:center; margin: 20px 0 30px;">
-    <button id="goBtn" class="button" type="button" aria-label="Перейти к выполнению">Перейти к выполнению</button>
   </div>
 
   <!-- Фиксированный прогресс-бар снизу -->
@@ -102,7 +112,7 @@
     </div>
   </div>
 
-  <!-- ЛОГИКА страницы (полностью совместима с prepare из Task 4) -->
+  <!-- ЛОГИКА страницы (как в prepare из Task 4) -->
   <script type="module">
     import { toggleThemeInit, navigateOnce, startPrepareTimer, fmtTime } from "../../../common.js";
 
@@ -117,7 +127,7 @@
       sessionStorage.setItem('ege2_meta', JSON.stringify(meta));
     }catch{}
 
-    // URL следующего шага (mic)
+    // Куда переходим дальше
     const NEXT_URL = /_1_prepare\.html$/i.test(location.pathname)
       ? location.pathname.replace(/_1_prepare\.html$/i, '_2_mic.html')
       : location.pathname.replace(/\.html$/i, '_2_mic.html');
@@ -127,7 +137,7 @@
       navigateOnce(NEXT_URL);
     });
 
-    // Таймер 1:30 (rAF)
+    // Таймер 1:30
     const TOTAL_MS = 90_000;
     const barEl  = document.getElementById('progressBarFixed');
     const timeEl = document.getElementById('progressTime');

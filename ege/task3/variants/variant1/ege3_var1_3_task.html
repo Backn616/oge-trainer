@@ -23,11 +23,9 @@
       box-shadow: var(--shadow);
       padding: 24px 28px;
     }
-    .q-head{
-      display:flex; align-items:center; justify-content:flex-start;
-      gap:16px; margin-bottom:8px;
-    }
+    .q-head{ margin-bottom:8px; }
     .q-title{ font-size:28px; font-weight:800; margin:0; }
+
     .timer{
       font-size:70px; margin:30px 0; font-weight:700;
       color:var(--primary); letter-spacing:4px; text-shadow:0 4px 12px rgba(0,0,0,.25);
@@ -40,7 +38,10 @@
       border:1px solid #ffffff22; border-radius:12px; padding:10px 14px;
       box-shadow:var(--shadow); font-size:14px; z-index:9999;
     }
-    #introBox{ margin-bottom:18px; }
+
+    #introBox{ margin-bottom:18px; text-align:center; }
+    #introNextWrap{ margin-top:40px; display:none; }
+
     #nextBtnWrap{
       text-align:center;
       margin: 10cm 0 30px;
@@ -66,11 +67,13 @@
     <div id="timer" class="timer" aria-live="polite">3</div>
   </div>
 
-  <!-- Основной блок -->
   <main class="content-wrapper" id="mainWrap" style="display:none">
     <!-- интро -->
     <section class="task-container" id="introBox" aria-live="polite">
       <b>Task 3.</b> Interviewer
+      <div id="introNextWrap">
+        <button id="introNextBtn" class="button" type="button">Перейти к выполнению</button>
+      </div>
     </section>
 
     <!-- вопросы -->
@@ -80,7 +83,7 @@
       </div>
     </section>
 
-    <!-- кнопка -->
+    <!-- кнопка под рамкой -->
     <div id="nextBtnWrap">
       <button id="nextBtn" class="button" type="button">Дальше</button>
     </div>
@@ -111,6 +114,9 @@
     const timerEl  = document.getElementById('timer');
 
     const introBox = document.getElementById('introBox');
+    const introNextWrap = document.getElementById('introNextWrap');
+    const introNextBtn  = document.getElementById('introNextBtn');
+
     const qWrap = document.getElementById('qWrap');
     const qTitleEl = document.getElementById('qTitle');
 
@@ -189,6 +195,11 @@
     }
 
     nextBtn.addEventListener('click', () => endAnswerWindow());
+    introNextBtn.addEventListener('click', () => {
+      introNextWrap.style.display = 'none';
+      qIdx = 0;
+      playQuestion(1);
+    });
 
     let qIdx = -1;
 
@@ -200,7 +211,11 @@
 
       try{ audio.pause(); audio.currentTime = 0; }catch{}
       audio.src = INTRO_AUDIO;
-      try{ await audio.play(); }catch{ showPlayHintAndRetry(); }
+      try{
+        await audio.play();
+        // показать кнопку через 7 секунд после старта интро
+        setTimeout(()=>{ introNextWrap.style.display = 'block'; }, 7000);
+      }catch{ showPlayHintAndRetry(); }
     }
 
     async function playQuestion(n){
@@ -217,16 +232,15 @@
 
     audio.addEventListener('ended', () => {
       if (qIdx === -1){
-        qIdx = 0;
-        playQuestion(1);
+        // интро закончилось → ждём кнопку
       } else {
         startAnswerWindow();
       }
     });
     audio.addEventListener('error', () => {
       if (qIdx === -1){
-        qIdx = 0;
-        playQuestion(1);
+        // если интро не проигралось → сразу покажем кнопку
+        introNextWrap.style.display = 'block';
       } else {
         startAnswerWindow();
       }
@@ -250,9 +264,7 @@
         if (recorder && recorder.state !== 'inactive'){
           recorder.onstop = saveAndGo;
           recorder.stop();
-        }else{
-          saveAndGo();
-        }
+        }else{ saveAndGo(); }
       }catch{ saveAndGo(); }
     }
 
@@ -273,9 +285,7 @@
             cleanupAndNavigate();
           };
           reader.readAsDataURL(blob);
-        }else{
-          cleanupAndNavigate();
-        }
+        }else{ cleanupAndNavigate(); }
       }catch{ cleanupAndNavigate(); }
     }
 
@@ -315,24 +325,12 @@
       answering = false;
       finishing = false;
       nextBtnWrap.style.display = 'none';
+      introNextWrap.style.display = 'none';
       startCountdown();
     }
     freshStart();
 
-    function isBackForward(){
-      try{
-        const nav = performance.getEntriesByType('navigation')[0];
-        return nav && nav.type === 'back_forward';
-      }catch{ return false; }
-    }
-    window.addEventListener('pageshow', (e)=>{
-      if (e.persisted || isBackForward()){
-        freshStart();
-      }else{
-        navigateOnce.lock = false;
-      }
-    });
-
+    window.addEventListener('pageshow', ()=>{ navigateOnce.lock = false; });
     window.addEventListener('beforeunload', ()=>{
       try{ if (recorder && recorder.state==='recording') recorder.stop(); }catch{}
       try{ streamRef?.getTracks()?.forEach(t=>t.stop()); }catch{}

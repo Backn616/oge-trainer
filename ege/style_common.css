@@ -34,6 +34,9 @@ body{
     radial-gradient(1200px 600px at 70% -10%, #29417a40, transparent),
     radial-gradient(900px 500px at -10% 10%, #344b9340, transparent),
     var(--bg);
+  background-repeat: no-repeat, no-repeat, no-repeat;  /* запрет повторов */
+  background-attachment: scroll, scroll, scroll;
+  min-height: 100svh;   /* фон всегда минимум на высоту экрана */
   display:flex;
   justify-content:center;
   text-align:center;

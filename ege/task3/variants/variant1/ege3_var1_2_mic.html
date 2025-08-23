@@ -36,11 +36,11 @@
       <p id="warnText">
         На следующем этапе тренажёр попытается получить доступ к микрофону.<br><br>
         Браузер покажет системный запрос на использование микрофона.<br><br>
-        Если вы готовы выполнить устную часть <strong>задания 1</strong>, пожалуйста,<br>
+        Если вы готовы выполнить устную часть <strong>задания 3</strong>, пожалуйста,<br>
         <strong>разрешите сайту использовать микрофон</strong>, чтобы начать запись ответа.
       </p>
 
-      <!-- href ставим как fallback, переход дублируем через JS c navigateOnce -->
+      <!-- Ставим href (fallback без JS) и дублируем переход через JS с защитой -->
       <a id="nextLink"
          class="button"
          type="button"
@@ -64,17 +64,17 @@
       ? location.pathname.replace(/_2_mic\.html$/i, '_3_task.html')
       : location.pathname.replace(/\.html$/i, '_3_task.html');
 
-    // Подготовка sessionStorage для задания 1
+    // Подготовка sessionStorage для задания 3
     try {
-      sessionStorage.removeItem('ege1_audio_base64');
-      sessionStorage.removeItem('ege1_audio_mime');
-      sessionStorage.setItem('ege1_warned', '1');
-      const meta = JSON.parse(sessionStorage.getItem('ege1_meta') || '{}');
+      sessionStorage.removeItem('ege3_audio_base64');
+      sessionStorage.removeItem('ege3_audio_mime');
+      sessionStorage.setItem('ege3_warned', '1');
+      const meta = JSON.parse(sessionStorage.getItem('ege3_meta') || '{}');
       meta.warnedAt = Date.now();
-      sessionStorage.setItem('ege1_meta', JSON.stringify(meta));
+      sessionStorage.setItem('ege3_meta', JSON.stringify(meta));
     } catch {}
 
-    // Кнопка «ОК» — единая точка перехода
+    // Кнопка «ОК» — единственная точка перехода
     const a = document.getElementById('nextLink');
     a.href = NEXT_URL; // fallback, если JS отключён
     a.addEventListener('click', (e) => {

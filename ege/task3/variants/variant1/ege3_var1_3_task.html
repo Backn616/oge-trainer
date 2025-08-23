@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 
-  <!-- Общие стили проекта -->
+  <!-- Общие стили -->
   <link rel="stylesheet" href="../../../style_common.css" />
 
   <style>
@@ -51,16 +51,15 @@
     /* интро-карточка перед вопросами */
     #introBox{ margin-bottom:18px; }
 
-    /* кнопка под рамкой — «ниже на 10 см» */
+    /* кнопка под рамкой */
     #nextBtnWrap{
       text-align:center;
-      margin: 10cm 0 30px;   /* именно сантиметры, как просил */
+      margin: 10cm 0 30px;
       display:none;
       width:100%;
     }
   </style>
 
-  <!-- Анти-мигание темы -->
   <script>
     (function(){
       try{
@@ -71,17 +70,17 @@
   </script>
 </head>
 <body>
-  <!-- Переключатель темы -->
+  <!-- Тумблер темы -->
   <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
 
-  <!-- ВЕРХ: отсчёт 3-2-1 -->
+  <!-- Отсчёт -->
   <div class="content-wrapper" id="countdownWrap">
     <div id="timer" class="timer" aria-live="polite">3</div>
   </div>
 
-  <!-- ОСНОВНОЙ БЛОК -->
+  <!-- Основной блок -->
   <main class="content-wrapper" id="mainWrap" style="display:none">
-    <!-- интро-экран перед вопросами -->
+    <!-- интро-экран -->
     <section class="task-container" id="introBox" aria-live="polite">
       <b>Task 3.</b> Interviewer
     </section>
@@ -95,38 +94,37 @@
       <div class="q-body" id="qBody">Listen to the question, then answer in 40 seconds.</div>
     </section>
 
-    <!-- кнопка НИЖЕ рамки -->
+    <!-- кнопка ниже рамки -->
     <div id="nextBtnWrap">
-      <button id="nextBtn" class="button" type="button" aria-label="Перейти к следующему вопросу">Дальше</button>
+      <button id="nextBtn" class="button" type="button">Дальше</button>
     </div>
   </main>
 
-  <!-- Проставка, чтобы фикс‑бар не наезжал -->
+  <!-- проставка под фикс-бар -->
   <div style="height: calc(var(--footer-h, 72px) + 24px);"></div>
 
-  <!-- Фиксированный прогресс‑бар снизу — на 40 сек ответа -->
+  <!-- фикс-бар -->
   <div id="progressContainerFixed" role="timer" aria-live="polite" style="display:none">
     <div id="progressBarFixed" class="rAF">
       <span id="progressTime" class="progress-time">00:40</span>
     </div>
   </div>
 
-  <!-- ЛОГИКА -->
+  <!-- Логика -->
   <script type="module">
     import { toggleThemeInit, navigateOnce, fmtTime } from "../../../common.js";
     toggleThemeInit();
 
-    /* ====== Сброс ключей Task 3 ====== */
     try{
       sessionStorage.removeItem('ege3_audio_base64');
       sessionStorage.removeItem('ege3_audio_mime');
     }catch{}
 
-    /* ====== Аудио-файлы (m4a, лежат рядом со страницей) ====== */
-    const INTRO_AUDIO = "intro.m4a";
-    const Q_AUDIO = ["q1.m4a","q2.m4a","q3.m4a","q4.m4a","q5.m4a"];
+    // файлы mp3
+    const INTRO_AUDIO = "intro.mp3";
+    const Q_AUDIO = ["q1.mp3","q2.mp3","q3.mp3","q4.mp3","q5.mp3"];
 
-    /* ====== DOM ====== */
+    // DOM
     const countdownWrap = document.getElementById('countdownWrap');
     const mainWrap = document.getElementById('mainWrap');
     const timerEl  = document.getElementById('timer');
@@ -144,13 +142,12 @@
     const nextBtn  = document.getElementById('nextBtn');
 
     const RESULT_URL = location.pathname.replace(/_3_task\.html$/i, '_4_result.html');
-    const ANSWER_MS = 40_000; // 40 секунд на ответ
+    const ANSWER_MS = 40_000;
 
-    /* ====== Аудио-плеер ====== */
     const audio = new Audio();
     audio.preload = 'auto';
 
-    /* ====== Микрофон: один сеанс записи ====== */
+    /* ===== Микрофон ===== */
     let streamRef=null, recorder=null, chosenMime='', recChunks=[];
     function pickMimeType(){
       const c=['audio/webm;codecs=opus','audio/webm','audio/ogg;codecs=opus','audio/ogg','audio/mp4'];
@@ -165,15 +162,13 @@
       recorder.ondataavailable = e => { if (e.data && e.data.size) recChunks.push(e.data); };
     }
 
-    /* ====== Таймер ответа (40 сек) ====== */
+    /* ===== Таймер ответа ===== */
     let startedAt=0, deadlineMs=0, rafId=0, intId=0, hardTO=0, answering=false, finishing=false;
 
     function startAnswerWindow(){
-      // показать прогресс-бар и кнопку (под рамкой)
       barWrap.style.display = 'block';
       nextBtnWrap.style.display = 'block';
       nextBtn.textContent = (qIdx === 4) ? 'Закончить' : 'Дальше';
-      nextBtn.setAttribute('aria-label', (qIdx === 4) ? 'Завершить задание' : 'Перейти к следующему вопросу');
 
       stateBadge.textContent = 'Answer (40s)…';
       timeEl.textContent = fmtTime(ANSWER_MS);
@@ -185,7 +180,6 @@
       stopClocks();
       tickRaf();
       intId = setInterval(tickWall, 250);
-      // страховка на случай подвисаний
       hardTO = setTimeout(()=>{ if(answering) endAnswerWindow(); }, ANSWER_MS + 1500);
     }
 
@@ -213,18 +207,16 @@
       if (!answering) return;
       answering = false;
       stopClocks();
-      nextBtnWrap.style.display = 'none'; // спрятать кнопку перед следующим вопросом
+      nextBtnWrap.style.display = 'none';
       proceedNext();
     }
 
-    // Клик по кнопке — сразу заканчиваем окно ответа (не ждём таймера)
     nextBtn.addEventListener('click', () => endAnswerWindow());
 
-    /* ====== Поток: intro → q1..q5 ====== */
-    let qIdx = -1; // -1 = интро, 0..4 = вопросы
+    /* ===== Поток: intro → q1..q5 ===== */
+    let qIdx = -1;
 
     async function playIntro(){
-      // показываем интро-экран, прячем экран вопросов
       introBox.style.display = 'block';
       qWrap.style.display = 'none';
       nextBtnWrap.style.display = 'none';
@@ -236,11 +228,10 @@
     }
 
     async function playQuestion(n){
-      // показываем экран вопросов, прячем интро
       introBox.style.display = 'none';
       qWrap.style.display = 'block';
-      nextBtnWrap.style.display = 'none'; // кнопки нет, пока звучит вопрос
-      barWrap.style.display = 'none';     // бегунок только в окне ответа
+      nextBtnWrap.style.display = 'none';
+      barWrap.style.display = 'none';
 
       qTitleEl.textContent = `Question ${n} of 5`;
       stateBadge.textContent = 'Playing question…';
@@ -251,10 +242,10 @@
 
     audio.addEventListener('ended', () => {
       if (qIdx === -1){
-        qIdx = 0;              // закончилось интро → первый вопрос
+        qIdx = 0;
         playQuestion(1);
       } else {
-        startAnswerWindow();   // закончилось аудио вопроса → 40 сек ответа и кнопка
+        startAnswerWindow();
       }
     });
     audio.addEventListener('error', () => {
@@ -275,7 +266,7 @@
       }
     }
 
-    /* ====== Завершение, сохранение, переход ====== */
+    /* ===== Завершение ===== */
     async function finishAll(){
       if (finishing) return;
       finishing = true;
@@ -311,9 +302,7 @@
         }else{
           cleanupAndNavigate();
         }
-      }catch{
-        cleanupAndNavigate();
-      }
+      }catch{ cleanupAndNavigate(); }
     }
 
     function cleanupAndNavigate(){
@@ -321,7 +310,7 @@
       navigateOnce(RESULT_URL);
     }
 
-    /* ====== Старт ====== */
+    /* ===== Старт ===== */
     function startCountdown(){
       let n = 3;
       timerEl.textContent = n;
@@ -338,15 +327,10 @@
     }
 
     async function startFlow(){
-      qIdx = -1; // начинаем с интро
+      qIdx = -1;
       try{
         await initMic();
         recorder.start(1000);
-        try{
-          const meta = JSON.parse(sessionStorage.getItem('ege3_meta') || '{}');
-          meta.taskStartedAt = Date.now();
-          sessionStorage.setItem('ege3_meta', JSON.stringify(meta));
-        }catch{}
       }catch(err){ console.warn('Mic init error:', err); }
       playIntro();
     }
@@ -382,7 +366,6 @@
       try{ audio.pause(); }catch{}
     });
 
-    /* ====== Подсказка для автоплея (если заблокирован звук) ====== */
     function showPlayHintAndRetry(){
       if (document.querySelector('.hint')) return;
       const el = document.createElement('div');

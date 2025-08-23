@@ -2,15 +2,15 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <title>Результат — Задание 1</title>
+  <title id="pageTitle">Результат — Задание 3</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- Шрифт как в prepare/task -->
+  <!-- Шрифт -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
 
-  <!-- Общие стили проекта -->
+  <!-- Общие стили -->
   <link rel="stylesheet" href="../../../style_common.css" />
 
   <!-- Анти-мигание темы -->
@@ -24,30 +24,22 @@
   </script>
 
   <style>
-    body{
-      font-family: Inter, system-ui, Segoe UI, Roboto, Arial, sans-serif;
-      background:
-        radial-gradient(1200px 600px at 70% -10%, #29417a40, transparent),
-        radial-gradient(900px 500px at -10% 10%, #344b9340, transparent),
-        var(--bg);
-    }
-
-    .wrap{ max-width: 1600px; width: 95%; margin: 0 auto; padding-top: 24px; }
+    .wrap{ max-width:1500px; margin:0 auto; }
     h1{ color:var(--primary); font-size:36px; margin:12px 0 6px; text-align:center; }
-    .status{ font-size:20px; color:#1f7a2e; text-align:center; margin:6px 0 26px; }
+    .status{ font-size:22px; color:#1f7a2e; text-align:center; margin:10px 0 26px; }
     .dark .status{ color:#5ee397; }
 
-    /* Плеер и волна (точно как во 2 задании) */
-    audio{ margin:20px auto 10px; width:min(900px,95%); display:block; }
-    .wave-wrap{ width:min(900px,95%); margin:0 auto 16px; display:none; }
+    /* Плеер + волна */
+    audio{ margin:20px auto 10px; width:min(900px, 90%); display:block; }
+    .wave-wrap{ width:min(900px,90%); margin:0 auto 18px; display:none; }
     .wave{ width:100%; height:48px; display:block; background:#e9edf7; border-radius:10px; box-shadow:var(--shadow); }
     .dark .wave{ background:#1f2a3d; }
 
-    /* Цвета волны для светлой/тёмной темы */
+    /* Цвета волны */
     :root{
-      --wave-base: rgba(0,0,0,.28);      /* незаполненная часть */
-      --wave-prog: var(--primary);       /* цвет прогресса */
-      --wave-glow: rgba(43,108,255,.45); /* свечение */
+      --wave-base: rgba(0,0,0,.28);
+      --wave-prog: var(--primary);
+      --wave-glow: rgba(43,108,255,.45);
     }
     html.dark{
       --wave-base: rgba(255,255,255,.52);
@@ -63,37 +55,30 @@
       box-shadow:0 10px 22px rgba(43,108,255,.3);
       transition: transform .06s ease, filter .2s ease, box-shadow .2s ease;
     }
-    .btn:hover{ transform: translateY(-1px); filter: brightness(1.03); }
+    .btn:hover{ transform: scale(1.05); filter: brightness(1.03); }
     .btn:disabled{ opacity:.6; cursor:not-allowed; transform:none; }
 
-    .instruction-box{
-      max-width:3000px; width:95%; margin:0 auto 30px; font-size:22px; line-height:1.6; text-align:left;
-      border:2px solid var(--panel-border); padding:25px; border-radius:12px; background:var(--panel-bg); box-shadow:var(--shadow);
-    }
-    .reading-box{
-      max-width:3000px; width:95%; margin:0 auto 30px;
-      font-size:32px; line-height:1.9; text-align:left;
-      border:1px solid #ccc; padding:40px; border-radius:12px;
-      background:var(--card); box-shadow:var(--shadow);
-    }
-    @media (max-width: 900px){
-      .reading-box{ font-size:28px; }
+    .task-container{
+      background:var(--card);
+      border-left:5px solid var(--primary);
+      padding:20px 30px 10px 30px;
+      margin:0 auto 30px;
+      font-size:20px; line-height:1.7; text-align:left;
+      box-shadow:var(--shadow); border-radius:12px;
     }
   </style>
 </head>
 <body>
-  <!-- Тумблер темы -->
   <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
 
   <div class="wrap">
     <h1 id="h1">Результат — Вариант <span id="varNum">?</span></h1>
     <div class="status" id="statusText" aria-live="polite">
-      ✅ Запись готова. Вы можете прослушать её ниже или сохранить файл.
+      ✅ Вы успешно завершили задание. Вы можете прослушать или скачать запись ниже.
     </div>
 
-    <!-- Плеер -->
     <audio id="audio" controls></audio>
-    <!-- ВОЛНА -->
+    <!-- Волна -->
     <div id="waveWrap" class="wave-wrap">
       <canvas id="wave" class="wave"></canvas>
     </div>
@@ -104,42 +89,35 @@
       <a class="btn" id="repeatBtn" href="#" role="button" aria-label="Повторить этот вариант">🔁 Повторить этот вариант</a>
     </div>
 
-    <!-- Инструкция -->
-    <div class="task-container" aria-labelledby="taskTitle" aria-describedby="inst">
-      <b id="taskTitle">Task 1. Imagine that you are preparing a project with your friend.</b>
-      You have found some interesting material for the presentation and you want to read this text to your friend.
-      You have 1.5 minutes to read the text silently, then be ready to read it out loud. You will not have more than 1.5 minutes to read it.
-      <div class="instruction" id="inst">You will read the text aloud for not more than 1.5 minutes.</div>
+    <!-- Карточка с кратким напоминанием условия Task 3 (по стилю эталона) -->
+    <div class="task-container" aria-labelledby="taskTitle">
+      <b id="taskTitle">Task 3. You are going to give an interview.</b>
+      <div style="margin-top:10px;">
+        You have to answer five questions. Give full answers to the questions (2–3 sentences).
+        Remember that you have 40 seconds to answer each question.
+      </div>
     </div>
-
-    <!-- Текст -->
-    <div class="reading-box" id="textBox">Bioluminescence is the ability of certain living organisms to produce light. This fascinating phenomenon can be observed in various species of deep-sea fish, jellyfish, fireflies, and even some fungi.
-
-The light is usually blue or green, which travels best through water. These organisms use light for different reasons. Some attract mates or prey, while others use it to confuse predators. For example, the anglerfish has a glowing lure to draw in its victims in the dark ocean depths.
-
-Scientists believe that studying bioluminescence can help develop new medical and technological solutions. Special proteins from glowing jellyfish are already used in genetic research. These discoveries support innovation in areas like disease detection and cell tracking.
-
-Bioluminescence is not only beautiful — it is a powerful tool of survival and discovery. These glowing creatures remind us how much we still have to learn about the natural world. Their light, shining in the darkness, is both mysterious and meaningful.</div>
 
     <div style="text-align:center;">
       <a class="btn nav-btn" id="toVariants" href="#" role="button" aria-label="Перейти к выбору варианта">Перейти к выбору варианта</a>
       <a class="btn nav-btn" id="toModeMenu" href="#" role="button" aria-label="Перейти к выбору задания">Перейти к выбору задания</a>
       <a class="btn nav-btn" id="toTaskMenu" href="#" role="button" aria-label="Перейти к выбору режима">Перейти к выбору режима</a>
-      <a class="btn nav-btn" id="toHome"     href="#" role="button" aria-label="Перейти на главную">Перейти на главную</a>
+      <a class="btn nav-btn" id="toHome" href="#" role="button" aria-label="Перейти на главную">Перейти на главную</a>
     </div>
   </div>
 
   <script type="module">
     import { toggleThemeInit, navigateOnce } from '../../../common.js';
-
     toggleThemeInit();
 
+    // ===== Заголовок/номер варианта =====
     const path = location.pathname;
     const m = path.match(/variant(\d+)/i);
     const varNum = m ? m[1] : '?';
     document.getElementById('varNum').textContent = varNum;
-    document.title = `Результат — Задание 1 · Вариант ${varNum}`;
+    document.title = `Результат — Задание 3 · Вариант ${varNum}`;
 
+    // ===== Базы путей =====
     function getBases(p){
       const i = p.indexOf('/ege/');
       if (i >= 0){
@@ -151,21 +129,23 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
     }
     const { ROOT_BASE, EGE_BASE } = getBases(path);
 
+    // Навигация (страницы меню/выбора — для блока EGE)
     const toVariants = document.getElementById('toVariants');
     if (toVariants){
-      toVariants.href = path.replace(/\/variants\/variant\d+\/[^/]+$/i, '/variants/ege1.html');
+      // /variants/variantX/_4_result.html → /variants/ege3.html
+      toVariants.href = path.replace(/\/variants\/variant\d+\/[^/]+$/i, '/variants/ege3.html');
     }
     document.getElementById('toModeMenu').href = `${EGE_BASE}ege_menu.html`;
     document.getElementById('toTaskMenu').href = `${EGE_BASE}ege.html`;
     document.getElementById('toHome').href     = `${ROOT_BASE}index.html`;
 
-    function clearTask1State(){
+    function clearTask3State(){
       try{
-        Object.keys(sessionStorage).forEach(k => { if (k.startsWith('ege1_')) sessionStorage.removeItem(k); });
-        if (varNum && /^\d+$/.test(varNum)) sessionStorage.removeItem(`ege1_var${varNum}_prepare_endtime`);
+        Object.keys(sessionStorage).forEach(k => { if (k.startsWith('ege3_')) sessionStorage.removeItem(k); });
+        if (varNum && /^\d+$/.test(varNum)) sessionStorage.removeItem(`ege3_var${varNum}_prepare_endtime`);
       }catch{}
     }
-    function clearAndGo(url){ clearTask1State(); navigateOnce(url); }
+    function clearAndGo(url){ clearTask3State(); navigateOnce(url); }
 
     const repeat = document.getElementById('repeatBtn');
     if (repeat){
@@ -173,13 +153,12 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
       repeat.href = repeatHref;
       repeat.addEventListener('click', (e)=>{ e.preventDefault(); clearAndGo(repeatHref); });
     }
-
     document.querySelectorAll('.nav-btn').forEach(a=>{
       a.addEventListener('click', (e)=>{ e.preventDefault(); clearAndGo(a.href); });
     });
-
     window.addEventListener('pageshow', ()=>{ navigateOnce.lock = false; });
 
+    // ===== Аудио + волна (берём то, что записали на task-странице)
     const audioEl     = document.getElementById('audio');
     const playBtn     = document.getElementById('playBtn');
     const downloadBtn = document.getElementById('downloadBtn');
@@ -188,8 +167,8 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
     const waveWrap    = document.getElementById('waveWrap');
     const waveCanvas  = document.getElementById('wave');
 
-    const base64     = sessionStorage.getItem('ege1_audio_base64');
-    const mimeStored = (sessionStorage.getItem('ege1_audio_mime') || 'audio/webm').toLowerCase();
+    const base64     = sessionStorage.getItem('ege3_audio_base64');
+    const mimeStored = (sessionStorage.getItem('ege3_audio_mime') || 'audio/webm').toLowerCase();
 
     let objectURL = null;
     const extByMime = {
@@ -198,7 +177,7 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
       'audio/mp4':'m4a','audio/mpeg':'mp3','audio/wav':'wav'
     };
     const fileExt  = extByMime[mimeStored] || 'webm';
-    const fileName = `ege1_variant${varNum}.${fileExt}`;
+    const fileName = `ege3_variant${varNum}.${fileExt}`;
 
     function dataURLtoBlob(dataURL){
       const parts = (dataURL || '').split(',');
@@ -210,13 +189,8 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
       for (let i=0;i<bin.length;i++) bytes[i] = bin.charCodeAt(i);
       return new Blob([bytes], { type });
     }
+    function setButtonsEnabled(en){ playBtn.disabled = !en; downloadBtn.disabled = !en; }
 
-    function setButtonsEnabled(en){
-      playBtn.disabled = !en;
-      downloadBtn.disabled = !en;
-    }
-
-    // === Инициализация аудио + волны (асинхронно)
     (async function initAudio(){
       if (!base64){
         statusText.textContent = '⚠️ Запись не найдена. Возможно, вы запретили доступ к микрофону или страница была закрыта до завершения.';
@@ -229,7 +203,7 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
           objectURL   = URL.createObjectURL(blob);
           audioEl.src = objectURL;
           audioEl.type= blob.type || mimeStored;
-          await initWaveformFromURL(objectURL);
+          await initWaveformFromBlob(blob);
         }else{
           audioEl.src = base64;
           audioEl.type= mimeStored;
@@ -255,39 +229,41 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
     window.addEventListener('pagehide', ()=>{ if (objectURL) URL.revokeObjectURL(objectURL); });
     window.addEventListener('beforeunload', ()=>{ if (objectURL) URL.revokeObjectURL(objectURL); });
 
-    // ===== Волновой бегунок (как во 2 задании)
+    // ===== Волна
+    async function initWaveformFromBlob(blob){
+      const arr = await blob.arrayBuffer();
+      await renderWave(arr);
+    }
     async function initWaveformFromURL(url){
-      try{
-        const resp = await fetch(url);
-        const buf  = await resp.arrayBuffer();
-        const AC   = window.AudioContext || window.webkitAudioContext;
-        const ctx  = new AC();
-        const audioBuf = await ctx.decodeAudioData(buf);
+      const resp = await fetch(url);
+      const arr  = await resp.arrayBuffer();
+      await renderWave(arr);
+    }
+    async function renderWave(arrayBuffer){
+      const AC   = window.AudioContext || window.webkitAudioContext;
+      const ctxA = new AC();
+      const audioBuf = await ctxA.decodeAudioData(arrayBuffer);
 
-        const peaks = buildPeaks(audioBuf, 1000); // количество «столбиков»
-        drawWave(peaks, 0);
-        waveWrap.style.display = 'block';
+      const peaks = buildPeaks(audioBuf, 1000);
+      drawWave(peaks, 0);
+      waveWrap.style.display = 'block';
 
-        let raf;
-        const tick = ()=>{
-          const p = audioEl.currentTime / (audioBuf.duration || 1);
-          drawWave(peaks, p);
-          raf = requestAnimationFrame(tick);
-        };
-        audioEl.addEventListener('play', ()=>{ cancelAnimationFrame(raf); tick(); });
-        audioEl.addEventListener('pause', ()=>{ cancelAnimationFrame(raf); drawWave(peaks, audioEl.currentTime/(audioBuf.duration||1)); });
-        audioEl.addEventListener('ended', ()=>{ cancelAnimationFrame(raf); drawWave(peaks, 1); });
+      let raf;
+      const tick = ()=>{
+        const p = audioEl.currentTime / (audioBuf.duration || 1);
+        drawWave(peaks, p);
+        raf = requestAnimationFrame(tick);
+      };
+      audioEl.addEventListener('play', ()=>{ cancelAnimationFrame(raf); tick(); });
+      audioEl.addEventListener('pause', ()=>{ cancelAnimationFrame(raf); drawWave(peaks, audioEl.currentTime/(audioBuf.duration||1)); });
+      audioEl.addEventListener('ended', ()=>{ cancelAnimationFrame(raf); drawWave(peaks, 1); });
 
-        waveCanvas.addEventListener('pointerdown', (e)=>{
-          const r = waveCanvas.getBoundingClientRect();
-          const x = Math.max(0, Math.min(1, (e.clientX - r.left)/r.width));
-          audioEl.currentTime = x * audioBuf.duration;
-          drawWave(peaks, x);
-        }, {passive:true});
-      }catch(err){
-        console.warn('Waveform init failed:', err);
-        waveWrap.style.display = 'none';
-      }
+      waveCanvas.addEventListener('pointerdown', (e)=>{
+        const r = waveCanvas.getBoundingClientRect();
+        const x = Math.max(0, Math.min(1, (e.clientX - r.left)/r.width));
+        audioEl.currentTime = x * audioBuf.duration;
+        drawWave(peaks, x);
+      }, {passive:true});
     }
 
     function buildPeaks(audioBuf, width){
@@ -318,22 +294,16 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
       const ctx = c.getContext('2d');
       ctx.setTransform(dpr,0,0,dpr,0,0);
 
-      // цвета зависят от темы (из CSS-переменных)
       const rs = getComputedStyle(document.documentElement);
       const waveBase = (rs.getPropertyValue('--wave-base') || 'rgba(0,0,0,.28)').trim();
       const waveProg = (rs.getPropertyValue('--wave-prog') || '#2b6cff').trim();
       const waveGlow = (rs.getPropertyValue('--wave-glow') || 'rgba(43,108,255,.45)').trim();
-
-      // фон берём из стиля канваса (.wave / .dark .wave)
       const bg = getComputedStyle(c).backgroundColor;
 
-      // фон
       ctx.clearRect(0,0,cssW,cssH);
       ctx.fillStyle = bg; ctx.fillRect(0,0,cssW,cssH);
 
       const mid = cssH/2;
-
-      // незаполненная часть (серые/светлые столбики)
       ctx.fillStyle = waveBase;
       for (let i=0;i<peaks.length;i++){
         const x = i/peaks.length*cssW;
@@ -343,16 +313,9 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
         ctx.fillRect(x, mid-hTop, 1, hTop+hBot || 1);
       }
 
-      // прогресс — цветной, с мягким glow
       const progW = Math.max(0, Math.min(cssW, progress*cssW));
-      ctx.save();
-      ctx.beginPath();
-      ctx.rect(0,0,progW,cssH);
-      ctx.clip();
-
-      ctx.fillStyle = waveProg;
-      ctx.shadowColor = waveGlow;
-      ctx.shadowBlur  = 8;
+      ctx.save(); ctx.beginPath(); ctx.rect(0,0,progW,cssH); ctx.clip();
+      ctx.fillStyle = waveProg; ctx.shadowColor = waveGlow; ctx.shadowBlur = 8;
       for (let i=0;i<peaks.length;i++){
         const x = i/peaks.length*cssW;
         const [min,max] = peaks[i];

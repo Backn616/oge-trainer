@@ -35,13 +35,13 @@
         Remember that you have 40 seconds to answer each question.
       </div>
     </div>
-  </div>
 
-  <!-- Кнопка ниже -->
-  <div style="text-align:center; margin: 100px 0 30px;">
-    <button id="goBtn" class="button" type="button" aria-label="Перейти к выполнению">
-      Перейти к выполнению
-    </button>
+    <!-- Кнопка остаётся ВНУТРИ .content-wrapper и опущена ниже -->
+    <div style="text-align:center; margin: 120px 0 30px;">
+      <button id="goBtn" class="button" type="button" aria-label="Перейти к выполнению">
+        Перейти к выполнению
+      </button>
+    </div>
   </div>
 
   <!-- Фиксированный прогресс-бар снизу -->
@@ -55,10 +55,8 @@
   <script type="module">
     import { toggleThemeInit, navigateOnce } from "../../../common.js";
 
-    // Инициализация темы
     toggleThemeInit();
 
-    // Служебные метки
     try{
       sessionStorage.removeItem('ege3_audio_base64');
       sessionStorage.setItem('ege3_prepared','1');
@@ -66,17 +64,13 @@
       sessionStorage.setItem('ege3_meta', JSON.stringify(meta));
     }catch{}
 
-    // Следующая страница (_2_mic.html)
     const NEXT_URL = /_1_prepare\.html$/i.test(location.pathname)
       ? location.pathname.replace(/_1_prepare\.html$/i, '_2_mic.html')
       : location.pathname.replace(/\.html$/i, '_2_mic.html');
 
-    // Кнопка перехода
     document.getElementById('goBtn')?.addEventListener('click', () => {
       navigateOnce(NEXT_URL);
     });
-
-    // У Task 3 нет времени на подготовку, таймер не запускается
   </script>
 </body>
 </html>

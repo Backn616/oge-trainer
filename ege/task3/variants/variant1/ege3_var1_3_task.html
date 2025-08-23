@@ -44,12 +44,18 @@
       position:fixed; left:50%; bottom:calc(var(--footer-h) + 16px);
       transform:translateX(-50%);
       background:var(--card); color:var(--text);
-      border:1px solid #ffffff22; border-radius:12px;
-      padding:10px 14px; box-shadow:var(--shadow);
-      font-size:14px; z-index:9999;
+      border:1px solid #ffffff22; border-radius:12px; padding:10px 14px;
+      box-shadow:var(--shadow); font-size:14px; z-index:9999;
     }
-    .controls{
-      display:flex; justify-content:center; gap:12px; margin-top:16px;
+    /* интро-карточка как на скрине */
+    #introBox{ margin-bottom:18px; }
+
+    /* кнопка под рамкой — «ниже на 10 см» */
+    #nextBtnWrap{
+      text-align:center;
+      margin: 10cm 0 30px;   /* именно сантиметры (≈378px/см) */
+      display:none;
+      width:100%;
     }
   </style>
 
@@ -74,18 +80,24 @@
 
   <!-- ОСНОВНОЙ БЛОК -->
   <main class="content-wrapper" id="mainWrap" style="display:none">
-    <section class="q-wrap">
+    <!-- интро-экран перед вопросами -->
+    <section class="task-container" id="introBox" aria-live="polite">
+      <b>Task 3.</b> Interviewer
+    </section>
+
+    <!-- экран вопросов -->
+    <section class="q-wrap" id="qWrap" style="display:none">
       <div class="q-head">
         <h2 class="q-title" id="qTitle">Question 1</h2>
         <div class="state" id="stateBadge" aria-live="polite">Playing question…</div>
       </div>
-      <div class="q-body" id="qBody">
-        Listen to the question, then answer in 40 seconds.
-        <div class="controls">
-          <button id="nextBtn" class="button" style="display:none" type="button">Дальше</button>
-        </div>
-      </div>
+      <div class="q-body" id="qBody">Listen to the question, then answer in 40 seconds.</div>
     </section>
+
+    <!-- кнопка НИЖЕ рамки -->
+    <div id="nextBtnWrap">
+      <button id="nextBtn" class="button" type="button">Дальше</button>
+    </div>
   </main>
 
   <!-- Проставка, чтобы фикс‑бар не наезжал -->
@@ -117,15 +129,21 @@
     const countdownWrap = document.getElementById('countdownWrap');
     const mainWrap = document.getElementById('mainWrap');
     const timerEl  = document.getElementById('timer');
+
+    const introBox = document.getElementById('introBox');
+    const qWrap = document.getElementById('qWrap');
     const qTitleEl = document.getElementById('qTitle');
     const stateBadge = document.getElementById('stateBadge');
+
     const barWrap  = document.getElementById('progressContainerFixed');
     const barEl    = document.getElementById('progressBarFixed');
     const timeEl   = document.getElementById('progressTime');
+
+    const nextBtnWrap = document.getElementById('nextBtnWrap');
     const nextBtn  = document.getElementById('nextBtn');
 
     const RESULT_URL = location.pathname.replace(/_3_task\.html$/i, '_4_result.html');
-    const ANSWER_MS = 40_000; // <-- 40 секунд
+    const ANSWER_MS = 40_000; // 40 секунд
 
     // Аудио-плеер
     const audio = new Audio();
@@ -150,10 +168,9 @@
     let startedAt=0, deadlineMs=0, rafId=0, intId=0, hardTO=0, answering=false, finishing=false;
 
     function startAnswerWindow(){
-      // Показать прогресс-бар
-      if (barWrap.style.display !== 'block') barWrap.style.display = 'block';
-      // Показать кнопку "Дальше"/"Закончить"
-      nextBtn.style.display = 'inline-block';
+      // показать прогресс-бар и кнопку (теперь под рамкой)
+      barWrap.style.display = 'block';
+      nextBtnWrap.style.display = 'block';
       nextBtn.textContent = (qIdx === 4) ? 'Закончить' : 'Дальше';
 
       stateBadge.textContent = 'Answer (40s)…';
@@ -166,7 +183,6 @@
       stopClocks();
       tickRaf();
       intId = setInterval(tickWall, 250);
-      // Жёсткая страховка: плюс небольшой буфер
       hardTO = setTimeout(()=>{ if(answering) endAnswerWindow(); }, ANSWER_MS + 1500);
     }
 
@@ -194,28 +210,37 @@
       if (!answering) return;
       answering = false;
       stopClocks();
-      nextBtn.style.display = 'none'; // спрятать кнопку перед следующим аудио
+      nextBtnWrap.style.display = 'none'; // спрячем кнопку перед следующим вопросом
       proceedNext();
     }
 
-    // Клик по кнопке "Дальше/Закончить" — сразу заканчиваем окно ответа
+    // Клик по кнопке — сразу заканчиваем окно ответа
     nextBtn.addEventListener('click', () => endAnswerWindow());
 
     /* ====== Поток: intro → q1..q5 ====== */
-    let qIdx = -1; // -1 = intro, 0..4 = вопросы
+    let qIdx = -1; // -1 = интро, 0..4 = вопросы
 
     async function playIntro(){
-      qTitleEl.textContent = "Task 3. Interviewer";
-      stateBadge.textContent = "Intro…";
+      // показываем интро-экран, прячем экран вопросов
+      introBox.style.display = 'block';
+      qWrap.style.display = 'none';
+      nextBtnWrap.style.display = 'none';
+      barWrap.style.display = 'none';
+
       try{ audio.pause(); audio.currentTime = 0; }catch{}
       audio.src = INTRO_AUDIO;
       try{ await audio.play(); }catch{ showPlayHintAndRetry(); }
     }
 
     async function playQuestion(n){
+      // показываем экран вопросов, прячем интро
+      introBox.style.display = 'none';
+      qWrap.style.display = 'block';
+      nextBtnWrap.style.display = 'none'; // кнопки нет, пока звучит вопрос
+      barWrap.style.display = 'none';     // бегунок только в окне ответа
+
       qTitleEl.textContent = `Question ${n} of 5`;
       stateBadge.textContent = 'Playing question…';
-      nextBtn.style.display = 'none'; // кнопка только во время ответа
       try{ audio.pause(); audio.currentTime = 0; }catch{}
       audio.src = Q_AUDIO[n-1];
       try{ await audio.play(); }catch{ showPlayHintAndRetry(); }
@@ -223,10 +248,10 @@
 
     audio.addEventListener('ended', () => {
       if (qIdx === -1){
-        qIdx = 0;          // закончилось intro → первый вопрос
+        qIdx = 0;              // закончилось интро → первый вопрос
         playQuestion(1);
       } else {
-        startAnswerWindow(); // закончилось аудио вопроса → 40 сек ответа
+        startAnswerWindow();   // закончилось аудио вопроса → 40 сек ответа и кнопка
       }
     });
     audio.addEventListener('error', () => {
@@ -310,8 +335,7 @@
     }
 
     async function startFlow(){
-      barWrap.style.display = 'block';
-      qIdx = -1; // сначала intro
+      qIdx = -1; // начинаем с интро
       try{
         await initMic();
         recorder.start(1000);
@@ -327,11 +351,10 @@
     function freshStart(){
       countdownWrap.style.display = 'block';
       mainWrap.style.display = 'none';
-      barWrap.style.display = 'none';
       stopClocks();
       answering = false;
       finishing = false;
-      nextBtn.style.display = 'none';
+      nextBtnWrap.style.display = 'none';
       startCountdown();
     }
     freshStart();
@@ -355,6 +378,23 @@
       try{ streamRef?.getTracks()?.forEach(t=>t.stop()); }catch{}
       try{ audio.pause(); }catch{}
     });
+
+    /* ====== Общая подсказка для автоплея ====== */
+    function showPlayHintAndRetry(){
+      if (document.querySelector('.hint')) return;
+      const el = document.createElement('div');
+      el.className = 'hint';
+      el.textContent = '🔊 Click anywhere to enable sound';
+      document.body.appendChild(el);
+      const resume = () => {
+        el.remove();
+        window.removeEventListener('click', resume);
+        window.removeEventListener('touchstart', resume);
+        audio.play().catch(()=>{});
+      };
+      window.addEventListener('click', resume, { passive:true });
+      window.addEventListener('touchstart', resume, { passive:true });
+    }
   </script>
 </body>
 </html>

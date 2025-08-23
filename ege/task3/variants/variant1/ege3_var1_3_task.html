@@ -24,17 +24,10 @@
       padding: 24px 28px;
     }
     .q-head{
-      display:flex; align-items:center; justify-content:space-between;
+      display:flex; align-items:center; justify-content:flex-start;
       gap:16px; margin-bottom:8px;
     }
     .q-title{ font-size:28px; font-weight:800; margin:0; }
-    .q-body{ font-size:20px; line-height:1.6; }
-    .state{
-      display:inline-block; padding:6px 10px; border-radius:10px;
-      background:#eef4ff; color:#1f58d9; font-size:14px; font-weight:700;
-    }
-    .dark .state{ background:rgba(255,255,255,.08); color:#a9c6ff; }
-
     .timer{
       font-size:70px; margin:30px 0; font-weight:700;
       color:var(--primary); letter-spacing:4px; text-shadow:0 4px 12px rgba(0,0,0,.25);
@@ -47,11 +40,7 @@
       border:1px solid #ffffff22; border-radius:12px; padding:10px 14px;
       box-shadow:var(--shadow); font-size:14px; z-index:9999;
     }
-
-    /* интро-карточка перед вопросами */
     #introBox{ margin-bottom:18px; }
-
-    /* кнопка под рамкой */
     #nextBtnWrap{
       text-align:center;
       margin: 10cm 0 30px;
@@ -70,7 +59,6 @@
   </script>
 </head>
 <body>
-  <!-- Тумблер темы -->
   <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
 
   <!-- Отсчёт -->
@@ -80,37 +68,32 @@
 
   <!-- Основной блок -->
   <main class="content-wrapper" id="mainWrap" style="display:none">
-    <!-- интро-экран -->
+    <!-- интро -->
     <section class="task-container" id="introBox" aria-live="polite">
       <b>Task 3.</b> Interviewer
     </section>
 
-    <!-- экран вопросов -->
+    <!-- вопросы -->
     <section class="q-wrap" id="qWrap" style="display:none">
       <div class="q-head">
         <h2 class="q-title" id="qTitle">Question 1</h2>
-        <div class="state" id="stateBadge" aria-live="polite">Playing question…</div>
       </div>
-      <div class="q-body" id="qBody">Listen to the question, then answer in 40 seconds.</div>
     </section>
 
-    <!-- кнопка ниже рамки -->
+    <!-- кнопка -->
     <div id="nextBtnWrap">
       <button id="nextBtn" class="button" type="button">Дальше</button>
     </div>
   </main>
 
-  <!-- проставка под фикс-бар -->
   <div style="height: calc(var(--footer-h, 72px) + 24px);"></div>
 
-  <!-- фикс-бар -->
   <div id="progressContainerFixed" role="timer" aria-live="polite" style="display:none">
     <div id="progressBarFixed" class="rAF">
       <span id="progressTime" class="progress-time">00:40</span>
     </div>
   </div>
 
-  <!-- Логика -->
   <script type="module">
     import { toggleThemeInit, navigateOnce, fmtTime } from "../../../common.js";
     toggleThemeInit();
@@ -120,11 +103,9 @@
       sessionStorage.removeItem('ege3_audio_mime');
     }catch{}
 
-    // файлы mp3
     const INTRO_AUDIO = "intro.mp3";
     const Q_AUDIO = ["q1.mp3","q2.mp3","q3.mp3","q4.mp3","q5.mp3"];
 
-    // DOM
     const countdownWrap = document.getElementById('countdownWrap');
     const mainWrap = document.getElementById('mainWrap');
     const timerEl  = document.getElementById('timer');
@@ -132,7 +113,6 @@
     const introBox = document.getElementById('introBox');
     const qWrap = document.getElementById('qWrap');
     const qTitleEl = document.getElementById('qTitle');
-    const stateBadge = document.getElementById('stateBadge');
 
     const barWrap  = document.getElementById('progressContainerFixed');
     const barEl    = document.getElementById('progressBarFixed');
@@ -147,7 +127,6 @@
     const audio = new Audio();
     audio.preload = 'auto';
 
-    /* ===== Микрофон ===== */
     let streamRef=null, recorder=null, chosenMime='', recChunks=[];
     function pickMimeType(){
       const c=['audio/webm;codecs=opus','audio/webm','audio/ogg;codecs=opus','audio/ogg','audio/mp4'];
@@ -162,7 +141,6 @@
       recorder.ondataavailable = e => { if (e.data && e.data.size) recChunks.push(e.data); };
     }
 
-    /* ===== Таймер ответа ===== */
     let startedAt=0, deadlineMs=0, rafId=0, intId=0, hardTO=0, answering=false, finishing=false;
 
     function startAnswerWindow(){
@@ -170,7 +148,6 @@
       nextBtnWrap.style.display = 'block';
       nextBtn.textContent = (qIdx === 4) ? 'Закончить' : 'Дальше';
 
-      stateBadge.textContent = 'Answer (40s)…';
       timeEl.textContent = fmtTime(ANSWER_MS);
       barEl.style.width = '100%';
 
@@ -213,7 +190,6 @@
 
     nextBtn.addEventListener('click', () => endAnswerWindow());
 
-    /* ===== Поток: intro → q1..q5 ===== */
     let qIdx = -1;
 
     async function playIntro(){
@@ -233,8 +209,7 @@
       nextBtnWrap.style.display = 'none';
       barWrap.style.display = 'none';
 
-      qTitleEl.textContent = `Question ${n} of 5`;
-      stateBadge.textContent = 'Playing question…';
+      qTitleEl.textContent = `Question ${n}`;
       try{ audio.pause(); audio.currentTime = 0; }catch{}
       audio.src = Q_AUDIO[n-1];
       try{ await audio.play(); }catch{ showPlayHintAndRetry(); }
@@ -266,7 +241,6 @@
       }
     }
 
-    /* ===== Завершение ===== */
     async function finishAll(){
       if (finishing) return;
       finishing = true;
@@ -310,7 +284,6 @@
       navigateOnce(RESULT_URL);
     }
 
-    /* ===== Старт ===== */
     function startCountdown(){
       let n = 3;
       timerEl.textContent = n;

@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Task 3 — Interview</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Шрифт -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+
+  <!-- Общие стили -->
+  <link rel="stylesheet" href="../../../style_common.css" />
+
+  <style>
+    .q-wrap{
+      max-width: 1100px;
+      margin: 0 auto;
+      background: var(--card);
+      border-left: 5px solid var(--primary);
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      padding: 24px 28px;
+    }
+    .q-head{ margin-bottom:8px; }
+    .q-title{ font-size:28px; font-weight:800; margin:0; }
+
+    .timer{
+      font-size:70px; margin:30px 0; font-weight:700;
+      color:var(--primary); letter-spacing:4px; text-shadow:0 4px 12px rgba(0,0,0,.25);
+      text-align:center;
+    }
+
+    /* Индикатор записи */
+    #recIndicator{
+      position:fixed; top:12px; left:12px;
+      background:rgba(255,0,0,0.1);
+      color:#d60000;
+      font-weight:700; font-size:15px;
+      padding:6px 10px;
+      border-radius:8px;
+      box-shadow:0 2px 6px rgba(0,0,0,.2);
+      display:none;
+      z-index:10001;
+    }
+
+    .hint, #unlock-audio{
+      position:fixed; inset:0; display:flex; align-items:center; justify-content:center;
+      background:rgba(0,0,0,.35); z-index:10000;
+    }
+    #unlock-audio .button{ padding:18px 28px; }
+
+    #introBox{ margin-bottom:18px; text-align:center; }
+    #introNextWrap{ margin-top:40px; display:none; }
+
+    /* кнопка под рамкой */
+    #nextBtnWrap{
+      text-align:center;
+      margin: 10cm 0 30px;
+      display:none;
+      width:100%;
+    }
+  </style>
+
+  <script>
+    (function(){
+      try{
+        const saved = localStorage.getItem('pref-theme') || 'light';
+        if (saved === 'dark') document.documentElement.classList.add('dark');
+      }catch(_){}
+    })();
+  </script>
+</head>
+<body>
+  <!-- Тумблер темы -->
+  <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
+
+  <!-- Индикатор записи -->
+  <div id="recIndicator">🔴 Recording</div>
+
+  <!-- Отсчёт -->
+  <div class="content-wrapper" id="countdownWrap">
+    <div id="timer" class="timer" aria-live="polite">3</div>
+  </div>
+
+  <!-- Основной блок -->
+  <main class="content-wrapper" id="mainWrap" style="display:none">
+    <!-- Интро -->
+    <section class="task-container" id="introBox" aria-live="polite">
+      <b>Task 3.</b> Interviewer
+      <div id="introNextWrap">
+        <button id="introNextBtn" class="button" type="button">Перейти к выполнению</button>
+      </div>
+    </section>
+
+    <!-- Вопросы -->
+    <section class="q-wrap" id="qWrap" style="display:none">
+      <div class="q-head">
+        <h2 class="q-title" id="qTitle">Question 1</h2>
+      </div>
+    </section>
+
+    <!-- Кнопка под рамкой -->
+    <div id="nextBtnWrap">
+      <button id="nextBtn" class="button" type="button">Дальше</button>
+    </div>
+  </main>
+
+  <!-- проставка -->
+  <div style="height: calc(var(--footer-h, 72px) + 24px);"></div>
+
+  <!-- Прогресс-бар -->
+  <div id="progressContainerFixed" role="timer" aria-live="polite" style="display:none">
+    <div id="progressBarFixed" class="rAF">
+      <span id="progressTime" class="progress-time">00:40</span>
+    </div>
+  </div>
+
+  <script type="module">
+    import { toggleThemeInit, navigateOnce, fmtTime } from "../../../common.js";
+    toggleThemeInit();
+
+    try{
+      sessionStorage.removeItem('ege3_audio_base64');
+      sessionStorage.removeItem('ege3_audio_mime');
+    }catch{}
+
+    const INTRO_AUDIO = "intro.mp3";
+    const Q_AUDIO = ["q1.mp3","q2.mp3","q3.mp3","q4.mp3","q5.mp3"];
+
+    const countdownWrap = document.getElementById('countdownWrap');
+    const mainWrap = document.getElementById('mainWrap');
+    const timerEl  = document.getElementById('timer');
+
+    const introBox = document.getElementById('introBox');
+    const introNextWrap = document.getElementById('introNextWrap');
+    const introNextBtn  = document.getElementById('introNextBtn');
+
+    const qWrap = document.getElementById('qWrap');
+    const qTitleEl = document.getElementById('qTitle');
+
+    const barWrap  = document.getElementById('progressContainerFixed');
+    const barEl    = document.getElementById('progressBarFixed');
+    const timeEl   = document.getElementById('progressTime');
+
+    const nextBtnWrap = document.getElementById('nextBtnWrap');
+    const nextBtn  = document.getElementById('nextBtn');
+
+    const recIndicator = document.getElementById('recIndicator');
+
+    const RESULT_URL = location.pathname.replace(/_3_task\.html$/i, '_4_result.html');
+    const ANSWER_MS = 40_000;
+
+    const audio = new Audio();
+    audio.preload = 'auto';
+
+    /* ===== Микрофон ===== */
+    let streamRef=null, recorder=null, chosenMime='', recChunks=[];
+    let micStarted = false;
+
+    function pickMimeType(){
+      const c=['audio/webm;codecs=opus','audio/webm','audio/ogg;codecs=opus','audio/ogg','audio/mp4'];
+      for (const t of c) if (window.MediaRecorder?.isTypeSupported?.(t)) return t;
+      return '';
+    }
+
+    async function ensureMicStarted(){
+      if (micStarted) return;
+      try{
+        streamRef = await navigator.mediaDevices.getUserMedia({ audio:true });
+        chosenMime = pickMimeType();
+        recorder = chosenMime ? new MediaRecorder(streamRef,{mimeType:chosenMime}) : new MediaRecorder(streamRef);
+        recChunks = [];
+        recorder.ondataavailable = e => { if (e.data && e.data.size) recChunks.push(e.data); };
+        recorder.start(1000);
+        micStarted = true;
+        recIndicator.style.display = 'block'; // показать индикатор
+      }catch(err){ console.warn('Mic error:', err); }
+    }
+
+    /* ===== Таймер ответа ===== */
+    let startedAt=0, deadlineMs=0, rafId=0, intId=0, hardTO=0, answering=false, finishing=false;
+
+    function startAnswerWindow(){
+      barWrap.style.display = 'block';
+      nextBtnWrap.style.display = 'block';
+      nextBtn.textContent = (qIdx === 4) ? 'Закончить' : 'Дальше';
+      timeEl.textContent = fmtTime(ANSWER_MS);
+      barEl.style.width = '100%';
+      answering = true;
+      startedAt = performance.now();
+      deadlineMs = startedAt + ANSWER_MS;
+      stopClocks();
+      tickRaf();
+      intId = setInterval(tickWall, 250);
+      hardTO = setTimeout(()=>{ if(answering) endAnswerWindow(); }, ANSWER_MS + 1500);
+    }
+
+    function tickRaf(){
+      const left = Math.max(0, deadlineMs - performance.now());
+      barEl.style.width = (left/ANSWER_MS*100)+'%';
+      if (!tickRaf._last || performance.now()-tickRaf._last>=250){
+        timeEl.textContent = fmtTime(left);
+        tickRaf._last = performance.now();
+      }
+      if (left<=0){ endAnswerWindow(); }
+      else { rafId = requestAnimationFrame(tickRaf); }
+    }
+    function tickWall(){
+      const left = deadlineMs - performance.now();
+      if (left<=0) endAnswerWindow();
+      else timeEl.textContent = fmtTime(Math.max(0,left));
+    }
+    function stopClocks(){
+      if (rafId){ cancelAnimationFrame(rafId); rafId=0; }
+      if (intId){ clearInterval(intId); intId=0; }
+      if (hardTO){ clearTimeout(hardTO); hardTO=0; }
+    }
+    function endAnswerWindow(){
+      if (!answering) return;
+      answering = false;
+      stopClocks();
+      nextBtnWrap.style.display = 'none';
+      proceedNext();
+    }
+
+    nextBtn.addEventListener('click', () => endAnswerWindow());
+    introNextBtn.addEventListener('click', async () => {
+      introNextWrap.style.display = 'none';
+      await ensureMicStarted();
+      qIdx = 0;
+      playQuestion(1);
+    });
+
+    let qIdx = -1;
+
+    async function playIntro(){
+      introBox.style.display = 'block';
+      qWrap.style.display = 'none';
+      nextBtnWrap.style.display = 'none';
+      barWrap.style.display = 'none';
+      try{ audio.pause(); audio.currentTime = 0; }catch{}
+      audio.src = INTRO_AUDIO;
+      try{
+        await audio.play();
+        setTimeout(()=>{ introNextWrap.style.display = 'block'; }, 7000);
+      }catch{ showUnlockOverlay(() => { audio.play().catch(()=>{}); introNextWrap.style.display = 'block'; }); }
+    }
+
+    async function playQuestion(n){
+      introBox.style.display = 'none';
+      qWrap.style.display = 'block';
+      nextBtnWrap.style.display = 'none';
+      barWrap.style.display = 'none';
+      qTitleEl.textContent = `Question ${n}`;
+      try{ audio.pause(); audio.currentTime = 0; }catch{}
+      audio.src = Q_AUDIO[n-1];
+      try{ await audio.play(); }catch{ showUnlockOverlay(() => audio.play().catch(()=> startAnswerWindow())); }
+    }
+
+    audio.addEventListener('ended', () => {
+      if (qIdx === -1){ /* ждём кнопку */ }
+      else { startAnswerWindow(); }
+    });
+    audio.addEventListener('error', () => {
+      if (qIdx === -1){ introNextWrap.style.display = 'block'; }
+      else { startAnswerWindow(); }
+    });
+
+    function proceedNext(){
+      qIdx++;
+      if (qIdx < 5){ playQuestion(qIdx+1); }
+      else { finishAll(); }
+    }
+
+    async function finishAll(){
+      if (finishing) return;
+      finishing = true;
+      stopClocks();
+      recIndicator.style.display = 'none'; // скрыть индикатор
+      try{ audio.pause(); }catch{}
+      try{
+        if (recorder && recorder.state !== 'inactive'){
+          recorder.onstop = saveAndGo;
+          recorder.stop();
+        }else{ saveAndGo(); }
+      }catch{ saveAndGo(); }
+    }
+
+    async function saveAndGo(){
+      try{
+        await new Promise(r=>setTimeout(r,0));
+        const blob = recChunks && recChunks.length ? new Blob(recChunks, { type: chosenMime || 'audio/webm' }) : null;
+        if (blob){
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            try{
+              sessionStorage.setItem('ege3_audio_base64', reader.result.toString());
+              sessionStorage.setItem('ege3_audio_mime', blob.type || 'audio/webm');
+            }catch{}
+            cleanupAndNavigate();
+          };
+          reader.readAsDataURL(blob);
+        }else{ cleanupAndNavigate(); }
+      }catch{ cleanupAndNavigate(); }
+    }
+
+    function cleanupAndNavigate(){
+      try{ streamRef?.getTracks()?.forEach(t=>t.stop()); }catch{}
+      navigateOnce(RESULT_URL);
+    }
+
+    function startCountdown(){
+      let n = 3;
+      timerEl.textContent = n;
+      const id = setInterval(()=>{
+        timerEl.textContent = n;
+        n--;
+        if (n < 0){
+          clearInterval(id);
+          countdownWrap.style.display = 'none';
+          mainWrap.style.display = 'block';
+          startFlow();
+        }
+      }, 1000);
+    }
+
+    async function startFlow(){ qIdx = -1; playIntro(); }
+
+    function freshStart(){
+      countdownWrap.style.display = 'block';
+      mainWrap.style.display = 'none';
+      stopClocks(); answering=false; finishing=false;
+      nextBtnWrap.style.display='none'; introNextWrap.style.display='none';
+      recIndicator.style.display='none';
+      startCountdown();
+    }
+    freshStart();
+
+    function showUnlockOverlay(onUnlock){
+      if (document.getElementById('unlock-audio')) return;
+      const wrap = document.createElement('div');
+      wrap.id = 'unlock-audio';
+      const btn = document.createElement('button');
+      btn.className = 'button';
+      btn.textContent = 'Нажмите, чтобы включить звук';
+      wrap.appendChild(btn);
+      document.body.appendChild(wrap);
+      const unlock = async () => {
+        wrap.remove(); await ensureMicStarted(); if (onUnlock) onUnlock();
+      };
+      btn.addEventListener('click', unlock, { once:true });
+      btn.addEventListener('touchstart', unlock, { once:true, passive:true });
+    }
+  </script>
+</body>
+</html>

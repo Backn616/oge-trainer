@@ -47,13 +47,14 @@
       border:1px solid #ffffff22; border-radius:12px; padding:10px 14px;
       box-shadow:var(--shadow); font-size:14px; z-index:9999;
     }
-    /* интро-карточка как на скрине */
+
+    /* интро-карточка перед вопросами */
     #introBox{ margin-bottom:18px; }
 
     /* кнопка под рамкой — «ниже на 10 см» */
     #nextBtnWrap{
       text-align:center;
-      margin: 10cm 0 30px;   /* именно сантиметры (≈378px/см) */
+      margin: 10cm 0 30px;   /* именно сантиметры, как просил */
       display:none;
       width:100%;
     }
@@ -96,7 +97,7 @@
 
     <!-- кнопка НИЖЕ рамки -->
     <div id="nextBtnWrap">
-      <button id="nextBtn" class="button" type="button">Дальше</button>
+      <button id="nextBtn" class="button" type="button" aria-label="Перейти к следующему вопросу">Дальше</button>
     </div>
   </main>
 
@@ -115,17 +116,17 @@
     import { toggleThemeInit, navigateOnce, fmtTime } from "../../../common.js";
     toggleThemeInit();
 
-    // Чистим ключи Task 3
+    /* ====== Сброс ключей Task 3 ====== */
     try{
       sessionStorage.removeItem('ege3_audio_base64');
       sessionStorage.removeItem('ege3_audio_mime');
     }catch{}
 
-    // Аудио-файлы (лежат рядом со страницей)
-    const INTRO_AUDIO = "intro.mp3";
-    const Q_AUDIO = ["q1.mp3","q2.mp3","q3.mp3","q4.mp3","q5.mp3"];
+    /* ====== Аудио-файлы (m4a, лежат рядом со страницей) ====== */
+    const INTRO_AUDIO = "intro.m4a";
+    const Q_AUDIO = ["q1.m4a","q2.m4a","q3.m4a","q4.m4a","q5.m4a"];
 
-    // DOM
+    /* ====== DOM ====== */
     const countdownWrap = document.getElementById('countdownWrap');
     const mainWrap = document.getElementById('mainWrap');
     const timerEl  = document.getElementById('timer');
@@ -143,13 +144,13 @@
     const nextBtn  = document.getElementById('nextBtn');
 
     const RESULT_URL = location.pathname.replace(/_3_task\.html$/i, '_4_result.html');
-    const ANSWER_MS = 40_000; // 40 секунд
+    const ANSWER_MS = 40_000; // 40 секунд на ответ
 
-    // Аудио-плеер
+    /* ====== Аудио-плеер ====== */
     const audio = new Audio();
     audio.preload = 'auto';
 
-    /* ====== Микрофон, один сеанс ====== */
+    /* ====== Микрофон: один сеанс записи ====== */
     let streamRef=null, recorder=null, chosenMime='', recChunks=[];
     function pickMimeType(){
       const c=['audio/webm;codecs=opus','audio/webm','audio/ogg;codecs=opus','audio/ogg','audio/mp4'];
@@ -168,10 +169,11 @@
     let startedAt=0, deadlineMs=0, rafId=0, intId=0, hardTO=0, answering=false, finishing=false;
 
     function startAnswerWindow(){
-      // показать прогресс-бар и кнопку (теперь под рамкой)
+      // показать прогресс-бар и кнопку (под рамкой)
       barWrap.style.display = 'block';
       nextBtnWrap.style.display = 'block';
       nextBtn.textContent = (qIdx === 4) ? 'Закончить' : 'Дальше';
+      nextBtn.setAttribute('aria-label', (qIdx === 4) ? 'Завершить задание' : 'Перейти к следующему вопросу');
 
       stateBadge.textContent = 'Answer (40s)…';
       timeEl.textContent = fmtTime(ANSWER_MS);
@@ -183,6 +185,7 @@
       stopClocks();
       tickRaf();
       intId = setInterval(tickWall, 250);
+      // страховка на случай подвисаний
       hardTO = setTimeout(()=>{ if(answering) endAnswerWindow(); }, ANSWER_MS + 1500);
     }
 
@@ -210,11 +213,11 @@
       if (!answering) return;
       answering = false;
       stopClocks();
-      nextBtnWrap.style.display = 'none'; // спрячем кнопку перед следующим вопросом
+      nextBtnWrap.style.display = 'none'; // спрятать кнопку перед следующим вопросом
       proceedNext();
     }
 
-    // Клик по кнопке — сразу заканчиваем окно ответа
+    // Клик по кнопке — сразу заканчиваем окно ответа (не ждём таймера)
     nextBtn.addEventListener('click', () => endAnswerWindow());
 
     /* ====== Поток: intro → q1..q5 ====== */
@@ -379,7 +382,7 @@
       try{ audio.pause(); }catch{}
     });
 
-    /* ====== Общая подсказка для автоплея ====== */
+    /* ====== Подсказка для автоплея (если заблокирован звук) ====== */
     function showPlayHintAndRetry(){
       if (document.querySelector('.hint')) return;
       const el = document.createElement('div');

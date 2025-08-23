@@ -14,7 +14,6 @@
   <link rel="stylesheet" href="../../../style_common.css" />
 
   <style>
-    /* Вёрстка блока вопросов */
     .q-wrap{
       max-width: 1100px;
       margin: 0 auto;
@@ -25,34 +24,22 @@
       padding: 24px 28px;
     }
     .q-head{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:16px;
-      margin-bottom:8px;
+      display:flex; align-items:center; justify-content:space-between;
+      gap:16px; margin-bottom:8px;
     }
     .q-title{ font-size:28px; font-weight:800; margin:0; }
-    .q-sub{ color:var(--muted); font-size:16px; margin:0; }
     .q-body{ font-size:20px; line-height:1.6; }
     .state{
-      display:inline-block;
-      padding:6px 10px;
-      border-radius:10px;
-      background: #eef4ff;
-      color:#1f58d9;
-      font-size:14px;
-      font-weight:700;
+      display:inline-block; padding:6px 10px; border-radius:10px;
+      background:#eef4ff; color:#1f58d9; font-size:14px; font-weight:700;
     }
-    .dark .state{ background: rgba(255,255,255,.08); color: #a9c6ff; }
+    .dark .state{ background:rgba(255,255,255,.08); color:#a9c6ff; }
 
-    /* Таймер 3‑2‑1 */
     .timer{
       font-size:70px; margin:30px 0; font-weight:700;
       color:var(--primary); letter-spacing:4px; text-shadow:0 4px 12px rgba(0,0,0,.25);
       text-align:center;
     }
-
-    /* Подсказка про клик для включения звука */
     .hint{
       position:fixed; left:50%; bottom:calc(var(--footer-h) + 16px);
       transform:translateX(-50%);
@@ -61,9 +48,8 @@
       padding:10px 14px; box-shadow:var(--shadow);
       font-size:14px; z-index:9999;
     }
-
-    .muted-note{
-      margin-top:10px; font-size:14px; color:var(--muted);
+    .controls{
+      display:flex; justify-content:center; gap:12px; margin-top:16px;
     }
   </style>
 
@@ -94,8 +80,10 @@
         <div class="state" id="stateBadge" aria-live="polite">Playing question…</div>
       </div>
       <div class="q-body" id="qBody">
-        Listen to the question, then answer in 20 seconds.
-        <div class="muted-note">If you can’t hear the audio, click anywhere to enable sound.</div>
+        Listen to the question, then answer in 40 seconds.
+        <div class="controls">
+          <button id="nextBtn" class="button" style="display:none" type="button">Дальше</button>
+        </div>
       </div>
     </section>
   </main>
@@ -103,10 +91,10 @@
   <!-- Проставка, чтобы фикс‑бар не наезжал -->
   <div style="height: calc(var(--footer-h, 72px) + 24px);"></div>
 
-  <!-- Фиксированный прогресс‑бар снизу — на 20 сек ответа -->
+  <!-- Фиксированный прогресс‑бар снизу — на 40 сек ответа -->
   <div id="progressContainerFixed" role="timer" aria-live="polite" style="display:none">
     <div id="progressBarFixed" class="rAF">
-      <span id="progressTime" class="progress-time">00:20</span>
+      <span id="progressTime" class="progress-time">00:40</span>
     </div>
   </div>
 
@@ -115,15 +103,14 @@
     import { toggleThemeInit, navigateOnce, fmtTime } from "../../../common.js";
     toggleThemeInit();
 
-    /* ===================== ПОДГОТОВКА ===================== */
-
-    // Чистим старые ключи именно Task 3
+    // Чистим ключи Task 3
     try{
       sessionStorage.removeItem('ege3_audio_base64');
       sessionStorage.removeItem('ege3_audio_mime');
     }catch{}
 
-    // Пути к аудиофайлам вопросов (лежат рядом с этим HTML)
+    // Аудио-файлы (лежат рядом со страницей)
+    const INTRO_AUDIO = "intro.mp3";
     const Q_AUDIO = ["q1.mp3","q2.mp3","q3.mp3","q4.mp3","q5.mp3"];
 
     // DOM
@@ -132,20 +119,19 @@
     const timerEl  = document.getElementById('timer');
     const qTitleEl = document.getElementById('qTitle');
     const stateBadge = document.getElementById('stateBadge');
-    const qBodyEl  = document.getElementById('qBody');
     const barWrap  = document.getElementById('progressContainerFixed');
     const barEl    = document.getElementById('progressBarFixed');
     const timeEl   = document.getElementById('progressTime');
+    const nextBtn  = document.getElementById('nextBtn');
 
     const RESULT_URL = location.pathname.replace(/_3_task\.html$/i, '_4_result.html');
-    const ANSWER_MS = 20_000;
+    const ANSWER_MS = 40_000; // <-- 40 секунд
 
-    // Аудиоплеер (один элемент, меняем src)
+    // Аудио-плеер
     const audio = new Audio();
     audio.preload = 'auto';
 
-    /* ===================== МИКРОФОН (ОДИН СЕАНС) ===================== */
-
+    /* ====== Микрофон, один сеанс ====== */
     let streamRef=null, recorder=null, chosenMime='', recChunks=[];
     function pickMimeType(){
       const c=['audio/webm;codecs=opus','audio/webm','audio/ogg;codecs=opus','audio/ogg','audio/mp4'];
@@ -160,14 +146,17 @@
       recorder.ondataavailable = e => { if (e.data && e.data.size) recChunks.push(e.data); };
     }
 
-    /* ===================== ТАЙМЕР ОТВЕТА (20 сек) ===================== */
-
+    /* ====== Таймер ответа (40 сек) ====== */
     let startedAt=0, deadlineMs=0, rafId=0, intId=0, hardTO=0, answering=false, finishing=false;
 
     function startAnswerWindow(){
-      // Включаем прогресс-бар и визуал
+      // Показать прогресс-бар
       if (barWrap.style.display !== 'block') barWrap.style.display = 'block';
-      stateBadge.textContent = 'Answer (20s)…';
+      // Показать кнопку "Дальше"/"Закончить"
+      nextBtn.style.display = 'inline-block';
+      nextBtn.textContent = (qIdx === 4) ? 'Закончить' : 'Дальше';
+
+      stateBadge.textContent = 'Answer (40s)…';
       timeEl.textContent = fmtTime(ANSWER_MS);
       barEl.style.width = '100%';
 
@@ -177,6 +166,7 @@
       stopClocks();
       tickRaf();
       intId = setInterval(tickWall, 250);
+      // Жёсткая страховка: плюс небольшой буфер
       hardTO = setTimeout(()=>{ if(answering) endAnswerWindow(); }, ANSWER_MS + 1500);
     }
 
@@ -204,66 +194,60 @@
       if (!answering) return;
       answering = false;
       stopClocks();
+      nextBtn.style.display = 'none'; // спрятать кнопку перед следующим аудио
       proceedNext();
     }
 
-    /* ===================== ПОТОК ВОПРОСОВ ===================== */
+    // Клик по кнопке "Дальше/Закончить" — сразу заканчиваем окно ответа
+    nextBtn.addEventListener('click', () => endAnswerWindow());
 
-    let qIdx = 0; // 0..4
-    function questionTitle(n){ return `Question ${n} of 5`; }
+    /* ====== Поток: intro → q1..q5 ====== */
+    let qIdx = -1; // -1 = intro, 0..4 = вопросы
+
+    async function playIntro(){
+      qTitleEl.textContent = "Task 3. Interviewer";
+      stateBadge.textContent = "Intro…";
+      try{ audio.pause(); audio.currentTime = 0; }catch{}
+      audio.src = INTRO_AUDIO;
+      try{ await audio.play(); }catch{ showPlayHintAndRetry(); }
+    }
 
     async function playQuestion(n){
-      qTitleEl.textContent = questionTitle(n);
+      qTitleEl.textContent = `Question ${n} of 5`;
       stateBadge.textContent = 'Playing question…';
-
-      // Гарантировано остановим прошлое аудио
+      nextBtn.style.display = 'none'; // кнопка только во время ответа
       try{ audio.pause(); audio.currentTime = 0; }catch{}
-
       audio.src = Q_AUDIO[n-1];
-      // Запрос на проигрывание; могут быть блокировки автоплея
-      try{
-        await audio.play();
-      }catch(err){
-        showPlayHintAndRetry();
-      }
+      try{ await audio.play(); }catch{ showPlayHintAndRetry(); }
     }
 
-    function showPlayHintAndRetry(){
-      if (document.querySelector('.hint')) return;
-      const el = document.createElement('div');
-      el.className = 'hint';
-      el.textContent = '🔊 Click anywhere to enable sound';
-      document.body.appendChild(el);
-      const resume = () => {
-        el.remove();
-        window.removeEventListener('click', resume);
-        window.removeEventListener('touchstart', resume);
-        audio.play().catch(()=>{}); // повторная попытка
-      };
-      window.addEventListener('click', resume, { passive:true });
-      window.addEventListener('touchstart', resume, { passive:true });
-    }
-
-    // После воспроизведения вопроса сразу запускаем 20 секунд ответа
     audio.addEventListener('ended', () => {
-      startAnswerWindow();
+      if (qIdx === -1){
+        qIdx = 0;          // закончилось intro → первый вопрос
+        playQuestion(1);
+      } else {
+        startAnswerWindow(); // закончилось аудио вопроса → 40 сек ответа
+      }
     });
-    // Если аудио не загрузилось — не стопорим поток
     audio.addEventListener('error', () => {
-      startAnswerWindow();
+      if (qIdx === -1){
+        qIdx = 0;
+        playQuestion(1);
+      } else {
+        startAnswerWindow();
+      }
     });
 
     function proceedNext(){
       qIdx++;
       if (qIdx < 5){
-        // Следующий вопрос
         playQuestion(qIdx+1);
-      }else{
-        // Конец → стоп записи → сохранить → result
+      } else {
         finishAll();
       }
     }
 
+    /* ====== Завершение, сохранение, переход ====== */
     async function finishAll(){
       if (finishing) return;
       finishing = true;
@@ -281,7 +265,7 @@
 
     async function saveAndGo(){
       try{
-        await new Promise(r=>setTimeout(r,0)); // дождаться последнего ondataavailable
+        await new Promise(r=>setTimeout(r,0));
         const blob = recChunks && recChunks.length ? new Blob(recChunks, { type: chosenMime || 'audio/webm' }) : null;
         if (blob){
           const reader = new FileReader();
@@ -309,8 +293,7 @@
       navigateOnce(RESULT_URL);
     }
 
-    /* ===================== СТАРТ ===================== */
-
+    /* ====== Старт ====== */
     function startCountdown(){
       let n = 3;
       timerEl.textContent = n;
@@ -328,29 +311,19 @@
 
     async function startFlow(){
       barWrap.style.display = 'block';
-      qIdx = 0;
-
-      // ИНИЦИАЛИЗАЦИЯ МИКРОФОНА И ОБЩЕЙ ЗАПИСИ
+      qIdx = -1; // сначала intro
       try{
         await initMic();
-        // timeslice = 1000 мс — равномерные чанки
         recorder.start(1000);
-        // отметка в meta
         try{
           const meta = JSON.parse(sessionStorage.getItem('ege3_meta') || '{}');
           meta.taskStartedAt = Date.now();
           sessionStorage.setItem('ege3_meta', JSON.stringify(meta));
         }catch{}
-      }catch(err){
-        console.warn('Mic init error:', err);
-        // даже если микрофон не доступен — даём пройти сценарий (для отладки)
-      }
-
-      // Первый вопрос
-      playQuestion(1);
+      }catch(err){ console.warn('Mic init error:', err); }
+      playIntro();
     }
 
-    // Свежий запуск (и при обновлении)
     function freshStart(){
       countdownWrap.style.display = 'block';
       mainWrap.style.display = 'none';
@@ -358,11 +331,11 @@
       stopClocks();
       answering = false;
       finishing = false;
+      nextBtn.style.display = 'none';
       startCountdown();
     }
     freshStart();
 
-    // BFCache: перезапуск
     function isBackForward(){
       try{
         const nav = performance.getEntriesByType('navigation')[0];
@@ -373,12 +346,10 @@
       if (e.persisted || isBackForward()){
         freshStart();
       }else{
-        // Снимаем возможный замок навигации
         navigateOnce.lock = false;
       }
     });
 
-    // Очистка ресурсов при уходе
     window.addEventListener('beforeunload', ()=>{
       try{ if (recorder && recorder.state==='recording') recorder.stop(); }catch{}
       try{ streamRef?.getTracks()?.forEach(t=>t.stop()); }catch{}

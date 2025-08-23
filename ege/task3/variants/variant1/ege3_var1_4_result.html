@@ -66,6 +66,8 @@
       font-size:20px; line-height:1.7; text-align:left;
       box-shadow:var(--shadow); border-radius:12px;
     }
+    .task-container ul{ margin:12px 0 0 22px; }
+    .task-container li{ margin:6px 0; }
   </style>
 </head>
 <body>
@@ -89,13 +91,20 @@
       <a class="btn" id="repeatBtn" href="#" role="button" aria-label="Повторить этот вариант">🔁 Повторить этот вариант</a>
     </div>
 
-    <!-- Карточка с кратким напоминанием условия Task 3 (по стилю эталона) -->
+    <!-- Карточка с условием и вопросами Task 3 -->
     <div class="task-container" aria-labelledby="taskTitle">
       <b id="taskTitle">Task 3. You are going to give an interview.</b>
       <div style="margin-top:10px;">
         You have to answer five questions. Give full answers to the questions (2–3 sentences).
         Remember that you have 40 seconds to answer each question.
       </div>
+      <ul>
+        <li>1. How old are you? What class are you in?</li>
+        <li>2. How do you usually spend your free time? What do you like to do on Sundays?</li>
+        <li>3. Do you prefer to spend your free time with your friends or your family? Why?</li>
+        <li>4. How do your friends spend their free time? Where do they go and what do they do?</li>
+        <li>5. How do you think you will spend your free time in ten years’ time?</li>
+      </ul>
     </div>
 
     <div style="text-align:center;">
@@ -129,7 +138,7 @@
     }
     const { ROOT_BASE, EGE_BASE } = getBases(path);
 
-    // Навигация (страницы меню/выбора — для блока EGE)
+    // Навигация
     const toVariants = document.getElementById('toVariants');
     if (toVariants){
       // /variants/variantX/_4_result.html → /variants/ege3.html
@@ -158,7 +167,7 @@
     });
     window.addEventListener('pageshow', ()=>{ navigateOnce.lock = false; });
 
-    // ===== Аудио + волна (берём то, что записали на task-странице)
+    // ===== Аудио + волна (берём запись из Task 3)
     const audioEl     = document.getElementById('audio');
     const playBtn     = document.getElementById('playBtn');
     const downloadBtn = document.getElementById('downloadBtn');

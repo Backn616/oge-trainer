@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Экзамен полностью — общий результат</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./style_common.css" />
+
+  <script>
+    (function(){ try{
+      const saved = localStorage.getItem('pref-theme') || 'light';
+      if (saved === 'dark') document.documentElement.classList.add('dark');
+    }catch{}})();
+  </script>
+
+  <style>
+    .wrap{ max-width:1400px; margin:0 auto; padding:20px; }
+    h1{ color:var(--primary); font-size:32px; margin:12px 0 20px; text-align:center; }
+    .grid{ display:grid; grid-template-columns:1fr; gap:28px; }
+    @media (min-width:1000px){ .grid{ grid-template-columns:1fr 1fr; } }
+
+    .block{
+      background:var(--card); border-left:5px solid var(--primary);
+      border-radius:12px; box-shadow:var(--shadow); padding:18px 24px;
+    }
+    .block h2{ margin:0 0 10px; font-size:22px; }
+    .status{ font-size:14px; color:var(--muted); margin-bottom:8px; }
+    audio{ margin:12px 0 6px; width:100%; display:block; }
+    .btns{ display:flex; flex-wrap:wrap; gap:10px; margin-top:8px; }
+    .btn{ padding:10px 16px; border-radius:10px; border:none; cursor:pointer;
+          background:linear-gradient(135deg,var(--primary),var(--primary-600));
+          color:#fff; font-weight:600; }
+    .navs{ text-align:center; margin-top:24px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+  </style>
+</head>
+<body>
+  <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
+
+  <div class="wrap">
+    <h1>Экзамен полностью — общий результат (вариант <span id="v">?</span>)</h1>
+
+    <div class="grid">
+      <section class="block"><h2>Task 1</h2><div class="status" id="s1">Загрузка...</div><audio id="a1" controls></audio></section>
+      <section class="block"><h2>Task 2</h2><div class="status" id="s2">Загрузка...</div><audio id="a2" controls></audio></section>
+      <section class="block"><h2>Task 3</h2><div class="status" id="s3">Загрузка...</div><audio id="a3" controls></audio></section>
+      <section class="block"><h2>Task 4</h2><div class="status" id="s4">Загрузка...</div><audio id="a4" controls></audio></section>
+    </div>
+
+    <div class="navs">
+      <a id="repeatExam" class="btn" href="#">🔁 Пройти этот вариант заново</a>
+      <a class="btn" href="./exams.html">← К выбору варианта</a>
+      <a class="btn" href="./ege_menu.html">← К выбору задания</a>
+      <a class="btn" href="../index.html">← На главную</a>
+    </div>
+  </div>
+
+  <script type="module">
+    import { toggleThemeInit, navigateOnce } from './common.js';
+    toggleThemeInit();
+
+    const q = new URLSearchParams(location.search);
+    const variant = q.get('variant') || sessionStorage.getItem('exam_variant') || '1';
+    document.getElementById('v').textContent = variant;
+
+    const rows = [
+      { key:'ege1', a:'a1', s:'s1' },
+      { key:'ege2', a:'a2', s:'s2' },
+      { key:'ege3', a:'a3', s:'s3' },
+      { key:'ege4', a:'a4', s:'s4' },
+    ];
+
+    rows.forEach(row=>{
+      const base64 = sessionStorage.getItem(`${row.key}_audio_base64`);
+      const mime   = sessionStorage.getItem(`${row.key}_audio_mime`) || 'audio/webm';
+      const a = document.getElementById(row.a);
+      const s = document.getElementById(row.s);
+
+      if (!base64){
+        s.textContent = '⚠️ Запись не найдена.';
+        return;
+      }
+      a.src = base64;
+      a.type = mime;
+      s.textContent = 'Готово.';
+    });
+
+    document.getElementById('repeatExam').addEventListener('click',(e)=>{
+      e.preventDefault();
+      try{
+        ['ege1_','ege2_','ege3_','ege4_'].forEach(prefix=>{
+          Object.keys(sessionStorage).forEach(k=>{ if(k.startsWith(prefix)) sessionStorage.removeItem(k); });
+        });
+      }catch{}
+      const v = sessionStorage.getItem('exam_variant') || variant;
+      const url = `./task1/variants/variant${v}/ege1_var${v}_1_prepare.html`;
+      navigateOnce(url);
+    });
+
+    window.addEventListener('pageshow', ()=>{ navigateOnce.lock = false; });
+  </script>
+</body>
+</html>

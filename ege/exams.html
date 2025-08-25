@@ -6,7 +6,7 @@
   <title>ЕГЭ — Экзамен полностью: выбор варианта</title>
   <meta name="description" content="Выбор варианта для прохождения полного экзамена (задания 1–4) устной части ЕГЭ." />
 
-  <!-- Шрифты -->
+  <!-- Шрифты + preconnect -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
@@ -80,17 +80,14 @@
       padding:22px; margin-top:12px;
     }
 
+    /* 3 → 2 → 1 колонки */
     .grid{
       display:grid;
       grid-template-columns: repeat(3, minmax(220px,1fr));
       gap: var(--grid-gap);
     }
-    @media (max-width:900px){
-      .grid{ grid-template-columns: repeat(2, minmax(220px,1fr)); }
-    }
-    @media (max-width:580px){
-      .grid{ grid-template-columns: 1fr; }
-    }
+    @media (max-width:900px){ .grid{ grid-template-columns: repeat(2, minmax(220px,1fr)); } }
+    @media (max-width:580px){ .grid{ grid-template-columns: 1fr; } }
 
     .variant{
       display:inline-flex; align-items:center; justify-content:center; gap:10px;
@@ -159,7 +156,7 @@
 
   <script>
     (async function(){
-      // Фолбэки (если common.js недоступен)
+      // Фолбэки на случай, если common.js недоступен
       let navigateOnce = (url) => { location.href = url; };
       let toggleThemeInit = () => {
         const key = 'pref-theme';
@@ -173,7 +170,7 @@
         btn?.addEventListener('click', () => { const m = get(); apply(m === 'dark' ? 'light' : 'dark'); });
       };
 
-      // База /ege/
+      // Вычисляем /ege/ и пробуем импортировать общий модуль
       const parts = location.pathname.split('/').filter(Boolean);
       const idx = parts.indexOf('ege');
       const egeBase = (idx !== -1) ? ('/' + parts.slice(0, idx + 1).join('/') + '/') : '/ege/';
@@ -187,17 +184,17 @@
         console.warn('Не удалось импортировать common.js:', commonUrl, e);
       }
 
-      // Тема
+      // Тема — инициализируем в любом случае
       try { toggleThemeInit(); } catch {}
 
-      // Назад в меню режимов
+      // «Назад к меню»
       document.querySelectorAll('.back-to-menu').forEach(a => {
         const url = egeBase + 'ege_menu.html';
         a.href = url;
         a.addEventListener('click', (e) => { e.preventDefault(); navigateOnce(url); });
       });
 
-      // Параметры списка вариантов
+      // Рендер вариантов + пагинация
       const VARIANTS_BASE_TASK1 = egeBase + 'task1/variants/';
       const TOTAL_VARIANTS = 60;       // при необходимости поменяем
       const PAGE_SIZE      = 15;
@@ -226,9 +223,18 @@
           btn.textContent = `Вариант ${n}`;
           btn.setAttribute('aria-label', `Перейти к варианту ${n}`);
           btn.addEventListener('click', () => {
-            // Старт полного экзамена: Task 1 → prepare выбранного варианта
+            // 1) флаг «режим экзамена»
+            try {
+              sessionStorage.setItem('exam_flow', '1');
+              sessionStorage.setItem('exam_variant', String(n));
+              // 2) очистим прошлые записи, на всякий
+              ['ege1_', 'ege2_', 'ege3_', 'ege4_'].forEach(prefix=>{
+                Object.keys(sessionStorage).forEach(k=>{ if(k.startsWith(prefix)) sessionStorage.removeItem(k); });
+              });
+            } catch {}
+            // 3) стартуем с Task 1 → prepare выбранного варианта
             const url = `${VARIANTS_BASE_TASK1}variant${n}/ege1_var${n}_1_prepare.html`
-              .replace(/\/{2,}/g, '/').replace(':/', '://');
+              .replace(/\/{2,}/g, '/').replace(':/','://');
             navigateOnce(url);
           });
           frag.appendChild(btn);
@@ -247,7 +253,7 @@
       nextBtn.addEventListener('click', () => renderPage(currentPage + 1));
       renderPage(1);
 
-      // BFCache: снять «замок», если navigateOnce есть
+      // BFCache: снять «замок» (если navigateOnce есть)
       try { window.addEventListener('pageshow', () => { navigateOnce.lock = false; }); } catch {}
     })();
   </script>

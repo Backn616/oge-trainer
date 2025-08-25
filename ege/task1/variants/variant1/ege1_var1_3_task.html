@@ -111,7 +111,16 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
     const progressBar    = document.getElementById('progressBarFixed');
     const progressTime   = document.getElementById('progressTime');
 
+    // Обычный локальный result (когда НЕ экзамен целиком)
     const RESULT_URL = location.pathname.replace(/_3_task\.html$/i, '_4_result.html');
+
+    // Режим «экзамен полностью»
+    const inExam   = (sessionStorage.getItem('exam_flow') === '1');
+    const varFromSS= sessionStorage.getItem('exam_variant') || '';
+    const varFromURL = (location.pathname.match(/variant(\d+)/i) || [,''])[1];
+    const EXAM_VARIANT = varFromSS || varFromURL || '';
+    // exams_countdown.html лежит в /ege/, из текущей папки это ../../../
+    const EXAM_NEXT_URL = `../../../exams_countdown.html?next=2&variant=${encodeURIComponent(EXAM_VARIANT)}`;
 
     // ===== Захват микрофона и запись =====
     let mediaRecorder = null, audioChunks = [], streamRef = null;
@@ -147,7 +156,8 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
               sessionStorage.setItem('ege1_audio_base64', reader.result);
               sessionStorage.setItem('ege1_audio_mime', blobType);
             }catch{}
-            navigateOnce(RESULT_URL);
+            // Ветка перехода: экзамен полностью → общий отсчёт к Task 2
+            navigateOnce(inExam ? EXAM_NEXT_URL : RESULT_URL);
           };
           reader.readAsDataURL(audioBlob);
         };
@@ -196,7 +206,7 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
       audioChunks = [];
       try{ if (mediaRecorder && mediaRecorder.state !== 'recording') mediaRecorder.start(); }catch{}
 
-      progressBar.classList.add('rAF');   // отключаем CSS-инерцию, управляем через rAF
+      progressBar.classList.add('rAF');   // управляем прогрессом через rAF
       endTs = performance.now() + TOTAL_MS;
       progressTime.textContent = fmtTime(TOTAL_MS);
       progressBar.style.width  = '100%';
@@ -218,11 +228,17 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
 
     function safeStopOrFinish(){
       try{ cancelAnimationFrame(rafId); }catch{}
-      if (hasStopped){ navigateOnce(RESULT_URL); return; }
+      if (hasStopped){ navigateOnce(inExam ? EXAM_NEXT_URL : RESULT_URL); return; }
       try{
         if (mediaRecorder?.state === 'recording'){ mediaRecorder.stop(); }
-        else { streamRef?.getTracks()?.forEach(t=>t.stop()); navigateOnce(RESULT_URL); }
-      }catch{ navigateOnce(RESULT_URL); }
+        else {
+          try{ streamRef?.getTracks()?.forEach(t=>t.stop()); }catch{}
+          navigateOnce(inExam ? EXAM_NEXT_URL : RESULT_URL);
+        }
+      }catch{
+        try{ streamRef?.getTracks()?.forEach(t=>t.stop()); }catch{}
+        navigateOnce(inExam ? EXAM_NEXT_URL : RESULT_URL);
+      }
     }
 
     window.addEventListener('beforeunload', ()=>{
@@ -231,7 +247,7 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
       try{ streamRef?.getTracks()?.forEach(t=>t.stop()); }catch{}
     });
 
-    // --- BFCache: назад из result → заново отсчёт и запись ---
+    // --- BFCache: назад из следующего шага → заново отсчёт и запись ---
     function isBackForwardNav(){
       try {
         const nav = performance.getEntriesByType('navigation')[0];

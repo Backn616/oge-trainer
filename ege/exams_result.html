@@ -19,42 +19,100 @@
 
   <style>
     .wrap{ max-width:1400px; margin:0 auto; padding:20px; }
-    h1{ color:var(--primary); font-size:32px; margin:12px 0 20px; text-align:center; }
-    .grid{ display:grid; grid-template-columns:1fr; gap:28px; }
-    @media (min-width:1000px){ .grid{ grid-template-columns:1fr 1fr; } }
+    h1{ color:var(--primary); font-size:34px; margin:12px 0 22px; text-align:center; }
 
     .block{
       background:var(--card); border-left:5px solid var(--primary);
-      border-radius:12px; box-shadow:var(--shadow); padding:18px 24px;
+      border-radius:12px; box-shadow:var(--shadow); padding:18px 24px; margin-bottom:26px;
     }
-    .block h2{ margin:0 0 10px; font-size:22px; }
-    .status{ font-size:14px; color:var(--muted); margin-bottom:8px; }
-    audio{ margin:12px 0 6px; width:100%; display:block; }
-    .btns{ display:flex; flex-wrap:wrap; gap:10px; margin-top:8px; }
-    .btn{ padding:10px 16px; border-radius:10px; border:none; cursor:pointer;
-          background:linear-gradient(135deg,var(--primary),var(--primary-600));
-          color:#fff; font-weight:600; }
-    .navs{ text-align:center; margin-top:24px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+    .block h2{ margin:0 0 8px; font-size:22px; }
+    .desc{ font-size:14px; color:var(--muted); margin:0 0 10px; }
+
+    audio{ margin:10px 0 8px; width:100%; display:block; }
+    .wave-wrap{ width:100%; margin:0 auto 10px; display:none; }
+    .wave{ width:100%; height:56px; display:block; background:#e9edf7; border-radius:10px; box-shadow:var(--shadow); }
+    .dark .wave{ background:#1f2a3d; }
+
+    :root{
+      --wave-base: rgba(0,0,0,.28);
+      --wave-prog: var(--primary);
+      --wave-glow: rgba(43,108,255,.45);
+    }
+    html.dark{
+      --wave-base: rgba(255,255,255,.52);
+      --wave-prog: #5bb8ff;
+      --wave-glow: rgba(91,184,255,.65);
+    }
+
+    .status{ font-size:14px; color:var(--muted); margin-bottom:4px; }
+
+    /* Картинки Task 4 (как в обычных result) */
+    .images{ display:flex; gap:14px; flex-wrap:wrap; margin-top:8px; }
+    .images img{ max-width:100%; width:calc(50% - 7px); border-radius:10px; box-shadow:var(--shadow); }
+
+    .navs{ text-align:center; margin-top:22px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+    .btn{
+      display:inline-block; padding:12px 18px; font-weight:600; color:#fff;
+      background:linear-gradient(135deg, var(--primary), var(--primary-600));
+      border:none; border-radius:10px; box-shadow:0 10px 22px rgba(43,108,255,.3);
+      cursor:pointer; text-decoration:none;
+    }
   </style>
 </head>
 <body>
   <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
 
   <div class="wrap">
-    <h1>Экзамен полностью — общий результат (вариант <span id="v">?</span>)</h1>
+    <h1>Экзамен полностью — общий результат</h1>
 
-    <div class="grid">
-      <section class="block"><h2>Task 1</h2><div class="status" id="s1">Загрузка...</div><audio id="a1" controls></audio></section>
-      <section class="block"><h2>Task 2</h2><div class="status" id="s2">Загрузка...</div><audio id="a2" controls></audio></section>
-      <section class="block"><h2>Task 3</h2><div class="status" id="s3">Загрузка...</div><audio id="a3" controls></audio></section>
-      <section class="block"><h2>Task 4</h2><div class="status" id="s4">Загрузка...</div><audio id="a4" controls></audio></section>
-    </div>
+    <!-- Task 1 -->
+    <section class="block" id="t1">
+      <h2>Task 1 — Reading the text aloud</h2>
+      <p class="desc">Вы прочитали текст вслух (до 1.5 минуты).</p>
+      <div class="status" id="s1">Загрузка записи…</div>
+      <audio id="a1" controls></audio>
+      <div class="wave-wrap"><canvas id="w1" class="wave"></canvas></div>
+    </section>
+
+    <!-- Task 2 -->
+    <section class="block" id="t2">
+      <h2>Task 2 — Questions to advertisement</h2>
+      <p class="desc">Вы задали 4 вопроса по объявлению (по 20 сек на ответ).</p>
+      <div class="status" id="s2">Загрузка записи…</div>
+      <audio id="a2" controls></audio>
+      <div class="wave-wrap"><canvas id="w2" class="wave"></canvas></div>
+    </section>
+
+    <!-- Task 3 -->
+    <section class="block" id="t3">
+      <h2>Task 3 — Interview</h2>
+      <p class="desc">Диалог‑интервью из 5 вопросов (40 сек на ответ).</p>
+      <div class="status" id="s3">Загрузка записи…</div>
+      <audio id="a3" controls></audio>
+      <div class="wave-wrap"><canvas id="w3" class="wave"></canvas></div>
+    </section>
+
+    <!-- Task 4 -->
+    <section class="block" id="t4">
+      <h2>Task 4 — Monologue (project)</h2>
+      <p class="desc">Монолог по проекту (до 3 минут, 12–15 предложений).</p>
+      <div class="status" id="s4">Загрузка записи…</div>
+      <audio id="a4" controls></audio>
+      <div class="wave-wrap"><canvas id="w4" class="wave"></canvas></div>
+
+      <!-- иллюстрации варианта (как в обычных result) -->
+      <div class="images" aria-label="Project illustrations (Task 4)">
+        <!-- пути подставим в скрипте, чтобы учитывать variant -->
+        <img id="img1" alt="Photo 1" onerror="this.style.display='none'">
+        <img id="img2" alt="Photo 2" onerror="this.style.display='none'">
+      </div>
+    </section>
 
     <div class="navs">
-      <a id="repeatExam" class="btn" href="#">🔁 Пройти этот вариант заново</a>
-      <a class="btn" href="./exams.html">← К выбору варианта</a>
-      <a class="btn" href="./ege_menu.html">← К выбору задания</a>
-      <a class="btn" href="../index.html">← На главную</a>
+      <a id="repeatExam" class="btn" href="#" role="button">🔁 Пройти этот вариант заново</a>
+      <a class="btn" href="./exams.html" role="button">← К выбору варианта</a>
+      <a class="btn" href="./ege_menu.html" role="button">← К выбору формата</a>
+      <a class="btn" href="../index.html" role="button">← На главную</a>
     </div>
   </div>
 
@@ -64,30 +122,161 @@
 
     const q = new URLSearchParams(location.search);
     const variant = q.get('variant') || sessionStorage.getItem('exam_variant') || '1';
-    document.getElementById('v').textContent = variant;
+
+    // Картинки Task 4 с учётом варианта (как в обычных result'ах)
+    const img1 = document.getElementById('img1');
+    const img2 = document.getElementById('img2');
+    img1.src = `./task4/variants/variant${variant}/photo1_city.png`;
+    img2.src = `./task4/variants/variant${variant}/photo2_countryside.png`;
 
     const rows = [
-      { key:'ege1', a:'a1', s:'s1' },
-      { key:'ege2', a:'a2', s:'s2' },
-      { key:'ege3', a:'a3', s:'s3' },
-      { key:'ege4', a:'a4', s:'s4' },
+      { key:'ege1', a:'a1', s:'s1', w:'w1' },
+      { key:'ege2', a:'a2', s:'s2', w:'w2' },
+      { key:'ege3', a:'a3', s:'s3', w:'w3' },
+      { key:'ege4', a:'a4', s:'s4', w:'w4' },
     ];
 
-    rows.forEach(row=>{
+    function dataURLtoBlob(dataURL){
+      const parts = (dataURL || '').split(',');
+      if (parts.length < 2) return null;
+      const header = parts[0], b64 = parts[1];
+      const type = (header.match(/data:(.*?);base64/) || [,'application/octet-stream'])[1];
+      const bin  = atob(b64);
+      const bytes= new Uint8Array(bin.length);
+      for (let i=0;i<bin.length;i++) bytes[i] = bin.charCodeAt(i);
+      return new Blob([bytes], { type });
+    }
+
+    async function renderWave(audioEl, canvas, arrayBuffer){
+      const AC   = window.AudioContext || window.webkitAudioContext;
+      const ctxA = new AC();
+      const buf  = await ctxA.decodeAudioData(arrayBuffer);
+
+      const waveWrap = canvas.parentElement;
+      waveWrap.style.display = 'block';
+
+      const width = 1000;
+      // пики
+      const peaks = (()=>{ 
+        const ch0 = buf.getChannelData(0);
+        const ch1 = buf.numberOfChannels>1 ? buf.getChannelData(1) : null;
+        const total = ch0.length;
+        const block = Math.floor(total / width) || 1;
+        const out = new Array(width);
+        for (let i=0;i<width;i++){
+          const s = i*block, e = Math.min(total, s+block);
+          let min=1, max=-1;
+          for (let j=s;j<e;j++){
+            const v = ch1 ? (ch0[j]+ch1[j])*0.5 : ch0[j];
+            if (v<min) min=v; if (v>max) max=v;
+          }
+          out[i] = [min,max];
+        }
+        return out;
+      })();
+
+      function draw(progress){
+        const dpr = Math.max(1, Math.floor(window.devicePixelRatio || 1));
+        const cssW = canvas.clientWidth || 600;
+        const cssH = canvas.clientHeight || 56;
+        if (canvas.width !== cssW*dpr) canvas.width = cssW*dpr;
+        if (canvas.height!== cssH*dpr) canvas.height= cssH*dpr;
+        const ctx = canvas.getContext('2d');
+        ctx.setTransform(dpr,0,0,dpr,0,0);
+
+        const rs = getComputedStyle(document.documentElement);
+        const base = (rs.getPropertyValue('--wave-base') || 'rgba(0,0,0,.28)').trim();
+        const prog = (rs.getPropertyValue('--wave-prog') || '#2b6cff').trim();
+        const glow = (rs.getPropertyValue('--wave-glow') || 'rgba(43,108,255,.45)').trim();
+        const bg   = getComputedStyle(canvas).backgroundColor;
+
+        ctx.clearRect(0,0,cssW,cssH);
+        ctx.fillStyle = bg; ctx.fillRect(0,0,cssW,cssH);
+
+        const mid = cssH/2;
+        ctx.fillStyle = base;
+        for (let i=0;i<peaks.length;i++){
+          const x = i/peaks.length*cssW;
+          const [min,max] = peaks[i];
+          const hTop = Math.abs(max)*mid, hBot = Math.abs(min)*mid;
+          ctx.fillRect(x, mid-hTop, 1, hTop+hBot || 1);
+        }
+
+        const progW = Math.max(0, Math.min(cssW, progress*cssW));
+        ctx.save(); ctx.beginPath(); ctx.rect(0,0,progW,cssH); ctx.clip();
+        ctx.fillStyle = prog; ctx.shadowColor = glow; ctx.shadowBlur = 8;
+        for (let i=0;i<peaks.length;i++){
+          const x = i/peaks.length*cssW;
+          const [min,max] = peaks[i];
+          const hTop = Math.abs(max)*mid, hBot = Math.abs(min)*mid;
+          ctx.fillRect(x, mid-hTop, 1, hTop+hBot || 1);
+        }
+        ctx.restore();
+      }
+
+      let raf;
+      const tick = ()=>{
+        const dur = buf.duration || (audioEl.duration || 1);
+        const p = Math.min(1, (audioEl.currentTime || 0) / dur);
+        draw(p);
+        raf = requestAnimationFrame(tick);
+      };
+      audioEl.addEventListener('play', ()=>{ cancelAnimationFrame(raf); tick(); });
+      audioEl.addEventListener('pause', ()=>{ cancelAnimationFrame(raf); draw((audioEl.currentTime||0)/(buf.duration||1)); });
+      audioEl.addEventListener('ended', ()=>{ cancelAnimationFrame(raf); draw(1); });
+
+      canvas.addEventListener('pointerdown', (e)=>{
+        const r = canvas.getBoundingClientRect();
+        const x = Math.max(0, Math.min(1, (e.clientX - r.left)/r.width));
+        audioEl.currentTime = x * (buf.duration || audioEl.duration || 0);
+        draw(x);
+      }, {passive:true});
+
+      draw(0);
+    }
+
+    async function setupRow(row){
       const base64 = sessionStorage.getItem(`${row.key}_audio_base64`);
-      const mime   = sessionStorage.getItem(`${row.key}_audio_mime`) || 'audio/webm';
+      const mime   = (sessionStorage.getItem(`${row.key}_audio_mime`) || 'audio/webm').toLowerCase();
+
       const a = document.getElementById(row.a);
       const s = document.getElementById(row.s);
+      const w = document.getElementById(row.w);
 
       if (!base64){
         s.textContent = '⚠️ Запись не найдена.';
         return;
       }
-      a.src = base64;
-      a.type = mime;
-      s.textContent = 'Готово.';
-    });
+      try{
+        // назначаем src и рисуем волну
+        const blob = dataURLtoBlob(base64);
+        if (blob){
+          const objectURL = URL.createObjectURL(blob);
+          a.src  = objectURL;
+          a.type = blob.type || mime;
+          const buf = await blob.arrayBuffer();
+          await renderWave(a, w, buf);
+          // чистим objectURL при уходе
+          window.addEventListener('beforeunload', ()=>{ URL.revokeObjectURL(objectURL); }, { once:true });
+        }else{
+          // fallback: напрямую из dataURL
+          a.src  = base64;
+          a.type = mime;
+          const resp = await fetch(base64);
+          await renderWave(a, w, await resp.arrayBuffer());
+        }
+        s.textContent = 'Готово.';
+      }catch{
+        a.src  = base64;
+        a.type = mime;
+        s.textContent = 'Готово (без волны).';
+      }
+    }
 
+    // Инициализация всех четырёх блоков
+    rows.reduce((p,row)=> p.then(()=>setupRow(row)), Promise.resolve());
+
+    // Повторить этот вариант
     document.getElementById('repeatExam').addEventListener('click',(e)=>{
       e.preventDefault();
       try{

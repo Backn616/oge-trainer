@@ -14,7 +14,6 @@
   <link rel="stylesheet" href="../../../style_common.css" />
 
   <style>
-    /* Сетка карточки */
     .q-layout{
       display:grid;
       grid-template-columns: 1.05fr 0.95fr;
@@ -33,14 +32,12 @@
     .actions{ grid-column:1 / -1; text-align:center; margin-top:10px; margin-bottom:6px; }
     @media (max-width:1100px){ .q-layout{ grid-template-columns:1fr; gap:22px; } }
 
-    /* Большой 3‑2‑1 (в верхнем блоке до карточки) */
     .timer{
       font-size:70px; margin:30px 0; font-weight:700;
       color:var(--primary); letter-spacing:4px; text-shadow:0 4px 12px rgba(0,0,0,.25);
       text-align:center;
     }
 
-    /* Подсказка про клик для включения звука (если TTS заблокирован) */
     .tts-hint{
       position:fixed; left:50%; bottom:20px; transform:translateX(-50%);
       background:var(--card); color:var(--text); border:1px solid var(--border);
@@ -68,7 +65,7 @@
     <div id="timer" class="timer" aria-live="polite">3</div>
   </div>
 
-  <!-- ОСНОВНОЙ БЛОК (как в Task 4) -->
+  <!-- ОСНОВНОЙ БЛОК -->
   <main class="page-center" id="mainWrap" style="display:none">
     <section class="card task-card">
       <div class="q-layout">
@@ -82,7 +79,6 @@
         <aside aria-label="Advertisement">
           <h3 class="ad-title">Join our bike club!</h3>
           <figure class="ad-figure">
-            <!-- СВОЁ ФОТО: замените путь ниже -->
             <img src="task2_bike.jpg" alt="Bike club advertisement image" loading="lazy">
           </figure>
         </aside>
@@ -110,13 +106,19 @@
     import { toggleThemeInit, navigateOnce, fmtTime } from "../../../common.js";
     toggleThemeInit();
 
-    /* ===================== ПОДГОТОВКА ===================== */
+    /* ====== РЕЖИМЫ: обычный vs «экзамен полностью» ====== */
+    const inExam         = (sessionStorage.getItem('exam_flow') === '1');
+    const varFromSS      = sessionStorage.getItem('exam_variant') || '';
+    const varFromURL     = (location.pathname.match(/variant(\d+)/i) || [,''])[1];
+    const EXAM_VARIANT   = varFromSS || varFromURL || '';
+    const RESULT_URL     = location.pathname.replace(/_3_task\.html$/i, '_4_result.html');
+    const EXAM_NEXT_URL  = `../../../exams_countdown.html?next=3&variant=${encodeURIComponent(EXAM_VARIANT)}`;
 
-    // Всегда начинаем с нуля (и при обновлении тоже)
+    /* ===================== ПОДГОТОВКА ===================== */
     try{
       sessionStorage.removeItem('ege2_audio_base64');
       sessionStorage.removeItem('ege2_audio_mime');
-      sessionStorage.removeItem('ege2_audio_parts'); // старый ключ, на всякий
+      sessionStorage.removeItem('ege2_audio_parts');
     }catch{}
 
     const QUESTIONS = [
@@ -137,11 +139,9 @@
     const barEl    = document.getElementById('progressBarFixed');
     const timeEl   = document.getElementById('progressTime');
 
-    const RESULT_URL = location.pathname.replace(/_3_task\.html$/i, '_4_result.html');
     const QUESTION_MS = 20_000;
 
     /* ===================== ОЗВУЧКА ===================== */
-
     function showTtsHint(){
       if (document.querySelector('.tts-hint')) return;
       const el = document.createElement('div');
@@ -170,7 +170,6 @@
     }
 
     /* ===================== МИКРОФОН (ОДИН СЕАНС) ===================== */
-
     let streamRef=null, recorder=null, chosenMime='', recChunks=[];
     function pickMimeType(){
       const c=['audio/webm;codecs=opus','audio/webm','audio/ogg;codecs=opus','audio/ogg','audio/mp4'];
@@ -186,7 +185,6 @@
     }
 
     /* ===================== ТАЙМЕР И ВОПРОСЫ ===================== */
-
     let qIdx=0, startedAt=0, deadlineMs=0;
     let rafId=0, intId=0, hardTO=0, finishing=false;
 
@@ -199,7 +197,6 @@
     async function beginSegment(){
       await speakQuestion(qIdx+1);
 
-      // Визуальный таймер
       timeEl.textContent = fmtTime(QUESTION_MS);
       barEl.style.width = '100%';
       startedAt = performance.now();
@@ -248,7 +245,7 @@
         nextBtn.disabled = false;
         beginSegment();
       }else{
-        // Конец: останавливаем запись, сохраняем один файл в sessionStorage и на результат
+        // Конец: останавливаем запись, сохраняем один файл и переходим дальше
         try{
           if (recorder && recorder.state !== 'inactive'){
             recorder.onstop = saveAndGo;
@@ -282,7 +279,7 @@
 
     function cleanupAndNavigate(){
       try{ streamRef?.getTracks()?.forEach(t=>t.stop()); }catch{}
-      navigateOnce(RESULT_URL);
+      navigateOnce(inExam ? EXAM_NEXT_URL : RESULT_URL);
     }
 
     // Кнопка «Далее»
@@ -296,7 +293,6 @@
     });
 
     /* ===================== СТАРТ ===================== */
-
     function startCountdown(){
       let n = 3;
       timerEl.textContent = n;
@@ -320,7 +316,6 @@
       // Один общий сеанс записи
       try{
         await initMic();
-        // timeslice = 1000 мс, чтобы chunk'и приходили регулярно и не «застревали»
         recorder.start(1000);
       }catch(err){
         console.warn('Mic init error:', err);

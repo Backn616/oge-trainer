@@ -24,7 +24,6 @@
   </script>
 
   <style>
-    /* Небольшой визуал для отсчёта 3-2-1 */
     .timer{
       font-size:70px;
       margin:30px 0;
@@ -93,13 +92,20 @@
     const progressBar    = document.getElementById('progressBarFixed');
     const progressTime   = document.getElementById('progressTime');
 
-    // Навигация
+    // Навигация: обычный локальный result (для режима «по заданиям»)
     const RESULT_URL = /_3_task\.html$/i.test(location.pathname)
       ? location.pathname.replace(/_3_task\.html$/i, '_4_result.html')
       : location.pathname.replace(/\.html$/i, '_4_result.html');
 
-    // Снимаем «замок» для кнопок при возврате из BFCache;
-    // если вернулись с result — перезапускаем страницу.
+    // Режим «экзамен полностью»
+    const inExam         = (sessionStorage.getItem('exam_flow') === '1');
+    const varFromSS      = sessionStorage.getItem('exam_variant') || '';
+    const varFromURL     = (location.pathname.match(/variant(\d+)/i) || [,''])[1];
+    const EXAM_VARIANT   = varFromSS || varFromURL || '';
+    // exams_result.html лежит в /ege/, отсюда относительный путь = ../../../
+    const EXAM_RESULT_URL = `../../../exams_result.html?variant=${encodeURIComponent(EXAM_VARIANT)}`;
+
+    // Снимаем «замок» для кнопок при возврате из BFCache; если вернулись с result — перезапуск
     window.addEventListener('pageshow', (e) => {
       navigateOnce.lock = false;
       if (e.persisted) location.reload();
@@ -116,7 +122,7 @@
       const candidates = [
         'audio/webm;codecs=opus',
         'audio/webm',
-        'audio/mp4',            // Safari
+        'audio/mp4',
         'audio/ogg;codecs=opus',
         'audio/ogg'
       ];
@@ -153,7 +159,7 @@
               sessionStorage.setItem('ege4_audio_base64', reader.result);
               sessionStorage.setItem('ege4_audio_mime', blobType);
             }catch{}
-            navigateOnce(RESULT_URL);
+            navigateOnce(inExam ? EXAM_RESULT_URL : RESULT_URL);
           };
           reader.readAsDataURL(audioBlob);
         };
@@ -179,7 +185,6 @@
         timerEl.style.color = (countdown > 1) ? '#2b6cff' : '#b30000';
         timerEl.textContent = countdown;
 
-        // небольшой "пульс" (уважаем reduce-motion)
         if (!reduceMotion) {
           timerEl.style.transform = 'scale(1.2)';
           setTimeout(()=>{ timerEl.style.transform = 'scale(1)'; }, 200);
@@ -198,40 +203,32 @@
     let endTs = 0;
     let rafId = 0;
     let lastAnnounceTs = 0;
-    const ANNOUNCE_EVERY = 250; // обновлять видимый текст раз в ~250 мс
+    const ANNOUNCE_EVERY = 250;
 
     function startTask(){
-      // UI
       taskContainer.style.display  = 'block';
       imageContainer.style.display = 'flex';
       endBtn.style.display         = 'inline-block';
       progressWrap.style.display   = 'block';
       timerEl.style.display        = 'none';
 
-      // прогресс-бар: убрать CSS-инерцию, т.к. обновляем на rAF
       progressBar.classList.add('rAF');
 
-      // запись
       audioChunks = [];
       try{ if (mediaRecorder && mediaRecorder.state !== 'recording') mediaRecorder.start(); }catch{}
 
-      // таймер
       endTs = performance.now() + TOTAL_MS;
       progressTime.textContent = fmtTime(TOTAL_MS);
       progressBar.style.width  = '100%';
       tick();
 
-      // кнопка "закончить"
       endBtn.onclick = () => safeStopOrFinish();
     }
 
     function tick(){
       const left = Math.max(0, endTs - performance.now());
-
-      // ширина — каждый кадр
       progressBar.style.width  = `${(left / TOTAL_MS) * 100}%`;
 
-      // текст — не чаще, чем раз в ANNOUNCE_EVERY мс
       if (!lastAnnounceTs || (performance.now() - lastAnnounceTs) >= ANNOUNCE_EVERY) {
         progressTime.textContent = fmtTime(left);
         lastAnnounceTs = performance.now();
@@ -246,18 +243,18 @@
 
     function safeStopOrFinish(){
       try{ cancelAnimationFrame(rafId); }catch{}
-      if (hasStopped) { navigateOnce(RESULT_URL); return; }
+      if (hasStopped) { navigateOnce(inExam ? EXAM_RESULT_URL : RESULT_URL); return; }
 
       try{
         if (mediaRecorder && mediaRecorder.state === 'recording') {
-          mediaRecorder.stop(); // onstop сохранит и перейдёт
+          mediaRecorder.stop();
         } else {
           try{ streamRef?.getTracks()?.forEach(t=>t.stop()); }catch{}
-          navigateOnce(RESULT_URL);
+          navigateOnce(inExam ? EXAM_RESULT_URL : RESULT_URL);
         }
       }catch{
         try{ streamRef?.getTracks()?.forEach(t=>t.stop()); }catch{}
-        navigateOnce(RESULT_URL);
+        navigateOnce(inExam ? EXAM_RESULT_URL : RESULT_URL);
       }
     }
 

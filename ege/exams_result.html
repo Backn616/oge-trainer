@@ -9,11 +9,13 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
-  <!-- Для Task 1 как в result 1 -->
+  <!-- Для Task 1 как в его result -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
+  <!-- Общий стиль проекта -->
   <link rel="stylesheet" href="./style_common.css" />
 
+  <!-- Анти-мигание темы -->
   <script>
     (function(){ try{
       const saved = localStorage.getItem('pref-theme') || 'light';
@@ -50,19 +52,17 @@
 
     .status{ font-size:14px; color:var(--muted); margin-bottom:4px; }
 
-    /* Подложки с оригинальным контентом заданий */
+    /* Сниппет-контейнер: базовый и «чистый» вариант без пунктира */
     .task-snippet{
-      margin-top:12px;
-      padding:14px 16px;
-      border:1px dashed var(--border);
-      border-radius:12px;
-      background: var(--card);
+      margin-top:12px; padding:14px 16px; border:1px dashed var(--border);
+      border-radius:12px; background:var(--card);
     }
-    .task-snippet h3{ margin:0 0 10px; font-size:18px; color:var(--primary); }
+    .task-snippet--plain{ border:none; padding:0; background:transparent; }
+
     .snippet-images{ display:flex; gap:14px; flex-wrap:wrap; margin-top:8px; }
     .snippet-images img{ max-width:100%; width:calc(50% - 7px); border-radius:10px; box-shadow:var(--shadow); }
 
-    /* === Стиль текста Task 1 как в ege1_varN_4_result.html === */
+    /* Стиль текста Task 1 как в его result */
     .reading-box{
       max-width:3000px; width:95%; margin:0 auto 30px;
       font-family: Inter, system-ui, Segoe UI, Roboto, Arial, sans-serif;
@@ -70,9 +70,7 @@
       border:1px solid #ccc; padding:40px; border-radius:12px;
       background:var(--card); box-shadow:var(--shadow);
     }
-    @media (max-width: 900px){
-      .reading-box{ font-size:28px; }
-    }
+    @media (max-width:900px){ .reading-box{ font-size:28px; } }
 
     .navs{ text-align:center; margin-top:22px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
     .btn{
@@ -96,12 +94,8 @@
       <div class="status" id="s1">Загрузка записи…</div>
       <audio id="a1" controls></audio>
       <div class="wave-wrap"><canvas id="w1" class="wave"></canvas></div>
-      <!-- Вставка оригинального текста (как в result 1) -->
-      <div class="task-snippet" id="snip1">
-        <h3>Текст задания</h3>
-        <!-- Важно: только .reading-box, без snippet-reading -->
-        <div id="snip1Box" class="reading-box">Загрузка текста…</div>
-      </div>
+      <!-- Чистая вставка .reading-box как в result 1 -->
+      <div class="task-snippet task-snippet--plain" id="snip1">Загрузка текста…</div>
     </section>
 
     <!-- Task 2 -->
@@ -111,7 +105,6 @@
       <div class="status" id="s2">Загрузка записи…</div>
       <audio id="a2" controls></audio>
       <div class="wave-wrap"><canvas id="w2" class="wave"></canvas></div>
-      <!-- Вставка объявления (картинка) -->
       <div class="task-snippet" id="snip2">
         <h3>Объявление</h3>
         <div class="snippet-images"><img id="snip2Img" alt="Advertisement" onerror="this.style.display='none'"></div>
@@ -125,11 +118,8 @@
       <div class="status" id="s3">Загрузка записи…</div>
       <audio id="a3" controls></audio>
       <div class="wave-wrap"><canvas id="w3" class="wave"></canvas></div>
-      <!-- Вставка вопросов (как в result 3) -->
-      <div class="task-snippet" id="snip3">
-        <h3>Вопросы</h3>
-        <div id="snip3Box">Загрузка вопросов…</div>
-      </div>
+      <!-- Чистая вставка .task-container как в result 3 -->
+      <div class="task-snippet task-snippet--plain" id="snip3">Загрузка вопросов…</div>
     </section>
 
     <!-- Task 4 -->
@@ -140,7 +130,6 @@
       <audio id="a4" controls></audio>
       <div class="wave-wrap"><canvas id="w4" class="wave"></canvas></div>
 
-      <!-- Иллюстрации варианта + инструкция (как раньше) -->
       <div class="task-snippet" id="snip4">
         <h3>Иллюстрации и инструкция</h3>
         <div class="snippet-images" aria-label="Project illustrations (Task 4)">
@@ -307,46 +296,48 @@
       }
     }
 
-    // Инициализируем все 4
+    // Инициализируем все 4 дорожки
     rows.reduce((p,row)=> p.then(()=>setupRow(row)), Promise.resolve());
 
     /* -------------------- ПОДТЯГИВАЕМ КОНТЕНТ ЗАДАНИЙ -------------------- */
     const domParse = (html, baseUrl='.')=>{
       const parser = new DOMParser();
       const doc = parser.parseFromString(html, 'text/html');
-      // починить относительные ссылки/картинки
+      // фикс относительных путей
       doc.querySelectorAll('[src]').forEach(el=>{
         const src = el.getAttribute('src');
-        if (src && !/^([a-z]+:|\/)/i.test(src)) el.setAttribute('src', (baseUrl + '/' + src).replace(/\/{2,}/g,'/').replace(':/','://'));
+        if (src && !/^([a-z]+:|\/)/i.test(src)){
+          el.setAttribute('src', (baseUrl + '/' + src).replace(/\/{2,}/g,'/').replace(':/','://'));
+        }
       });
       return doc;
     };
 
-    // Task 1: ТЕКСТ из result-страницы (точно как там) — .reading-box
+    // Task 1: вставляем целую .reading-box из ege1_varN_4_result.html
     (async ()=>{
       try{
         const url  = `./task1/variants/variant${variant}/ege1_var${variant}_4_result.html`;
         const html = await (await fetch(url, {cache:'no-store'})).text();
         const doc  = domParse(html, `./task1/variants/variant${variant}`);
-        const box  = doc.querySelector('.reading-box');
-        const target = document.getElementById('snip1Box');
-        if (box && target){
-          target.innerHTML = box.innerHTML; // вставляем контент 1-в-1
-        }else{
-          target.textContent = '—';
-        }
+        const rb   = doc.querySelector('.reading-box');
+        const mount= document.getElementById('snip1');
+        if (rb && mount){
+          mount.innerHTML = '';
+          mount.appendChild(rb.cloneNode(true));
+        }else if(mount){ mount.textContent = '—'; }
       }catch{
-        document.getElementById('snip1Box').textContent = 'Не удалось загрузить текст.';
+        const mount = document.getElementById('snip1');
+        if (mount) mount.textContent = 'Не удалось загрузить текст.';
       }
     })();
 
     // Task 2: картинка объявления из task-страницы
     (async ()=>{
       try{
-        const url = `./task2/variants/variant${variant}/ege2_var${variant}_3_task.html`;
+        const url  = `./task2/variants/variant${variant}/ege2_var${variant}_3_task.html`;
         const html = await (await fetch(url, {cache:'no-store'})).text();
-        const doc = domParse(html, `./task2/variants/variant${variant}`);
-        const img = doc.querySelector('.ad-figure img');
+        const doc  = domParse(html, `./task2/variants/variant${variant}`);
+        const img  = doc.querySelector('.ad-figure img');
         if (img){
           const out = document.getElementById('snip2Img');
           out.src = img.getAttribute('src');
@@ -359,49 +350,46 @@
       }
     })();
 
-    // Task 3: ВОПРОСЫ из result-страницы — .task-container
+    // Task 3: вставляем целую .task-container из ege3_varN_4_result.html
     (async ()=>{
       try{
         const url  = `./task3/variants/variant${variant}/ege3_var${variant}_4_result.html`;
         const html = await (await fetch(url, {cache:'no-store'})).text();
         const doc  = domParse(html, `./task3/variants/variant${variant}`);
-        const tc   = doc.querySelector('.task-container'); // здесь лежат вопросы
-        const target = document.getElementById('snip3Box');
-        if (tc && target){
-          target.innerHTML = tc.innerHTML;
-        }else{
-          target.textContent = '—';
-        }
+        const tc   = doc.querySelector('.task-container');
+        const mount= document.getElementById('snip3');
+        if (tc && mount){
+          mount.innerHTML = '';
+          mount.appendChild(tc.cloneNode(true));
+        }else if(mount){ mount.textContent = '—'; }
       }catch{
-        document.getElementById('snip3Box').textContent = 'Не удалось загрузить вопросы.';
+        const mount = document.getElementById('snip3');
+        if (mount) mount.textContent = 'Не удалось загрузить вопросы.';
       }
     })();
 
-    // Task 4: инструкция (.task-container) + фотографии (как раньше)
+    // Task 4: инструкция (.task-container) + фото
     (async ()=>{
       try{
-        const url = `./task4/variants/variant${variant}/ege4_var${variant}_3_task.html`;
+        const url  = `./task4/variants/variant${variant}/ege4_var${variant}_3_task.html`;
         const html = await (await fetch(url, {cache:'no-store'})).text();
-        const doc = domParse(html, `./task4/variants/variant${variant}`);
-        const instr = doc.querySelector('.task-container');
+        const doc  = domParse(html, `./task4/variants/variant${variant}`);
+        const instr= doc.querySelector('.task-container');
         const target = document.getElementById('snip4Box');
-        if (instr){
-          target.innerHTML = instr.innerHTML;
-        }else{
-          target.textContent = '—';
-        }
+        if (instr){ target.innerHTML = instr.innerHTML; }
+        else{ target.textContent = '—'; }
       }catch{
         document.getElementById('snip4Box').textContent = 'Не удалось загрузить инструкцию.';
       }
 
-      // Фото (текущий вариант)
+      // Фото из текущего варианта
       const img1 = document.getElementById('img1');
       const img2 = document.getElementById('img2');
       img1.src = `./task4/variants/variant${variant}/photo1_city.png`;
       img2.src = `./task4/variants/variant${variant}/photo2_countryside.png`;
     })();
 
-    /* -------------------- КНОПКИ НИЖЕ -------------------- */
+    /* -------------------- НИЖНИЕ КНОПКИ -------------------- */
     document.getElementById('repeatExam').addEventListener('click',(e)=>{
       e.preventDefault();
       try{
@@ -410,8 +398,7 @@
         });
       }catch{}
       const v = sessionStorage.getItem('exam_variant') || variant;
-      const url = `./task1/variants/variant${v}/ege1_var${v}_1_prepare.html`;
-      navigateOnce(url);
+      navigateOnce(`./task1/variants/variant${v}/ege1_var${v}_1_prepare.html`);
     });
 
     window.addEventListener('pageshow', ()=>{ navigateOnce.lock = false; });

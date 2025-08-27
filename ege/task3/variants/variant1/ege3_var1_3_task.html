@@ -32,7 +32,6 @@
       text-align:center;
     }
 
-    /* Индикатор записи */
     #recIndicator{
       position:fixed; top:12px; left:12px;
       background:rgba(255,0,0,0.1);
@@ -54,7 +53,6 @@
     #introBox{ margin-bottom:18px; text-align:center; }
     #introNextWrap{ margin-top:40px; display:none; }
 
-    /* кнопка под рамкой */
     #nextBtnWrap{
       text-align:center;
       margin: 10cm 0 30px;
@@ -73,10 +71,7 @@
   </script>
 </head>
 <body>
-  <!-- Тумблер темы -->
   <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
-
-  <!-- Индикатор записи -->
   <div id="recIndicator">🔴 Recording</div>
 
   <!-- Отсчёт -->
@@ -84,9 +79,7 @@
     <div id="timer" class="timer" aria-live="polite">3</div>
   </div>
 
-  <!-- Основной блок -->
   <main class="content-wrapper" id="mainWrap" style="display:none">
-    <!-- Интро -->
     <section class="task-container" id="introBox" aria-live="polite">
       <b>Task 3.</b> Interviewer
       <div id="introNextWrap">
@@ -94,23 +87,19 @@
       </div>
     </section>
 
-    <!-- Вопросы -->
     <section class="q-wrap" id="qWrap" style="display:none">
       <div class="q-head">
         <h2 class="q-title" id="qTitle">Question 1</h2>
       </div>
     </section>
 
-    <!-- Кнопка под рамкой -->
     <div id="nextBtnWrap">
       <button id="nextBtn" class="button" type="button">Дальше</button>
     </div>
   </main>
 
-  <!-- проставка -->
   <div style="height: calc(var(--footer-h, 72px) + 24px);"></div>
 
-  <!-- Прогресс-бар -->
   <div id="progressContainerFixed" role="timer" aria-live="polite" style="display:none">
     <div id="progressBarFixed" class="rAF">
       <span id="progressTime" class="progress-time">00:40</span>
@@ -127,6 +116,15 @@
     const EXAM_VARIANT   = varFromSS || varFromURL || '';
     const RESULT_URL     = location.pathname.replace(/_3_task\.html$/i, '_4_result.html');
     const EXAM_NEXT_URL  = `../../../exams_countdown.html?next=4&variant=${encodeURIComponent(EXAM_VARIANT)}`;
+
+    /* === добавлено: редирект на mic при reload === */
+    try {
+      const nav = performance.getEntriesByType("navigation")[0];
+      const isReload = nav ? (nav.type === "reload") : (performance.navigation && performance.navigation.type === 1);
+      if (isReload) {
+        location.replace(location.pathname.replace(/_3_task\.html$/i, "_2_mic.html"));
+      }
+    } catch(_) {}
 
     try{
       sessionStorage.removeItem('ege3_audio_base64');
@@ -161,7 +159,6 @@
     const audio = new Audio();
     audio.preload = 'auto';
 
-    /* ===== Микрофон ===== */
     let streamRef=null, recorder=null, chosenMime='', recChunks=[];
     let micStarted = false;
 
@@ -185,7 +182,6 @@
       }catch(err){ console.warn('Mic error:', err); }
     }
 
-    /* ===== Таймер ответа ===== */
     let startedAt=0, deadlineMs=0, rafId=0, intId=0, hardTO=0, answering=false, finishing=false;
 
     function startAnswerWindow(){

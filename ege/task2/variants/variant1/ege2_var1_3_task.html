@@ -170,6 +170,18 @@
       recorder.ondataavailable = e => { if (e.data && e.data.size) recChunks.push(e.data); };
     }
 
+    /* ===================== АВТОЗАПУСК ПОСЛЕ MIC ===================== */
+    async function primeMutedAutoplay(){
+      // Тихий запуск q1.mp3 (разрешён браузером), чтобы снять блокировку автоплея
+      try{
+        qAudio.src = AUDIO_SRC[0];
+        qAudio.muted = true;
+        await qAudio.play();
+      }catch(e){
+        console.warn('Prime autoplay failed:', e);
+      }
+    }
+
     /* ===================== ТАЙМЕР И ВОПРОСЫ ===================== */
     let qIdx=0, startedAt=0, deadlineMs=0;
     let rafId=0, intId=0, hardTO=0, finishing=false;
@@ -181,6 +193,14 @@
     }
 
     async function beginSegment(){
+      // Если пришли с mic (флаг установлен) и это первый вопрос — снимаем mute и перематываем
+      if (qIdx === 0 && sessionStorage.getItem('t2_autostart') === '1') {
+        try{
+          qAudio.muted = false;
+          qAudio.currentTime = 0;
+        }catch{}
+      }
+
       await speakQuestion(qIdx+1);
 
       timeEl.textContent = fmtTime(QUESTION_MS);
@@ -265,6 +285,7 @@
 
     function cleanupAndNavigate(){
       try{ streamRef?.getTracks()?.forEach(t=>t.stop()); }catch{}
+      try{ sessionStorage.removeItem('t2_autostart'); }catch{}   /* очистим флаг */
       navigateOnce(inExam ? EXAM_NEXT_URL : RESULT_URL);
     }
 
@@ -280,7 +301,7 @@
 
     /* ===================== СТАРТ ===================== */
     function startCountdown(){
-      // Подогреем первый трек
+      // Подогреем первый трек (быстрее старт после отсчёта)
       try{ qAudio.src = AUDIO_SRC[0]; qAudio.load(); }catch{}
 
       let n = 3;
@@ -304,6 +325,10 @@
 
       try{
         await initMic();
+        // Если пришли с mic и поставлен флаг — тихо праймим q1.mp3 заранее
+        if (sessionStorage.getItem('t2_autostart') === '1') {
+          await primeMutedAutoplay();
+        }
         recorder.start(1000);
       }catch(err){
         console.warn('Mic init error:', err);
@@ -317,6 +342,12 @@
       mainWrap.style.display = 'none';
       barWrap.style.display = 'none';
       nextBtn.disabled = false;
+
+      // Если пришли со страницы mic с OK → праймим q1.mp3
+      if (sessionStorage.getItem('t2_autostart') === '1') {
+        primeMutedAutoplay();
+      }
+
       startCountdown();
     }
 

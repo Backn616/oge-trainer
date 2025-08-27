@@ -53,6 +53,33 @@
   <!-- Переключатель темы -->
   <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
 
+  <!-- СКРЫТЫЙ ПРОИГРЫВАТЕЛЬ ДЛЯ MP3 (ПОСТАВИЛ ВВЕРХ, ЧТОБЫ МОЖНО БЫЛО ПРАЙМИТЬ РАНО) -->
+  <audio id="qAudio" preload="auto" playsinline webkit-playsinline></audio>
+
+  <!-- РАННИЙ СКРИПТ: при RELOAD запускаем q1.mp3 в mute c autoplay без нового play() позднее -->
+  <script>
+    (function(){
+      try {
+        var nav = performance.getEntriesByType && performance.getEntriesByType('navigation')[0];
+        var isReload = nav ? (nav.type === 'reload') : (performance && performance.navigation && performance.navigation.type === 1);
+        if (isReload) {
+          var a = document.getElementById('qAudio');
+          if (a) {
+            a.src = './q1.mp3';
+            a.muted = true;
+            a.autoplay = true;         // даём браузеру автозапустить трек по атрибуту
+            a.playsInline = true;      // страховка для мобильных
+            a.setAttribute('playsinline','');
+            a.setAttribute('webkit-playsinline','');
+            // На некоторых платформах помогает явный вызов play() - он будет разрешён, т.к. muted+autoplay
+            setTimeout(function(){ a.play().catch(function(){}); }, 0);
+            window.__t2Primed = true;  // помечаем, что трек уже крутится в mute
+          }
+        }
+      } catch(_) {}
+    })();
+  </script>
+
   <!-- ВЕРХ: отсчёт 3-2-1 -->
   <div class="content-wrapper" id="countdownWrap">
     <div id="timer" class="timer" aria-live="polite">3</div>
@@ -93,9 +120,6 @@
       <span id="progressTime" class="progress-time">00:20</span>
     </div>
   </div>
-
-  <!-- СКРЫТЫЙ ПРОИГРЫВАТЕЛЬ ДЛЯ MP3 -->
-  <audio id="qAudio" preload="auto"></audio>
 
   <!-- ЛОГИКА -->
   <script type="module">
@@ -179,7 +203,7 @@
     }
 
     async function primeMutedAutoplay(){
-      // Запускаем q1.mp3 в mute и НЕ ставим на паузу: будет крутиться тихо до старта сегмента
+      // Если не RELOAD и пришли с mic-флага — крутим q1.mp3 тихо заранее (на всякий случай)
       try{
         qAudio.src = AUDIO_SRC[0];
         qAudio.muted = true;
@@ -312,7 +336,7 @@
 
     /* ===================== СТАРТ ===================== */
     function startCountdown(){
-      // Подогреем первый трек (быстрее старт после отсчёта)
+      // Быстрая загрузка первого трека
       try{ qAudio.src = AUDIO_SRC[0]; qAudio.load(); }catch{}
 
       let n = 3;
@@ -336,8 +360,8 @@
 
       try{
         await initMic();
-        // Если пришли с mic (флаг) или это reload — сразу праймим q1.mp3 в mute
-        if (sessionStorage.getItem('t2_autostart') === '1' || isReload()) {
+        // Если пришли с mic-флага — подстрахуемся и тоже праймим (для не-reload сценария)
+        if (sessionStorage.getItem('t2_autostart') === '1' && !isReload()) {
           await primeMutedAutoplay();
         }
         recorder.start(1000);
@@ -354,8 +378,8 @@
       barWrap.style.display = 'none';
       nextBtn.disabled = false;
 
-      // На входе со страницы mic (флаг) или при обновлении — праймим q1.mp3 (mute)
-      if (sessionStorage.getItem('t2_autostart') === '1' || isReload()) {
+      // При reload ранний скрипт уже запустил q1 в mute. При приходе с mic — праймим тут.
+      if (sessionStorage.getItem('t2_autostart') === '1' && !isReload()) {
         primeMutedAutoplay();
       }
 

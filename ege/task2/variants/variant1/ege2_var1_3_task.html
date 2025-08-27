@@ -102,15 +102,34 @@
     import { toggleThemeInit, navigateOnce, fmtTime } from "../../../common.js";
     toggleThemeInit();
 
-    /* ====== РЕЖИМЫ: обычный vs «экзамен полностью» ====== */
-    const inExam       = (sessionStorage.getItem('exam_flow') === '1');
-    const varFromSS    = sessionStorage.getItem('exam_variant') || '';
-    const varFromURL   = (()=>{ const m = location.pathname.match(/var(?:iant)?(\d+)/i); return m ? m[1] : ''; })();
-    const EXAM_VARIANT = varFromSS || varFromURL || '';
-    const RESULT_URL   = location.pathname.replace(/_3_task\.html$/i, '_4_result.html');
-    const EXAM_NEXT_URL= `../../../exams_countdown.html?next=3&variant=${encodeURIComponent(EXAM_VARIANT)}`;
+    /* ====== URL'ы и режимы ====== */
+    const inExam        = (sessionStorage.getItem('exam_flow') === '1');
+    const varFromSS     = sessionStorage.getItem('exam_variant') || '';
+    const varFromURL    = (()=>{ const m = location.pathname.match(/var(?:iant)?(\d+)/i); return m ? m[1] : ''; })();
+    const EXAM_VARIANT  = varFromSS || varFromURL || '';
+    const RESULT_URL    = location.pathname.replace(/_3_task\.html$/i, '_4_result.html');
+    const EXAM_NEXT_URL = `../../../exams_countdown.html?next=3&variant=${encodeURIComponent(EXAM_VARIANT)}`;
+    const MIC_URL       = location.pathname.replace(/_3_task\.html$/i, '_2_mic.html');
 
-    /* ===================== ПОДГОТОВКА ===================== */
+    /* ====== Редирект на mic при перезагрузке ====== */
+    function isReload(){
+      try{
+        const nav = performance.getEntriesByType('navigation')[0];
+        return nav && nav.type === 'reload';
+      }catch{
+        return (performance && performance.navigation && performance.navigation.type === 1);
+      }
+    }
+
+    if (isReload() && !sessionStorage.getItem('t2_reload_redirected')){
+      try { sessionStorage.setItem('t2_reload_redirected','1'); } catch {}
+      try { sessionStorage.setItem('t2_autostart','1'); } catch {}
+      location.replace(MIC_URL);
+      // Прекращаем дальнейшее выполнение
+      throw new Error('Redirecting to mic after reload');
+    }
+
+    /* ====== Подготовка ====== */
     try{
       sessionStorage.removeItem('ege2_audio_base64');
       sessionStorage.removeItem('ege2_audio_mime');
@@ -138,7 +157,7 @@
 
     const QUESTION_MS = 20_000;
 
-    /* ===================== ОЗВУЧКА: ЛОКАЛЬНЫЕ MP3 ===================== */
+    /* ====== Аудио (локальные mp3) ====== */
     const AUDIO_SRC = ["./q1.mp3","./q2.mp3","./q3.mp3","./q4.mp3"];
 
     async function speakQuestion(num){
@@ -155,7 +174,7 @@
       }
     }
 
-    /* ===================== МИКРОФОН (ОДИН СЕАНС) ===================== */
+    /* ====== Микрофон ====== */
     let streamRef=null, recorder=null, chosenMime='', recChunks=[];
     function pickMimeType(){
       const c=['audio/webm;codecs=opus','audio/webm','audio/ogg;codecs=opus','audio/ogg','audio/mp4'];
@@ -170,34 +189,19 @@
       recorder.ondataavailable = e => { if (e.data && e.data.size) recChunks.push(e.data); };
     }
 
-    /* ===================== АВТОЗАПУСК ПОСЛЕ MIC ===================== */
-    // 1) праймим q1.mp3 в mute сразу после getUserMedia (жест на mic-странице не переносится, но mute-autoplay разрешён)
+    /* ====== Прайминг q1 после getUserMedia (mute) ====== */
     async function primeMutedQ1(){
       try{
         qAudio.src = AUDIO_SRC[0];
         qAudio.muted = true;
-        await qAudio.play();     // начать играть тихо
+        await qAudio.play();           // начинаем «тихо»
         window.__t2Primed = true;
       }catch(e){
         console.warn('Prime (muted) failed:', e);
       }
     }
 
-    // 2) запасной план: если всё равно заблокировалось, один раз включим звук по первому клику
-    function installOneTapUnmute(){
-      const handler = () => {
-        try{
-          qAudio.muted = false;
-          if (qAudio.paused) qAudio.play().catch(()=>{});
-        }catch{}
-        window.removeEventListener('click', handler, {capture:true});
-        window.removeEventListener('touchstart', handler, {capture:true});
-      };
-      window.addEventListener('click', handler, {once:true, capture:true, passive:true});
-      window.addEventListener('touchstart', handler, {once:true, capture:true, passive:true});
-    }
-
-    /* ===================== ТАЙМЕР И ВОПРОСЫ ===================== */
+    /* ====== Таймер и вопросы ====== */
     let qIdx=0, startedAt=0, deadlineMs=0;
     let rafId=0, intId=0, hardTO=0, finishing=false;
 
@@ -208,14 +212,13 @@
     }
 
     async function beginSegment(){
-      // Если это первый вопрос и мы уже крутим q1 в mute → просто снимаем mute и перематываем (без нового play)
+      // если первый вопрос и q1 уже крутится в mute — просто снимаем mute и перематываем
       if (qIdx === 0 && window.__t2Primed && qAudio.src.includes('q1.mp3')){
         try{
           qAudio.currentTime = 0;
           qAudio.muted = false;
         }catch{}
       } else {
-        // Для всех остальных (и если прайминг не сработал) — обычный запуск
         await speakQuestion(qIdx+1);
       }
 
@@ -267,7 +270,7 @@
         nextBtn.disabled = false;
         beginSegment();
       }else{
-        // Конец: останавливаем запись, сохраняем один файл и переходим дальше
+        // конец: сохраняем запись и уходим дальше
         try{
           if (recorder && recorder.state !== 'inactive'){
             recorder.onstop = saveAndGo;
@@ -279,7 +282,7 @@
 
     async function saveAndGo(){
       try{
-        await new Promise(r=>setTimeout(r,0)); // дождаться последнего ondataavailable
+        await new Promise(r=>setTimeout(r,0));
         const blob = recChunks && recChunks.length ? new Blob(recChunks, { type: chosenMime || 'audio/webm' }) : null;
         if (blob){
           const reader = new FileReader();
@@ -302,6 +305,7 @@
     function cleanupAndNavigate(){
       try{ streamRef?.getTracks()?.forEach(t=>t.stop()); }catch{}
       try{ sessionStorage.removeItem('t2_autostart'); }catch{}
+      try{ sessionStorage.removeItem('t2_reload_redirected'); }catch{}
       navigateOnce(inExam ? EXAM_NEXT_URL : RESULT_URL);
     }
 
@@ -315,9 +319,9 @@
       }
     });
 
-    /* ===================== СТАРТ ===================== */
+    /* ====== Старт ====== */
     function startCountdown(){
-      // Быстрая загрузка первого трека
+      // прогружаем q1 для быстрого старта
       try{ qAudio.src = AUDIO_SRC[0]; qAudio.load(); }catch{}
 
       let n = 3;
@@ -340,18 +344,17 @@
       renderQuestion();
 
       try{
-        await initMic();
-        // если пришли с mic (ставили флаг) — заранее крутим q1.mp3 тихо
-        if (sessionStorage.getItem('t2_autostart') === '1') {
-          await primeMutedQ1();
+        await initMic();                 // жест «Allow» от пользователя
+        if (sessionStorage.getItem('t2_autostart') === '1'){
+          await primeMutedQ1();          // крутим q1 тихо заранее
         }
         recorder.start(1000);
       }catch(err){
         console.warn('Mic init error:', err);
       }
 
-      // запасной план: если вдруг прайминг не прошёл — активируем по первому клику
-      if (!window.__t2Primed) installOneTapUnmute();
+      // мы успешно стартовали — снимем метку анти-зацикливания reload
+      try { sessionStorage.removeItem('t2_reload_redirected'); } catch {}
 
       beginSegment();
     }

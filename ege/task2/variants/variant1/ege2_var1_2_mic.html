@@ -78,6 +78,8 @@
     a.href = NEXT_URL; // fallback, если JS отключён
     a.addEventListener('click', (e) => {
       e.preventDefault();
+      // ⚡ Ставим флаг для автозапуска озвучки на странице task
+      try { sessionStorage.setItem('t2_autostart', '1'); } catch {}
       navigateOnce(NEXT_URL);
     });
 

@@ -24,7 +24,7 @@
   </script>
 
   <style>
-    /* Таймер-цифры 3‑2‑1 */
+    /* Таймер-цифры 3-2-1 */
     .timer{
       font-size:70px; margin:30px 0; font-weight:700; color:var(--primary);
       letter-spacing:4px; text-shadow:0 4px 12px rgba(0,0,0,.25);
@@ -32,16 +32,26 @@
     }
     @media (prefers-reduced-motion: reduce) { .timer{ transition:none; } }
 
-    /* Текст для чтения — как в prepare/result */
+    /* Текст для чтения — как в prepare (компактная рамка) */
     .reading-box{
-      max-width:2500px; width:95%; margin:0 auto 30px;
-      background:var(--card); border:1px solid #ccc; border-radius:12px; box-shadow:var(--shadow);
-      padding:40px; text-align:left;
-      font-size:32px; line-height:1.9;
+      background:var(--card);
+      border:1px solid #ccc;
+      border-radius:12px;
+      box-shadow:var(--shadow);
+      padding:24px 28px;                 /* было 40px */
+      text-align:left;
+      font-family: Inter, system-ui, Segoe UI, Roboto, Arial, sans-serif;
+      font-size:25px;                     /* было 32px */
+      line-height:1.7;
+      max-width:1200px;                   /* было 2500px */
+      margin:0 auto 24px;
+      white-space:pre-line;               /* переносы строк как абзацы */
     }
-    @media (max-width:900px){ .reading-box{ font-size:28px; } }
+    @media (max-width:900px){
+      .reading-box{ font-size:18px; padding:18px 16px; max-width:100%; }
+    }
 
-    /* Единый стиль крупных кнопок (как в result и 4‑м эталоне) */
+    /* Кнопка завершения */
     .btn{
       display:inline-block; padding:16px 32px; margin:12px;
       font-size:20px; font-weight:600; color:#fff; text-decoration:none; cursor:pointer;
@@ -59,7 +69,7 @@
   <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
 
   <div class="content-wrapper">
-    <!-- Формулировка задания: СКРЫТА до конца отсчёта. Рамка — как в result (.task-container) -->
+    <!-- Формулировка задания: скрыта до конца отсчёта -->
     <div class="task-container" id="instructionBox" style="display:none" aria-labelledby="taskTitle" aria-describedby="inst">
       <b id="taskTitle">Task 1. Imagine that you are preparing a project with your friend.</b>
       You have found some interesting material for the presentation and you want to read this text to your friend.
@@ -81,13 +91,13 @@ Scientists believe that studying bioluminescence can help develop new medical an
 Bioluminescence is not only beautiful — it is a powerful tool of survival and discovery. These glowing creatures remind us how much we still have to learn about the natural world. Their light, shining in the darkness, is both mysterious and meaningful.
     </div>
 
-    <!-- Кнопка завершения — крупная .btn -->
+    <!-- Кнопка завершения -->
     <div style="text-align:center; margin-bottom:30px;">
       <button class="btn" id="endBtn" type="button" aria-label="Закончить запись" style="display:none">✅ Закончить</button>
     </div>
   </div>
 
-  <!-- Проставка над фикс‑баром -->
+  <!-- Проставка над фикс-баром -->
   <div style="height: calc(var(--footer-h) + 24px);"></div>
 
   <!-- Фиксированный прогресс-бар времени ответа -->
@@ -111,18 +121,15 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
     const progressBar    = document.getElementById('progressBarFixed');
     const progressTime   = document.getElementById('progressTime');
 
-    // Обычный локальный result (когда НЕ экзамен целиком)
     const RESULT_URL = location.pathname.replace(/_3_task\.html$/i, '_4_result.html');
 
-    // Режим «экзамен полностью»
-    const inExam   = (sessionStorage.getItem('exam_flow') === '1');
-    const varFromSS= sessionStorage.getItem('exam_variant') || '';
-    const varFromURL = (location.pathname.match(/variant(\d+)/i) || [,''])[1];
-    const EXAM_VARIANT = varFromSS || varFromURL || '';
-    // exams_countdown.html лежит в /ege/, из текущей папки это ../../../
+    const inExam      = (sessionStorage.getItem('exam_flow') === '1');
+    const varFromSS   = sessionStorage.getItem('exam_variant') || '';
+    const varFromURL  = (location.pathname.match(/variant(\d+)/i) || [,''])[1];
+    const EXAM_VARIANT= varFromSS || varFromURL || '';
     const EXAM_NEXT_URL = `../../../exams_countdown.html?next=2&variant=${encodeURIComponent(EXAM_VARIANT)}`;
 
-    // ===== Захват микрофона и запись =====
+    /* === Микрофон и запись === */
     let mediaRecorder = null, audioChunks = [], streamRef = null;
     let chosenMime = '', hasStopped = false;
 
@@ -156,7 +163,6 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
               sessionStorage.setItem('ege1_audio_base64', reader.result);
               sessionStorage.setItem('ege1_audio_mime', blobType);
             }catch{}
-            // Ветка перехода: экзамен полностью → общий отсчёт к Task 2
             navigateOnce(inExam ? EXAM_NEXT_URL : RESULT_URL);
           };
           reader.readAsDataURL(audioBlob);
@@ -169,7 +175,7 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
       }
     }
 
-    // ===== Отсчёт 3‑2‑1 =====
+    /* === Отсчёт 3-2-1 === */
     let countdown = 3;
     let cdInterval = 0;
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -192,7 +198,7 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
       },1000);
     }
 
-    // ===== Таймер ответа 1:30 на rAF =====
+    /* === Таймер ответа 1:30 на rAF === */
     const TOTAL_MS = 90_000;
     let endTs = 0, rafId = 0, lastAnnounce = 0;
 
@@ -206,7 +212,7 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
       audioChunks = [];
       try{ if (mediaRecorder && mediaRecorder.state !== 'recording') mediaRecorder.start(); }catch{}
 
-      progressBar.classList.add('rAF');   // управляем прогрессом через rAF
+      progressBar.classList.add('rAF');
       endTs = performance.now() + TOTAL_MS;
       progressTime.textContent = fmtTime(TOTAL_MS);
       progressBar.style.width  = '100%';
@@ -247,18 +253,18 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
       try{ streamRef?.getTracks()?.forEach(t=>t.stop()); }catch{}
     });
 
-    // --- BFCache: назад из следующего шага → заново отсчёт и запись ---
+    /* === BFCache: возврат со следующего шага → рестарт === */
     function isBackForwardNav(){
-      try {
+      try{
         const nav = performance.getEntriesByType('navigation')[0];
         return nav && nav.type === 'back_forward';
-      } catch { return false; }
+      }catch{ return false; }
     }
     function resetAndRestart(){
       try { cancelAnimationFrame(rafId); } catch {}
       try { clearInterval(cdInterval); } catch {}
       try { if (mediaRecorder?.state === 'recording') mediaRecorder.stop(); } catch {}
-      try { streamRef?.getTracks()?.forEach(t => t.stop()); } catch {}
+      try { streamRef?.getTracks()?.forEach(t=>t.stop()); } catch {}
 
       timerEl.style.display        = 'block';
       timerEl.textContent          = '3';
@@ -275,7 +281,7 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
 
       initMic();
     }
-    window.addEventListener('pageshow', (e) => {
+    window.addEventListener('pageshow', (e)=>{
       try { navigateOnce.lock = false; } catch {}
       if (e.persisted || isBackForwardNav()) resetAndRestart();
     });

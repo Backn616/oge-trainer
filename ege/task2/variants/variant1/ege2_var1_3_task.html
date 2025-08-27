@@ -101,7 +101,7 @@
     </div>
   </div>
 
-  <!-- СКРЫТЫЙ ПРОИГРЫВАТЕЛЬ ДЛЯ MP3 (ДОБАВЛЕНО) -->
+  <!-- СКРЫТЫЙ ПРОИГРЫВАТЕЛЬ ДЛЯ MP3 -->
   <audio id="qAudio" preload="auto"></audio>
 
   <!-- ЛОГИКА -->
@@ -110,12 +110,13 @@
     toggleThemeInit();
 
     /* ====== РЕЖИМЫ: обычный vs «экзамен полностью» ====== */
-    const inExam         = (sessionStorage.getItem('exam_flow') === '1');
-    const varFromSS      = sessionStorage.getItem('exam_variant') || '';
-    const varFromURL     = (location.pathname.match(/variant(\d+)/i) || [,''])[1];
-    const EXAM_VARIANT   = varFromSS || varFromURL || '';
-    const RESULT_URL     = location.pathname.replace(/_3_task\.html$/i, '_4_result.html');
-    const EXAM_NEXT_URL  = `../../../exams_countdown.html?next=3&variant=${encodeURIComponent(EXAM_VARIANT)}`;
+    const inExam       = (sessionStorage.getItem('exam_flow') === '1');
+    const varFromSS    = sessionStorage.getItem('exam_variant') || '';
+    // выцепим var1/variant1 из пути (работает и для .../variants/variant1/..., и для ...var1_3_task.html)
+    const varFromURL   = (()=>{ const m = location.pathname.match(/var(?:iant)?\s*?(\d+)/i); return m ? m[1] : ''; })();
+    const EXAM_VARIANT = varFromSS || varFromURL || '';
+    const RESULT_URL   = location.pathname.replace(/_3_task\.html$/i, '_4_result.html');
+    const EXAM_NEXT_URL= `../../../exams_countdown.html?next=3&variant=${encodeURIComponent(EXAM_VARIANT)}`;
 
     /* ===================== ПОДГОТОВКА ===================== */
     try{
@@ -145,7 +146,10 @@
 
     const QUESTION_MS = 20_000;
 
-    /* ===================== ОЗВУЧКА: MP3 с fallback на TTS (ОБНОВЛЕНО) ===================== */
+    /* ===================== ОЗВУЧКА: MP3 (рядом с HTML) + fallback на TTS ===================== */
+    // локальные файлы в той же папке, что и этот HTML:
+    const AUDIO_SRC = ["./q1.mp3","./q2.mp3","./q3.mp3","./q4.mp3"];
+
     function showTtsHint(){
       if (document.querySelector('.tts-hint')) return;
       const el = document.createElement('div');
@@ -157,14 +161,6 @@
       window.addEventListener('touchstart', remove, { passive:true });
     }
 
-    // Пути к аудио. Положи файлы по схеме: audio/ege2/variant{N}/q{1..4}.mp3
-    const AUDIO_SRC = [
-      `../../../audio/ege2/variant${EXAM_VARIANT || 1}/q1.mp3`,
-      `../../../audio/ege2/variant${EXAM_VARIANT || 1}/q2.mp3`,
-      `../../../audio/ege2/variant${EXAM_VARIANT || 1}/q3.mp3`,
-      `../../../audio/ege2/variant${EXAM_VARIANT || 1}/q4.mp3`,
-    ];
-
     function stripHtml(html){ return (html || '').replace(/<[^>]+>/g, ''); }
 
     async function speakQuestion(num){
@@ -173,32 +169,29 @@
 
       // 1) Пытаемся проиграть MP3
       try{
-        // Если путь пустой/undefined — бросим исключение в ручную
         if (!src) throw new Error('No audio src');
         qAudio.pause();
         qAudio.currentTime = 0;
         qAudio.src = src;
-        await qAudio.play();        // может бросить в случае блокировки автоплея или 404
-        return;                     // успех — выходим
+        await qAudio.play();             // если 404/блок автоплея — упадём в catch
+        return;
       }catch(_){
-        // 2) Fallback на TTS (и подсказка про первый клик)
+        // 2) Fallback на TTS
         showTtsHint();
         try{
           speechSynthesis.cancel();
           const text = "Question " + num + ". " + stripHtml(QUESTIONS[idx]?.line);
           const u = new SpeechSynthesisUtterance(text);
-          // предпочитаем британский, если доступен
           u.lang = "en-GB"; u.rate = 1.0; u.pitch = 1.0;
 
           const pickVoice = () => {
             const voices = speechSynthesis.getVoices();
             return voices.find(v => /UK|GB|British/i.test(v.name))
                 || voices.find(v => /en-GB/i.test(v.lang))
-                || voices.find(v => /India|IN|en-IN/i.test(v.name+v.lang))
+                || voices.find(v => /India|IN|en-IN/i.test((v.name||'')+(v.lang||'')))
                 || voices[0];
           };
-          const voice = pickVoice();
-          if (voice) u.voice = voice;
+          const voice = pickVoice(); if (voice) u.voice = voice;
 
           const said = await new Promise(res=>{
             let done=false; const to=setTimeout(()=>{ if(!done){done=true;res(false);} },1500);

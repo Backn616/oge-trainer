@@ -24,30 +24,32 @@
   </script>
 
   <style>
-    /* Локальная рамка для текста чтения (не конфликтует с эталоном) */
+    /* Компактная рамка для текста чтения */
     .reading-box{
       background:var(--card);
       border:1px solid #ccc;
       border-radius:12px;
       box-shadow:var(--shadow);
-      padding:40px;
+      padding:24px 28px;                  /* было 40px */
       text-align:left;
       font-family: Inter, system-ui, Segoe UI, Roboto, Arial, sans-serif;
-      font-size:32px;
-      line-height:1.9;
-      margin-bottom:30px;
+      font-size:21px;                      /* было 32px (≈ в 1.5 раза меньше) */
+      line-height:1.7;                     /* чуть плотнее */
+      max-width:1000px;                    /* уже контейнера */
+      margin:0 auto 24px;                  /* центрируем и уменьшаем отступ снизу */
+      white-space:pre-line;                /* показывать переносы строк как абзацы */
     }
     @media (max-width:900px){
-      .reading-box{ font-size:28px; }
+      .reading-box{ font-size:18px; padding:18px 16px; max-width:100%; }
     }
   </style>
 </head>
 <body>
-  <!-- Тумблер темы (уже оформлен в style_common.css) -->
+  <!-- Тумблер темы -->
   <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
 
   <div class="content-wrapper">
-    <!-- Инструкция — используем общий .task-container -->
+    <!-- Инструкция -->
     <div class="task-container" role="region" aria-labelledby="taskTitle">
       <p id="taskTitle" style="margin-top:0;">
         <strong>Task 1.</strong> Imagine that you are preparing a project with your friend.
@@ -57,13 +59,10 @@
       </p>
     </div>
 
-    <!-- Текст для чтения: БЕЗ <p>/<br>, текст сразу после <div> -->
+    <!-- Текст для чтения -->
     <div class="reading-box" id="readingBox">Bioluminescence is the ability of certain living organisms to produce light. This fascinating phenomenon can be observed in various species of deep-sea fish, jellyfish, fireflies, and even some fungi.
-
 The light is usually blue or green, which travels best through water. These organisms use light for different reasons. Some attract mates or prey, while others use it to confuse predators. For example, the anglerfish has a glowing lure to draw in its victims in the dark ocean depths.
-
 Scientists believe that studying bioluminescence can help develop new medical and technological solutions. Special proteins from glowing jellyfish are already used in genetic research. These discoveries support innovation in areas like disease detection and cell tracking.
-
 Bioluminescence is not only beautiful — it is a powerful tool of survival and discovery. These glowing creatures remind us how much we still have to learn about the natural world. Their light, shining in the darkness, is both mysterious and meaningful.</div>
 
     <div style="text-align:center; margin-bottom:30px;">
@@ -71,10 +70,10 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
     </div>
   </div>
 
-  <!-- Проставка над фикс‑баром (см. --footer-h в style_common.css) -->
+  <!-- Проставка над фикс-баром -->
   <div style="height: calc(var(--footer-h) + 24px);"></div>
 
-  <!-- Фиксированный прогресс‑бар (оформление в style_common.css) -->
+  <!-- Фиксированный прогресс-бар -->
   <div id="progressContainerFixed" role="timer" aria-live="polite" aria-atomic="true" aria-label="Оставшееся время подготовки">
     <div id="progressBarFixed" class="rAF">
       <span id="progressTime" class="progress-time">01:30</span>
@@ -85,16 +84,11 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
   <script type="module">
     import { toggleThemeInit, navigateOnce, startPrepareTimer, fmtTime } from "../../../common.js";
 
-    // Тема
     toggleThemeInit();
 
-    // Следующий шаг (mic) — подставляем номер варианта из имени файла
     const NEXT_URL = location.pathname.replace(/_1_prepare\.html$/i, '_2_mic.html');
-
-    // Кнопка перехода
     document.getElementById('goBtn')?.addEventListener('click', () => navigateOnce(NEXT_URL));
 
-    // Метаданные + очистка прошлой записи
     try{
       sessionStorage.removeItem('ege1_audio_base64');
       sessionStorage.removeItem('ege1_audio_mime');
@@ -105,12 +99,10 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
       }));
     }catch{}
 
-    // Таймер 1:30 на rAF (визуал берём из style_common.css)
     const TOTAL_MS = 90_000;
     const barEl  = document.getElementById('progressBarFixed');
     const timeEl = document.getElementById('progressTime');
 
-    // Старт/рестарт
     let stopTimer = null;
     function startTimerFresh(){
       timeEl.textContent = fmtTime(TOTAL_MS);
@@ -129,7 +121,6 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
     }
     startTimerFresh();
 
-    // BFCache: возврат со следующего шага → перезапуск таймера
     function isBackForwardNav(){
       try{
         const nav = performance.getEntriesByType('navigation')[0];

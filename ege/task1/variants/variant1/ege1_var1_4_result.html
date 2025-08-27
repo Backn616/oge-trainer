@@ -37,7 +37,7 @@
     .status{ font-size:20px; color:#1f7a2e; text-align:center; margin:6px 0 26px; }
     .dark .status{ color:#5ee397; }
 
-    /* Плеер и волна (точно как во 2 задании) */
+    /* Плеер и волна */
     audio{ margin:20px auto 10px; width:min(900px,95%); display:block; }
     .wave-wrap{ width:min(900px,95%); margin:0 auto 16px; display:none; }
     .wave{ width:100%; height:48px; display:block; background:#e9edf7; border-radius:10px; box-shadow:var(--shadow); }
@@ -45,9 +45,9 @@
 
     /* Цвета волны для светлой/тёмной темы */
     :root{
-      --wave-base: rgba(0,0,0,.28);      /* незаполненная часть */
-      --wave-prog: var(--primary);       /* цвет прогресса */
-      --wave-glow: rgba(43,108,255,.45); /* свечение */
+      --wave-base: rgba(0,0,0,.28);
+      --wave-prog: var(--primary);
+      --wave-glow: rgba(43,108,255,.45);
     }
     html.dark{
       --wave-base: rgba(255,255,255,.52);
@@ -67,17 +67,22 @@
     .btn:disabled{ opacity:.6; cursor:not-allowed; transform:none; }
 
     .instruction-box{
-      max-width:3000px; width:95%; margin:0 auto 30px; font-size:22px; line-height:1.6; text-align:left;
-      border:2px solid var(--panel-border); padding:25px; border-radius:12px; background:var(--panel-bg); box-shadow:var(--shadow);
+      max-width:1200px; width:95%; margin:0 auto 24px;
+      font-size:20px; line-height:1.6; text-align:left;
+      border:2px solid var(--panel-border); padding:20px; border-radius:12px;
+      background:var(--panel-bg); box-shadow:var(--shadow);
     }
+
+    /* >>> СЮДА ВНЕСЁННЫЕ ИЗМЕНЕНИЯ, как в prepare/task <<< */
     .reading-box{
-      max-width:3000px; width:95%; margin:0 auto 30px;
-      font-size:32px; line-height:1.9; text-align:left;
-      border:1px solid #ccc; padding:40px; border-radius:12px;
+      max-width:1200px; width:95%; margin:0 auto 24px;
+      font-size:25px; line-height:1.7; text-align:left;
+      border:1px solid #ccc; padding:24px 28px; border-radius:12px;
       background:var(--card); box-shadow:var(--shadow);
+      white-space:pre-line;
     }
     @media (max-width: 900px){
-      .reading-box{ font-size:28px; }
+      .reading-box{ font-size:18px; padding:18px 16px; max-width:100%; }
     }
   </style>
 </head>
@@ -105,7 +110,7 @@
     </div>
 
     <!-- Инструкция -->
-    <div class="task-container" aria-labelledby="taskTitle" aria-describedby="inst">
+    <div class="task-container instruction-box" aria-labelledby="taskTitle" aria-describedby="inst">
       <b id="taskTitle">Task 1. Imagine that you are preparing a project with your friend.</b>
       You have found some interesting material for the presentation and you want to read this text to your friend.
       You have 1.5 minutes to read the text silently, then be ready to read it out loud. You will not have more than 1.5 minutes to read it.
@@ -255,7 +260,7 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
     window.addEventListener('pagehide', ()=>{ if (objectURL) URL.revokeObjectURL(objectURL); });
     window.addEventListener('beforeunload', ()=>{ if (objectURL) URL.revokeObjectURL(objectURL); });
 
-    // ===== Волновой бегунок (как во 2 задании)
+    // ===== Волновой бегунок
     async function initWaveformFromURL(url){
       try{
         const resp = await fetch(url);
@@ -264,7 +269,7 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
         const ctx  = new AC();
         const audioBuf = await ctx.decodeAudioData(buf);
 
-        const peaks = buildPeaks(audioBuf, 1000); // количество «столбиков»
+        const peaks = buildPeaks(audioBuf, 1000);
         drawWave(peaks, 0);
         waveWrap.style.display = 'block';
 
@@ -318,22 +323,18 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
       const ctx = c.getContext('2d');
       ctx.setTransform(dpr,0,0,dpr,0,0);
 
-      // цвета зависят от темы (из CSS-переменных)
       const rs = getComputedStyle(document.documentElement);
       const waveBase = (rs.getPropertyValue('--wave-base') || 'rgba(0,0,0,.28)').trim();
       const waveProg = (rs.getPropertyValue('--wave-prog') || '#2b6cff').trim();
       const waveGlow = (rs.getPropertyValue('--wave-glow') || 'rgba(43,108,255,.45)').trim();
 
-      // фон берём из стиля канваса (.wave / .dark .wave)
       const bg = getComputedStyle(c).backgroundColor;
 
-      // фон
       ctx.clearRect(0,0,cssW,cssH);
       ctx.fillStyle = bg; ctx.fillRect(0,0,cssW,cssH);
 
       const mid = cssH/2;
 
-      // незаполненная часть (серые/светлые столбики)
       ctx.fillStyle = waveBase;
       for (let i=0;i<peaks.length;i++){
         const x = i/peaks.length*cssW;
@@ -343,7 +344,6 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
         ctx.fillRect(x, mid-hTop, 1, hTop+hBot || 1);
       }
 
-      // прогресс — цветной, с мягким glow
       const progW = Math.max(0, Math.min(cssW, progress*cssW));
       ctx.save();
       ctx.beginPath();

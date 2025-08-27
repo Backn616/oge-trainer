@@ -91,15 +91,18 @@
     </section>
   </main>
 
-  <!-- Проставка, чтобы фикс‑бар не наезжал -->
+  <!-- Проставка, чтобы фикс-бар не наезжал -->
   <div style="height: calc(var(--footer-h, 72px) + 24px);"></div>
 
-  <!-- Фиксированный прогресс‑бар снизу (20 сек) -->
+  <!-- Фиксированный прогресс-бар снизу (20 сек) -->
   <div id="progressContainerFixed" role="timer" aria-live="polite" style="display:none">
     <div id="progressBarFixed" class="rAF">
       <span id="progressTime" class="progress-time">00:20</span>
     </div>
   </div>
+
+  <!-- СКРЫТЫЙ ПРОИГРЫВАТЕЛЬ ДЛЯ MP3 (ДОБАВЛЕНО) -->
+  <audio id="qAudio" preload="auto"></audio>
 
   <!-- ЛОГИКА -->
   <script type="module">
@@ -138,10 +141,11 @@
     const barWrap  = document.getElementById('progressContainerFixed');
     const barEl    = document.getElementById('progressBarFixed');
     const timeEl   = document.getElementById('progressTime');
+    const qAudio   = document.getElementById('qAudio');
 
     const QUESTION_MS = 20_000;
 
-    /* ===================== ОЗВУЧКА ===================== */
+    /* ===================== ОЗВУЧКА: MP3 с fallback на TTS (ОБНОВЛЕНО) ===================== */
     function showTtsHint(){
       if (document.querySelector('.tts-hint')) return;
       const el = document.createElement('div');
@@ -153,20 +157,59 @@
       window.addEventListener('touchstart', remove, { passive:true });
     }
 
+    // Пути к аудио. Положи файлы по схеме: audio/ege2/variant{N}/q{1..4}.mp3
+    const AUDIO_SRC = [
+      `../../../audio/ege2/variant${EXAM_VARIANT || 1}/q1.mp3`,
+      `../../../audio/ege2/variant${EXAM_VARIANT || 1}/q2.mp3`,
+      `../../../audio/ege2/variant${EXAM_VARIANT || 1}/q3.mp3`,
+      `../../../audio/ege2/variant${EXAM_VARIANT || 1}/q4.mp3`,
+    ];
+
+    function stripHtml(html){ return (html || '').replace(/<[^>]+>/g, ''); }
+
     async function speakQuestion(num){
+      const idx = (num - 1) | 0;
+      const src = AUDIO_SRC[idx];
+
+      // 1) Пытаемся проиграть MP3
       try{
-        speechSynthesis.cancel();
-        const u = new SpeechSynthesisUtterance("Question " + num);
-        u.lang = "en-US"; u.rate = 1.0; u.pitch = 1.0;
-        const said = await new Promise(res=>{
-          let done=false; const to=setTimeout(()=>{ if(!done){done=true;res(false);} },1500);
-          u.onend=()=>{ if(!done){done=true;clearTimeout(to);res(true);} };
-          u.onerror=()=>{ if(!done){done=true;clearTimeout(to);res(false);} };
-          try{ speechSynthesis.resume(); }catch{}
-          speechSynthesis.speak(u);
-        });
-        if (!said) showTtsHint();
-      }catch{}
+        // Если путь пустой/undefined — бросим исключение в ручную
+        if (!src) throw new Error('No audio src');
+        qAudio.pause();
+        qAudio.currentTime = 0;
+        qAudio.src = src;
+        await qAudio.play();        // может бросить в случае блокировки автоплея или 404
+        return;                     // успех — выходим
+      }catch(_){
+        // 2) Fallback на TTS (и подсказка про первый клик)
+        showTtsHint();
+        try{
+          speechSynthesis.cancel();
+          const text = "Question " + num + ". " + stripHtml(QUESTIONS[idx]?.line);
+          const u = new SpeechSynthesisUtterance(text);
+          // предпочитаем британский, если доступен
+          u.lang = "en-GB"; u.rate = 1.0; u.pitch = 1.0;
+
+          const pickVoice = () => {
+            const voices = speechSynthesis.getVoices();
+            return voices.find(v => /UK|GB|British/i.test(v.name))
+                || voices.find(v => /en-GB/i.test(v.lang))
+                || voices.find(v => /India|IN|en-IN/i.test(v.name+v.lang))
+                || voices[0];
+          };
+          const voice = pickVoice();
+          if (voice) u.voice = voice;
+
+          const said = await new Promise(res=>{
+            let done=false; const to=setTimeout(()=>{ if(!done){done=true;res(false);} },1500);
+            u.onend=()=>{ if(!done){done=true;clearTimeout(to);res(true);} };
+            u.onerror=()=>{ if(!done){done=true;clearTimeout(to);res(false);} };
+            try{ speechSynthesis.resume(); }catch{}
+            speechSynthesis.speak(u);
+          });
+          if (!said) showTtsHint();
+        }catch{}
+      }
     }
 
     /* ===================== МИКРОФОН (ОДИН СЕАНС) ===================== */
@@ -294,6 +337,12 @@
 
     /* ===================== СТАРТ ===================== */
     function startCountdown(){
+      // Подогреем первый трек (чтобы быстрее стартовал после отсчёта)
+      try{
+        qAudio.src = AUDIO_SRC[0];
+        qAudio.load();
+      }catch{}
+
       let n = 3;
       timerEl.textContent = n;
       const id = setInterval(()=>{

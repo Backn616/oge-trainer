@@ -170,13 +170,21 @@
       recorder.ondataavailable = e => { if (e.data && e.data.size) recChunks.push(e.data); };
     }
 
-    /* ===================== АВТОЗАПУСК ПОСЛЕ MIC ===================== */
+    /* ===================== АВТОЗАПУСК ПОСЛЕ MIC / ПРИ ОБНОВЛЕНИИ ===================== */
+    function isReload(){
+      try{
+        const nav = performance.getEntriesByType('navigation')[0];
+        return nav && nav.type === 'reload';
+      }catch{ return false; }
+    }
+
     async function primeMutedAutoplay(){
-      // Тихий запуск q1.mp3 (разрешён браузером), чтобы снять блокировку автоплея
+      // Запускаем q1.mp3 в mute и НЕ ставим на паузу: будет крутиться тихо до старта сегмента
       try{
         qAudio.src = AUDIO_SRC[0];
         qAudio.muted = true;
         await qAudio.play();
+        window.__t2Primed = true;
       }catch(e){
         console.warn('Prime autoplay failed:', e);
       }
@@ -193,15 +201,18 @@
     }
 
     async function beginSegment(){
-      // Если пришли с mic (флаг установлен) и это первый вопрос — снимаем mute и перематываем
-      if (qIdx === 0 && sessionStorage.getItem('t2_autostart') === '1') {
-        try{
-          qAudio.muted = false;
-          qAudio.currentTime = 0;
-        }catch{}
-      }
+      const auto = sessionStorage.getItem('t2_autostart') === '1';
 
-      await speakQuestion(qIdx+1);
+      if (qIdx === 0 && (auto || isReload()) && window.__t2Primed && qAudio.src.includes('q1.mp3')){
+        // Уже крутится в mute → НЕ делаем новый play(), просто перематываем и снимаем mute
+        try{
+          qAudio.currentTime = 0;
+          qAudio.muted = false;
+        }catch{}
+      } else {
+        // Обычный путь (и для q2..q4)
+        await speakQuestion(qIdx+1);
+      }
 
       timeEl.textContent = fmtTime(QUESTION_MS);
       barEl.style.width = '100%';
@@ -285,7 +296,7 @@
 
     function cleanupAndNavigate(){
       try{ streamRef?.getTracks()?.forEach(t=>t.stop()); }catch{}
-      try{ sessionStorage.removeItem('t2_autostart'); }catch{}   /* очистим флаг */
+      try{ sessionStorage.removeItem('t2_autostart'); }catch{}
       navigateOnce(inExam ? EXAM_NEXT_URL : RESULT_URL);
     }
 
@@ -325,8 +336,8 @@
 
       try{
         await initMic();
-        // Если пришли с mic и поставлен флаг — тихо праймим q1.mp3 заранее
-        if (sessionStorage.getItem('t2_autostart') === '1') {
+        // Если пришли с mic (флаг) или это reload — сразу праймим q1.mp3 в mute
+        if (sessionStorage.getItem('t2_autostart') === '1' || isReload()) {
           await primeMutedAutoplay();
         }
         recorder.start(1000);
@@ -343,8 +354,8 @@
       barWrap.style.display = 'none';
       nextBtn.disabled = false;
 
-      // Если пришли со страницы mic с OK → праймим q1.mp3
-      if (sessionStorage.getItem('t2_autostart') === '1') {
+      // На входе со страницы mic (флаг) или при обновлении — праймим q1.mp3 (mute)
+      if (sessionStorage.getItem('t2_autostart') === '1' || isReload()) {
         primeMutedAutoplay();
       }
 

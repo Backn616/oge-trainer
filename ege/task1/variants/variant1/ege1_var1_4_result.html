@@ -66,14 +66,7 @@
     .btn:hover{ transform: translateY(-1px); filter: brightness(1.03); }
     .btn:disabled{ opacity:.6; cursor:not-allowed; transform:none; }
 
-    .instruction-box{
-      max-width:1200px; width:95%; margin:0 auto 24px;
-      font-size:20px; line-height:1.6; text-align:left;
-      border:2px solid var(--panel-border); padding:20px; border-radius:12px;
-      background:var(--panel-bg); box-shadow:var(--shadow);
-    }
-
-    /* >>> СЮДА ВНЕСЁННЫЕ ИЗМЕНЕНИЯ, как в prepare/task <<< */
+    /* <<< как в prepare/task: компактная рамка для текста чтения >>> */
     .reading-box{
       max-width:1200px; width:95%; margin:0 auto 24px;
       font-size:25px; line-height:1.7; text-align:left;
@@ -109,15 +102,18 @@
       <a class="btn" id="repeatBtn" href="#" role="button" aria-label="Повторить этот вариант">🔁 Повторить этот вариант</a>
     </div>
 
-    <!-- Инструкция -->
-    <div class="task-container instruction-box" aria-labelledby="taskTitle" aria-describedby="inst">
-      <b id="taskTitle">Task 1. Imagine that you are preparing a project with your friend.</b>
-      You have found some interesting material for the presentation and you want to read this text to your friend.
-      You have 1.5 minutes to read the text silently, then be ready to read it out loud. You will not have more than 1.5 minutes to read it.
+    <!-- Инструкция — именно .task-container, шире, как в prepare -->
+    <div class="task-container" aria-labelledby="taskTitle" aria-describedby="inst">
+      <p id="taskTitle" style="margin-top:0;">
+        <strong>Task 1.</strong> Imagine that you are preparing a project with your friend.
+        You have found some interesting material for the presentation and you want to read this text to your friend.
+        You have <strong>1.5 minutes</strong> to read the text silently, then be ready to read it out loud.
+        You will not have more than <strong>1.5 minutes</strong> to read it.
+      </p>
       <div class="instruction" id="inst">You will read the text aloud for not more than 1.5 minutes.</div>
     </div>
 
-    <!-- Текст -->
+    <!-- Текст — уже рамка (1200px), как в prepare/task -->
     <div class="reading-box" id="textBox">Bioluminescence is the ability of certain living organisms to produce light. This fascinating phenomenon can be observed in various species of deep-sea fish, jellyfish, fireflies, and even some fungi.
 The light is usually blue or green, which travels best through water. These organisms use light for different reasons. Some attract mates or prey, while others use it to confuse predators. For example, the anglerfish has a glowing lure to draw in its victims in the dark ocean depths.
 Scientists believe that studying bioluminescence can help develop new medical and technological solutions. Special proteins from glowing jellyfish are already used in genetic research. These discoveries support innovation in areas like disease detection and cell tracking.

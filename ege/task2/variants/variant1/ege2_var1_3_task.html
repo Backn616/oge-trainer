@@ -53,32 +53,8 @@
   <!-- Переключатель темы -->
   <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
 
-  <!-- СКРЫТЫЙ ПРОИГРЫВАТЕЛЬ ДЛЯ MP3 (ПОСТАВИЛ ВВЕРХ, ЧТОБЫ МОЖНО БЫЛО ПРАЙМИТЬ РАНО) -->
+  <!-- Плеер для MP3 -->
   <audio id="qAudio" preload="auto" playsinline webkit-playsinline></audio>
-
-  <!-- РАННИЙ СКРИПТ: при RELOAD запускаем q1.mp3 в mute c autoplay без нового play() позднее -->
-  <script>
-    (function(){
-      try {
-        var nav = performance.getEntriesByType && performance.getEntriesByType('navigation')[0];
-        var isReload = nav ? (nav.type === 'reload') : (performance && performance.navigation && performance.navigation.type === 1);
-        if (isReload) {
-          var a = document.getElementById('qAudio');
-          if (a) {
-            a.src = './q1.mp3';
-            a.muted = true;
-            a.autoplay = true;         // даём браузеру автозапустить трек по атрибуту
-            a.playsInline = true;      // страховка для мобильных
-            a.setAttribute('playsinline','');
-            a.setAttribute('webkit-playsinline','');
-            // На некоторых платформах помогает явный вызов play() - он будет разрешён, т.к. muted+autoplay
-            setTimeout(function(){ a.play().catch(function(){}); }, 0);
-            window.__t2Primed = true;  // помечаем, что трек уже крутится в mute
-          }
-        }
-      } catch(_) {}
-    })();
-  </script>
 
   <!-- ВЕРХ: отсчёт 3-2-1 -->
   <div class="content-wrapper" id="countdownWrap">
@@ -162,7 +138,7 @@
 
     const QUESTION_MS = 20_000;
 
-    /* ===================== ОЗВУЧКА: ТОЛЬКО ЛОКАЛЬНЫЕ MP3 ===================== */
+    /* ===================== ОЗВУЧКА: ЛОКАЛЬНЫЕ MP3 ===================== */
     const AUDIO_SRC = ["./q1.mp3","./q2.mp3","./q3.mp3","./q4.mp3"];
 
     async function speakQuestion(num){
@@ -194,24 +170,31 @@
       recorder.ondataavailable = e => { if (e.data && e.data.size) recChunks.push(e.data); };
     }
 
-    /* ===================== АВТОЗАПУСК ПОСЛЕ MIC / ПРИ ОБНОВЛЕНИИ ===================== */
-    function isReload(){
-      try{
-        const nav = performance.getEntriesByType('navigation')[0];
-        return nav && nav.type === 'reload';
-      }catch{ return false; }
-    }
-
-    async function primeMutedAutoplay(){
-      // Если не RELOAD и пришли с mic-флага — крутим q1.mp3 тихо заранее (на всякий случай)
+    /* ===================== АВТОЗАПУСК ПОСЛЕ MIC ===================== */
+    // 1) праймим q1.mp3 в mute сразу после getUserMedia (жест на mic-странице не переносится, но mute-autoplay разрешён)
+    async function primeMutedQ1(){
       try{
         qAudio.src = AUDIO_SRC[0];
         qAudio.muted = true;
-        await qAudio.play();
+        await qAudio.play();     // начать играть тихо
         window.__t2Primed = true;
       }catch(e){
-        console.warn('Prime autoplay failed:', e);
+        console.warn('Prime (muted) failed:', e);
       }
+    }
+
+    // 2) запасной план: если всё равно заблокировалось, один раз включим звук по первому клику
+    function installOneTapUnmute(){
+      const handler = () => {
+        try{
+          qAudio.muted = false;
+          if (qAudio.paused) qAudio.play().catch(()=>{});
+        }catch{}
+        window.removeEventListener('click', handler, {capture:true});
+        window.removeEventListener('touchstart', handler, {capture:true});
+      };
+      window.addEventListener('click', handler, {once:true, capture:true, passive:true});
+      window.addEventListener('touchstart', handler, {once:true, capture:true, passive:true});
     }
 
     /* ===================== ТАЙМЕР И ВОПРОСЫ ===================== */
@@ -225,16 +208,14 @@
     }
 
     async function beginSegment(){
-      const auto = sessionStorage.getItem('t2_autostart') === '1';
-
-      if (qIdx === 0 && (auto || isReload()) && window.__t2Primed && qAudio.src.includes('q1.mp3')){
-        // Уже крутится в mute → НЕ делаем новый play(), просто перематываем и снимаем mute
+      // Если это первый вопрос и мы уже крутим q1 в mute → просто снимаем mute и перематываем (без нового play)
+      if (qIdx === 0 && window.__t2Primed && qAudio.src.includes('q1.mp3')){
         try{
           qAudio.currentTime = 0;
           qAudio.muted = false;
         }catch{}
       } else {
-        // Обычный путь (и для q2..q4)
+        // Для всех остальных (и если прайминг не сработал) — обычный запуск
         await speakQuestion(qIdx+1);
       }
 
@@ -360,14 +341,17 @@
 
       try{
         await initMic();
-        // Если пришли с mic-флага — подстрахуемся и тоже праймим (для не-reload сценария)
-        if (sessionStorage.getItem('t2_autostart') === '1' && !isReload()) {
-          await primeMutedAutoplay();
+        // если пришли с mic (ставили флаг) — заранее крутим q1.mp3 тихо
+        if (sessionStorage.getItem('t2_autostart') === '1') {
+          await primeMutedQ1();
         }
         recorder.start(1000);
       }catch(err){
         console.warn('Mic init error:', err);
       }
+
+      // запасной план: если вдруг прайминг не прошёл — активируем по первому клику
+      if (!window.__t2Primed) installOneTapUnmute();
 
       beginSegment();
     }
@@ -377,12 +361,6 @@
       mainWrap.style.display = 'none';
       barWrap.style.display = 'none';
       nextBtn.disabled = false;
-
-      // При reload ранний скрипт уже запустил q1 в mute. При приходе с mic — праймим тут.
-      if (sessionStorage.getItem('t2_autostart') === '1' && !isReload()) {
-        primeMutedAutoplay();
-      }
-
       startCountdown();
     }
 

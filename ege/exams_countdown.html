@@ -38,22 +38,35 @@
     import { toggleThemeInit, navigateOnce } from './common.js';
     toggleThemeInit();
 
-    const params   = new URLSearchParams(location.search);
-    const next     = Number(params.get('next') || '2'); // 2..4
-    const variantQ = params.get('variant');
-    const variantS = sessionStorage.getItem('exam_variant') || '';
-    const variant  = variantQ || variantS || '1';
+    const params     = new URLSearchParams(location.search);
+    const nextRaw    = Number(params.get('next') || '2');      // ожидали 2..4
+    const next       = Math.max(2, Math.min(4, nextRaw));      // страховка
+    const variantQ   = params.get('variant');
+    const variantS   = sessionStorage.getItem('exam_variant') || '';
+    const variant    = variantQ || variantS || '1';
+    const examFlowOn = sessionStorage.getItem('exam_flow') === '1';
 
-    // Заголовок
+    // если пришли сюда не из «экзамен полностью» — отправим к выбору варианта
+    if (!examFlowOn) {
+      const fallback = './exams.html';
+      navigateOnce(fallback);
+    }
+
+    // Заголовок и title
     document.getElementById('title').textContent = `Task ${next}`;
+    try { document.title = `Экзамен полностью — Task ${next}`; } catch {}
 
-    // Куда идти после отсчёта
+    // Куда идти после отсчёта (с прокидыванием ?variant=)
     function nextPrepareUrl(){
-      return `./task${next}/variants/variant${variant}/ege${next}_var${variant}_1_prepare.html`
+      // после Task 4 этим экраном уже не пользуемся — на всякий случай отправим на общий результат
+      if (next > 4) {
+        return `./exams_result.html?variant=${encodeURIComponent(variant)}`;
+      }
+      return `./task${next}/variants/variant${variant}/ege${next}_var${variant}_1_prepare.html?variant=${encodeURIComponent(variant)}`
         .replace(/\/{2,}/g,'/').replace(':/','://');
     }
 
-    // Отсчёт
+    // Отсчёт 3-2-1
     const timerEl = document.getElementById('timer');
     let n = 3;
     timerEl.textContent = n;
@@ -66,6 +79,8 @@
       }
     },1000);
 
+    // Чистим интервал при уходе/перезагрузке
+    window.addEventListener('beforeunload', ()=>{ try{ clearInterval(id); }catch{} });
     window.addEventListener('pageshow', ()=>{ navigateOnce.lock = false; });
   </script>
 </body>

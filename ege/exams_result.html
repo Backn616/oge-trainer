@@ -9,7 +9,6 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
-  <!-- Для Task 1 как в его task/result -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
   <!-- Общий стиль проекта -->
@@ -62,7 +61,7 @@
     .snippet-images{ display:flex; gap:14px; flex-wrap:wrap; margin-top:8px; }
     .snippet-images img{ max-width:100%; width:calc(50% - 7px); border-radius:10px; box-shadow:var(--shadow); }
 
-    /* === ВАЖНО: читаемый текст Task 1 — как в новом Task 1 (компактный) === */
+    /* === Task 1: читаемый текст как в его result === */
     .reading-box{
       background:var(--card);
       border:1px solid #ccc;
@@ -75,10 +74,39 @@
       line-height:1.7;
       max-width:1200px;
       margin:0 auto 24px;
-      white-space:pre-line; /* переносы строк как абзацы */
+      white-space:pre-line;
     }
     @media (max-width:900px){
       .reading-box{ font-size:18px; padding:18px 16px; max-width:100%; }
+    }
+
+    /* ===== Task 2: оформление как в result Task 2 (локальные классы) ===== */
+    .t2-layout{
+      display:grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap:28px 36px;
+      align-items:start;
+      max-width:1500px;
+      margin:18px auto 0;
+    }
+    .t2-header{
+      background:var(--card);
+      border-left:5px solid var(--primary);
+      box-shadow:var(--shadow);
+      border-radius:12px;
+      padding:20px 24px;
+      grid-column:1 / -1;
+      text-align:center;
+      font-size:20px; line-height:1.7;
+    }
+    .t2-left{ font-size:22px; line-height:1.55; text-align:left; }
+    .t2-list{ list-style:none; margin:0 0 24px 0; padding:0; }
+    .t2-list li{ margin:10px 0; }
+    .t2-title{ font-weight:800; font-size:30px; margin:6px 0 12px; text-align:center; }
+    .t2-figure{ width:100%; aspect-ratio:3/2; border-radius:12px; overflow:hidden; box-shadow:var(--shadow); background:#ddd; }
+    .t2-figure>img{ width:100%; height:100%; object-fit:cover; object-position:center; display:block; }
+    @media (max-width:1100px){
+      .t2-layout{ grid-template-columns:1fr; gap:22px; }
     }
 
     .navs{ text-align:center; margin-top:22px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
@@ -103,7 +131,6 @@
       <div class="status" id="s1">Загрузка записи…</div>
       <audio id="a1" controls></audio>
       <div class="wave-wrap"><canvas id="w1" class="wave"></canvas></div>
-      <!-- Чистая вставка .reading-box -->
       <div class="task-snippet task-snippet--plain" id="snip1">Загрузка текста…</div>
     </section>
 
@@ -114,6 +141,7 @@
       <div class="status" id="s2">Загрузка записи…</div>
       <audio id="a2" controls></audio>
       <div class="wave-wrap"><canvas id="w2" class="wave"></canvas></div>
+      <!-- Контейнер, в который монтируем полный layout result Task 2 -->
       <div class="task-snippet" id="snip2">
         <h3>Объявление</h3>
         <div class="snippet-images"><img id="snip2Img" alt="Advertisement" onerror="this.style.display='none'"></div>
@@ -339,22 +367,66 @@
       }
     })();
 
-    // Task 2: картинка объявления из task-страницы
+    // Task 2: подтягиваем ВЕСЬ блок объявления из result 2
     (async ()=>{
+      const mount = document.getElementById('snip2');
       try{
-        const url  = `./task2/variants/variant${variant}/ege2_var${variant}_3_task.html`;
+        const url  = `./task2/variants/variant${variant}/ege2_var${variant}_4_result.html`;
         const html = await (await fetch(url, {cache:'no-store'})).text();
         const doc  = domParse(html, `./task2/variants/variant${variant}`);
-        const img  = doc.querySelector('.ad-figure img');
+
+        const ad = doc.querySelector('.ad-layout');
+        if (ad){
+          const clone = ad.cloneNode(true);
+
+          // Переименовываем классы под локальные стили
+          clone.classList.remove('ad-layout');
+          clone.classList.add('t2-layout');
+
+          const header = clone.querySelector('.task-header');
+          if (header){
+            header.classList.remove('task-header','card');
+            header.classList.add('t2-header');
+          }
+          const left = clone.querySelector('.left-free');
+          if (left){
+            left.classList.remove('left-free');
+            left.classList.add('t2-left');
+          }
+          const list = clone.querySelector('.plain-list');
+          if (list){
+            list.classList.remove('plain-list');
+            list.classList.add('t2-list');
+          }
+          const title = clone.querySelector('.ad-title');
+          if (title){
+            title.classList.remove('ad-title');
+            title.classList.add('t2-title');
+          }
+          const figure = clone.querySelector('.ad-figure');
+          if (figure){
+            figure.classList.remove('ad-figure');
+            figure.classList.add('t2-figure');
+          }
+
+          mount.innerHTML = '';
+          mount.appendChild(clone);
+          return;
+        }
+
+        // Фолбэк: только картинка из task-страницы
+        const taskUrl  = `./task2/variants/variant${variant}/ege2_var${variant}_3_task.html`;
+        const taskHtml = await (await fetch(taskUrl, {cache:'no-store'})).text();
+        const taskDoc  = domParse(taskHtml, `./task2/variants/variant${variant}`);
+        const img      = taskDoc.querySelector('.ad-figure img');
         if (img){
-          const out = document.getElementById('snip2Img');
-          out.src = img.getAttribute('src');
-          out.alt = img.getAttribute('alt') || 'Advertisement';
+          mount.querySelector('#snip2Img').src = img.getAttribute('src');
+          mount.querySelector('#snip2Img').alt = img.getAttribute('alt') || 'Advertisement';
         }else{
-          document.getElementById('snip2').style.display = 'none';
+          mount.style.display = 'none';
         }
       }catch{
-        document.getElementById('snip2').style.display = 'none';
+        mount.style.display = 'none';
       }
     })();
 

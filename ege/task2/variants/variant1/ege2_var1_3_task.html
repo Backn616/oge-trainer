@@ -54,9 +54,8 @@
   <!-- Переключатель темы -->
   <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
 
-  <!-- Плееры -->
+  <!-- Плеер для MP3 -->
   <audio id="qAudio" preload="auto" playsinline webkit-playsinline></audio>
-  <audio id="sigAudio" preload="auto" playsinline webkit-playsinline></audio>
 
   <!-- ВЕРХ: отсчёт 3-2-1 -->
   <div class="content-wrapper" id="countdownWrap">
@@ -113,6 +112,7 @@
     const EXAM_NEXT_URL = `../../../exams_countdown.html?next=3&variant=${encodeURIComponent(EXAM_VARIANT)}`;
     const MIC_URL       = location.pathname.replace(/_3_task\.html$/i, '_2_mic.html');
 
+    /* ===== При reload уходим на mic (надёжно для автоплея) ===== */
     function isReload(){
       try{
         const nav = performance.getEntriesByType('navigation')[0];
@@ -154,17 +154,11 @@
     const barEl    = document.getElementById('progressBarFixed');
     const timeEl   = document.getElementById('progressTime');
     const qAudio   = document.getElementById('qAudio');
-    const sigAudio = document.getElementById('sigAudio');
 
     const QUESTION_MS = 20_000;
 
     /* ===== Аудио (локальные mp3) ===== */
     const AUDIO_SRC = ["./q1.mp3","./q2.mp3","./q3.mp3","./q4.mp3"];
-    const BEEP_SRC  = "./not.mp3";
-
-    // Предзагрузка
-    try { qAudio.src = AUDIO_SRC[0]; qAudio.load(); } catch {}
-    try { sigAudio.src = BEEP_SRC; sigAudio.load(); } catch {}
 
     function renderQuestion(){
       const q=QUESTIONS[qIdx];
@@ -172,34 +166,19 @@
       qLineEl.innerHTML=q.line;
     }
 
-    // Универсальный проигрыватель: резолвится по ended/error/блокировке
-    function playEl(el){
-      return new Promise((resolve)=>{
-        const onEnd = ()=>{ cleanup(); resolve(); };
-        const onErr = ()=>{ cleanup(); resolve(); };
-        const cleanup = ()=>{
-          el.removeEventListener('ended', onEnd);
-          el.removeEventListener('error', onErr);
-        };
-        el.addEventListener('ended', onEnd, { once:true });
-        el.addEventListener('error', onErr, { once:true });
-        el.currentTime = 0;
-        const p = el.play();
-        if (p && typeof p.catch === 'function'){
-          p.catch(()=> resolve()); // если автоплей заблокирован — просто резолвим
-        }
-      });
-    }
-
-    // Последовательность: сигнал → вопрос → сигнал → таймер
-    async function playQuestionWithSignals(n){
-      try{ qAudio.pause(); }catch{}
+    // Специально: ПЕРЕД таймером проигрываем «Question N», по образцу Task 3
+    async function playQuestionAudio(n){
+      try{
+        qAudio.pause();
+        qAudio.currentTime = 0;
+      }catch{}
       qAudio.src = AUDIO_SRC[n-1];
-
-      await playEl(sigAudio);        // сигнал перед вопросом
-      await playEl(qAudio);          // озвучка вопроса
-      await playEl(sigAudio);        // сигнал после вопроса
-      startAnswerWindow();           // запуск окна ответа (20 сек)
+      try{
+        await qAudio.play();
+      }catch(e){
+        // на случай блокировки — покажем однократный оверлей-клик
+        showUnlockOverlay(() => qAudio.play().catch(()=>{}));
+      }
     }
 
     /* ===== Микрофон ===== */
@@ -218,7 +197,7 @@
       recorder.start(1000);
     }
 
-    /* ===== Состояния ===== */
+    /* ===== Состояния — как в Task 3: озвучка -> ответ ===== */
     let qIdx=0, answering=false, finishing=false;
     let startedAt=0, deadlineMs=0, rafId=0, intId=0, hardTO=0;
 
@@ -258,25 +237,31 @@
       if (intId){ clearInterval(intId); intId=0; }
       if (hardTO){ clearTimeout(hardTO); hardTO=0; }
     }
-
     function endAnswerWindow(){
       if (!answering) return;
       answering = false;
       stopClocks();
       actionsWrap.style.display = 'none';
-
-      // сигнал после ответа, затем — переход
-      playEl(sigAudio).then(()=> proceedNext());
+      proceedNext();
     }
 
     nextBtn.addEventListener('click', () => endAnswerWindow());
+
+    // когда озвучка заканчивается — стартует окно ответа (как в Task 3)
+    qAudio.addEventListener('ended', () => {
+      startAnswerWindow();
+    });
+    qAudio.addEventListener('error', () => {
+      // если аудио не нашлось — всё равно даём окно ответа
+      startAnswerWindow();
+    });
 
     function proceedNext(){
       qIdx++;
       if (qIdx < QUESTIONS.length){
         renderQuestion();
-        // снова: сигнал → вопрос → сигнал → таймер
-        playQuestionWithSignals(qIdx+1);
+        // СНОВА: сначала звучит «Question N», а потом — таймер
+        playQuestionAudio(qIdx+1);
       }else{
         finishAll();
       }
@@ -322,6 +307,9 @@
 
     /* ===== Старт страницы ===== */
     function startCountdown(){
+      // заранее грузим 1-й трек, чтобы быстрее стартанул
+      try{ qAudio.src = AUDIO_SRC[0]; qAudio.load(); }catch{}
+
       let n = 3;
       timerEl.textContent = n;
       const id = setInterval(()=>{
@@ -337,17 +325,26 @@
     }
 
     async function startFlow(){
+      // РИСУЕМ 1-й вопрос
       qIdx = 0;
       renderQuestion();
 
+      // Микрофон и запуск озвучки (как в Task 3: сначала играет «Question», затем — окно ответа)
       try{
         await initMic();
-        await playQuestionWithSignals(1);
+        // если пришли с mic → ставили флаг; можем дополнительно «подогреть» (обычно не нужно)
+        if (sessionStorage.getItem('t2_autostart') === '1'){
+          // ничего не делаем: Chrome уже разрешает play после getUserMedia
+        }
+        // ВАЖНО: СЕЙЧАС НЕ ЗАПУСКАЕМ ТАЙМЕР — только озвучку
+        await playQuestionAudio(1);
       }catch(err){
         console.warn('Mic init error:', err);
-        // даже если микрофон не дали — звук вопроса/сигналы всё равно проигрываем
-        playQuestionWithSignals(1);
+        // даже если микрофон не дали — озвучку всё равно пытаемся запустить
+        playQuestionAudio(1);
       }
+
+      // после успешного старта — убираем флаг анти-зацикливания reload
       try { sessionStorage.removeItem('t2_reload_redirected'); } catch {}
     }
 

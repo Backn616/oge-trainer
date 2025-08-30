@@ -51,16 +51,11 @@
 
     .status{ font-size:14px; color:var(--muted); margin-bottom:4px; }
 
-    .task-snippet{
-      margin-top:12px; padding:14px 16px; border:1px dashed var(--border);
-      border-radius:12px; background:var(--card);
-    }
+    /* Сниппет-контейнеры */
+    .task-snippet{ margin-top:12px; padding:14px 16px; border:1px dashed var(--border); border-radius:12px; background:var(--card); }
     .task-snippet--plain{ border:none; padding:0; background:transparent; }
 
-    .snippet-images{ display:flex; gap:14px; flex-wrap:wrap; margin-top:8px; }
-    .snippet-images img{ max-width:100%; width:calc(50% - 7px); border-radius:10px; box-shadow:var(--shadow); }
-
-    /* Task 1 */
+    /* === Task 1: читабельный блок текста === */
     .reading-box{
       background:var(--card);
       border:1px solid #ccc;
@@ -76,28 +71,50 @@
       white-space:pre-line;
     }
     @media (max-width:900px){
-      .reading-box{
-        font-size:18px;
-        line-height:1.55;
-        padding:18px 16px;
-        max-width:100%;
-      }
+      .reading-box{ font-size:18px; line-height:1.55; padding:18px 16px; max-width:100%; }
     }
 
-    /* Task 2 */
+    /* ===== Task 2: сетка + нормализация изображения ===== */
+    .t2-layout{
+      display:grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap:28px 36px;
+      align-items:start;
+      max-width:1500px;
+      margin:18px auto 0;
+    }
+    .t2-header{
+      background:var(--card);
+      border-left:5px solid var(--primary);
+      box-shadow:var(--shadow);
+      border-radius:12px;
+      padding:20px 24px;
+      grid-column:1 / -1;
+      text-align:center;
+      font-size:20px; line-height:1.7;
+    }
     .t2-left{
-      font-size:20px;
-      line-height:1.6;
-      text-align:left;
+      font-size:20px; line-height:1.6; text-align:left;
+    }
+    .t2-list{ list-style:none; margin:0 0 24px 0; padding:0; }
+    .t2-list li{ margin:10px 0; }
+    .t2-title{ font-weight:800; font-size:30px; margin:6px 0 12px; text-align:center; }
+    .t2-figure{
+      width:100%; aspect-ratio:3/2; border-radius:12px; overflow:hidden; box-shadow:var(--shadow); background:#ddd; justify-self:center;
+    }
+    .t2-figure>img{ width:100%; height:100%; object-fit:cover; object-position:center; display:block; }
+    /* страховка, если пришёл «голый» <img> */
+    #t2 .task-snippet img{
+      max-width:100%; height:auto; display:block; margin:12px auto; border-radius:12px; box-shadow:var(--shadow);
+    }
+    @media (max-width:1100px){
+      .t2-layout{ grid-template-columns:1fr; gap:22px; }
     }
     @media (max-width:900px){
-      .t2-left{
-        font-size:18px;
-        line-height:1.55;
-      }
+      .t2-left{ font-size:18px; line-height:1.55; }
     }
 
-    /* Task 3 */
+    /* ===== Task 3: унифицированный контейнер ===== */
     .t3-container{
       background:var(--card);
       border-left:5px solid var(--primary);
@@ -110,14 +127,10 @@
       box-shadow:var(--shadow); border-radius:12px;
     }
     @media (max-width:900px){
-      .t3-container{
-        font-size:18px;
-        line-height:1.55;
-        padding:16px 18px;
-      }
+      .t3-container{ font-size:18px; line-height:1.55; padding:16px 18px; }
     }
 
-    /* Task 4 */
+    /* ===== Task 4: как на result 4 ===== */
     .t4-container{
       background:var(--card);
       border-left:5px solid var(--primary);
@@ -177,7 +190,7 @@
       <div class="status" id="s2">Загрузка записи…</div>
       <audio id="a2" controls></audio>
       <div class="wave-wrap"><canvas id="w2" class="wave"></canvas></div>
-      <div class="task-snippet" id="snip2"></div>
+      <div class="task-snippet" id="snip2">Загрузка объявления…</div>
     </section>
 
     <!-- Task 3 -->
@@ -215,11 +228,155 @@
     const q = new URLSearchParams(location.search);
     const variant = q.get('variant') || sessionStorage.getItem('exam_variant') || '1';
 
-    /* --- твой код renderWave / setupRow / rows --- */
+    /* -------------------- АУДИО + ВОЛНА -------------------- */
+    const rows = [
+      { key:'ege1', a:'a1', s:'s1', w:'w1' },
+      { key:'ege2', a:'a2', s:'s2', w:'w2' },
+      { key:'ege3', a:'a3', s:'s3', w:'w3' },
+      { key:'ege4', a:'a4', s:'s4', w:'w4' },
+    ];
 
+    function dataURLtoBlob(dataURL){
+      const parts = (dataURL || '').split(',');
+      if (parts.length < 2) return null;
+      const header = parts[0], b64 = parts[1];
+      const type = (header.match(/data:(.*?);base64/) || [,'application/octet-stream'])[1];
+      const bin  = atob(b64);
+      const bytes= new Uint8Array(bin.length);
+      for (let i=0;i<bin.length;i++) bytes[i] = bin.charCodeAt(i);
+      return new Blob([bytes], { type });
+    }
+
+    async function renderWave(audioEl, canvas, arrayBuffer){
+      const AC   = window.AudioContext || window.webkitAudioContext;
+      const ctxA = new AC();
+      const buf  = await ctxA.decodeAudioData(arrayBuffer);
+
+      const waveWrap = canvas.parentElement;
+      waveWrap.style.display = 'block';
+
+      const width = 1000;
+      const peaks = (()=>{
+        const ch0 = buf.getChannelData(0);
+        const ch1 = buf.numberOfChannels>1 ? buf.getChannelData(1) : null;
+        const total = ch0.length;
+        const block = Math.floor(total / width) || 1;
+        const out = new Array(width);
+        for (let i=0;i<width;i++){
+          const s = i*block, e = Math.min(total, s+block);
+          let min=1, max=-1;
+          for (let j=s;j<e;j++){
+            const v = ch1 ? (ch0[j]+ch1[j])*0.5 : ch0[j];
+            if (v<min) min=v; if (v>max) max=v;
+          }
+          out[i] = [min,max];
+        }
+        return out;
+      })();
+
+      function draw(progress){
+        const dpr = Math.max(1, Math.floor(window.devicePixelRatio || 1));
+        const cssW = canvas.clientWidth || 600;
+        const cssH = canvas.clientHeight || 56;
+        if (canvas.width !== cssW*dpr) canvas.width = cssW*dpr;
+        if (canvas.height!== cssH*dpr) canvas.height= cssH*dpr;
+        const ctx = canvas.getContext('2d');
+        ctx.setTransform(dpr,0,0,dpr,0,0);
+
+        const rs = getComputedStyle(document.documentElement);
+        const base = (rs.getPropertyValue('--wave-base') || 'rgba(0,0,0,.28)').trim();
+        const prog = (rs.getPropertyValue('--wave-prog') || '#2b6cff').trim();
+        const glow = (rs.getPropertyValue('--wave-glow') || 'rgba(43,108,255,.45)').trim();
+        const bg   = getComputedStyle(canvas).backgroundColor;
+
+        ctx.clearRect(0,0,cssW,cssH);
+        ctx.fillStyle = bg; ctx.fillRect(0,0,cssW,cssH);
+
+        const mid = cssH/2;
+        ctx.fillStyle = base;
+        for (let i=0;i<peaks.length;i++){
+          const x = i/peaks.length*cssW;
+          const [min,max] = peaks[i];
+          const hTop = Math.abs(max)*mid, hBot = Math.abs(min)*mid;
+          ctx.fillRect(x, mid-hTop, 1, hTop+hBot || 1);
+        }
+
+        const progW = Math.max(0, Math.min(cssW, progress*cssW));
+        ctx.save(); ctx.beginPath(); ctx.rect(0,0,progW,cssH); ctx.clip();
+        ctx.fillStyle = prog; ctx.shadowColor = glow; ctx.shadowBlur = 8;
+        for (let i=0;i<peaks.length;i++){
+          const x = i/peaks.length*cssW;
+          const [min,max] = peaks[i];
+          const hTop = Math.abs(max)*mid, hBot = Math.abs(min)*mid;
+          ctx.fillRect(x, mid-hTop, 1, hTop+hBot || 1);
+        }
+        ctx.restore();
+      }
+
+      let raf;
+      const tick = ()=>{
+        const dur = buf.duration || (audioEl.duration || 1);
+        const p = Math.min(1, (audioEl.currentTime || 0) / dur);
+        draw(p);
+        raf = requestAnimationFrame(tick);
+      };
+      audioEl.addEventListener('play', ()=>{ cancelAnimationFrame(raf); tick(); });
+      audioEl.addEventListener('pause', ()=>{ cancelAnimationFrame(raf); draw((audioEl.currentTime||0)/(buf.duration||1)); });
+      audioEl.addEventListener('ended', ()=>{ cancelAnimationFrame(raf); draw(1); });
+
+      canvas.addEventListener('pointerdown', (e)=>{
+        const r = canvas.getBoundingClientRect();
+        const x = Math.max(0, Math.min(1, (e.clientX - r.left)/r.width));
+        audioEl.currentTime = x * (buf.duration || audioEl.duration || 0);
+        draw(x);
+      }, {passive:true});
+
+      draw(0);
+    }
+
+    async function setupRow(row){
+      const base64 = sessionStorage.getItem(`${row.key}_audio_base64`);
+      const mime   = (sessionStorage.getItem(`${row.key}_audio_mime`) || 'audio/webm').toLowerCase();
+
+      const a = document.getElementById(row.a);
+      const s = document.getElementById(row.s);
+      const w = document.getElementById(row.w);
+
+      if (!base64){
+        s.textContent = '⚠️ Запись не найдена.';
+        return;
+      }
+      try{
+        const blob = dataURLtoBlob(base64);
+        if (blob){
+          const objectURL = URL.createObjectURL(blob);
+          a.src  = objectURL;
+          a.type = blob.type || mime;
+          const buf = await blob.arrayBuffer();
+          await renderWave(a, w, buf);
+          window.addEventListener('beforeunload', ()=>{ URL.revokeObjectURL(objectURL); }, { once:true });
+        }else{
+          a.src  = base64;
+          a.type = mime;
+          const resp = await fetch(base64);
+          await renderWave(a, w, await resp.arrayBuffer());
+        }
+        s.textContent = 'Готово.';
+      }catch{
+        a.src  = base64;
+        a.type = mime;
+        s.textContent = 'Готово (без волны).';
+      }
+    }
+
+    // Инициализируем все 4 дорожки
+    rows.reduce((p,row)=> p.then(()=>setupRow(row)), Promise.resolve());
+
+    /* -------------------- ПОДТЯГИВАЕМ КОНТЕНТ ЗАДАНИЙ -------------------- */
     const domParse = (html, baseUrl='.')=>{
       const parser = new DOMParser();
       const doc = parser.parseFromString(html, 'text/html');
+      // фикс относительных путей
       doc.querySelectorAll('[src]').forEach(el=>{
         const src = el.getAttribute('src');
         if (src && !/^([a-z]+:|\/)/i.test(src)){
@@ -229,62 +386,123 @@
       return doc;
     };
 
-    // Task 1
+    // Task 1: целиком .reading-box из result 1
     (async ()=>{
       try{
         const url  = `./task1/variants/variant${variant}/ege1_var${variant}_4_result.html`;
-        const html = await (await fetch(url)).text();
+        const html = await (await fetch(url, {cache:'no-store'})).text();
         const doc  = domParse(html, `./task1/variants/variant${variant}`);
         const rb   = doc.querySelector('.reading-box');
         const mount= document.getElementById('snip1');
         if (rb && mount){ mount.innerHTML=''; mount.appendChild(rb.cloneNode(true)); }
-      }catch{ document.getElementById('snip1').textContent='Не удалось загрузить текст.'; }
+        else if(mount){ mount.textContent='—'; }
+      }catch{
+        const mount = document.getElementById('snip1');
+        if (mount) mount.textContent = 'Не удалось загрузить текст.';
+      }
     })();
 
-    // Task 2
+    // Task 2: тянем result 2, нормализуем, гарантируем figure c img
     (async ()=>{
       const mount = document.getElementById('snip2');
       try{
         const url  = `./task2/variants/variant${variant}/ege2_var${variant}_4_result.html`;
-        const html = await (await fetch(url)).text();
+        const html = await (await fetch(url, {cache:'no-store'})).text();
         const doc  = domParse(html, `./task2/variants/variant${variant}`);
-        const ad   = doc.querySelector('.ad-layout');
+
+        const ad = doc.querySelector('.ad-layout') || doc.querySelector('.task-container');
         if (ad){
           const clone = ad.cloneNode(true);
-          clone.classList.replace('ad-layout','t2-layout');
-          clone.querySelectorAll('.task-header').forEach(h=>h.className='t2-header');
-          clone.querySelectorAll('.left-free').forEach(l=>l.className='t2-left');
-          clone.querySelectorAll('.plain-list').forEach(l=>l.className='t2-list');
-          clone.querySelectorAll('.ad-title').forEach(t=>t.className='t2-title');
-          clone.querySelectorAll('.ad-figure').forEach(f=>f.className='t2-figure');
-          mount.innerHTML=''; mount.appendChild(clone);
+
+          // Маппинг классов под локальные стили
+          clone.classList.remove('ad-layout','task-container');
+          clone.classList.add('t2-layout');
+
+          const header = clone.querySelector('.task-header');
+          if (header) header.className = 't2-header';
+
+          const left = clone.querySelector('.left-free,.left');
+          if (left) left.className = 't2-left';
+
+          const list = clone.querySelector('.plain-list,ul');
+          if (list && !list.classList.contains('t2-list')) list.classList.add('t2-list');
+
+          const title = clone.querySelector('.ad-title,h2,h3');
+          if (title) title.className = 't2-title';
+
+          // Картинка: обязательно в .t2-figure
+          let fig = clone.querySelector('.ad-figure,.t2-figure');
+          if (!fig){
+            fig = document.createElement('div');
+            fig.className = 't2-figure';
+            let img = clone.querySelector('img');
+            if (img){
+              img.parentElement && img.parentElement.removeChild(img);
+              img.loading = 'lazy'; img.decoding = 'async';
+              fig.appendChild(img);
+            }
+            clone.appendChild(fig);
+          }else{
+            fig.classList.remove('ad-figure');
+            fig.classList.add('t2-figure');
+            const img = fig.querySelector('img');
+            if (img){ img.loading='lazy'; img.decoding='async'; }
+          }
+
+          mount.innerHTML = '';
+          mount.appendChild(clone);
           return;
         }
-      }catch{ mount.style.display='none'; }
+
+        // Фолбэк: картинка из task-страницы
+        const taskUrl  = `./task2/variants/variant${variant}/ege2_var${variant}_3_task.html`;
+        const taskHtml = await (await fetch(taskUrl, {cache:'no-store'})).text();
+        const taskDoc  = domParse(taskHtml, `./task2/variants/variant${variant}`);
+        const img      = taskDoc.querySelector('.ad-figure img, img');
+        mount.innerHTML = '';
+        if (img){
+          const wrap = document.createElement('div');
+          wrap.className = 't2-layout';
+          const fig = document.createElement('div');
+          fig.className = 't2-figure';
+          const copy = img.cloneNode(true);
+          copy.loading = 'lazy'; copy.decoding = 'async';
+          fig.appendChild(copy);
+          wrap.appendChild(fig);
+          mount.appendChild(wrap);
+        }else{
+          mount.style.display = 'none';
+        }
+      }catch{
+        mount.style.display = 'none';
+      }
     })();
 
-    // Task 3
+    // Task 3: целиком .task-container из result 3 -> .t3-container
     (async ()=>{
-      const mount = document.getElementById('snip3');
       try{
         const url  = `./task3/variants/variant${variant}/ege3_var${variant}_4_result.html`;
-        const html = await (await fetch(url)).text();
+        const html = await (await fetch(url, {cache:'no-store'})).text();
         const doc  = domParse(html, `./task3/variants/variant${variant}`);
         const tc   = doc.querySelector('.task-container');
-        if (tc){
+        const mount= document.getElementById('snip3');
+        if (tc && mount){
           const cont = tc.cloneNode(true);
           cont.className = 't3-container';
           mount.innerHTML=''; mount.appendChild(cont);
-        }
-      }catch{ mount.textContent='Не удалось загрузить вопросы.'; }
+        }else if(mount){ mount.textContent='—'; }
+      }catch{
+        const mount = document.getElementById('snip3');
+        if (mount) mount.textContent = 'Не удалось загрузить вопросы.';
+      }
     })();
 
-    // Task 4
+    // Task 4: как на result 4 (инструкция + фото)
     (async ()=>{
       const mount = document.getElementById('snip4');
       try{
         const url  = `./task4/variants/variant${variant}/ege4_var${variant}_4_result.html`;
-        const html = await (await fetch(url)).text();
+        const html = await (await fetch(url, {cache:'no-store'})).text();
         const doc  = domParse(html, `./task4/variants/variant${variant}`);
         const container = doc.querySelector('.task-container');
         const images    = doc.querySelector('.images');
@@ -301,19 +519,24 @@
           }
           return;
         }
-      }catch{ mount.textContent='Не удалось загрузить инструкцию.'; }
+      }catch{
+        mount.textContent='Не удалось загрузить инструкцию.';
+      }
     })();
 
-    // Нижние кнопки
+    /* -------------------- НИЖНИЕ КНОПКИ -------------------- */
     document.getElementById('repeatExam').addEventListener('click',(e)=>{
       e.preventDefault();
-      ['ege1_','ege2_','ege3_','ege4_'].forEach(prefix=>{
-        Object.keys(sessionStorage).forEach(k=>{ if(k.startsWith(prefix)) sessionStorage.removeItem(k); });
-      });
+      try{
+        ['ege1_','ege2_','ege3_','ege4_'].forEach(prefix=>{
+          Object.keys(sessionStorage).forEach(k=>{ if(k.startsWith(prefix)) sessionStorage.removeItem(k); });
+        });
+      }catch{}
       const v = sessionStorage.getItem('exam_variant') || variant;
       navigateOnce(`./task1/variants/variant${v}/ege1_var${v}_1_prepare.html`);
     });
-    window.addEventListener('pageshow', ()=>{ navigateOnce.lock=false; });
+
+    window.addEventListener('pageshow', ()=>{ navigateOnce.lock = false; });
   </script>
 </body>
 </html>

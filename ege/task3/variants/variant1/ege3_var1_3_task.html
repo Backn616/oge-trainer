@@ -269,9 +269,9 @@
       try{ audio.pause(); audio.currentTime = 0; }catch{}
       audio.src = INTRO_AUDIO;
 
-      // запускаем воспроизведение, но НЕ ждём окончания — кнопка появится через 5 секунд
+      // запускаем воспроизведение, но НЕ ждём окончания — кнопка появится через 7 секунд
       playWithUnlock(audio);
-      setTimeout(()=>{ introNextWrap.style.display = 'block'; }, 5000);
+      setTimeout(()=>{ introNextWrap.style.display = 'block'; }, 7000);
     }
 
     // Сигнал → вопрос → сигнал → окно ответа

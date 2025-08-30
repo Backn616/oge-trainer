@@ -117,7 +117,7 @@
     const RESULT_URL     = location.pathname.replace(/_3_task\.html$/i, '_4_result.html');
     const EXAM_NEXT_URL  = `../../../exams_countdown.html?next=4&variant=${encodeURIComponent(EXAM_VARIANT)}`;
 
-    /* === добавлено: редирект на mic при reload === */
+    /* === редирект на mic при reload (для автоплея) === */
     try {
       const nav = performance.getEntriesByType("navigation")[0];
       const isReload = nav ? (nav.type === "reload") : (performance.navigation && performance.navigation.type === 1);
@@ -132,8 +132,10 @@
     }catch{}
 
     const INTRO_AUDIO = "intro.mp3";
-    const Q_AUDIO = ["q1.mp3","q2.mp3","q3.mp3","q4.mp3","q5.mp3"];
+    const Q_AUDIO     = ["q1.mp3","q2.mp3","q3.mp3","q4.mp3","q5.mp3"];
+    const SIG_SRC     = "../not.mp3"; // сигнал из общей папки variants
 
+    // DOM
     const countdownWrap = document.getElementById('countdownWrap');
     const mainWrap = document.getElementById('mainWrap');
     const timerEl  = document.getElementById('timer');
@@ -156,8 +158,11 @@
 
     const ANSWER_MS = 40_000;
 
-    const audio = new Audio();
+    // Два аудио-объекта: озвучка вопроса и сигнал
+    const audio = new Audio();          // для q1..q5
     audio.preload = 'auto';
+    const sig   = new Audio(SIG_SRC);   // сигнал
+    sig.preload = 'auto';
 
     let streamRef=null, recorder=null, chosenMime='', recChunks=[];
     let micStarted = false;
@@ -245,30 +250,53 @@
       try{ audio.pause(); audio.currentTime = 0; }catch{}
       audio.src = INTRO_AUDIO;
       try{
-        await audio.play();
+        await playWithUnlock(audio);
         setTimeout(()=>{ introNextWrap.style.display = 'block'; }, 7000);
-      }catch{ showUnlockOverlay(() => { audio.play().catch(()=>{}); introNextWrap.style.display = 'block'; }); }
+      }catch{ introNextWrap.style.display = 'block'; }
     }
 
+    // Универсальный плей с разблокировкой по клику при необходимости
+    function playWithUnlock(el){
+      return new Promise((resolve)=>{
+        const cleanup = ()=>{
+          el.removeEventListener('ended', onEnd);
+          el.removeEventListener('error', onErr);
+        };
+        const onEnd = ()=>{ cleanup(); resolve(); };
+        const onErr = ()=>{ cleanup(); resolve(); };
+        el.addEventListener('ended', onEnd, { once:true });
+        el.addEventListener('error', onErr, { once:true });
+        el.currentTime = 0;
+        const p = el.play();
+        if (p && typeof p.catch === 'function'){
+          p.catch(()=> showUnlockOverlay(()=> el.play().catch(()=>{})));
+        }
+      });
+    }
+
+    // Сигнал → вопрос → сигнал → окно ответа
     async function playQuestion(n){
       introBox.style.display = 'none';
       qWrap.style.display = 'block';
       nextBtnWrap.style.display = 'none';
       barWrap.style.display = 'none';
       qTitleEl.textContent = `Question ${n}`;
-      try{ audio.pause(); audio.currentTime = 0; }catch{}
-      audio.src = Q_AUDIO[n-1];
-      try{ await audio.play(); }catch{ showUnlockOverlay(() => audio.play().catch(()=> startAnswerWindow())); }
-    }
 
-    audio.addEventListener('ended', () => {
-      if (qIdx === -1){ /* ждём кнопку */ }
-      else { startAnswerWindow(); }
-    });
-    audio.addEventListener('error', () => {
-      if (qIdx === -1){ introNextWrap.style.display = 'block'; }
-      else { startAnswerWindow(); }
-    });
+      try{ audio.pause(); audio.currentTime = 0; }catch{}
+
+      // сигнал перед
+      await playWithUnlock(sig);
+
+      // сам вопрос
+      audio.src = Q_AUDIO[n-1];
+      await playWithUnlock(audio);
+
+      // сигнал после
+      await playWithUnlock(sig);
+
+      // окно ответа
+      startAnswerWindow();
+    }
 
     function proceedNext(){
       qIdx++;
@@ -301,7 +329,7 @@
               sessionStorage.setItem('ege3_audio_base64', reader.result.toString());
               sessionStorage.setItem('ege3_audio_mime', blob.type || 'audio/webm');
             }catch{}
-              cleanupAndNavigate();
+            cleanupAndNavigate();
           };
           reader.readAsDataURL(blob);
         }else{ cleanupAndNavigate(); }
@@ -344,6 +372,7 @@
       if (document.getElementById('unlock-audio')) return;
       const wrap = document.createElement('div');
       wrap.id = 'unlock-audio';
+      wrap.style.cssText = 'position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.35);z-index:10000;';
       const btn = document.createElement('button');
       btn.className = 'button';
       btn.textContent = 'Нажмите, чтобы включить звук';

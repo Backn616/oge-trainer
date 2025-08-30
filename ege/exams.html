@@ -123,7 +123,7 @@
       <a class="brand back-to-menu" href="#" aria-label="Назад к списку режимов">
         <div class="logo">A</div>
         <div>
-          <div class="brand-title">Онлайн‑тренажёр «Говорение»</div>
+          <div class="brand-title">Онлайн-тренажёр «Говорение»</div>
           <div class="badge">ЕГЭ · экзамен полностью</div>
         </div>
       </a>
@@ -151,7 +151,7 @@
       </section>
     </main>
 
-    <footer>© 2025 — Демо‑версия тренажёра ЕГЭ.</footer>
+    <footer>© 2025 — Демо-версия тренажёра ЕГЭ.</footer>
   </div>
 
   <script>
@@ -232,8 +232,8 @@
                 Object.keys(sessionStorage).forEach(k=>{ if(k.startsWith(prefix)) sessionStorage.removeItem(k); });
               });
             } catch {}
-            // 3) стартуем с Task 1 → prepare выбранного варианта
-            const url = `${VARIANTS_BASE_TASK1}variant${n}/ege1_var${n}_1_prepare.html`
+            // 3) стартуем с Task 1 → prepare выбранного варианта + ?variant=n
+            const url = `${VARIANTS_BASE_TASK1}variant${n}/ege1_var${n}_1_prepare.html?variant=${n}`
               .replace(/\/{2,}/g, '/').replace(':/','://');
             navigateOnce(url);
           });

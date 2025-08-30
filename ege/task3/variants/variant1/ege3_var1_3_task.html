@@ -159,7 +159,7 @@
     const ANSWER_MS = 40_000;
 
     // Два аудио-объекта: озвучка вопроса и сигнал
-    const audio = new Audio();          // для q1..q5
+    const audio = new Audio();          // для intro/q1..q5
     audio.preload = 'auto';
     const sig   = new Audio(SIG_SRC);   // сигнал
     sig.preload = 'auto';
@@ -242,20 +242,7 @@
 
     let qIdx = -1;
 
-    async function playIntro(){
-      introBox.style.display = 'block';
-      qWrap.style.display = 'none';
-      nextBtnWrap.style.display = 'none';
-      barWrap.style.display = 'none';
-      try{ audio.pause(); audio.currentTime = 0; }catch{}
-      audio.src = INTRO_AUDIO;
-      try{
-        await playWithUnlock(audio);
-        setTimeout(()=>{ introNextWrap.style.display = 'block'; }, 5000);
-      }catch{ introNextWrap.style.display = 'block'; }
-    }
-
-    // Универсальный плей с разблокировкой по клику при необходимости
+    // Универсальный плей с разблокировкой по клику при необходимости (но НЕ ждём окончания для интро)
     function playWithUnlock(el){
       return new Promise((resolve)=>{
         const cleanup = ()=>{
@@ -272,6 +259,19 @@
           p.catch(()=> showUnlockOverlay(()=> el.play().catch(()=>{})));
         }
       });
+    }
+
+    async function playIntro(){
+      introBox.style.display = 'block';
+      qWrap.style.display = 'none';
+      nextBtnWrap.style.display = 'none';
+      barWrap.style.display = 'none';
+      try{ audio.pause(); audio.currentTime = 0; }catch{}
+      audio.src = INTRO_AUDIO;
+
+      // запускаем воспроизведение, но НЕ ждём окончания — кнопка появится через 5 секунд
+      playWithUnlock(audio);
+      setTimeout(()=>{ introNextWrap.style.display = 'block'; }, 5000);
     }
 
     // Сигнал → вопрос → сигнал → окно ответа

@@ -233,7 +233,7 @@
     const q = new URLSearchParams(location.search);
     const variant = q.get('variant') || sessionStorage.getItem('exam_variant') || '1';
 
-    /* --- аудио + волна (без изменений) --- */
+    /* --- аудио + волна (предполагается, что функции уже есть в этом файле) --- */
     const rows = [
       { key:'ege1', a:'a1', s:'s1', w:'w1' },
       { key:'ege2', a:'a2', s:'s2', w:'w2' },
@@ -329,11 +329,13 @@
     // Кнопки
     document.getElementById('repeatExam').addEventListener('click',(e)=>{
       e.preventDefault();
-      ['ege1_','ege2_','ege3_','ege4_'].forEach(prefix=>{
-        Object.keys(sessionStorage).forEach(k=>{ if(k.startsWith(prefix)) sessionStorage.removeItem(k); });
-      });
+      try{
+        ['ege1_','ege2_','ege3_','ege4_'].forEach(prefix=>{
+          Object.keys(sessionStorage).forEach(k=>{ if(k.startsWith(prefix)) sessionStorage.removeItem(k); });
+        });
+      }catch{}
       const v = sessionStorage.getItem('exam_variant') || variant;
-      navigateOnce(`./task1/variants/variant${v}/ege1_var${v}_1_prepare.html`);
+      navigateOnce(`./task1/variants/variant${v}/ege1_var${v}_1_prepare.html?variant=${v}`);
     });
     window.addEventListener('pageshow', ()=>{ navigateOnce.lock=false; });
   </script>

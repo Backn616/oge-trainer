@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
-  <!-- Для Task 1 как в его result -->
+  <!-- Для Task 1 как в его task/result -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
   <!-- Общий стиль проекта -->
@@ -62,15 +62,24 @@
     .snippet-images{ display:flex; gap:14px; flex-wrap:wrap; margin-top:8px; }
     .snippet-images img{ max-width:100%; width:calc(50% - 7px); border-radius:10px; box-shadow:var(--shadow); }
 
-    /* Стиль текста Task 1 как в его result */
+    /* === ВАЖНО: читаемый текст Task 1 — как в новом Task 1 (компактный) === */
     .reading-box{
-      max-width:3000px; width:95%; margin:0 auto 30px;
+      background:var(--card);
+      border:1px solid #ccc;
+      border-radius:12px;
+      box-shadow:var(--shadow);
+      padding:24px 28px;
+      text-align:left;
       font-family: Inter, system-ui, Segoe UI, Roboto, Arial, sans-serif;
-      font-size:32px; line-height:1.9; text-align:left;
-      border:1px solid #ccc; padding:40px; border-radius:12px;
-      background:var(--card); box-shadow:var(--shadow);
+      font-size:25px;
+      line-height:1.7;
+      max-width:1200px;
+      margin:0 auto 24px;
+      white-space:pre-line; /* переносы строк как абзацы */
     }
-    @media (max-width:900px){ .reading-box{ font-size:28px; } }
+    @media (max-width:900px){
+      .reading-box{ font-size:18px; padding:18px 16px; max-width:100%; }
+    }
 
     .navs{ text-align:center; margin-top:22px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
     .btn{
@@ -94,7 +103,7 @@
       <div class="status" id="s1">Загрузка записи…</div>
       <audio id="a1" controls></audio>
       <div class="wave-wrap"><canvas id="w1" class="wave"></canvas></div>
-      <!-- Чистая вставка .reading-box как в result 1 -->
+      <!-- Чистая вставка .reading-box -->
       <div class="task-snippet task-snippet--plain" id="snip1">Загрузка текста…</div>
     </section>
 
@@ -118,7 +127,6 @@
       <div class="status" id="s3">Загрузка записи…</div>
       <audio id="a3" controls></audio>
       <div class="wave-wrap"><canvas id="w3" class="wave"></canvas></div>
-      <!-- Чистая вставка .task-container как в result 3 -->
       <div class="task-snippet task-snippet--plain" id="snip3">Загрузка вопросов…</div>
     </section>
 

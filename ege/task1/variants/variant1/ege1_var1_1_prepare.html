@@ -5,12 +5,12 @@
   <title>Task 1 — Preparation</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- Шрифт Inter под конкретную страницу (общий css не трогаем) -->
+  <!-- Шрифт Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
-  <!-- Общие стили проекта (эталонные) -->
+  <!-- Общие стили -->
   <link rel="stylesheet" href="../../../style_common.css" />
 
   <!-- Анти-мигание темы -->
@@ -24,24 +24,63 @@
   </script>
 
   <style>
-    /* Компактная рамка для текста чтения */
+    /* Рамка текста */
     .reading-box{
       background:var(--card);
       border:1px solid #ccc;
       border-radius:12px;
       box-shadow:var(--shadow);
-      padding:24px 28px;                  /* было 40px */
+      padding:24px 28px;
       text-align:left;
       font-family: Inter, system-ui, Segoe UI, Roboto, Arial, sans-serif;
-      font-size:25px;                      /* было 32px (≈ в 1.5 раза меньше) */
-      line-height:1.7;                     /* чуть плотнее */
-      max-width:1200px;                    /* уже контейнера */
-      margin:0 auto 24px;                  /* центрируем и уменьшаем отступ снизу */
-      white-space:pre-line;                /* показывать переносы строк как абзацы */
+      font-size:25px;
+      line-height:1.7;
+      max-width:1200px;
+      margin:0 auto 24px;
+      white-space:pre-line;
     }
     @media (max-width:900px){
       .reading-box{ font-size:18px; padding:18px 16px; max-width:100%; }
     }
+
+    /* Подсказка-рамка */
+    .helper-box{
+      margin-top:18px;
+      border-left-color:var(--primary-600);
+    }
+
+    /* Компактная таблица слов */
+    .wordlist{
+      width:100%;
+      border-collapse: collapse;
+      font-size:18px;
+      table-layout: fixed;
+    }
+    .wordlist th, .wordlist td{
+      padding:6px 4px;
+      border-bottom:1px solid #e4e7ef;
+    }
+    .dark .wordlist th, .dark .wordlist td{
+      border-bottom:1px solid rgba(255,255,255,.12);
+    }
+    .wordlist th{ text-align:left; font-weight:600; }
+    .wordlist td:nth-child(1){ width:35%; }
+    .wordlist td:nth-child(2){ width:45%; }
+    .wordlist td:nth-child(3){ width:20%; text-align:center; }
+
+    /* Кнопка озвучки компактнее */
+    .wordlist button.play{
+      border:none;
+      background:linear-gradient(135deg, var(--primary), var(--primary-600));
+      color:#fff;
+      border-radius:6px;
+      padding:4px 8px;
+      font-size:14px;
+      cursor:pointer;
+      box-shadow:0 3px 8px rgba(43,108,255,.25);
+      transition:transform .08s ease, filter .2s ease;
+    }
+    .wordlist button.play:hover{ transform:translateY(-1px); filter:brightness(1.05); }
   </style>
 </head>
 <body>
@@ -59,36 +98,60 @@
       </p>
     </div>
 
-    <!-- Текст для чтения -->
+    <!-- Текст -->
     <div class="reading-box" id="readingBox">Bioluminescence is the ability of certain living organisms to produce light. This fascinating phenomenon can be observed in various species of deep-sea fish, jellyfish, fireflies, and even some fungi.
 The light is usually blue or green, which travels best through water. These organisms use light for different reasons. Some attract mates or prey, while others use it to confuse predators. For example, the anglerfish has a glowing lure to draw in its victims in the dark ocean depths.
 Scientists believe that studying bioluminescence can help develop new medical and technological solutions. Special proteins from glowing jellyfish are already used in genetic research. These discoveries support innovation in areas like disease detection and cell tracking.
 Bioluminescence is not only beautiful — it is a powerful tool of survival and discovery. These glowing creatures remind us how much we still have to learn about the natural world. Their light, shining in the darkness, is both mysterious and meaningful.</div>
 
-    <div style="text-align:center; margin-bottom:30px;">
+    <!-- Сложные слова -->
+    <div class="task-container helper-box" role="region" aria-labelledby="hardWordsTitle">
+      <details>
+        <summary id="hardWordsTitle" style="cursor:pointer; font-weight:700;">
+          🔎 Сложные слова (подсказка) — нажмите, чтобы открыть
+        </summary>
+        <div class="wordlist-wrap" style="margin-top:14px;">
+          <table class="wordlist" aria-label="Список сложных слов с транскрипцией и озвучкой">
+            <thead>
+              <tr>
+                <th>Word</th>
+                <th>IPA</th>
+                <th>Audio</th>
+              </tr>
+            </thead>
+            <tbody id="hardWordsTbody"></tbody>
+          </table>
+        </div>
+      </details>
+    </div>
+
+    <div style="text-align:center; margin:22px 0 30px;">
       <button id="goBtn" class="button" type="button" aria-label="Перейти к выполнению">Перейти к выполнению</button>
     </div>
   </div>
 
-  <!-- Проставка над фикс-баром -->
+  <!-- Проставка -->
   <div style="height: calc(var(--footer-h) + 24px);"></div>
 
-  <!-- Фиксированный прогресс-бар -->
+  <!-- Прогресс-бар -->
   <div id="progressContainerFixed" role="timer" aria-live="polite" aria-atomic="true" aria-label="Оставшееся время подготовки">
     <div id="progressBarFixed" class="rAF">
       <span id="progressTime" class="progress-time">01:30</span>
     </div>
   </div>
 
-  <!-- Логика страницы -->
+  <!-- Логика -->
   <script type="module">
     import { toggleThemeInit, navigateOnce, startPrepareTimer, fmtTime } from "../../../common.js";
 
+    // Тема
     toggleThemeInit();
 
+    // Навигация
     const NEXT_URL = location.pathname.replace(/_1_prepare\.html$/i, '_2_mic.html');
     document.getElementById('goBtn')?.addEventListener('click', () => navigateOnce(NEXT_URL));
 
+    // Метаданные
     try{
       sessionStorage.removeItem('ege1_audio_base64');
       sessionStorage.removeItem('ege1_audio_mime');
@@ -99,11 +162,12 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
       }));
     }catch{}
 
+    // Таймер
     const TOTAL_MS = 90_000;
     const barEl  = document.getElementById('progressBarFixed');
     const timeEl = document.getElementById('progressTime');
-
     let stopTimer = null;
+
     function startTimerFresh(){
       timeEl.textContent = fmtTime(TOTAL_MS);
       barEl.style.width  = '100%';
@@ -121,16 +185,70 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
     }
     startTimerFresh();
 
-    function isBackForwardNav(){
-      try{
-        const nav = performance.getEntriesByType('navigation')[0];
-        return nav && nav.type === 'back_forward';
-      }catch{ return false; }
-    }
     window.addEventListener('pageshow', (e)=>{
       try { navigateOnce.lock = false; } catch {}
-      if (e.persisted || isBackForwardNav()) startTimerFresh();
+      if (e.persisted) startTimerFresh();
     });
+
+    // Сложные слова
+    const HARD_WORDS = [
+      { w: 'bioluminescence', ipa: '/ˌbaɪoʊluːˈmɪnəsəns/' },
+      { w: 'phenomenon',      ipa: '/fəˈnɒmɪnən/' },
+      { w: 'species',         ipa: '/ˈspiːʃiːz/' },
+      { w: 'organisms',       ipa: '/ˈɔːrɡəˌnɪzəmz/' },
+      { w: 'jellyfish',       ipa: '/ˈdʒɛlɪfɪʃ/' },
+      { w: 'fireflies',       ipa: '/ˈfaɪəflaɪz/' },
+      { w: 'fungi',           ipa: '/ˈfʌndʒaɪ, ˈfʌŋɡaɪ/' },
+      { w: 'predators',       ipa: '/ˈprɛdətəz/' },
+      { w: 'anglerfish',      ipa: '/ˈæŋɡləfɪʃ/' },
+      { w: 'lure',            ipa: '/lʊə(r)/' },
+      { w: 'genetic',         ipa: '/dʒəˈnɛtɪk/' },
+      { w: 'detection',       ipa: '/dɪˈtɛkʃən/' },
+      { w: 'depths',          ipa: '/dɛpθs/' }
+    ];
+
+    (function renderHardWords(){
+      const tbody = document.getElementById('hardWordsTbody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+      HARD_WORDS.forEach((item) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${item.w}</td>
+          <td>${item.ipa}</td>
+          <td><button class="play" type="button" aria-label="Прослушать ${item.w}">▶︎</button></td>
+        `;
+        tr.querySelector('button').addEventListener('click', () => speakWord(item.w));
+        tbody.appendChild(tr);
+      });
+    })();
+
+    // Озвучка
+    let voices = [];
+    function loadVoices(){ voices = window.speechSynthesis?.getVoices?.() || []; }
+    loadVoices();
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.addEventListener('voiceschanged', loadVoices);
+    }
+
+    function pickEnglishVoice(){
+      if (!voices || !voices.length) return null;
+      const byLang = (substr) => voices.find(v => (v.lang || '').toLowerCase().startsWith(substr));
+      return (byLang('en-gb')) || (byLang('en-us')) || voices.find(v => (v.lang || '').toLowerCase().startsWith('en')) || null;
+    }
+
+    function speakWord(word){
+      try{
+        if (!('speechSynthesis' in window)) return;
+        const u = new SpeechSynthesisUtterance(word);
+        const v = pickEnglishVoice();
+        if (v) u.voice = v;
+        u.rate = 0.95;
+        u.lang = (v?.lang) || 'en-GB';
+        window.speechSynthesis.cancel();
+        window.speechSynthesis.speak(u);
+      }catch(e){ console.warn('Speech error:', e); }
+    }
   </script>
 </body>
 </html>

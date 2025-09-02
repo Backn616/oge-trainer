@@ -24,7 +24,7 @@
   </script>
 
   <style>
-    /* Таймер-цифры 3-2-1 */
+    /* Таймер-цифры 3‑2‑1 */
     .timer{
       font-size:70px; margin:30px 0; font-weight:700; color:var(--primary);
       letter-spacing:4px; text-shadow:0 4px 12px rgba(0,0,0,.25);
@@ -32,26 +32,16 @@
     }
     @media (prefers-reduced-motion: reduce) { .timer{ transition:none; } }
 
-    /* Текст для чтения — как в prepare (компактная рамка) */
+    /* Текст для чтения — как в prepare/result */
     .reading-box{
-      background:var(--card);
-      border:1px solid #ccc;
-      border-radius:12px;
-      box-shadow:var(--shadow);
-      padding:24px 28px;                 /* было 40px */
-      text-align:left;
-      font-family: Inter, system-ui, Segoe UI, Roboto, Arial, sans-serif;
-      font-size:25px;                     /* было 32px */
-      line-height:1.7;
-      max-width:1200px;                   /* было 2500px */
-      margin:0 auto 24px;
-      white-space:pre-line;               /* переносы строк как абзацы */
+      max-width:2500px; width:95%; margin:0 auto 30px;
+      background:var(--card); border:1px solid #ccc; border-radius:12px; box-shadow:var(--shadow);
+      padding:40px; text-align:left;
+      font-size:32px; line-height:1.9;
     }
-    @media (max-width:900px){
-      .reading-box{ font-size:18px; padding:18px 16px; max-width:100%; }
-    }
+    @media (max-width:900px){ .reading-box{ font-size:28px; } }
 
-    /* Кнопка завершения */
+    /* Единый стиль крупных кнопок (как в result и 4‑м эталоне) */
     .btn{
       display:inline-block; padding:16px 32px; margin:12px;
       font-size:20px; font-weight:600; color:#fff; text-decoration:none; cursor:pointer;
@@ -69,7 +59,7 @@
   <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
 
   <div class="content-wrapper">
-    <!-- Формулировка задания: скрыта до конца отсчёта -->
+    <!-- Формулировка задания: СКРЫТА до конца отсчёта. Рамка — как в result (.task-container) -->
     <div class="task-container" id="instructionBox" style="display:none" aria-labelledby="taskTitle" aria-describedby="inst">
       <b id="taskTitle">Task 1. Imagine that you are preparing a project with your friend.</b>
       You have found some interesting material for the presentation and you want to read this text to your friend.
@@ -81,19 +71,21 @@
     <div id="timer" class="timer" aria-live="polite">3</div>
 
     <!-- Текст для чтения: скрыт до конца отсчёта -->
-    <div class="reading-box" id="textBox" style="display:none">Bioluminescence is the ability of certain living organisms to produce light. This fascinating phenomenon can be observed in various species of deep-sea fish, jellyfish, fireflies, and even some fungi.
-The light is usually blue or green, which travels best through water. These organisms use light for different reasons. Some attract mates or prey, while others use it to confuse predators. For example, the anglerfish has a glowing lure to draw in its victims in the dark ocean depths.
-Scientists believe that studying bioluminescence can help develop new medical and technological solutions. Special proteins from glowing jellyfish are already used in genetic research. These discoveries support innovation in areas like disease detection and cell tracking.
-Bioluminescence is not only beautiful — it is a powerful tool of survival and discovery. These glowing creatures remind us how much we still have to learn about the natural world. Their light, shining in the darkness, is both mysterious and meaningful.
+    <div class="reading-box" id="textBox" style="display:none">
+Sherlock Holmes is a famous fictional character from British literature. He was created by Sir Arthur Conan Doyle. Holmes is a private detective who lives in London. Many people know him because of his great mind and amazing logical thinking. He solves difficult crimes that others cannot.
+
+In the stories, Holmes is usually described as tall and thin. He often wears a hat and smokes a pipe. He is very intelligent and notices the smallest details. He doesn’t talk much and prefers to work alone or with his friend Dr Watson. Holmes likes music and sometimes plays the violin.
+
+Although Holmes is not a real person, he has become a symbol of clever thinking and observation. People all over the world read stories about him and watch films and series. Many believe that Sherlock Holmes is the best detective character ever created.
     </div>
 
-    <!-- Кнопка завершения -->
+    <!-- Кнопка завершения — крупная .btn -->
     <div style="text-align:center; margin-bottom:30px;">
       <button class="btn" id="endBtn" type="button" aria-label="Закончить запись" style="display:none">✅ Закончить</button>
     </div>
   </div>
 
-  <!-- Проставка над фикс-баром -->
+  <!-- Проставка над фикс‑баром -->
   <div style="height: calc(var(--footer-h) + 24px);"></div>
 
   <!-- Фиксированный прогресс-бар времени ответа -->
@@ -119,13 +111,7 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
 
     const RESULT_URL = location.pathname.replace(/_3_task\.html$/i, '_4_result.html');
 
-    const inExam      = (sessionStorage.getItem('exam_flow') === '1');
-    const varFromSS   = sessionStorage.getItem('exam_variant') || '';
-    const varFromURL  = (location.pathname.match(/variant(\d+)/i) || [,''])[1];
-    const EXAM_VARIANT= varFromSS || varFromURL || '';
-    const EXAM_NEXT_URL = `../../../exams_countdown.html?next=2&variant=${encodeURIComponent(EXAM_VARIANT)}`;
-
-    /* === Микрофон и запись === */
+    // ===== Захват микрофона и запись =====
     let mediaRecorder = null, audioChunks = [], streamRef = null;
     let chosenMime = '', hasStopped = false;
 
@@ -159,7 +145,7 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
               sessionStorage.setItem('ege1_audio_base64', reader.result);
               sessionStorage.setItem('ege1_audio_mime', blobType);
             }catch{}
-            navigateOnce(inExam ? EXAM_NEXT_URL : RESULT_URL);
+            navigateOnce(RESULT_URL);
           };
           reader.readAsDataURL(audioBlob);
         };
@@ -171,7 +157,7 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
       }
     }
 
-    /* === Отсчёт 3-2-1 === */
+    // ===== Отсчёт 3‑2‑1 =====
     let countdown = 3;
     let cdInterval = 0;
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -194,7 +180,7 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
       },1000);
     }
 
-    /* === Таймер ответа 1:30 на rAF === */
+    // ===== Таймер ответа 1:30 на rAF =====
     const TOTAL_MS = 90_000;
     let endTs = 0, rafId = 0, lastAnnounce = 0;
 
@@ -208,7 +194,7 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
       audioChunks = [];
       try{ if (mediaRecorder && mediaRecorder.state !== 'recording') mediaRecorder.start(); }catch{}
 
-      progressBar.classList.add('rAF');
+      progressBar.classList.add('rAF');   // отключаем CSS-инерцию, управляем через rAF
       endTs = performance.now() + TOTAL_MS;
       progressTime.textContent = fmtTime(TOTAL_MS);
       progressBar.style.width  = '100%';
@@ -230,17 +216,11 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
 
     function safeStopOrFinish(){
       try{ cancelAnimationFrame(rafId); }catch{}
-      if (hasStopped){ navigateOnce(inExam ? EXAM_NEXT_URL : RESULT_URL); return; }
+      if (hasStopped){ navigateOnce(RESULT_URL); return; }
       try{
         if (mediaRecorder?.state === 'recording'){ mediaRecorder.stop(); }
-        else {
-          try{ streamRef?.getTracks()?.forEach(t=>t.stop()); }catch{}
-          navigateOnce(inExam ? EXAM_NEXT_URL : RESULT_URL);
-        }
-      }catch{
-        try{ streamRef?.getTracks()?.forEach(t=>t.stop()); }catch{}
-        navigateOnce(inExam ? EXAM_NEXT_URL : RESULT_URL);
-      }
+        else { streamRef?.getTracks()?.forEach(t=>t.stop()); navigateOnce(RESULT_URL); }
+      }catch{ navigateOnce(RESULT_URL); }
     }
 
     window.addEventListener('beforeunload', ()=>{
@@ -249,18 +229,18 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
       try{ streamRef?.getTracks()?.forEach(t=>t.stop()); }catch{}
     });
 
-    /* === BFCache: возврат со следующего шага → рестарт === */
+    // --- BFCache: назад из result → заново отсчёт и запись ---
     function isBackForwardNav(){
-      try{
+      try {
         const nav = performance.getEntriesByType('navigation')[0];
         return nav && nav.type === 'back_forward';
-      }catch{ return false; }
+      } catch { return false; }
     }
     function resetAndRestart(){
       try { cancelAnimationFrame(rafId); } catch {}
       try { clearInterval(cdInterval); } catch {}
       try { if (mediaRecorder?.state === 'recording') mediaRecorder.stop(); } catch {}
-      try { streamRef?.getTracks()?.forEach(t=>t.stop()); } catch {}
+      try { streamRef?.getTracks()?.forEach(t => t.stop()); } catch {}
 
       timerEl.style.display        = 'block';
       timerEl.textContent          = '3';
@@ -277,7 +257,7 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
 
       initMic();
     }
-    window.addEventListener('pageshow', (e)=>{
+    window.addEventListener('pageshow', (e) => {
       try { navigateOnce.lock = false; } catch {}
       if (e.persisted || isBackForwardNav()) resetAndRestart();
     });

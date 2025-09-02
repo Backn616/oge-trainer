@@ -43,7 +43,7 @@
       .reading-box{ font-size:18px; padding:18px 16px; max-width:100%; }
     }
 
-    /* Подсказка-рамка — компактная */
+    /* Подсказка-рамка */
     .helper-box{
       border:1px solid #ccc;          
       border-radius:8px;              
@@ -51,7 +51,6 @@
       background:var(--card);
       max-width:800px;                
       margin:16px auto;               
-      font-family: Inter, system-ui, Segoe UI, Roboto, Arial, sans-serif;
       font-size:18px;
       line-height:1.5;
       box-shadow:0 2px 6px rgba(0,0,0,0.08); 
@@ -60,7 +59,6 @@
       .helper-box{ font-size:16px; padding:12px 14px; max-width:100%; }
     }
 
-    /* Компактная таблица слов */
     .wordlist{
       width:100%;
       border-collapse: collapse;
@@ -149,25 +147,22 @@ School life also teaches us important values like friendship and respect. Althou
     </div>
   </div>
 
-  <!-- Проставка -->
   <div style="height: calc(var(--footer-h) + 24px);"></div>
 
-  <!-- Прогресс-бар -->
   <div id="progressContainerFixed" role="timer" aria-live="polite" aria-atomic="true" aria-label="Оставшееся время подготовки">
     <div id="progressBarFixed" class="rAF">
       <span id="progressTime" class="progress-time">01:30</span>
     </div>
   </div>
 
-  <!-- Логика -->
   <script type="module">
     import { toggleThemeInit, navigateOnce, startPrepareTimer, fmtTime } from "../../../common.js";
 
     // Тема
     toggleThemeInit();
 
-    // Навигация
-    const NEXT_URL = location.pathname.replace(/_1_prepare\.html$/i, '_4_result.html');
+    // Навигация → теперь ведёт на mic
+    const NEXT_URL = location.pathname.replace(/_1_prepare\.html$/i, '_2_mic.html');
     document.getElementById('goBtn')?.addEventListener('click', () => navigateOnce(NEXT_URL));
 
     // Метаданные
@@ -209,7 +204,7 @@ School life also teaches us important values like friendship and respect. Althou
       if (e.persisted) startTimerFresh();
     });
 
-    // Сложные слова (≤10, без повторов)
+    // Сложные слова
     const HARD_WORDS = [
       { w: 'exciting',     ipa: '/ɪkˈsaɪtɪŋ/' },
       { w: 'academic',     ipa: '/ˌækəˈdemɪk/' },

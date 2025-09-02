@@ -11,7 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
   <!-- Общие стили проекта -->
-  <link rel="stylesheet" href="./././style_common.css" />
+  <link rel="stylesheet" href="../../../style_common.css" />
 
   <!-- Анти-мигание темы -->
   <script>
@@ -43,7 +43,7 @@
     .wave{ width:100%; height:48px; display:block; background:#e9edf7; border-radius:10px; box-shadow:var(--shadow); }
     .dark .wave{ background:#1f2a3d; }
 
-    /* Цвета волны для светлой/тёмной темы */
+    /* Цвета волны */
     :root{
       --wave-base: rgba(0,0,0,.28);
       --wave-prog: var(--primary);
@@ -66,7 +66,7 @@
     .btn:hover{ transform: translateY(-1px); filter: brightness(1.03); }
     .btn:disabled{ opacity:.6; cursor:not-allowed; transform:none; }
 
-    /* <<< как в prepare/task: компактная рамка для текста чтения >>> */
+    /* Рамка текста */
     .reading-box{
       max-width:1200px; width:95%; margin:0 auto 24px;
       font-size:25px; line-height:1.7; text-align:left;
@@ -78,7 +78,7 @@
       .reading-box{ font-size:18px; padding:18px 16px; max-width:100%; }
     }
 
-    /* >>> добавлено: рамка-подсказка и таблица слов (как в prepare) <<< */
+    /* Рамка со словами + таблица (как в эталоне) */
     .helper-box{
       border:1px solid #ccc;
       border-radius:8px;
@@ -91,7 +91,7 @@
       box-shadow:0 2px 6px rgba(0,0,0,0.08);
     }
     @media (max-width:900px){
-      .helper-box{ font-size:16px; padding:12px 14px; max-width:100%; }
+      .helper-box{ font-size:16px; padding:12px 14px; max-width:95%; }
     }
     .wordlist{
       width:100%;
@@ -121,7 +121,6 @@
       transition:transform .08s ease, filter .2s ease;
     }
     .wordlist button.play:hover{ transform:translateY(-1px); filter:brightness(1.05); }
-    /* <<< конец добавленного блока стилей >>> */
   </style>
 </head>
 <body>
@@ -136,7 +135,7 @@
 
     <!-- Плеер -->
     <audio id="audio" controls></audio>
-    <!-- ВОЛНА -->
+    <!-- Волна -->
     <div id="waveWrap" class="wave-wrap">
       <canvas id="wave" class="wave"></canvas>
     </div>
@@ -147,7 +146,7 @@
       <a class="btn" id="repeatBtn" href="#" role="button" aria-label="Повторить этот вариант">🔁 Повторить этот вариант</a>
     </div>
 
-    <!-- Инструкция — именно .task-container, шире, как в prepare -->
+    <!-- Инструкция -->
     <div class="task-container" aria-labelledby="taskTitle" aria-describedby="inst">
       <p id="taskTitle" style="margin-top:0;">
         <strong>Task 1.</strong> Imagine that you are preparing a project with your friend.
@@ -158,14 +157,14 @@
       <div class="instruction" id="inst">You will read the text aloud for not more than 1.5 minutes.</div>
     </div>
 
-    <!-- Текст — уже рамка (1200px), как в prepare/task) -->
+    <!-- Текст -->
     <div class="reading-box" id="textBox">Sherlock Holmes is a famous fictional character from British literature. He was created by Sir Arthur Conan Doyle. Holmes is a private detective who lives in London. Many people know him because of his great mind and amazing logical thinking. He solves difficult crimes that others cannot.
 
 In the stories, Holmes is usually described as tall and thin. He often wears a hat and smokes a pipe. He is very intelligent and notices the smallest details. He doesn’t talk much and prefers to work alone or with his friend Dr Watson. Holmes likes music and sometimes plays the violin.
 
 Although Holmes is not a real person, he has become a symbol of clever thinking and observation. People all over the world read stories about him and watch films and series. Many believe that Sherlock Holmes is the best detective character ever created.</div>
 
-    <!-- >>> добавлено: компактная рамка со «Сложными словами» (как в prepare) <<< -->
+    <!-- Сложные слова (как в эталоне) -->
     <div class="task-container helper-box" role="region" aria-labelledby="hardWordsTitle">
       <details>
         <summary id="hardWordsTitle" style="cursor:pointer; font-weight:700;">
@@ -185,7 +184,6 @@ Although Holmes is not a real person, he has become a symbol of clever thinking 
         </div>
       </details>
     </div>
-    <!-- <<< конец добавленного блока HTML >>> -->
 
     <div style="text-align:center;">
       <a class="btn nav-btn" id="toVariants" href="#" role="button" aria-label="Перейти к выбору варианта">Перейти к выбору варианта</a>
@@ -194,8 +192,9 @@ Although Holmes is not a real person, he has become a symbol of clever thinking 
       <a class="btn nav-btn" id="toHome"     href="#" role="button" aria-label="Перейти на главную">Перейти на главную</a>
     </div>
   </div>
+
   <script type="module">
-    import { toggleThemeInit, navigateOnce } from './././common.js';
+    import { toggleThemeInit, navigateOnce } from '../../../common.js';
 
     toggleThemeInit();
 
@@ -423,7 +422,7 @@ Although Holmes is not a real person, he has become a symbol of clever thinking 
       ctx.restore();
     }
 
-    /* >>> добавлено: логика рендера "Сложные слова" и озвучка <<< */
+    /* Блок "Сложные слова" — слова из prepare */
     const HARD_WORDS = [
       { w: 'Sherlock Holmes', ipa: '/ˈʃɜːrlɒk hoʊmz/' },
       { w: 'fictional',       ipa: '/ˈfɪkʃənəl/' },
@@ -453,6 +452,7 @@ Although Holmes is not a real person, he has become a symbol of clever thinking 
       });
     })();
 
+    // Озвучка слов
     let voices = [];
     function loadVoices(){ voices = window.speechSynthesis?.getVoices?.() || []; }
     loadVoices();
@@ -476,7 +476,6 @@ Although Holmes is not a real person, he has become a symbol of clever thinking 
         window.speechSynthesis.speak(u);
       }catch(e){ console.warn('Speech error:', e); }
     }
-    /* <<< конец добавленного блока логики >>> */
   </script>
 </body>
 </html>

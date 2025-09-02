@@ -77,6 +77,51 @@
     @media (max-width: 900px){
       .reading-box{ font-size:18px; padding:18px 16px; max-width:100%; }
     }
+
+    /* >>> добавлено: рамка-подсказка и таблица слов (как в prepare) <<< */
+    .helper-box{
+      border:1px solid #ccc;
+      border-radius:8px;
+      padding:14px 18px;
+      background:var(--card);
+      max-width:800px;
+      margin:16px auto;
+      font-size:18px;
+      line-height:1.5;
+      box-shadow:0 2px 6px rgba(0,0,0,0.08);
+    }
+    @media (max-width:900px){
+      .helper-box{ font-size:16px; padding:12px 14px; max-width:100%; }
+    }
+    .wordlist{
+      width:100%;
+      border-collapse: collapse;
+      font-size:18px;
+      table-layout: fixed;
+    }
+    .wordlist th, .wordlist td{
+      padding:6px 4px;
+      border-bottom:1px solid #e4e7ef;
+      vertical-align: middle;
+    }
+    .dark .wordlist th, .wordlist td{
+      border-bottom:1px solid rgba(255,255,255,.12);
+    }
+    .wordlist th{ text-align:left; font-weight:600; }
+    .wordlist td:nth-child(1){ width:35%; }
+    .wordlist td:nth-child(2){ width:45%; }
+    .wordlist td:nth-child(3){ width:20%; text-align:center; }
+    .wordlist th:nth-child(3){ text-align:center; }
+    .wordlist button.play{
+      display:inline-flex; align-items:center; justify-content:center;
+      line-height:1; min-width:36px; height:28px;
+      border:none; color:#fff; border-radius:6px; padding:4px 8px; font-size:14px; cursor:pointer;
+      background:linear-gradient(135deg, var(--primary), var(--primary-600));
+      box-shadow:0 3px 8px rgba(43,108,255,.25);
+      transition:transform .08s ease, filter .2s ease;
+    }
+    .wordlist button.play:hover{ transform:translateY(-1px); filter:brightness(1.05); }
+    /* <<< конец добавленного блока стилей >>> */
   </style>
 </head>
 <body>
@@ -118,6 +163,28 @@
 The light is usually blue or green, which travels best through water. These organisms use light for different reasons. Some attract mates or prey, while others use it to confuse predators. For example, the anglerfish has a glowing lure to draw in its victims in the dark ocean depths.
 Scientists believe that studying bioluminescence can help develop new medical and technological solutions. Special proteins from glowing jellyfish are already used in genetic research. These discoveries support innovation in areas like disease detection and cell tracking.
 Bioluminescence is not only beautiful — it is a powerful tool of survival and discovery. These glowing creatures remind us how much we still have to learn about the natural world. Their light, shining in the darkness, is both mysterious and meaningful.</div>
+
+    <!-- >>> добавлено: компактная рамка со «Сложными словами» (как в prepare) <<< -->
+    <div class="task-container helper-box" role="region" aria-labelledby="hardWordsTitle">
+      <details>
+        <summary id="hardWordsTitle" style="cursor:pointer; font-weight:700;">
+          🔎 Сложные слова (подсказка) — нажмите, чтобы открыть
+        </summary>
+        <div class="wordlist-wrap" style="margin-top:14px;">
+          <table class="wordlist" aria-label="Список сложных слов с транскрипцией и озвучкой">
+            <thead>
+              <tr>
+                <th>Word</th>
+                <th>IPA</th>
+                <th>Audio</th>
+              </tr>
+            </thead>
+            <tbody id="hardWordsTbody"></tbody>
+          </table>
+        </div>
+      </details>
+    </div>
+    <!-- <<< конец добавленного блока HTML >>> -->
 
     <div style="text-align:center;">
       <a class="btn nav-btn" id="toVariants" href="#" role="button" aria-label="Перейти к выбору варианта">Перейти к выбору варианта</a>
@@ -355,6 +422,64 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
       }
       ctx.restore();
     }
+
+    /* >>> добавлено: логика рендера "Сложные слова" и озвучка <<< */
+    const HARD_WORDS = [
+      { w: 'bioluminescence', ipa: '/ˌbaɪoʊluːˈmɪnəsəns/' },
+      { w: 'phenomenon',      ipa: '/fəˈnɒmɪnən/' },
+      { w: 'species',         ipa: '/ˈspiːʃiːz/' },
+      { w: 'organisms',       ipa: '/ˈɔːrɡəˌnɪzəmz/' },
+      { w: 'jellyfish',       ipa: '/ˈdʒɛlɪfɪʃ/' },
+      { w: 'fireflies',       ipa: '/ˈfaɪəflaɪz/' },
+      { w: 'fungi',           ipa: '/ˈfʌndʒaɪ, ˈfʌŋɡaɪ/' },
+      { w: 'predators',       ipa: '/ˈprɛdətəz/' },
+      { w: 'anglerfish',      ipa: '/ˈæŋɡləfɪʃ/' },
+      { w: 'lure',            ipa: '/lʊə(r)/' },
+      { w: 'genetic',         ipa: '/dʒəˈnɛtɪk/' },
+      { w: 'detection',       ipa: '/dɪˈtɛkʃən/' },
+      { w: 'depths',          ipa: '/dɛpθs/' }
+    ];
+
+    (function renderHardWords(){
+      const tbody = document.getElementById('hardWordsTbody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+      HARD_WORDS.forEach((item) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${item.w}</td>
+          <td>${item.ipa}</td>
+          <td><button class="play" type="button" aria-label="Прослушать ${item.w}"><span aria-hidden="true">▶︎</span></button></td>
+        `;
+        tr.querySelector('button')?.addEventListener('click', () => speakWord(item.w));
+        tbody.appendChild(tr);
+      });
+    })();
+
+    let voices = [];
+    function loadVoices(){ voices = window.speechSynthesis?.getVoices?.() || []; }
+    loadVoices();
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.addEventListener('voiceschanged', loadVoices);
+    }
+    function pickEnglishVoice(){
+      if (!voices || !voices.length) return null;
+      const byLang = (substr) => voices.find(v => (v.lang || '').toLowerCase().startsWith(substr));
+      return (byLang('en-gb')) || (byLang('en-us')) || voices.find(v => (v.lang || '').toLowerCase().startsWith('en')) || null;
+    }
+    function speakWord(word){
+      try{
+        if (!('speechSynthesis' in window)) return;
+        const u = new SpeechSynthesisUtterance(word);
+        const v = pickEnglishVoice();
+        if (v) u.voice = v;
+        u.rate = 0.95;
+        u.lang = (v?.lang) || 'en-GB';
+        window.speechSynthesis.cancel();
+        window.speechSynthesis.speak(u);
+      }catch(e){ console.warn('Speech error:', e); }
+    }
+    /* <<< конец добавленного блока логики >>> */
   </script>
 </body>
 </html>

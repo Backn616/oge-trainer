@@ -4,170 +4,267 @@
   <meta charset="UTF-8" />
   <title>Task 1 — Preparation</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Шрифт Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <!-- Общие стили -->
+  <link rel="stylesheet" href="../../../style_common.css" />
 
   <!-- Анти-мигание темы -->
   <script>
     (function(){
       try{
         const saved = localStorage.getItem('pref-theme') || 'light';
-        if(saved === 'dark') document.documentElement.classList.add('dark');
+        if (saved === 'dark') document.documentElement.classList.add('dark');
       }catch(_){}
     })();
   </script>
 
   <style>
-    :root{
-      --bg:#f7f9ff; --text:#0b1020; --muted:#5a6475; --card:#ffffff;
-      --primary:#2b6cff; --primary-600:#1f58d9; --shadow:0 10px 25px rgba(17,24,39,.08);
-      --panel-bg:#f9f9f9; --panel-border:#0077cc;
-    }
-    .dark{
-      --bg:#0b1020; --text:#eaf0ff; --muted:#b9c2d3; --card:rgba(255,255,255,.08);
-      --primary:#6aa3ff; --primary-600:#4b8dff; --shadow:0 10px 35px rgba(0,0,0,.35);
-      --panel-bg:rgba(255,255,255,.08); --panel-border:#4b8dff;
-    }
-
-    body{
+    /* Рамка текста */
+    .reading-box{
+      background:var(--card);
+      border:1px solid #ccc;
+      border-radius:12px;
+      box-shadow:var(--shadow);
+      padding:24px 28px;
+      text-align:left;
       font-family: Inter, system-ui, Segoe UI, Roboto, Arial, sans-serif;
-      margin:0; padding:40px 20px 80px; color:var(--text); text-align:center;
-      background:
-        radial-gradient(1200px 600px at 70% -10%, #29417a40, transparent),
-        radial-gradient(900px 500px at -10% 10%, #344b9340, transparent),
-        var(--bg);
+      font-size:25px;
+      line-height:1.7;
+      max-width:1200px;
+      margin:0 auto 24px;
+      white-space:pre-line;
+    }
+    @media (max-width:900px){
+      .reading-box{ font-size:18px; padding:18px 16px; max-width:100%; }
     }
 
-    .instruction-box{
-      max-width:1600px; width:95%; margin:0 auto 30px; font-size:22px; line-height:1.6; text-align:left;
-      border:2px solid var(--panel-border); padding:25px; border-radius:12px; background:var(--panel-bg); box-shadow:var(--shadow);
+    /* Подсказка-рамка — компактная */
+    .helper-box{
+      border:1px solid #ccc;          
+      border-radius:8px;              
+      padding:14px 18px;              
+      background:var(--card);
+      max-width:800px;                
+      margin:16px auto;               
+      font-family: Inter, system-ui, Segoe UI, Roboto, Arial, sans-serif;
+      font-size:18px;
+      line-height:1.5;
+      box-shadow:0 2px 6px rgba(0,0,0,0.08); 
     }
-    .text-box{
-      max-width:1600px; width:95%; margin:0 auto 30px; font-size:32px; line-height:1.9; text-align:left;
-      border:1px solid #ccc; padding:40px; border-radius:12px; background:var(--card); box-shadow:var(--shadow);
+    @media (max-width:900px){
+      .helper-box{ font-size:16px; padding:12px 14px; max-width:100%; }
     }
 
-    .button{
-      font-size:20px; padding:16px 32px; background:linear-gradient(135deg, var(--primary), var(--primary-600));
-      color:#fff; border:none; border-radius:12px; cursor:pointer;
-      box-shadow:0 10px 22px rgba(43,108,255,.28); transition:transform .06s ease, filter .2s ease;
-      display:inline-block;
+    /* Компактная таблица слов */
+    .wordlist{
+      width:100%;
+      border-collapse: collapse;
+      font-size:18px;
+      table-layout: fixed;
     }
-    .button:hover{ transform:translateY(-1px); filter:brightness(1.03); }
+    .wordlist th, .wordlist td{
+      padding:6px 4px;
+      border-bottom:1px solid #e4e7ef;
+      vertical-align: middle;
+    }
+    .dark .wordlist th, .wordlist td{
+      border-bottom:1px solid rgba(255,255,255,.12);
+    }
+    .wordlist th{ text-align:left; font-weight:600; }
+    .wordlist td:nth-child(1){ width:35%; }
+    .wordlist td:nth-child(2){ width:45%; }
+    .wordlist td:nth-child(3){ width:20%; text-align:center; }
+    .wordlist th:nth-child(3){ text-align:center; }
 
-    .theme-toggle{
-      position:fixed; top:16px; right:16px; z-index:1000; border:1px solid #ffffff22; background:transparent; color:var(--text);
-      padding:10px 14px; border-radius:10px; cursor:pointer; backdrop-filter: blur(6px); transition:transform .08s ease, filter .2s ease;
+    .wordlist button.play{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      line-height:1;
+      min-width:36px;
+      height:28px;
+      border:none;
+      background:linear-gradient(135deg, var(--primary), var(--primary-600));
+      color:#fff;
+      border-radius:6px;
+      padding:4px 8px;
+      font-size:14px;
+      cursor:pointer;
+      box-shadow:0 3px 8px rgba(43,108,255,.25);
+      transition:transform .08s ease, filter .2s ease;
     }
-    .theme-toggle:hover{ transform:translateY(-1px); filter:brightness(1.03); }
-
-    #progressContainerFixed{
-      position:fixed; bottom:0; left:0; width:100%; height:32px; background:#eee; z-index:9999;
-    }
-    .dark #progressContainerFixed{ background:#222; }
-    #progressBarFixed{
-      height:100%; width:0%; background:linear-gradient(to right, #0066ff, #00cfff);
-      position:relative; transition:width .5s linear;
-    }
-    .progress-time{
-      position:absolute; right:14px; top:50%; transform:translateY(-50%); color:#fff; font-weight:700; font-size:20px; user-select:none;
-      text-shadow:0 1px 2px rgba(0,0,0,.35);
-    }
+    .wordlist button.play:hover{ transform:translateY(-1px); filter:brightness(1.05); }
   </style>
 </head>
 <body>
-
   <!-- Тумблер темы -->
   <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
 
-  <div class="instruction-box">
-    <p><strong>Task 1.</strong> Imagine that you are preparing a project with your friend. You have found some interesting material for the presentation and you want to read this text to your friend. You have 1.5 minutes to read the text silently, then be ready to read it out loud. You will not have more than 1.5 minutes to read it.</p>
-  </div>
+  <div class="content-wrapper">
+    <!-- Инструкция -->
+    <div class="task-container" role="region" aria-labelledby="taskTitle">
+      <p id="taskTitle" style="margin-top:0;">
+        <strong>Task 1.</strong> Imagine that you are preparing a project with your friend.
+        You have found some interesting material for the presentation and you want to read this text to your friend.
+        You have <strong>1.5 minutes</strong> to read the text silently, then be ready to read it out loud.
+        You will not have more than <strong>1.5 minutes</strong> to read it.
+      </p>
+    </div>
 
-  <div class="text-box">
-    Many students say that school is both exciting and tough. They enjoy learning new things, spending time with classmates, and taking part in school events. However, preparing for exams and writing essays can be stressful and tiring. Some students also worry about their academic performance.
+    <!-- Текст -->
+    <div class="reading-box" id="readingBox">Many students say that school is both exciting and tough. They enjoy learning new things, spending time with classmates, and taking part in school events. However, preparing for exams and writing essays can be stressful and tiring. Some students also worry about their academic performance.
 
 Being thoughtful and responsible helps students succeed. They should plan their time carefully and avoid leaving everything until the last moment. Through experience, they learn how to study effectively and deal with pressure. Revision is important, especially before final exams.
 
-School life also teaches us important values like friendship and respect. Although some subjects may seem boring or difficult at first, they often become interesting when taught by a passionate teacher. In the end, going through these years makes students stronger and more confident.
+School life also teaches us important values like friendship and respect. Although some subjects may seem boring or difficult at first, they often become interesting when taught by a passionate teacher. In the end, going through these years makes students stronger and more confident.</div>
+
+    <!-- Сложные слова -->
+    <div class="task-container helper-box" role="region" aria-labelledby="hardWordsTitle">
+      <details>
+        <summary id="hardWordsTitle" style="cursor:pointer; font-weight:700;">
+          🔎 Сложные слова (подсказка) — нажмите, чтобы открыть
+        </summary>
+        <div class="wordlist-wrap" style="margin-top:14px;">
+          <table class="wordlist" aria-label="Список сложных слов с транскрипцией и озвучкой">
+            <thead>
+              <tr>
+                <th>Word</th>
+                <th>IPA</th>
+                <th>Audio</th>
+              </tr>
+            </thead>
+            <tbody id="hardWordsTbody"></tbody>
+          </table>
+        </div>
+      </details>
+    </div>
+
+    <div style="text-align:center; margin:22px 0 30px;">
+      <button id="goBtn" class="button" type="button" aria-label="Перейти к выполнению">Перейти к выполнению</button>
+    </div>
   </div>
 
-  <div style="text-align:center; margin-bottom:30px;">
-    <button id="goBtn" class="button" aria-label="Перейти к выполнению (будет запрос доступа к микрофону)">
-      Перейти к выполнению
-    </button>
-  </div>
+  <!-- Проставка -->
+  <div style="height: calc(var(--footer-h) + 24px);"></div>
 
-  <div id="progressContainerFixed" role="timer" aria-live="polite">
-    <div id="progressBarFixed">
+  <!-- Прогресс-бар -->
+  <div id="progressContainerFixed" role="timer" aria-live="polite" aria-atomic="true" aria-label="Оставшееся время подготовки">
+    <div id="progressBarFixed" class="rAF">
       <span id="progressTime" class="progress-time">01:30</span>
     </div>
   </div>
 
-  <script>
-    // == Очистка прошлых данных и маркер подготовки ==
-    try {
+  <!-- Логика -->
+  <script type="module">
+    import { toggleThemeInit, navigateOnce, startPrepareTimer, fmtTime } from "../../../common.js";
+
+    // Тема
+    toggleThemeInit();
+
+    // Навигация
+    const NEXT_URL = location.pathname.replace(/_1_prepare\.html$/i, '_4_result.html');
+    document.getElementById('goBtn')?.addEventListener('click', () => navigateOnce(NEXT_URL));
+
+    // Метаданные
+    try{
       sessionStorage.removeItem('ege1_audio_base64');
       sessionStorage.removeItem('ege1_audio_mime');
       sessionStorage.setItem('ege1_prepared', '1');
-    } catch (_) {}
+      sessionStorage.setItem('ege1_meta', JSON.stringify({
+        preparedAt: Date.now(),
+        prepareDurationSec: 90
+      }));
+    }catch{}
 
-    // == Переключатель темы ==
-    (function(){
-      const btn = document.getElementById('themeBtn');
-      const key = 'pref-theme';
-      const root = document.documentElement;
-      function apply(mode){
-        root.classList.toggle('dark', mode === 'dark');
-        localStorage.setItem(key, mode);
-      }
-      apply(localStorage.getItem(key) || 'light');
-      btn.addEventListener('click', ()=>{
-        const curr = localStorage.getItem(key) || 'light';
-        apply(curr === 'dark' ? 'light' : 'dark');
+    // Таймер
+    const TOTAL_MS = 90_000;
+    const barEl  = document.getElementById('progressBarFixed');
+    const timeEl = document.getElementById('progressTime');
+    let stopTimer = null;
+
+    function startTimerFresh(){
+      timeEl.textContent = fmtTime(TOTAL_MS);
+      barEl.style.width  = '100%';
+      try { stopTimer?.(); } catch {}
+      stopTimer = startPrepareTimer({
+        barEl,
+        timeEl,
+        totalMs: TOTAL_MS,
+        nextUrl: NEXT_URL,
+        key: 'ege1_prepare_end',
+        persist: false,
+        textEveryMs: 250,
+        useRAF: true
+      });
+    }
+    startTimerFresh();
+
+    window.addEventListener('pageshow', (e)=>{
+      try { navigateOnce.lock = false; } catch {}
+      if (e.persisted) startTimerFresh();
+    });
+
+    // Сложные слова (≤10, без повторов)
+    const HARD_WORDS = [
+      { w: 'exciting',     ipa: '/ɪkˈsaɪtɪŋ/' },
+      { w: 'academic',     ipa: '/ˌækəˈdemɪk/' },
+      { w: 'performance',  ipa: '/pəˈfɔːməns/' },
+      { w: 'stressful',    ipa: '/ˈstresfʊl/' },
+      { w: 'pressure',     ipa: '/ˈpreʃə/' },
+      { w: 'revision',     ipa: '/rɪˈvɪʒən/' },
+      { w: 'responsible',  ipa: '/rɪˈspɒnsəbl/' },
+      { w: 'effectively',  ipa: '/ɪˈfektɪvli/' },
+      { w: 'passionate',   ipa: '/ˈpæʃənət/' },
+      { w: 'confident',    ipa: '/ˈkɒnfɪdənt/' }
+    ];
+
+    (function renderHardWords(){
+      const tbody = document.getElementById('hardWordsTbody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+      HARD_WORDS.forEach((item) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${item.w}</td>
+          <td>${item.ipa}</td>
+          <td><button class="play" type="button" aria-label="Прослушать ${item.w}"><span aria-hidden="true">▶︎</span></button></td>
+        `;
+        tr.querySelector('button').addEventListener('click', () => speakWord(item.w));
+        tbody.appendChild(tr);
       });
     })();
 
-    // == Таймер 1:30 и прогресс ==
-    const progressBar = document.getElementById('progressBarFixed');
-    const progressTime = document.getElementById('progressTime');
-
-    // ✅ ДИНАМИЧЕСКАЯ СБОРКА ССЫЛКИ НА СЛЕДУЮЩИЙ ШАГ (mic)
-    // Пример текущего файла: .../variant7/ege1_var7_1_prepare.html
-    // Меняем только окончание файла на _2_mic.html, номер варианта сохраняется автоматически.
-    const NEXT_URL = location.pathname.replace(/_1_prepare\.html$/i, '_2_mic.html');
-
-    const totalMs = 90_000; // 1.5 минуты
-    const endTime = Date.now() + totalMs;
-    let timerId = null;
-
-    function fmt(ms){
-      const s = Math.max(0, Math.floor(ms/1000));
-      const m = String(Math.floor(s/60)).padStart(2,'0');
-      const r = String(s%60).padStart(2,'0');
-      return `${m}:${r}`;
+    // Озвучка
+    let voices = [];
+    function loadVoices(){ voices = window.speechSynthesis?.getVoices?.() || []; }
+    loadVoices();
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.addEventListener('voiceschanged', loadVoices);
     }
 
-    function tick(){
-      const left = Math.max(0, endTime - Date.now());
-      progressTime.textContent = fmt(left);
-      progressBar.style.width = `${(left/totalMs)*100}%`;
-      if (left <= 0){
-        clearInterval(timerId);
-        // Переход по окончании подготовки
-        window.location.href = NEXT_URL;
-      }
+    function pickEnglishVoice(){
+      if (!voices || !voices.length) return null;
+      const byLang = (substr) => voices.find(v => (v.lang || '').toLowerCase().startsWith(substr));
+      return (byLang('en-gb')) || (byLang('en-us')) || voices.find(v => (v.lang || '').toLowerCase().startsWith('en')) || null;
     }
-    tick();
-    timerId = setInterval(tick, 500);
 
-    // == Кнопка ручного перехода ==
-    document.getElementById('goBtn').addEventListener('click', ()=>{
-      window.location.href = NEXT_URL;
-    });
-
-    // == Страховка: очистим интервал при уходе ==
-    window.addEventListener('beforeunload', ()=>{ try{ clearInterval(timerId); }catch(_){} });
+    function speakWord(word){
+      try{
+        if (!('speechSynthesis' in window)) return;
+        const u = new SpeechSynthesisUtterance(word);
+        const v = pickEnglishVoice();
+        if (v) u.voice = v;
+        u.rate = 0.95;
+        u.lang = (v?.lang) || 'en-GB';
+        window.speechSynthesis.cancel();
+        window.speechSynthesis.speak(u);
+      }catch(e){ console.warn('Speech error:', e); }
+    }
   </script>
 </body>
 </html>

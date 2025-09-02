@@ -5,12 +5,12 @@
   <title>Task 1 — Preparation</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- Шрифт Inter под конкретную страницу (общий css не трогаем) -->
+  <!-- Шрифт Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
-  <!-- Общие стили проекта (эталонные) -->
+  <!-- Общие стили -->
   <link rel="stylesheet" href="../../../style_common.css" />
 
   <!-- Анти-мигание темы -->
@@ -24,30 +24,91 @@
   </script>
 
   <style>
-    /* Локальная рамка для текста чтения (не конфликтует с эталоном) */
+    /* Рамка текста */
     .reading-box{
       background:var(--card);
       border:1px solid #ccc;
       border-radius:12px;
       box-shadow:var(--shadow);
-      padding:40px;
+      padding:24px 28px;
       text-align:left;
       font-family: Inter, system-ui, Segoe UI, Roboto, Arial, sans-serif;
-      font-size:32px;
-      line-height:1.9;
-      margin-bottom:30px;
+      font-size:25px;
+      line-height:1.7;
+      max-width:1200px;
+      margin:0 auto 24px;
+      white-space:pre-line;
     }
     @media (max-width:900px){
-      .reading-box{ font-size:28px; }
+      .reading-box{ font-size:18px; padding:18px 16px; max-width:100%; }
     }
+
+    /* Подсказка-рамка — компактная */
+    .helper-box{
+      border:1px solid #ccc;          
+      border-radius:8px;              
+      padding:14px 18px;              
+      background:var(--card);
+      max-width:800px;                
+      margin:16px auto;               
+      font-family: Inter, system-ui, Segoe UI, Roboto, Arial, sans-serif;
+      font-size:18px;
+      line-height:1.5;
+      box-shadow:0 2px 6px rgba(0,0,0,0.08); 
+    }
+    @media (max-width:900px){
+      .helper-box{ font-size:16px; padding:12px 14px; max-width:100%; }
+    }
+
+    /* Компактная таблица слов */
+    .wordlist{
+      width:100%;
+      border-collapse: collapse;
+      font-size:18px;
+      table-layout: fixed;
+    }
+    .wordlist th, .wordlist td{
+      padding:6px 4px;
+      border-bottom:1px solid #e4e7ef;
+      vertical-align: middle;
+    }
+    .dark .wordlist th, .wordlist td{
+      border-bottom:1px solid rgba(255,255,255,.12);
+    }
+    .wordlist th{ text-align:left; font-weight:600; }
+    .wordlist td:nth-child(1){ width:35%; }
+    .wordlist td:nth-child(2){ width:45%; }
+    .wordlist td:nth-child(3){ width:20%; text-align:center; }
+    .wordlist th:nth-child(3){ text-align:center; }
+
+    /* Кнопка озвучки компактнее */
+    .wordlist button.play{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      line-height:1;
+      min-width:36px;
+      height:28px;
+
+      border:none;
+      background:linear-gradient(135deg, var(--primary), var(--primary-600));
+      color:#fff;
+      border-radius:6px;
+      padding:4px 8px;
+      font-size:14px;
+      cursor:pointer;
+      box-shadow:0 3px 8px rgba(43,108,255,.25);
+      transition:transform .08s ease, filter .2s ease;
+    }
+    .wordlist button.play:hover{ transform:translateY(-1px); filter:brightness(1.05); }
   </style>
 </head>
 <body>
-  <!-- Тумблер темы (уже оформлен в style_common.css) -->
+  <!-- Тумблер темы -->
   <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
 
   <div class="content-wrapper">
-    <!-- Инструкция — используем общий .task-container -->
+    <!-- Инструкция -->
     <div class="task-container" role="region" aria-labelledby="taskTitle">
       <p id="taskTitle" style="margin-top:0;">
         <strong>Task 1.</strong> Imagine that you are preparing a project with your friend.
@@ -57,42 +118,61 @@
       </p>
     </div>
 
-    <!-- Текст для чтения: БЕЗ <p>/<br>, текст сразу после <div> -->
+    <!-- Текст -->
     <div class="reading-box" id="readingBox">Sherlock Holmes is a famous fictional character from British literature. He was created by Sir Arthur Conan Doyle. Holmes is a private detective who lives in London. Many people know him because of his great mind and amazing logical thinking. He solves difficult crimes that others cannot.
 
 In the stories, Holmes is usually described as tall and thin. He often wears a hat and smokes a pipe. He is very intelligent and notices the smallest details. He doesn’t talk much and prefers to work alone or with his friend Dr Watson. Holmes likes music and sometimes plays the violin.
 
 Although Holmes is not a real person, he has become a symbol of clever thinking and observation. People all over the world read stories about him and watch films and series. Many believe that Sherlock Holmes is the best detective character ever created.</div>
 
-    <div style="text-align:center; margin-bottom:30px;">
+    <!-- Сложные слова -->
+    <div class="task-container helper-box" role="region" aria-labelledby="hardWordsTitle">
+      <details>
+        <summary id="hardWordsTitle" style="cursor:pointer; font-weight:700;">
+          🔎 Сложные слова (подсказка) — нажмите, чтобы открыть
+        </summary>
+        <div class="wordlist-wrap" style="margin-top:14px;">
+          <table class="wordlist" aria-label="Список сложных слов с транскрипцией и озвучкой">
+            <thead>
+              <tr>
+                <th>Word</th>
+                <th>IPA</th>
+                <th>Audio</th>
+              </tr>
+            </thead>
+            <tbody id="hardWordsTbody"></tbody>
+          </table>
+        </div>
+      </details>
+    </div>
+
+    <div style="text-align:center; margin:22px 0 30px;">
       <button id="goBtn" class="button" type="button" aria-label="Перейти к выполнению">Перейти к выполнению</button>
     </div>
   </div>
 
-  <!-- Проставка над фикс‑баром (см. --footer-h в style_common.css) -->
+  <!-- Проставка -->
   <div style="height: calc(var(--footer-h) + 24px);"></div>
 
-  <!-- Фиксированный прогресс‑бар (оформление в style_common.css) -->
+  <!-- Прогресс-бар -->
   <div id="progressContainerFixed" role="timer" aria-live="polite" aria-atomic="true" aria-label="Оставшееся время подготовки">
     <div id="progressBarFixed" class="rAF">
       <span id="progressTime" class="progress-time">01:30</span>
     </div>
   </div>
 
-  <!-- Логика страницы -->
+  <!-- Логика -->
   <script type="module">
     import { toggleThemeInit, navigateOnce, startPrepareTimer, fmtTime } from "../../../common.js";
 
     // Тема
     toggleThemeInit();
 
-    // Следующий шаг (mic) — подставляем номер варианта из имени файла
+    // Навигация
     const NEXT_URL = location.pathname.replace(/_1_prepare\.html$/i, '_2_mic.html');
-
-    // Кнопка перехода
     document.getElementById('goBtn')?.addEventListener('click', () => navigateOnce(NEXT_URL));
 
-    // Метаданные + очистка прошлой записи
+    // Метаданные
     try{
       sessionStorage.removeItem('ege1_audio_base64');
       sessionStorage.removeItem('ege1_audio_mime');
@@ -103,13 +183,12 @@ Although Holmes is not a real person, he has become a symbol of clever thinking 
       }));
     }catch{}
 
-    // Таймер 1:30 на rAF (визуал берём из style_common.css)
+    // Таймер
     const TOTAL_MS = 90_000;
     const barEl  = document.getElementById('progressBarFixed');
     const timeEl = document.getElementById('progressTime');
-
-    // Старт/рестарт
     let stopTimer = null;
+
     function startTimerFresh(){
       timeEl.textContent = fmtTime(TOTAL_MS);
       barEl.style.width  = '100%';
@@ -127,17 +206,67 @@ Although Holmes is not a real person, he has become a symbol of clever thinking 
     }
     startTimerFresh();
 
-    // BFCache: возврат со следующего шага → перезапуск таймера
-    function isBackForwardNav(){
-      try{
-        const nav = performance.getEntriesByType('navigation')[0];
-        return nav && nav.type === 'back_forward';
-      }catch{ return false; }
-    }
     window.addEventListener('pageshow', (e)=>{
       try { navigateOnce.lock = false; } catch {}
-      if (e.persisted || isBackForwardNav()) startTimerFresh();
+      if (e.persisted) startTimerFresh();
     });
+
+    // Сложные слова (обновлено)
+    const HARD_WORDS = [
+      { w: 'Sherlock Holmes', ipa: '/ˈʃɜːrlɒk hoʊmz/' },
+      { w: 'fictional',       ipa: '/ˈfɪkʃənəl/' },
+      { w: 'literature',      ipa: '/ˈlɪtərətʃər/' },
+      { w: 'detective',       ipa: '/dɪˈtɛktɪv/' },
+      { w: 'logical',         ipa: '/ˈlɒdʒɪkəl/' },
+      { w: 'intelligent',     ipa: '/ɪnˈtɛlɪdʒənt/' },
+      { w: 'details',         ipa: '/ˈdiːteɪlz/' },
+      { w: 'violin',          ipa: '/ˌvaɪəˈlɪn/' },
+      { w: 'observation',     ipa: '/ˌɒbzərˈveɪʃən/' },
+      { w: 'series',          ipa: '/ˈsɪəriːz/' }
+    ];
+
+    (function renderHardWords(){
+      const tbody = document.getElementById('hardWordsTbody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+      HARD_WORDS.forEach((item) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${item.w}</td>
+          <td>${item.ipa}</td>
+          <td><button class="play" type="button" aria-label="Прослушать ${item.w}"><span aria-hidden="true">▶︎</span></button></td>
+        `;
+        tr.querySelector('button').addEventListener('click', () => speakWord(item.w));
+        tbody.appendChild(tr);
+      });
+    })();
+
+    // Озвучка
+    let voices = [];
+    function loadVoices(){ voices = window.speechSynthesis?.getVoices?.() || []; }
+    loadVoices();
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.addEventListener('voiceschanged', loadVoices);
+    }
+
+    function pickEnglishVoice(){
+      if (!voices || !voices.length) return null;
+      const byLang = (substr) => voices.find(v => (v.lang || '').toLowerCase().startsWith(substr));
+      return (byLang('en-gb')) || (byLang('en-us')) || voices.find(v => (v.lang || '').toLowerCase().startsWith('en')) || null;
+    }
+
+    function speakWord(word){
+      try{
+        if (!('speechSynthesis' in window)) return;
+        const u = new SpeechSynthesisUtterance(word);
+        const v = pickEnglishVoice();
+        if (v) u.voice = v;
+        u.rate = 0.95;
+        u.lang = (v?.lang) || 'en-GB';
+        window.speechSynthesis.cancel();
+        window.speechSynthesis.speak(u);
+      }catch(e){ console.warn('Speech error:', e); }
+    }
   </script>
 </body>
 </html>

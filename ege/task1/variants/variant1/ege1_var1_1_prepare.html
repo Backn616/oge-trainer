@@ -43,23 +43,21 @@
       .reading-box{ font-size:18px; padding:18px 16px; max-width:100%; }
     }
 
-    /* Подсказка-рамка — СДЕЛАТЬ КАК У ТЕКСТА (.reading-box) */
+    /* Подсказка-рамка — компактная */
     .helper-box{
+      border:1px solid #ccc;          
+      border-radius:8px;              
+      padding:14px 18px;              
       background:var(--card);
-      border:1px solid #ccc;
-      border-radius:12px;
-      box-shadow:var(--shadow);
-      padding:24px 28px;
-      text-align:left;
+      max-width:800px;                
+      margin:16px auto;               
       font-family: Inter, system-ui, Segoe UI, Roboto, Arial, sans-serif;
-      font-size:25px;
-      line-height:1.7;
-      max-width:1200px;
-      margin:0 auto 24px;   /* центр + отступ снизу как у reading-box */
-      white-space:pre-line;
+      font-size:18px;
+      line-height:1.5;
+      box-shadow:0 2px 6px rgba(0,0,0,0.08); 
     }
     @media (max-width:900px){
-      .helper-box{ font-size:18px; padding:18px 16px; max-width:100%; }
+      .helper-box{ font-size:16px; padding:12px 14px; max-width:100%; }
     }
 
     /* Компактная таблица слов */
@@ -72,20 +70,20 @@
     .wordlist th, .wordlist td{
       padding:6px 4px;
       border-bottom:1px solid #e4e7ef;
-      vertical-align: middle; /* выравнивание по вертикали */
+      vertical-align: middle;
     }
-    .dark .wordlist th, .dark .wordlist td{
+    .dark .wordlist th, .wordlist td{
       border-bottom:1px solid rgba(255,255,255,.12);
     }
     .wordlist th{ text-align:left; font-weight:600; }
     .wordlist td:nth-child(1){ width:35%; }
     .wordlist td:nth-child(2){ width:45%; }
     .wordlist td:nth-child(3){ width:20%; text-align:center; }
-    .wordlist th:nth-child(3){ text-align:center; } /* заголовок Audio по центру */
+    .wordlist th:nth-child(3){ text-align:center; }
 
-    /* Кнопка озвучки компактнее и выровнена по центру */
+    /* Кнопка озвучки компактнее */
     .wordlist button.play{
-      display:inline-flex;            /* центрирование иконки */
+      display:inline-flex;
       align-items:center;
       justify-content:center;
       line-height:1;
@@ -130,7 +128,7 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
     <div class="task-container helper-box" role="region" aria-labelledby="hardWordsTitle">
       <details>
         <summary id="hardWordsTitle" style="cursor:pointer; font-weight:700;">
-          🔎 Сложные слова — нажмите, чтобы открыть
+          🔎 Сложные слова (подсказка) — нажмите, чтобы открыть
         </summary>
         <div class="wordlist-wrap" style="margin-top:14px;">
           <table class="wordlist" aria-label="Список сложных слов с транскрипцией и озвучкой">
@@ -221,7 +219,7 @@ Bioluminescence is not only beautiful — it is a powerful tool of survival and 
       { w: 'jellyfish',       ipa: '/ˈdʒɛlɪfɪʃ/' },
       { w: 'fireflies',       ipa: '/ˈfaɪəflaɪz/' },
       { w: 'fungi',           ipa: '/ˈfʌndʒaɪ, ˈfʌŋɡaɪ/' },
-      { w: 'predators',       ipa: '/ˈпрɛdətəz/' },
+      { w: 'predators',       ipa: '/ˈprɛdətəz/' },
       { w: 'anglerfish',      ipa: '/ˈæŋɡləfɪʃ/' },
       { w: 'lure',            ipa: '/lʊə(r)/' },
       { w: 'genetic',         ipa: '/dʒəˈnɛtɪk/' },

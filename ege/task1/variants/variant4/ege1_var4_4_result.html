@@ -66,7 +66,7 @@
     .btn:hover{ transform: translateY(-1px); filter: brightness(1.03); }
     .btn:disabled{ opacity:.6; cursor:not-allowed; transform:none; }
 
-    /* Рамка текста — как в prepare/task */
+    /* Рамка текста */
     .reading-box{
       max-width:1200px; width:95%; margin:0 auto 24px;
       font-size:25px; line-height:1.7; text-align:left;
@@ -78,20 +78,20 @@
       .reading-box{ font-size:18px; padding:18px 16px; max-width:100%; }
     }
 
-    /* Рамка со словами (как в prepare) */
+    /* Рамка со словами + таблица (как в эталоне) */
     .helper-box{
       border:1px solid #ccc;
       border-radius:8px;
       padding:14px 18px;
       background:var(--card);
       max-width:800px;
-      margin:16px auto 28px;
+      margin:16px auto;
       font-size:18px;
       line-height:1.5;
       box-shadow:0 2px 6px rgba(0,0,0,0.08);
     }
     @media (max-width:900px){
-      .helper-box{ font-size:16px; padding:12px 14px; max-width:100%; }
+      .helper-box{ font-size:16px; padding:12px 14px; max-width:95%; }
     }
     .wordlist{
       width:100%;
@@ -112,21 +112,11 @@
     .wordlist td:nth-child(2){ width:45%; }
     .wordlist td:nth-child(3){ width:20%; text-align:center; }
     .wordlist th:nth-child(3){ text-align:center; }
-
     .wordlist button.play{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      line-height:1;
-      min-width:36px;
-      height:28px;
-      border:none;
+      display:inline-flex; align-items:center; justify-content:center;
+      line-height:1; min-width:36px; height:28px;
+      border:none; color:#fff; border-radius:6px; padding:4px 8px; font-size:14px; cursor:pointer;
       background:linear-gradient(135deg, var(--primary), var(--primary-600));
-      color:#fff;
-      border-radius:6px;
-      padding:4px 8px;
-      font-size:14px;
-      cursor:pointer;
       box-shadow:0 3px 8px rgba(43,108,255,.25);
       transition:transform .08s ease, filter .2s ease;
     }
@@ -145,7 +135,7 @@
 
     <!-- Плеер -->
     <audio id="audio" controls></audio>
-    <!-- ВОЛНА -->
+    <!-- Волна -->
     <div id="waveWrap" class="wave-wrap">
       <canvas id="wave" class="wave"></canvas>
     </div>
@@ -156,7 +146,7 @@
       <a class="btn" id="repeatBtn" href="#" role="button" aria-label="Повторить этот вариант">🔁 Повторить этот вариант</a>
     </div>
 
-    <!-- Инструкция — как в prepare -->
+    <!-- Инструкция -->
     <div class="task-container" aria-labelledby="taskTitle" aria-describedby="inst">
       <p id="taskTitle" style="margin-top:0;">
         <strong>Task 1.</strong> Imagine that you are preparing a project with your friend.
@@ -174,7 +164,7 @@ Gagarin was born in a small village and studied to become a pilot. He was chosen
 
 People remember Gagarin for his bravery and his famous smile. He proved that space travel was possible and inspired future generations of scientists and astronauts. Today, many streets, schools, and even planets are named after him. Yuri Gagarin will always be a symbol of courage and progress.</div>
 
-    <!-- Сложные слова (подсказка) -->
+    <!-- Сложные слова -->
     <div class="task-container helper-box" role="region" aria-labelledby="hardWordsTitle">
       <details>
         <summary id="hardWordsTitle" style="cursor:pointer; font-weight:700;">
@@ -202,6 +192,7 @@ People remember Gagarin for his bravery and his famous smile. He proved that spa
       <a class="btn nav-btn" id="toHome"     href="#" role="button" aria-label="Перейти на главную">Перейти на главную</a>
     </div>
   </div>
+
   <script type="module">
     import { toggleThemeInit, navigateOnce } from '../../../common.js';
 
@@ -431,18 +422,18 @@ People remember Gagarin for his bravery and his famous smile. He proved that spa
       ctx.restore();
     }
 
-    /* ======= СЛОВА: отрисовка + озвучка ======= */
+    /* Блок "Сложные слова" — слова из prepare (Gagarin) */
     const HARD_WORDS = [
-      { w: 'Yuri Gagarin',  ipa: '/ˈjʊəri ɡəˈɡɑːrɪn/' },
-      { w: 'spacecraft',    ipa: '/ˈspeɪskrɑːft/' },
-      { w: 'mission',       ipa: '/ˈmɪʃən/' },
-      { w: 'personality',   ipa: '/ˌpɜːsəˈnæləti/' },
-      { w: 'astronauts',    ipa: '/ˈæstrənɔːts/' },
-      { w: 'generations',   ipa: '/ˌdʒenəˈreɪʃənz/' },
-      { w: 'courage',       ipa: '/ˈkʌrɪdʒ/' },
-      { w: 'progress',      ipa: '/ˈprəʊɡres/' },
-      { w: 'bravery',       ipa: '/ˈbreɪvəri/' },
-      { w: 'Soviet Union',  ipa: '/ˈsəʊvɪət ˈjuːnjən/' }
+      { w: 'spacecraft',   ipa: '/ˈspeɪskræft/' },
+      { w: 'Vostok 1',     ipa: '/ˈvɒstɒk wʌn/' },
+      { w: 'mission',      ipa: '/ˈmɪʃən/' },
+      { w: 'personality',  ipa: '/ˌpɜːrsəˈnælɪti/' },
+      { w: 'Soviet Union', ipa: '/ˈsəʊviət ˈjuːnjən/' },
+      { w: 'bravery',      ipa: '/ˈbreɪvəri/' },
+      { w: 'generations',  ipa: '/ˌdʒɛnəˈreɪʃənz/' },
+      { w: 'astronauts',   ipa: '/ˈæstrəˌnɔːts/' },
+      { w: 'courage',      ipa: '/ˈkʌrɪdʒ/' },
+      { w: 'progress',     ipa: '/ˈprəʊɡrɛs/' }
     ];
 
     (function renderHardWords(){
@@ -456,11 +447,12 @@ People remember Gagarin for his bravery and his famous smile. He proved that spa
           <td>${item.ipa}</td>
           <td><button class="play" type="button" aria-label="Прослушать ${item.w}"><span aria-hidden="true">▶︎</span></button></td>
         `;
-        tr.querySelector('button').addEventListener('click', () => speakWord(item.w));
+        tr.querySelector('button')?.addEventListener('click', () => speakWord(item.w));
         tbody.appendChild(tr);
       });
     })();
 
+    // Озвучка слов
     let voices = [];
     function loadVoices(){ voices = window.speechSynthesis?.getVoices?.() || []; }
     loadVoices();

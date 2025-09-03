@@ -43,7 +43,7 @@
     .wave{ width:100%; height:48px; display:block; background:#e9edf7; border-radius:10px; box-shadow:var(--shadow); }
     .dark .wave{ background:#1f2a3d; }
 
-    /* Цвета волны для светлой/тёмной темы */
+    /* Цвета волны */
     :root{
       --wave-base: rgba(0,0,0,.28);
       --wave-prog: var(--primary);
@@ -66,7 +66,7 @@
     .btn:hover{ transform: translateY(-1px); filter: brightness(1.03); }
     .btn:disabled{ opacity:.6; cursor:not-allowed; transform:none; }
 
-    /* Рамка текста — как в prepare/task */
+    /* Рамка текста */
     .reading-box{
       max-width:1200px; width:95%; margin:0 auto 24px;
       font-size:25px; line-height:1.7; text-align:left;
@@ -78,20 +78,20 @@
       .reading-box{ font-size:18px; padding:18px 16px; max-width:100%; }
     }
 
-    /* Подсказка-рамка — компактная (как в prepare) */
+    /* Рамка со словами + таблица (как в эталоне) */
     .helper-box{
       border:1px solid #ccc;
       border-radius:8px;
       padding:14px 18px;
       background:var(--card);
       max-width:800px;
-      margin:16px auto 28px;
+      margin:16px auto;
       font-size:18px;
       line-height:1.5;
       box-shadow:0 2px 6px rgba(0,0,0,0.08);
     }
     @media (max-width:900px){
-      .helper-box{ font-size:16px; padding:12px 14px; max-width:100%; }
+      .helper-box{ font-size:16px; padding:12px 14px; max-width:95%; }
     }
     .wordlist{
       width:100%;
@@ -112,21 +112,11 @@
     .wordlist td:nth-child(2){ width:45%; }
     .wordlist td:nth-child(3){ width:20%; text-align:center; }
     .wordlist th:nth-child(3){ text-align:center; }
-
     .wordlist button.play{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      line-height:1;
-      min-width:36px;
-      height:28px;
-      border:none;
+      display:inline-flex; align-items:center; justify-content:center;
+      line-height:1; min-width:36px; height:28px;
+      border:none; color:#fff; border-radius:6px; padding:4px 8px; font-size:14px; cursor:pointer;
       background:linear-gradient(135deg, var(--primary), var(--primary-600));
-      color:#fff;
-      border-radius:6px;
-      padding:4px 8px;
-      font-size:14px;
-      cursor:pointer;
       box-shadow:0 3px 8px rgba(43,108,255,.25);
       transition:transform .08s ease, filter .2s ease;
     }
@@ -145,7 +135,7 @@
 
     <!-- Плеер -->
     <audio id="audio" controls></audio>
-    <!-- ВОЛНА -->
+    <!-- Волна -->
     <div id="waveWrap" class="wave-wrap">
       <canvas id="wave" class="wave"></canvas>
     </div>
@@ -156,7 +146,7 @@
       <a class="btn" id="repeatBtn" href="#" role="button" aria-label="Повторить этот вариант">🔁 Повторить этот вариант</a>
     </div>
 
-    <!-- Инструкция — как в prepare -->
+    <!-- Инструкция -->
     <div class="task-container" aria-labelledby="taskTitle" aria-describedby="inst">
       <p id="taskTitle" style="margin-top:0;">
         <strong>Task 1.</strong> Imagine that you are preparing a project with your friend.
@@ -174,7 +164,7 @@ Today, Cardiff is a modern and multicultural city. It has a population of over 3
 
 Cardiff is home to several universities and is considered a centre of education and culture in Wales. It’s a place where old traditions meet new ideas. Thanks to its rich history and active present, Cardiff attracts thousands of tourists and students every year.</div>
 
-    <!-- Сложные слова (подсказка) -->
+    <!-- Сложные слова -->
     <div class="task-container helper-box" role="region" aria-labelledby="hardWordsTitle">
       <details>
         <summary id="hardWordsTitle" style="cursor:pointer; font-weight:700;">
@@ -202,6 +192,7 @@ Cardiff is home to several universities and is considered a centre of education 
       <a class="btn nav-btn" id="toHome"     href="#" role="button" aria-label="Перейти на главную">Перейти на главную</a>
     </div>
   </div>
+
   <script type="module">
     import { toggleThemeInit, navigateOnce } from '../../../common.js';
 
@@ -431,18 +422,18 @@ Cardiff is home to several universities and is considered a centre of education 
       ctx.restore();
     }
 
-    /* ======= СЛОВА: отрисовка + озвучка ======= */
+    /* Блок "Сложные слова" — слова из prepare (Cardiff) */
     const HARD_WORDS = [
-      { w: 'capital',        ipa: '/ˈkæpɪtl/' },
-      { w: 'United Kingdom', ipa: '/juːˌnaɪtɪd ˈkɪŋdəm/' },
+      { w: 'capital',        ipa: '/ˈkæpɪtəl/' },
+      { w: 'United Kingdom', ipa: '/juːˈnaɪtɪd ˈkɪŋdəm/' },
       { w: 'rapidly',        ipa: '/ˈræpɪdli/' },
-      { w: 'mining',         ipa: '/ˈmaɪnɪŋ/' },
+      { w: 'century',        ipa: '/ˈsɛntʃəri/' },
+      { w: 'coal mining',    ipa: '/kəʊl ˈmaɪnɪŋ/' },
       { w: 'multicultural',  ipa: '/ˌmʌltiˈkʌltʃərəl/' },
-      { w: 'medieval',       ipa: '/ˌmediˈiːvəl/' },
-      { w: 'Millennium',     ipa: '/mɪˈleniəm/' },
+      { w: 'population',     ipa: '/ˌpɒpjʊˈleɪʃən/' },
+      { w: 'medieval',       ipa: '/ˌmɛdɪˈiːvəl/' },
       { w: 'performances',   ipa: '/pəˈfɔːmənsɪz/' },
-      { w: 'universities',   ipa: '/ˌjuːnɪˈvɜːsətiz/' },
-      { w: 'traditions',     ipa: '/trəˈdɪʃənz/' }
+      { w: 'universities',   ipa: '/ˌjuːnɪˈvɜːsɪtiz/' }
     ];
 
     (function renderHardWords(){
@@ -456,11 +447,12 @@ Cardiff is home to several universities and is considered a centre of education 
           <td>${item.ipa}</td>
           <td><button class="play" type="button" aria-label="Прослушать ${item.w}"><span aria-hidden="true">▶︎</span></button></td>
         `;
-        tr.querySelector('button').addEventListener('click', () => speakWord(item.w));
+        tr.querySelector('button')?.addEventListener('click', () => speakWord(item.w));
         tbody.appendChild(tr);
       });
     })();
 
+    // Озвучка слов
     let voices = [];
     function loadVoices(){ voices = window.speechSynthesis?.getVoices?.() || []; }
     loadVoices();

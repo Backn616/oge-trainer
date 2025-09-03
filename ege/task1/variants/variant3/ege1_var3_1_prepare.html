@@ -24,7 +24,7 @@
   </script>
 
   <style>
-    /* >>> Глобально как в эталоне */
+    /* Глобально как в эталоне */
     body{
       font-family: Inter, system-ui, Segoe UI, Roboto, Arial, sans-serif;
       background: var(--bg);
@@ -38,7 +38,6 @@
       box-shadow:var(--shadow);
       padding:24px 28px;
       text-align:left;
-      /* font-family удалён, шрифт задаём на body */
       font-size:25px;
       line-height:1.7;
       max-width:1200px;
@@ -51,16 +50,15 @@
 
     /* Подсказка-рамка — компактная */
     .helper-box{
-      border:1px solid #ccc;
-      border-radius:8px;
-      padding:14px 18px;
+      border:1px solid #ccc;          
+      border-radius:8px;              
+      padding:14px 18px;              
       background:var(--card);
-      max-width:800px;
-      margin:16px auto;
-      /* font-family удалён, шрифт задаём на body */
+      max-width:800px;                
+      margin:16px auto;               
       font-size:18px;
       line-height:1.5;
-      box-shadow:0 2px 6px rgba(0,0,0,0.08);
+      box-shadow:0 2px 6px rgba(0,0,0,0.08); 
     }
     @media (max-width:900px){
       .helper-box{ font-size:16px; padding:12px 14px; max-width:100%; }
@@ -124,11 +122,11 @@
     </div>
 
     <!-- Текст -->
-    <div class="reading-box" id="readingBox">Sherlock Holmes is a famous fictional character from British literature. He was created by Sir Arthur Conan Doyle. Holmes is a private detective who lives in London. Many people know him because of his great mind and amazing logical thinking. He solves difficult crimes that others cannot.
+    <div class="reading-box" id="readingBox">Cardiff is the capital of Wales and one of the most important cities in the United Kingdom. It became a city in 1905 and was made the capital in 1955. In the past, Cardiff was a small town, but it grew rapidly during the 19th century because of coal mining and trade. Its port became one of the busiest in the world.
 
-In the stories, Holmes is usually described as tall and thin. He often wears a hat and smokes a pipe. He is very intelligent and notices the smallest details. He doesn’t talk much and prefers to work alone or with his friend Dr Watson. Holmes likes music and sometimes plays the violin.
+Today, Cardiff is a modern and multicultural city. It has a population of over 350,000 people. The city is known for Cardiff Castle, which shows parts of Roman and medieval history. Visitors also enjoy the Millennium Stadium and the Wales Millennium Centre, which hosts concerts and theatre performances.
 
-Although Holmes is not a real person, he has become a symbol of clever thinking and observation. People all over the world read stories about him and watch films and series. Many believe that Sherlock Holmes is the best detective character ever created.</div>
+Cardiff is home to several universities and is considered a centre of education and culture in Wales. It’s a place where old traditions meet new ideas. Thanks to its rich history and active present, Cardiff attracts thousands of tourists and students every year.</div>
 
     <!-- Сложные слова -->
     <div class="task-container helper-box" role="region" aria-labelledby="hardWordsTitle">
@@ -173,7 +171,7 @@ Although Holmes is not a real person, he has become a symbol of clever thinking 
     // Тема
     toggleThemeInit();
 
-    // Навигация (как в эталоне)
+    // Навигация
     const NEXT_URL = location.pathname.replace(/_1_prepare\.html$/i, '_2_mic.html');
     document.getElementById('goBtn')?.addEventListener('click', () => navigateOnce(NEXT_URL));
 
@@ -218,16 +216,16 @@ Although Holmes is not a real person, he has become a symbol of clever thinking 
 
     // Сложные слова
     const HARD_WORDS = [
-      { w: 'Sherlock Holmes', ipa: '/ˈʃɜːrlɒk hoʊmz/' },
-      { w: 'fictional',       ipa: '/ˈfɪkʃənəl/' },
-      { w: 'literature',      ipa: '/ˈlɪtərətʃər/' },
-      { w: 'detective',       ipa: '/dɪˈtɛktɪv/' },
-      { w: 'logical',         ipa: '/ˈlɒdʒɪkəl/' },
-      { w: 'intelligent',     ipa: '/ɪnˈtɛlɪdʒənt/' },
-      { w: 'details',         ipa: '/ˈdiːteɪlz/' },
-      { w: 'violin',          ipa: '/ˌvaɪəˈlɪn/' },
-      { w: 'observation',     ipa: '/ˌɒbzərˈveɪʃən/' },
-      { w: 'series',          ipa: '/ˈsɪəriːz/' }
+      { w: 'capital',        ipa: '/ˈkæpɪtl/' },
+      { w: 'United Kingdom', ipa: '/juːˌnaɪtɪd ˈkɪŋdəm/' },
+      { w: 'rapidly',        ipa: '/ˈræpɪdli/' },
+      { w: 'mining',         ipa: '/ˈmaɪnɪŋ/' },
+      { w: 'multicultural',  ipa: '/ˌmʌltiˈkʌltʃərəl/' },
+      { w: 'medieval',       ipa: '/ˌmediˈiːvəl/' },
+      { w: 'Millennium',     ipa: '/mɪˈleniəm/' },
+      { w: 'performances',   ipa: '/pəˈfɔːmənsɪz/' },
+      { w: 'universities',   ipa: '/ˌjuːnɪˈvɜːsətiz/' },
+      { w: 'traditions',     ipa: '/trəˈdɪʃənz/' }
     ];
 
     (function renderHardWords(){

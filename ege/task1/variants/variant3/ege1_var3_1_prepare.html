@@ -24,6 +24,12 @@
   </script>
 
   <style>
+    /* >>> Глобально как в эталоне */
+    body{
+      font-family: Inter, system-ui, Segoe UI, Roboto, Arial, sans-serif;
+      background: var(--bg);
+    }
+
     /* Рамка текста */
     .reading-box{
       background:var(--card);
@@ -32,7 +38,7 @@
       box-shadow:var(--shadow);
       padding:24px 28px;
       text-align:left;
-      font-family: Inter, system-ui, Segoe UI, Roboto, Arial, sans-serif;
+      /* font-family удалён, шрифт задаём на body */
       font-size:25px;
       line-height:1.7;
       max-width:1200px;
@@ -43,22 +49,24 @@
       .reading-box{ font-size:18px; padding:18px 16px; max-width:100%; }
     }
 
-    /* Подсказка-рамка */
+    /* Подсказка-рамка — компактная */
     .helper-box{
-      border:1px solid #ccc;          
-      border-radius:8px;              
-      padding:14px 18px;              
+      border:1px solid #ccc;
+      border-radius:8px;
+      padding:14px 18px;
       background:var(--card);
-      max-width:800px;                
-      margin:16px auto;               
+      max-width:800px;
+      margin:16px auto;
+      /* font-family удалён, шрифт задаём на body */
       font-size:18px;
       line-height:1.5;
-      box-shadow:0 2px 6px rgba(0,0,0,0.08); 
+      box-shadow:0 2px 6px rgba(0,0,0,0.08);
     }
     @media (max-width:900px){
       .helper-box{ font-size:16px; padding:12px 14px; max-width:100%; }
     }
 
+    /* Компактная таблица слов */
     .wordlist{
       width:100%;
       border-collapse: collapse;
@@ -79,6 +87,7 @@
     .wordlist td:nth-child(3){ width:20%; text-align:center; }
     .wordlist th:nth-child(3){ text-align:center; }
 
+    /* Кнопка озвучки компактнее */
     .wordlist button.play{
       display:inline-flex;
       align-items:center;
@@ -115,11 +124,11 @@
     </div>
 
     <!-- Текст -->
-    <div class="reading-box" id="readingBox">Many students say that school is both exciting and tough. They enjoy learning new things, spending time with classmates, and taking part in school events. However, preparing for exams and writing essays can be stressful and tiring. Some students also worry about their academic performance.
+    <div class="reading-box" id="readingBox">Sherlock Holmes is a famous fictional character from British literature. He was created by Sir Arthur Conan Doyle. Holmes is a private detective who lives in London. Many people know him because of his great mind and amazing logical thinking. He solves difficult crimes that others cannot.
 
-Being thoughtful and responsible helps students succeed. They should plan their time carefully and avoid leaving everything until the last moment. Through experience, they learn how to study effectively and deal with pressure. Revision is important, especially before final exams.
+In the stories, Holmes is usually described as tall and thin. He often wears a hat and smokes a pipe. He is very intelligent and notices the smallest details. He doesn’t talk much and prefers to work alone or with his friend Dr Watson. Holmes likes music and sometimes plays the violin.
 
-School life also teaches us important values like friendship and respect. Although some subjects may seem boring or difficult at first, they often become interesting when taught by a passionate teacher. In the end, going through these years makes students stronger and more confident.</div>
+Although Holmes is not a real person, he has become a symbol of clever thinking and observation. People all over the world read stories about him and watch films and series. Many believe that Sherlock Holmes is the best detective character ever created.</div>
 
     <!-- Сложные слова -->
     <div class="task-container helper-box" role="region" aria-labelledby="hardWordsTitle">
@@ -147,21 +156,24 @@ School life also teaches us important values like friendship and respect. Althou
     </div>
   </div>
 
+  <!-- Проставка -->
   <div style="height: calc(var(--footer-h) + 24px);"></div>
 
+  <!-- Прогресс-бар -->
   <div id="progressContainerFixed" role="timer" aria-live="polite" aria-atomic="true" aria-label="Оставшееся время подготовки">
     <div id="progressBarFixed" class="rAF">
       <span id="progressTime" class="progress-time">01:30</span>
     </div>
   </div>
 
+  <!-- Логика -->
   <script type="module">
     import { toggleThemeInit, navigateOnce, startPrepareTimer, fmtTime } from "../../../common.js";
 
     // Тема
     toggleThemeInit();
 
-    // Навигация → теперь ведёт на mic
+    // Навигация (как в эталоне)
     const NEXT_URL = location.pathname.replace(/_1_prepare\.html$/i, '_2_mic.html');
     document.getElementById('goBtn')?.addEventListener('click', () => navigateOnce(NEXT_URL));
 
@@ -206,16 +218,16 @@ School life also teaches us important values like friendship and respect. Althou
 
     // Сложные слова
     const HARD_WORDS = [
-      { w: 'exciting',     ipa: '/ɪkˈsaɪtɪŋ/' },
-      { w: 'academic',     ipa: '/ˌækəˈdemɪk/' },
-      { w: 'performance',  ipa: '/pəˈfɔːməns/' },
-      { w: 'stressful',    ipa: '/ˈstresfʊl/' },
-      { w: 'pressure',     ipa: '/ˈpreʃə/' },
-      { w: 'revision',     ipa: '/rɪˈvɪʒən/' },
-      { w: 'responsible',  ipa: '/rɪˈspɒnsəbl/' },
-      { w: 'effectively',  ipa: '/ɪˈfektɪvli/' },
-      { w: 'passionate',   ipa: '/ˈpæʃənət/' },
-      { w: 'confident',    ipa: '/ˈkɒnfɪdənt/' }
+      { w: 'Sherlock Holmes', ipa: '/ˈʃɜːrlɒk hoʊmz/' },
+      { w: 'fictional',       ipa: '/ˈfɪkʃənəl/' },
+      { w: 'literature',      ipa: '/ˈlɪtərətʃər/' },
+      { w: 'detective',       ipa: '/dɪˈtɛktɪv/' },
+      { w: 'logical',         ipa: '/ˈlɒdʒɪkəl/' },
+      { w: 'intelligent',     ipa: '/ɪnˈtɛlɪdʒənt/' },
+      { w: 'details',         ipa: '/ˈdiːteɪlz/' },
+      { w: 'violin',          ipa: '/ˌvaɪəˈlɪn/' },
+      { w: 'observation',     ipa: '/ˌɒbzərˈveɪʃən/' },
+      { w: 'series',          ipa: '/ˈsɪəriːz/' }
     ];
 
     (function renderHardWords(){

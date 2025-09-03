@@ -43,7 +43,7 @@
     .wave{ width:100%; height:48px; display:block; background:#e9edf7; border-radius:10px; box-shadow:var(--shadow); }
     .dark .wave{ background:#1f2a3d; }
 
-    /* Цвета волны */
+    /* Цвета волны для светлой/тёмной темы */
     :root{
       --wave-base: rgba(0,0,0,.28);
       --wave-prog: var(--primary);
@@ -66,7 +66,7 @@
     .btn:hover{ transform: translateY(-1px); filter: brightness(1.03); }
     .btn:disabled{ opacity:.6; cursor:not-allowed; transform:none; }
 
-    /* Рамка текста */
+    /* Рамка текста — как в prepare/task */
     .reading-box{
       max-width:1200px; width:95%; margin:0 auto 24px;
       font-size:25px; line-height:1.7; text-align:left;
@@ -78,20 +78,20 @@
       .reading-box{ font-size:18px; padding:18px 16px; max-width:100%; }
     }
 
-    /* Рамка со словами + таблица (как в эталоне) */
+    /* Рамка со словами (как в prepare) */
     .helper-box{
       border:1px solid #ccc;
       border-radius:8px;
       padding:14px 18px;
       background:var(--card);
       max-width:800px;
-      margin:16px auto;
+      margin:16px auto 28px;
       font-size:18px;
       line-height:1.5;
       box-shadow:0 2px 6px rgba(0,0,0,0.08);
     }
     @media (max-width:900px){
-      .helper-box{ font-size:16px; padding:12px 14px; max-width:95%; }
+      .helper-box{ font-size:16px; padding:12px 14px; max-width:100%; }
     }
     .wordlist{
       width:100%;
@@ -112,11 +112,21 @@
     .wordlist td:nth-child(2){ width:45%; }
     .wordlist td:nth-child(3){ width:20%; text-align:center; }
     .wordlist th:nth-child(3){ text-align:center; }
+
     .wordlist button.play{
-      display:inline-flex; align-items:center; justify-content:center;
-      line-height:1; min-width:36px; height:28px;
-      border:none; color:#fff; border-radius:6px; padding:4px 8px; font-size:14px; cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      line-height:1;
+      min-width:36px;
+      height:28px;
+      border:none;
       background:linear-gradient(135deg, var(--primary), var(--primary-600));
+      color:#fff;
+      border-radius:6px;
+      padding:4px 8px;
+      font-size:14px;
+      cursor:pointer;
       box-shadow:0 3px 8px rgba(43,108,255,.25);
       transition:transform .08s ease, filter .2s ease;
     }
@@ -135,7 +145,7 @@
 
     <!-- Плеер -->
     <audio id="audio" controls></audio>
-    <!-- Волна -->
+    <!-- ВОЛНА -->
     <div id="waveWrap" class="wave-wrap">
       <canvas id="wave" class="wave"></canvas>
     </div>
@@ -146,7 +156,7 @@
       <a class="btn" id="repeatBtn" href="#" role="button" aria-label="Повторить этот вариант">🔁 Повторить этот вариант</a>
     </div>
 
-    <!-- Инструкция -->
+    <!-- Инструкция — как в prepare -->
     <div class="task-container" aria-labelledby="taskTitle" aria-describedby="inst">
       <p id="taskTitle" style="margin-top:0;">
         <strong>Task 1.</strong> Imagine that you are preparing a project with your friend.
@@ -158,13 +168,13 @@
     </div>
 
     <!-- Текст -->
-    <div class="reading-box" id="textBox">Sherlock Holmes is a famous fictional character from British literature. He was created by Sir Arthur Conan Doyle. Holmes is a private detective who lives in London. Many people know him because of his great mind and amazing logical thinking. He solves difficult crimes that others cannot.
+    <div class="reading-box" id="textBox">New Zealand is one of the most popular travel destinations for nature lovers and adventure seekers. This country consists of two main islands and is located in the southwestern Pacific Ocean. It is known for its breathtaking landscapes, including mountains, volcanoes, beaches, and lakes.
 
-In the stories, Holmes is usually described as tall and thin. He often wears a hat and smokes a pipe. He is very intelligent and notices the smallest details. He doesn’t talk much and prefers to work alone or with his friend Dr Watson. Holmes likes music and sometimes plays the violin.
+Many tourists come to New Zealand to try activities like hiking, kayaking, and bungee jumping. The country is also famous for its unique wildlife and strong traditions of protecting the environment. Visitors often say that the air feels fresher and the views are unforgettable.
 
-Although Holmes is not a real person, he has become a symbol of clever thinking and observation. People all over the world read stories about him and watch films and series. Many believe that Sherlock Holmes is the best detective character ever created.</div>
+Apart from nature, New Zealand has a rich culture. The Maori people, who were the first inhabitants of the islands, have kept many of their customs and language. Travellers can visit museums, attend cultural shows, or even try traditional food. Whether you want to relax or explore, New Zealand offers a memorable and rewarding experience.</div>
 
-    <!-- Сложные слова (как в эталоне) -->
+    <!-- Сложные слова (подсказка) -->
     <div class="task-container helper-box" role="region" aria-labelledby="hardWordsTitle">
       <details>
         <summary id="hardWordsTitle" style="cursor:pointer; font-weight:700;">
@@ -192,7 +202,6 @@ Although Holmes is not a real person, he has become a symbol of clever thinking 
       <a class="btn nav-btn" id="toHome"     href="#" role="button" aria-label="Перейти на главную">Перейти на главную</a>
     </div>
   </div>
-
   <script type="module">
     import { toggleThemeInit, navigateOnce } from '../../../common.js';
 
@@ -422,18 +431,18 @@ Although Holmes is not a real person, he has become a symbol of clever thinking 
       ctx.restore();
     }
 
-    /* Блок "Сложные слова" — слова из prepare */
+    /* ======= СЛОВА: отрисовка + озвучка ======= */
     const HARD_WORDS = [
-      { w: 'Sherlock Holmes', ipa: '/ˈʃɜːrlɒk hoʊmz/' },
-      { w: 'fictional',       ipa: '/ˈfɪkʃənəl/' },
-      { w: 'literature',      ipa: '/ˈlɪtərətʃər/' },
-      { w: 'detective',       ipa: '/dɪˈtɛktɪv/' },
-      { w: 'logical',         ipa: '/ˈlɒdʒɪkəl/' },
-      { w: 'intelligent',     ipa: '/ɪnˈtɛlɪdʒənt/' },
-      { w: 'details',         ipa: '/ˈdiːteɪlz/' },
-      { w: 'violin',          ipa: '/ˌvaɪəˈlɪn/' },
-      { w: 'observation',     ipa: '/ˌɒbzərˈveɪʃən/' },
-      { w: 'series',          ipa: '/ˈsɪəriːz/' }
+      { w: 'New Zealand',     ipa: '/njuː ˈziːlənd/' },
+      { w: 'southwestern',    ipa: '/ˌsaʊθˈwɛstən/' },
+      { w: 'breathtaking',    ipa: '/ˈbrɛθˌteɪkɪŋ/' },
+      { w: 'volcanoes',       ipa: '/vɒlˈkeɪnəʊz/' },
+      { w: 'kayaking',        ipa: '/ˈkaɪækɪŋ/' },
+      { w: 'bungee jumping',  ipa: '/ˈbʌndʒi ˌdʒʌmpɪŋ/' },
+      { w: 'wildlife',        ipa: '/ˈwaɪldlaɪf/' },
+      { w: 'traditions',      ipa: '/trəˈdɪʃənz/' },
+      { w: 'inhabitants',     ipa: '/ɪnˈhæbɪtənts/' },
+      { w: 'rewarding',       ipa: '/rɪˈwɔːdɪŋ/' }
     ];
 
     (function renderHardWords(){
@@ -447,12 +456,11 @@ Although Holmes is not a real person, he has become a symbol of clever thinking 
           <td>${item.ipa}</td>
           <td><button class="play" type="button" aria-label="Прослушать ${item.w}"><span aria-hidden="true">▶︎</span></button></td>
         `;
-        tr.querySelector('button')?.addEventListener('click', () => speakWord(item.w));
+        tr.querySelector('button').addEventListener('click', () => speakWord(item.w));
         tbody.appendChild(tr);
       });
     })();
 
-    // Озвучка слов
     let voices = [];
     function loadVoices(){ voices = window.speechSynthesis?.getVoices?.() || []; }
     loadVoices();

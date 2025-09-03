@@ -24,6 +24,8 @@
   </script>
 
   <style>
+    body{ font-family: Inter, system-ui, Segoe UI, Roboto, Arial, sans-serif; background: var(--bg); }
+
     /* Таймер-цифры 3-2-1 */
     .timer{
       font-size:70px; margin:30px 0; font-weight:700; color:var(--primary);
@@ -32,20 +34,19 @@
     }
     @media (prefers-reduced-motion: reduce) { .timer{ transition:none; } }
 
-    /* Текст для чтения — как в prepare (компактная рамка) */
+    /* Текст для чтения — компактная рамка */
     .reading-box{
       background:var(--card);
       border:1px solid #ccc;
       border-radius:12px;
       box-shadow:var(--shadow);
-      padding:24px 28px;                 /* было 40px */
+      padding:24px 28px;
       text-align:left;
-      font-family: Inter, system-ui, Segoe UI, Roboto, Arial, sans-serif;
-      font-size:25px;                     /* было 32px */
+      font-size:25px;
       line-height:1.7;
-      max-width:1200px;                   /* было 2500px */
+      max-width:1200px;
       margin:0 auto 24px;
-      white-space:pre-line;               /* переносы строк как абзацы */
+      white-space:pre-line;
     }
     @media (max-width:900px){
       .reading-box{ font-size:18px; padding:18px 16px; max-width:100%; }
@@ -81,11 +82,11 @@
     <div id="timer" class="timer" aria-live="polite">3</div>
 
     <!-- Текст для чтения: скрыт до конца отсчёта -->
-    <div class="reading-box" id="textBox" style="display:none">Sherlock Holmes is a famous fictional character from British literature. He was created by Sir Arthur Conan Doyle. Holmes is a private detective who lives in London. Many people know him because of his great mind and amazing logical thinking. He solves difficult crimes that others cannot.
+    <div class="reading-box" id="textBox" style="display:none">New Zealand is one of the most popular travel destinations for nature lovers and adventure seekers. This country consists of two main islands and is located in the southwestern Pacific Ocean. It is known for its breathtaking landscapes, including mountains, volcanoes, beaches, and lakes.
 
-In the stories, Holmes is usually described as tall and thin. He often wears a hat and smokes a pipe. He is very intelligent and notices the smallest details. He doesn’t talk much and prefers to work alone or with his friend Dr Watson. Holmes likes music and sometimes plays the violin.
+Many tourists come to New Zealand to try activities like hiking, kayaking, and bungee jumping. The country is also famous for its unique wildlife and strong traditions of protecting the environment. Visitors often say that the air feels fresher and the views are unforgettable.
 
-Although Holmes is not a real person, he has become a symbol of clever thinking and observation. People all over the world read stories about him and watch films and series. Many believe that Sherlock Holmes is the best detective character ever created.
+Apart from nature, New Zealand has a rich culture. The Maori people, who were the first inhabitants of the islands, have kept many of their customs and language. Travellers can visit museums, attend cultural shows, or even try traditional food. Whether you want to relax or explore, New Zealand offers a memorable and rewarding experience.
     </div>
 
     <!-- Кнопка завершения -->
@@ -119,12 +120,6 @@ Although Holmes is not a real person, he has become a symbol of clever thinking 
     const progressTime   = document.getElementById('progressTime');
 
     const RESULT_URL = location.pathname.replace(/_3_task\.html$/i, '_4_result.html');
-
-    const inExam      = (sessionStorage.getItem('exam_flow') === '1');
-    const varFromSS   = sessionStorage.getItem('exam_variant') || '';
-    const varFromURL  = (location.pathname.match(/variant(\d+)/i) || [,''])[1];
-    const EXAM_VARIANT= varFromSS || varFromURL || '';
-    const EXAM_NEXT_URL = `../../../exams_countdown.html?next=2&variant=${encodeURIComponent(EXAM_VARIANT)}`;
 
     /* === Микрофон и запись === */
     let mediaRecorder = null, audioChunks = [], streamRef = null;
@@ -160,7 +155,7 @@ Although Holmes is not a real person, he has become a symbol of clever thinking 
               sessionStorage.setItem('ege1_audio_base64', reader.result);
               sessionStorage.setItem('ege1_audio_mime', blobType);
             }catch{}
-            navigateOnce(inExam ? EXAM_NEXT_URL : RESULT_URL);
+            navigateOnce(RESULT_URL);
           };
           reader.readAsDataURL(audioBlob);
         };
@@ -231,16 +226,16 @@ Although Holmes is not a real person, he has become a symbol of clever thinking 
 
     function safeStopOrFinish(){
       try{ cancelAnimationFrame(rafId); }catch{}
-      if (hasStopped){ navigateOnce(inExam ? EXAM_NEXT_URL : RESULT_URL); return; }
+      if (hasStopped){ navigateOnce(RESULT_URL); return; }
       try{
         if (mediaRecorder?.state === 'recording'){ mediaRecorder.stop(); }
         else {
           try{ streamRef?.getTracks()?.forEach(t=>t.stop()); }catch{}
-          navigateOnce(inExam ? EXAM_NEXT_URL : RESULT_URL);
+          navigateOnce(RESULT_URL);
         }
       }catch{
         try{ streamRef?.getTracks()?.forEach(t=>t.stop()); }catch{}
-        navigateOnce(inExam ? EXAM_NEXT_URL : RESULT_URL);
+        navigateOnce(RESULT_URL);
       }
     }
 
@@ -250,7 +245,7 @@ Although Holmes is not a real person, he has become a symbol of clever thinking 
       try{ streamRef?.getTracks()?.forEach(t=>t.stop()); }catch{}
     });
 
-    /* === BFCache: возврат со следующего шага → рестарт === */
+    /* === BFCache: возврат → рестарт === */
     function isBackForwardNav(){
       try{
         const nav = performance.getEntriesByType('navigation')[0];

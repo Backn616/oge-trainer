@@ -24,12 +24,6 @@
   </script>
 
   <style>
-    /* Глобально как в эталоне */
-    body{
-      font-family: Inter, system-ui, Segoe UI, Roboto, Arial, sans-serif;
-      background: var(--bg);
-    }
-
     /* Рамка текста */
     .reading-box{
       background:var(--card);
@@ -38,6 +32,7 @@
       box-shadow:var(--shadow);
       padding:24px 28px;
       text-align:left;
+      font-family: Inter, system-ui, Segoe UI, Roboto, Arial, sans-serif;
       font-size:25px;
       line-height:1.7;
       max-width:1200px;
@@ -56,6 +51,7 @@
       background:var(--card);
       max-width:800px;                
       margin:16px auto;               
+      font-family: Inter, system-ui, Segoe UI, Roboto, Arial, sans-serif;
       font-size:18px;
       line-height:1.5;
       box-shadow:0 2px 6px rgba(0,0,0,0.08); 
@@ -93,6 +89,7 @@
       line-height:1;
       min-width:36px;
       height:28px;
+
       border:none;
       background:linear-gradient(135deg, var(--primary), var(--primary-600));
       color:#fff;
@@ -214,18 +211,18 @@ Cardiff is home to several universities and is considered a centre of education 
       if (e.persisted) startTimerFresh();
     });
 
-    // Сложные слова
+    // Сложные слова (обновлено)
     const HARD_WORDS = [
+      { w: 'Cardiff',        ipa: '/ˈkɑːrdɪf/' },
+      { w: 'Wales',          ipa: '/weɪlz/' },
+      { w: 'United Kingdom', ipa: '/juːˈnaɪtɪd ˈkɪŋdəm/' },
       { w: 'capital',        ipa: '/ˈkæpɪtl/' },
-      { w: 'United Kingdom', ipa: '/juːˌnaɪtɪd ˈkɪŋdəm/' },
       { w: 'rapidly',        ipa: '/ˈræpɪdli/' },
-      { w: 'mining',         ipa: '/ˈmaɪnɪŋ/' },
-      { w: 'multicultural',  ipa: '/ˌmʌltiˈkʌltʃərəl/' },
-      { w: 'medieval',       ipa: '/ˌmediˈiːvəl/' },
-      { w: 'Millennium',     ipa: '/mɪˈleniəm/' },
-      { w: 'performances',   ipa: '/pəˈfɔːmənsɪz/' },
+      { w: 'medieval',       ipa: '/ˌmɛdiˈiːvl/' },
+      { w: 'stadium',        ipa: '/ˈsteɪdiəm/' },
       { w: 'universities',   ipa: '/ˌjuːnɪˈvɜːsətiz/' },
-      { w: 'traditions',     ipa: '/trəˈdɪʃənz/' }
+      { w: 'traditions',     ipa: '/trəˈdɪʃənz/' },
+      { w: 'tourists',       ipa: '/ˈtʊərɪsts/' }
     ];
 
     (function renderHardWords(){

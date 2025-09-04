@@ -5,7 +5,7 @@
   <title>Task 2 — Questions</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- Шрифты -->
+  <!-- Шрифт -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
@@ -54,7 +54,7 @@
   <!-- Переключатель темы -->
   <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
 
-  <!-- Плеер для MP3 -->
+  <!-- Плеер для MP3 с вопросами -->
   <audio id="qAudio" preload="auto" playsinline webkit-playsinline></audio>
 
   <!-- ВЕРХ: отсчёт 3-2-1 -->
@@ -72,11 +72,11 @@
           <p id="qLine">1) Ask a direct question about the following: <b>location</b></p>
         </section>
 
-        <!-- Право — заголовок над фото и фото -->
+        <!-- Право — заголовок и картинка (можно тоже вынести в общую папку) -->
         <aside aria-label="Advertisement">
-          <h3 class="ad-title">Join our swimming club!</h3>
+          <h3 class="ad-title" id="adTitle">Join our swimming club!</h3>
           <figure class="ad-figure">
-            <img src="pool.jpg" alt="image" loading="lazy">
+            <img id="adImg" src="pool.jpg" alt="image" loading="lazy">
           </figure>
         </aside>
 
@@ -103,7 +103,7 @@
     import { toggleThemeInit, navigateOnce, fmtTime } from "../../../common.js";
     toggleThemeInit();
 
-    /* ===== URL'ы и режимы ===== */
+    /* ===== Маршрутизация и режимы ===== */
     const inExam        = (sessionStorage.getItem('exam_flow') === '1');
     const varFromSS     = sessionStorage.getItem('exam_variant') || '';
     const varFromURL    = (()=>{ const m = location.pathname.match(/var(?:iant)?(\d+)/i); return m ? m[1] : ''; })();
@@ -112,7 +112,19 @@
     const EXAM_NEXT_URL = `../../../exams_countdown.html?next=3&variant=${encodeURIComponent(EXAM_VARIANT)}`;
     const MIC_URL       = location.pathname.replace(/_3_task\.html$/i, '_2_mic.html');
 
-    /* ===== При reload уходим на mic (надёжно для автоплея) ===== */
+    /* ===== Единая база для общих ресурсов из /task2/variants/ =====
+       /task2/variants/variantN/FILE.html → /task2/variants/
+    */
+    function getVariantsBase(){
+      const m = location.pathname.match(/^(.*?\/task2\/variants)\/variant\d+\/[^/]+$/i);
+      if (m) return m[1] + '/';
+      // fallback: найти последний /variants/
+      const i = location.pathname.toLowerCase().lastIndexOf('/variants/');
+      return (i !== -1) ? location.pathname.slice(0, i + '/variants/'.length) : './';
+    }
+    const VARIANTS_BASE = getVariantsBase();
+
+    /* ===== Анти-рефреш (как и раньше: при reload → на MIC) ===== */
     function isReload(){
       try{
         const nav = performance.getEntriesByType('navigation')[0];
@@ -128,13 +140,14 @@
       throw new Error('Redirecting to mic after reload');
     }
 
-    /* ===== Подготовка ===== */
+    /* ===== Очистка предыдущей записи ===== */
     try{
       sessionStorage.removeItem('ege2_audio_base64');
       sessionStorage.removeItem('ege2_audio_mime');
       sessionStorage.removeItem('ege2_audio_parts');
     }catch{}
 
+    /* ===== Вопросы текущего варианта ===== */
     const QUESTIONS = [
       { title: "Question 1.", line: "1) Ask a direct question about the following: <b>location</b>" },
       { title: "Question 2.", line: "2) Ask a direct question about the following: <b>timetable</b>" },
@@ -142,7 +155,7 @@
       { title: "Question 4.", line: "4) Ask a direct question about the following: <b>membership fee</b>" }
     ];
 
-    // DOM
+    /* ===== DOM ===== */
     const countdownWrap = document.getElementById('countdownWrap');
     const mainWrap = document.getElementById('mainWrap');
     const timerEl  = document.getElementById('timer');
@@ -154,29 +167,34 @@
     const barEl    = document.getElementById('progressBarFixed');
     const timeEl   = document.getElementById('progressTime');
     const qAudio   = document.getElementById('qAudio');
+    const adImg    = document.getElementById('adImg');
 
     const QUESTION_MS = 20_000;
 
-    /* ===== Аудио (локальные mp3) ===== */
-    const AUDIO_SRC = ["./q1.mp3","./q2.mp3","./q3.mp3","./q4.mp3"];
+    /* ===== Аудио вопроса из общей папки /task2/variants/ ===== */
+    const AUDIO_SRC = [
+      `${VARIANTS_BASE}q1.mp3`,
+      `${VARIANTS_BASE}q2.mp3`,
+      `${VARIANTS_BASE}q3.mp3`,
+      `${VARIANTS_BASE}q4.mp3`,
+    ];
+
+    /* (опционально) Картинку тоже можно хранить единую: pool.jpg в /task2/variants/ */
+    // adImg.src = `${VARIANTS_BASE}pool.jpg`;
 
     function renderQuestion(){
-      const q=QUESTIONS[qIdx];
-      qTitleEl.textContent=q.title;
-      qLineEl.innerHTML=q.line;
+      const q = QUESTIONS[qIdx];
+      qTitleEl.textContent = q.title;
+      qLineEl.innerHTML = q.line;
     }
 
-    // Специально: ПЕРЕД таймером проигрываем «Question N», по образцу Task 3
+    // Перед окном ответа проигрываем «Question N»
     async function playQuestionAudio(n){
-      try{
-        qAudio.pause();
-        qAudio.currentTime = 0;
-      }catch{}
+      try{ qAudio.pause(); qAudio.currentTime = 0; }catch{}
       qAudio.src = AUDIO_SRC[n-1];
       try{
         await qAudio.play();
-      }catch(e){
-        // на случай блокировки — покажем однократный оверлей-клик
+      }catch{
         showUnlockOverlay(() => qAudio.play().catch(()=>{}));
       }
     }
@@ -197,7 +215,7 @@
       recorder.start(1000);
     }
 
-    /* ===== Состояния — как в Task 3: озвучка -> ответ ===== */
+    /* ===== Состояния ===== */
     let qIdx=0, answering=false, finishing=false;
     let startedAt=0, deadlineMs=0, rafId=0, intId=0, hardTO=0;
 
@@ -246,21 +264,13 @@
     }
 
     nextBtn.addEventListener('click', () => endAnswerWindow());
-
-    // когда озвучка заканчивается — стартует окно ответа (как в Task 3)
-    qAudio.addEventListener('ended', () => {
-      startAnswerWindow();
-    });
-    qAudio.addEventListener('error', () => {
-      // если аудио не нашлось — всё равно даём окно ответа
-      startAnswerWindow();
-    });
+    qAudio.addEventListener('ended', startAnswerWindow);
+    qAudio.addEventListener('error', startAnswerWindow);
 
     function proceedNext(){
       qIdx++;
       if (qIdx < QUESTIONS.length){
         renderQuestion();
-        // СНОВА: сначала звучит «Question N», а потом — таймер
         playQuestionAudio(qIdx+1);
       }else{
         finishAll();
@@ -307,7 +317,7 @@
 
     /* ===== Старт страницы ===== */
     function startCountdown(){
-      // заранее грузим 1-й трек, чтобы быстрее стартанул
+      // заранее грузим 1-й трек
       try{ qAudio.src = AUDIO_SRC[0]; qAudio.load(); }catch{}
 
       let n = 3;
@@ -325,26 +335,19 @@
     }
 
     async function startFlow(){
-      // РИСУЕМ 1-й вопрос
       qIdx = 0;
       renderQuestion();
 
-      // Микрофон и запуск озвучки (как в Task 3: сначала играет «Question», затем — окно ответа)
       try{
         await initMic();
-        // если пришли с mic → ставили флаг; можем дополнительно «подогреть» (обычно не нужно)
         if (sessionStorage.getItem('t2_autostart') === '1'){
-          // ничего не делаем: Chrome уже разрешает play после getUserMedia
+          // Chrome уже разрешит play после getUserMedia
         }
-        // ВАЖНО: СЕЙЧАС НЕ ЗАПУСКАЕМ ТАЙМЕР — только озвучку
         await playQuestionAudio(1);
       }catch(err){
         console.warn('Mic init error:', err);
-        // даже если микрофон не дали — озвучку всё равно пытаемся запустить
         playQuestionAudio(1);
       }
-
-      // после успешного старта — убираем флаг анти-зацикливания reload
       try { sessionStorage.removeItem('t2_reload_redirected'); } catch {}
     }
 
@@ -358,7 +361,7 @@
     }
     freshStart();
 
-    /* ===== Оверлей на случай блокировки звука (один клик) ===== */
+    /* ===== Разблокировка автоплея по клику ===== */
     function showUnlockOverlay(onUnlock){
       if (document.getElementById('unlock-audio')) return;
       const wrap = document.createElement('div');
@@ -378,7 +381,7 @@
       btn.addEventListener('touchstart', unlock, { once:true, passive:true });
     }
 
-    /* ===== Housekeeping ===== */
+    /* ===== Возврат/вперёд в истории ===== */
     function isBackForward(){
       try{
         const nav = performance.getEntriesByType('navigation')[0];

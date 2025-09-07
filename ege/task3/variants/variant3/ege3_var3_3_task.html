@@ -110,12 +110,18 @@
     import { toggleThemeInit, navigateOnce, fmtTime } from "../../../common.js";
     toggleThemeInit();
 
-    const inExam         = (sessionStorage.getItem('exam_flow') === '1');
-    const varFromSS      = sessionStorage.getItem('exam_variant') || '';
-    const varFromURL     = (location.pathname.match(/variant(\d+)/i) || [,''])[1];
-    const EXAM_VARIANT   = varFromSS || varFromURL || '';
-    const RESULT_URL     = location.pathname.replace(/_3_task\.html$/i, '_4_result.html');
-    const EXAM_NEXT_URL  = `../../../exams_countdown.html?next=4&variant=${encodeURIComponent(EXAM_VARIANT)}`;
+    // ==== Навигация ====
+    const inExam =
+      (sessionStorage.getItem('exam_flow') === '1') ||
+      (sessionStorage.getItem('exam_mode') === 'full');
+
+    const varFromSS    = sessionStorage.getItem('exam_variant') || '';
+    const varFromURL   = (location.pathname.match(/variant(\d+)/i) || [,''])[1];
+    const EXAM_VARIANT = varFromSS || varFromURL || '';
+
+    const RESULT_URL    = location.pathname.replace(/_3_task\.html$/i, '_4_result.html');
+    const EXAM_NEXT_URL = `../../../exams_countdown.html?next=4&variant=${encodeURIComponent(EXAM_VARIANT || '1')}`;
+    // ===================
 
     /* === редирект на mic при reload (для автоплея) === */
     try {
@@ -159,9 +165,9 @@
     const ANSWER_MS = 40_000;
 
     // Два аудио-объекта: озвучка вопроса и сигнал
-    const audio = new Audio();          // для intro/q1..q5
+    const audio = new Audio();
     audio.preload = 'auto';
-    const sig   = new Audio(SIG_SRC);   // сигнал
+    const sig   = new Audio(SIG_SRC);
     sig.preload = 'auto';
 
     let streamRef=null, recorder=null, chosenMime='', recChunks=[];
@@ -242,7 +248,6 @@
 
     let qIdx = -1;
 
-    // Универсальный плей с разблокировкой по клику при необходимости (но НЕ ждём окончания для интро)
     function playWithUnlock(el){
       return new Promise((resolve)=>{
         const cleanup = ()=>{
@@ -268,13 +273,10 @@
       barWrap.style.display = 'none';
       try{ audio.pause(); audio.currentTime = 0; }catch{}
       audio.src = INTRO_AUDIO;
-
-      // запускаем воспроизведение, но НЕ ждём окончания — кнопка появится через 7 секунд
       playWithUnlock(audio);
       setTimeout(()=>{ introNextWrap.style.display = 'block'; }, 7000);
     }
 
-    // Сигнал → вопрос → сигнал → окно ответа
     async function playQuestion(n){
       introBox.style.display = 'none';
       qWrap.style.display = 'block';
@@ -284,17 +286,11 @@
 
       try{ audio.pause(); audio.currentTime = 0; }catch{}
 
-      // сигнал перед
       await playWithUnlock(sig);
-
-      // сам вопрос
       audio.src = Q_AUDIO[n-1];
       await playWithUnlock(audio);
-
-      // сигнал после
       await playWithUnlock(sig);
 
-      // окно ответа
       startAnswerWindow();
     }
 

@@ -5,12 +5,12 @@
   <title>Task 3 — Interview</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- Шрифт -->
+  <!-- Шрифты -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 
-  <!-- Общие стили -->
+  <!-- Общие стили проекта -->
   <link rel="stylesheet" href="../../../style_common.css" />
 
   <style>
@@ -44,12 +44,6 @@
       z-index:10001;
     }
 
-    .hint, #unlock-audio{
-      position:fixed; inset:0; display:flex; align-items:center; justify-content:center;
-      background:rgba(0,0,0,.35); z-index:10000;
-    }
-    #unlock-audio .button{ padding:18px 28px; }
-
     #introBox{ margin-bottom:18px; text-align:center; }
     #introNextWrap{ margin-top:40px; display:none; }
 
@@ -59,8 +53,15 @@
       display:none;
       width:100%;
     }
+
+    #unlock-audio{
+      position:fixed; inset:0; display:flex; align-items:center; justify-content:center;
+      background:rgba(0,0,0,.35); z-index:10000;
+    }
+    #unlock-audio .button{ padding:18px 28px; }
   </style>
 
+  <!-- Анти-мигание темы -->
   <script>
     (function(){
       try{
@@ -110,12 +111,18 @@
     import { toggleThemeInit, navigateOnce, fmtTime } from "../../../common.js";
     toggleThemeInit();
 
-    const inExam         = (sessionStorage.getItem('exam_flow') === '1');
-    const varFromSS      = sessionStorage.getItem('exam_variant') || '';
-    const varFromURL     = (location.pathname.match(/variant(\d+)/i) || [,''])[1];
-    const EXAM_VARIANT   = varFromSS || varFromURL || '';
-    const RESULT_URL     = location.pathname.replace(/_3_task\.html$/i, '_4_result.html');
-    const EXAM_NEXT_URL  = `../../../exams_countdown.html?next=4&variant=${encodeURIComponent(EXAM_VARIANT)}`;
+    // ==== Навигация / режимы ====
+    const inExam =
+      (sessionStorage.getItem('exam_flow') === '1') ||
+      (sessionStorage.getItem('exam_mode') === 'full');
+
+    const varFromSS    = sessionStorage.getItem('exam_variant') || '';
+    const varFromURL   = (location.pathname.match(/variant(\d+)/i) || [,''])[1];
+    const EXAM_VARIANT = varFromSS || varFromURL || '3'; // безопасный дефолт
+
+    const RESULT_URL    = location.pathname.replace(/_3_task\.html$/i, '_4_result.html');
+    const EXAM_NEXT_URL = `../../../exams_countdown.html?next=4&variant=${encodeURIComponent(EXAM_VARIANT)}`;
+    // ============================
 
     /* === редирект на mic при reload (для автоплея) === */
     try {
@@ -126,25 +133,29 @@
       }
     } catch(_) {}
 
+    // Сброс старой записи Task 3
     try{
       sessionStorage.removeItem('ege3_audio_base64');
       sessionStorage.removeItem('ege3_audio_mime');
     }catch{}
 
+    // Аудиофайлы
     const INTRO_AUDIO = "intro.mp3";
     const Q_AUDIO     = ["q1.mp3","q2.mp3","q3.mp3","q4.mp3","q5.mp3"];
-    const SIG_SRC     = "../not.mp3"; // сигнал из общей папки variants
+    // Если сигнал общий и лежит в /variants: "../not.mp3"
+    // Если сигнал лежит внутри variant3 — поменяй на "./not.mp3"
+    const SIG_SRC     = "../not.mp3";
 
     // DOM
     const countdownWrap = document.getElementById('countdownWrap');
-    const mainWrap = document.getElementById('mainWrap');
-    const timerEl  = document.getElementById('timer');
+    const mainWrap      = document.getElementById('mainWrap');
+    const timerEl       = document.getElementById('timer');
 
-    const introBox = document.getElementById('introBox');
+    const introBox      = document.getElementById('introBox');
     const introNextWrap = document.getElementById('introNextWrap');
     const introNextBtn  = document.getElementById('introNextBtn');
 
-    const qWrap = document.getElementById('qWrap');
+    const qWrap    = document.getElementById('qWrap');
     const qTitleEl = document.getElementById('qTitle');
 
     const barWrap  = document.getElementById('progressContainerFixed');
@@ -152,18 +163,17 @@
     const timeEl   = document.getElementById('progressTime');
 
     const nextBtnWrap = document.getElementById('nextBtnWrap');
-    const nextBtn  = document.getElementById('nextBtn');
+    const nextBtn     = document.getElementById('nextBtn');
 
     const recIndicator = document.getElementById('recIndicator');
 
     const ANSWER_MS = 40_000;
 
-    // Два аудио-объекта: озвучка вопроса и сигнал
-    const audio = new Audio();          // для intro/q1..q5
-    audio.preload = 'auto';
-    const sig   = new Audio(SIG_SRC);   // сигнал
-    sig.preload = 'auto';
+    // Аудио плееры
+    const audio = new Audio();  audio.preload = 'auto';
+    const sig   = new Audio(SIG_SRC); sig.preload = 'auto';
 
+    // Микрофон/запись
     let streamRef=null, recorder=null, chosenMime='', recChunks=[];
     let micStarted = false;
 
@@ -187,20 +197,20 @@
       }catch(err){ console.warn('Mic error:', err); }
     }
 
-    let startedAt=0, deadlineMs=0, rafId=0, intId=0, hardTO=0, answering=false, finishing=false;
+    // Таймер ответа
+    let deadlineMs=0, rafId=0, intId=0, hardTO=0, answering=false, finishing=false;
 
     function startAnswerWindow(){
       barWrap.style.display = 'block';
       nextBtnWrap.style.display = 'block';
       nextBtn.textContent = (qIdx === 4) ? 'Закончить' : 'Дальше';
       timeEl.textContent = fmtTime(ANSWER_MS);
-      barEl.style.width = '100%';
+      barEl.style.width  = '100%';
       answering = true;
-      startedAt = performance.now();
-      deadlineMs = startedAt + ANSWER_MS;
+      deadlineMs = performance.now() + ANSWER_MS;
       stopClocks();
       tickRaf();
-      intId = setInterval(tickWall, 250);
+      intId  = setInterval(tickWall, 250);
       hardTO = setTimeout(()=>{ if(answering) endAnswerWindow(); }, ANSWER_MS + 1500);
     }
 
@@ -232,6 +242,9 @@
       proceedNext();
     }
 
+    // Поток вопросов
+    let qIdx = -1;
+
     nextBtn.addEventListener('click', () => endAnswerWindow());
     introNextBtn.addEventListener('click', async () => {
       introNextWrap.style.display = 'none';
@@ -240,9 +253,6 @@
       playQuestion(1);
     });
 
-    let qIdx = -1;
-
-    // Универсальный плей с разблокировкой по клику при необходимости (но НЕ ждём окончания для интро)
     function playWithUnlock(el){
       return new Promise((resolve)=>{
         const cleanup = ()=>{
@@ -268,13 +278,10 @@
       barWrap.style.display = 'none';
       try{ audio.pause(); audio.currentTime = 0; }catch{}
       audio.src = INTRO_AUDIO;
-
-      // запускаем воспроизведение, но НЕ ждём окончания — кнопка появится через 7 секунд
-      playWithUnlock(audio);
+      playWithUnlock(audio);                // не ждём окончания
       setTimeout(()=>{ introNextWrap.style.display = 'block'; }, 7000);
     }
 
-    // Сигнал → вопрос → сигнал → окно ответа
     async function playQuestion(n){
       introBox.style.display = 'none';
       qWrap.style.display = 'block';
@@ -284,18 +291,12 @@
 
       try{ audio.pause(); audio.currentTime = 0; }catch{}
 
-      // сигнал перед
-      await playWithUnlock(sig);
-
-      // сам вопрос
-      audio.src = Q_AUDIO[n-1];
+      await playWithUnlock(sig);    // сигнал перед
+      audio.src = Q_AUDIO[n-1];     // вопрос
       await playWithUnlock(audio);
+      await playWithUnlock(sig);    // сигнал после
 
-      // сигнал после
-      await playWithUnlock(sig);
-
-      // окно ответа
-      startAnswerWindow();
+      startAnswerWindow();          // окно ответа
     }
 
     function proceedNext(){
@@ -320,7 +321,6 @@
 
     async function saveAndGo(){
       try{
-        await new Promise(r=>setTimeout(r,0));
         const blob = recChunks && recChunks.length ? new Blob(recChunks, { type: chosenMime || 'audio/webm' }) : null;
         if (blob){
           const reader = new FileReader();
@@ -332,8 +332,12 @@
             cleanupAndNavigate();
           };
           reader.readAsDataURL(blob);
-        }else{ cleanupAndNavigate(); }
-      }catch{ cleanupAndNavigate(); }
+        }else{
+          cleanupAndNavigate();
+        }
+      }catch{
+        cleanupAndNavigate();
+      }
     }
 
     function cleanupAndNavigate(){
@@ -341,6 +345,7 @@
       navigateOnce(inExam ? EXAM_NEXT_URL : RESULT_URL);
     }
 
+    // Стартовая логика
     function startCountdown(){
       let n = 3;
       timerEl.textContent = n;
@@ -368,11 +373,11 @@
     }
     freshStart();
 
+    // Разблокировка аудио по пользовательскому действию
     function showUnlockOverlay(onUnlock){
       if (document.getElementById('unlock-audio')) return;
       const wrap = document.createElement('div');
       wrap.id = 'unlock-audio';
-      wrap.style.cssText = 'position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.35);z-index:10000;';
       const btn = document.createElement('button');
       btn.className = 'button';
       btn.textContent = 'Нажмите, чтобы включить звук';

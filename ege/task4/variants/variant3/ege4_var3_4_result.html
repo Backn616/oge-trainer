@@ -132,8 +132,19 @@
   </div>
 
   <script type="module">
-    import { toggleThemeInit, navigateOnce } from '../../../common.js';
+    import { toggleThemeInit, navigateOnce, examModeInit } from '../../../common.js';
     toggleThemeInit();
+    examModeInit(); // включает/сбрасывает exam_flow по ?exam=1
+
+    // 👉 Если это запуск в режиме «Экзамен полностью» — сразу уходим на общий результат
+    try {
+      if (sessionStorage.getItem('exam_flow') === '1') {
+        const vSS  = sessionStorage.getItem('exam_variant') || '';
+        const vURL = (location.pathname.match(/variant(\d+)/i) || [,''])[1] || '';
+        const v    = vSS || vURL;
+        if (v) navigateOnce(`../../../exams_result.html?exam=1&variant=${encodeURIComponent(v)}`);
+      }
+    } catch {}
 
     // ===== Заголовок/номер варианта =====
     const path = location.pathname;
@@ -226,9 +237,8 @@
           objectURL   = URL.createObjectURL(blob);
           audioEl.src = objectURL;
           audioEl.type= blob.type || mimeStored;
-          await initWaveformFromBlob(blob);   // <-- декодируем напрямую из Blob
+          await initWaveformFromBlob(blob);
         }else{
-          // если blob не собрался — используем data URL
           audioEl.src = base64;
           audioEl.type= mimeStored;
           await initWaveformFromURL(base64);

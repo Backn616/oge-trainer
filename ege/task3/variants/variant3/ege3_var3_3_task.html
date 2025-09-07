@@ -115,7 +115,8 @@
     const varFromURL     = (location.pathname.match(/variant(\d+)/i) || [,''])[1];
     const EXAM_VARIANT   = varFromSS || varFromURL || '';
     const RESULT_URL     = location.pathname.replace(/_3_task\.html$/i, '_4_result.html');
-    const EXAM_NEXT_URL  = `../../../exams_countdown.html?next=4&variant=${encodeURIComponent(EXAM_VARIANT)}`;
+    const EXAM_NEXT_URL  = `../../../exams_countdown.html?exam=1&next=4&variant=${encodeURIComponent(EXAM_VARIANT)}`;
+
 
     /* === редирект на mic при reload (для автоплея) === */
     try {

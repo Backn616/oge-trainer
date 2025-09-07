@@ -220,9 +220,9 @@
 
     <div class="navs">
       <a id="repeatExam" class="btn" href="#" role="button">🔁 Пройти этот вариант заново</a>
-      <a class="btn" href="./exams.html" role="button">← К выбору варианта</a>
-      <a class="btn" href="./ege_menu.html" role="button">← К выбору формата</a>
-      <a class="btn" href="../index.html" role="button">← На главную</a>
+      <a id="toVariants" class="btn" href="./exams.html" role="button">← К выбору варианта</a>
+      <a id="toFormat"   class="btn" href="./ege_menu.html" role="button">← К выбору формата</a>
+      <a id="toHome"     class="btn" href="../index.html" role="button">← На главную</a>
     </div>
   </div>
 
@@ -230,20 +230,152 @@
     import { toggleThemeInit, navigateOnce } from './common.js';
     toggleThemeInit();
 
+    // ==== Безопасный разбор variant ====
     const q = new URLSearchParams(location.search);
-    const variant = q.get('variant') || sessionStorage.getItem('exam_variant') || '1';
+    const variant = (q.get('variant') || sessionStorage.getItem('exam_variant') || '1').replace(/\D+/g,'');
 
-    /* --- аудио + волна (предполагается, что функции уже есть в этом файле) --- */
-    const rows = [
-      { key:'ege1', a:'a1', s:'s1', w:'w1' },
-      { key:'ege2', a:'a2', s:'s2', w:'w2' },
-      { key:'ege3', a:'a3', s:'s3', w:'w3' },
-      { key:'ege4', a:'a4', s:'s4', w:'w4' },
-    ];
-    // ... твой renderWave / setupRow ...
+    // ==== Универсальные утилиты ====
+    function clearExamState(){
+      try{
+        ['exam_flow','exam_variant','exam_started_at','exams_payload','exams_state']
+          .forEach(k => sessionStorage.removeItem(k));
+        ['ege1_','ege2_','ege3_','ege4_'].forEach(prefix=>{
+          Object.keys(sessionStorage).forEach(k=>{ if(k.startsWith(prefix)) sessionStorage.removeItem(k); });
+        });
+      }catch{}
+    }
 
-    rows.reduce((p,row)=> p.then(()=>setupRow(row)), Promise.resolve());
+    function dataURLtoBlob(dataURL){
+      const parts = (dataURL || '').split(',');
+      if (parts.length < 2) return null;
+      const header = parts[0], b64 = parts[1];
+      const type = (header.match(/data:(.*?);base64/) || [,'application/octet-stream'])[1];
+      const bin  = atob(b64);
+      const bytes= new Uint8Array(bin.length);
+      for (let i=0;i<bin.length;i++) bytes[i] = bin.charCodeAt(i);
+      return new Blob([bytes], { type });
+    }
 
+    async function renderWaveTo(canvas, audioEl, arrayBuffer){
+      const AC = window.AudioContext || window.webkitAudioContext;
+      const ctxA = new AC();
+      const buf = await ctxA.decodeAudioData(arrayBuffer);
+
+      const peaks = buildPeaks(buf, 1000);
+      const wrap = canvas.parentElement;
+      drawWave(canvas, peaks, 0);
+      wrap.style.display = 'block';
+
+      let raf=0;
+      const tick = ()=>{
+        const p = audioEl.currentTime / (buf.duration || 1);
+        drawWave(canvas, peaks, p);
+        raf = requestAnimationFrame(tick);
+      };
+      audioEl.addEventListener('play', ()=>{ cancelAnimationFrame(raf); tick(); });
+      audioEl.addEventListener('pause', ()=>{ cancelAnimationFrame(raf); drawWave(canvas, peaks, audioEl.currentTime/(buf.duration||1)); });
+      audioEl.addEventListener('ended', ()=>{ cancelAnimationFrame(raf); drawWave(canvas, peaks, 1); });
+    }
+
+    function buildPeaks(buf, width){
+      const ch0 = buf.getChannelData(0);
+      const ch1 = buf.numberOfChannels>1 ? buf.getChannelData(1) : null;
+      const total = ch0.length;
+      const block = Math.floor(total / width) || 1;
+      const arr = new Array(width);
+      for (let i=0;i<width;i++){
+        const start = i*block, end = Math.min(total, start+block);
+        let min=1, max=-1;
+        for (let j=start;j<end;j++){
+          const s = ch1 ? (ch0[j]+ch1[j])*0.5 : ch0[j];
+          if (s<min) min=s; if (s>max) max=s;
+        }
+        arr[i] = [min,max];
+      }
+      return arr;
+    }
+
+    function drawWave(c, peaks, progress){
+      const dpr = Math.max(1, Math.floor(window.devicePixelRatio || 1));
+      const cssW = c.clientWidth || 600;
+      const cssH = c.clientHeight || 56;
+      if (c.width !== cssW*dpr) c.width = cssW*dpr;
+      if (c.height!== cssH*dpr) c.height= cssH*dpr;
+      const ctx = c.getContext('2d');
+      ctx.setTransform(dpr,0,0,dpr,0,0);
+
+      const rs = getComputedStyle(document.documentElement);
+      const waveBase = (rs.getPropertyValue('--wave-base') || 'rgba(0,0,0,.28)').trim();
+      const waveProg = (rs.getPropertyValue('--wave-prog') || '#2b6cff').trim();
+      const waveGlow = (rs.getPropertyValue('--wave-glow') || 'rgba(43,108,255,.45)').trim();
+      const bg = getComputedStyle(c).backgroundColor;
+
+      ctx.clearRect(0,0,cssW,cssH);
+      ctx.fillStyle = bg; ctx.fillRect(0,0,cssW,cssH);
+
+      const mid = cssH/2;
+      ctx.fillStyle = waveBase;
+      for (let i=0;i<peaks.length;i++){
+        const x = i/peaks.length*cssW;
+        const [min,max] = peaks[i];
+        const hTop = Math.abs(max)*mid;
+        const hBot = Math.abs(min)*mid;
+        ctx.fillRect(x, mid-hTop, 1, hTop+hBot || 1);
+      }
+
+      const progW = Math.max(0, Math.min(cssW, progress*cssW));
+      ctx.save(); ctx.beginPath(); ctx.rect(0,0,progW,cssH); ctx.clip();
+      ctx.fillStyle = waveProg; ctx.shadowColor = waveGlow; ctx.shadowBlur = 8;
+      for (let i=0;i<peaks.length;i++){
+        const x = i/peaks.length*cssW;
+        const [min,max] = peaks[i];
+        const hTop = Math.abs(max)*mid;
+        const hBot = Math.abs(min)*mid;
+        ctx.fillRect(x, mid-hTop, 1, hTop+hBot || 1);
+      }
+      ctx.restore();
+    }
+
+    async function setupRow({key, a, s, w}){
+      const audioEl = document.getElementById(a);
+      const status  = document.getElementById(s);
+      const canvas  = document.getElementById(w);
+
+      const base64     = sessionStorage.getItem(`${key}_audio_base64`);
+      const mimeStored = (sessionStorage.getItem(`${key}_audio_mime`) || 'audio/webm').toLowerCase();
+
+      if (!base64){
+        status.textContent = '⚠️ Запись не найдена.';
+        return;
+      }
+      try{
+        const blob = dataURLtoBlob(base64);
+        if (blob){
+          const url = URL.createObjectURL(blob);
+          audioEl.src  = url;
+          audioEl.type = blob.type || mimeStored;
+          const arr = await blob.arrayBuffer();
+          await renderWaveTo(canvas, audioEl, arr);
+          status.textContent = 'Готово.';
+          window.addEventListener('pagehide', ()=> URL.revokeObjectURL(url));
+          window.addEventListener('beforeunload', ()=> URL.revokeObjectURL(url));
+        }else{
+          // data: URL
+          audioEl.src  = base64;
+          audioEl.type = mimeStored;
+          const resp = await fetch(base64);
+          const arr  = await resp.arrayBuffer();
+          await renderWaveTo(canvas, audioEl, arr);
+          status.textContent = 'Готово.';
+        }
+      }catch{
+        audioEl.src  = base64;
+        audioEl.type = mimeStored;
+        status.textContent = 'Готово.';
+      }
+    }
+
+    // ==== Подгрузка сниппетов с отдельных результатов ====
     const domParse = (html, baseUrl='.')=>{
       const parser = new DOMParser();
       const doc = parser.parseFromString(html, 'text/html');
@@ -268,7 +400,7 @@
       }catch{ document.getElementById('snip1').textContent='Не удалось загрузить текст.'; }
     })();
 
-    // Task 2 — как в result 2
+    // Task 2
     (async ()=>{
       const mount = document.getElementById('snip2');
       try{
@@ -276,11 +408,8 @@
         const html = await (await fetch(url)).text();
         const doc  = domParse(html, `./task2/variants/variant${variant}`);
         const ad = doc.querySelector('.ad-layout');
-        if (ad){
-          mount.innerHTML='';
-          mount.appendChild(ad.cloneNode(true));
-          return;
-        }
+        if (ad){ mount.innerHTML=''; mount.appendChild(ad.cloneNode(true)); }
+        else { mount.textContent='Не удалось загрузить объявление.'; }
       }catch{
         mount.textContent='Не удалось загрузить объявление.';
       }
@@ -294,7 +423,7 @@
         const doc  = domParse(html, `./task3/variants/variant${variant}`);
         const tc   = doc.querySelector('.task-container');
         const mount= document.getElementById('snip3');
-        if (tc && mount){ 
+        if (tc && mount){
           const cont = tc.cloneNode(true);
           cont.className='t3-container';
           mount.innerHTML=''; mount.appendChild(cont);
@@ -322,14 +451,26 @@
             imgs.className='t4-images';
             mount.appendChild(imgs);
           }
+        } else {
+          mount.textContent='Не удалось загрузить инструкцию.';
         }
       }catch{ mount.textContent='Не удалось загрузить инструкцию.'; }
     })();
 
-    // Кнопки
+    // ==== Аудио-вклейка + волны ====
+    const rows = [
+      { key:'ege1', a:'a1', s:'s1', w:'w1' },
+      { key:'ege2', a:'a2', s:'s2', w:'w2' },
+      { key:'ege3', a:'a3', s:'s3', w:'w3' },
+      { key:'ege4', a:'a4', s:'s4', w:'w4' },
+    ];
+    rows.reduce((p,row)=> p.then(()=>setupRow(row)), Promise.resolve());
+
+    // ==== Кнопки ====
     document.getElementById('repeatExam').addEventListener('click',(e)=>{
       e.preventDefault();
       try{
+        // чистим хвосты заданий, НО сохраняем exam_flow/exam_variant (перезапуск текущего варианта)
         ['ege1_','ege2_','ege3_','ege4_'].forEach(prefix=>{
           Object.keys(sessionStorage).forEach(k=>{ if(k.startsWith(prefix)) sessionStorage.removeItem(k); });
         });
@@ -337,6 +478,19 @@
       const v = sessionStorage.getItem('exam_variant') || variant;
       navigateOnce(`./task1/variants/variant${v}/ege1_var${v}_1_prepare.html?variant=${v}`);
     });
+
+    // На все «уходящие» ссылки — сброс режима экзамена
+    [['toVariants','./exams.html'], ['toFormat','./ege_menu.html'], ['toHome','../index.html']]
+      .forEach(([id,href])=>{
+        const a = document.getElementById(id);
+        if (!a) return;
+        a.addEventListener('click',(e)=>{
+          e.preventDefault();
+          clearExamState();
+          navigateOnce(href);
+        });
+      });
+
     window.addEventListener('pageshow', ()=>{ navigateOnce.lock=false; });
   </script>
 </body>

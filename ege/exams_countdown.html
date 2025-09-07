@@ -3,89 +3,84 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Экзамен — переход к следующему заданию</title>
+  <title>Экзамен полностью — переход к следующему заданию</title>
 
-  <!-- Анти-мигание темы -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./style_common.css" />
+
   <script>
-    (function(){try{
+    (function(){ try{
       const saved = localStorage.getItem('pref-theme') || 'light';
       if (saved === 'dark') document.documentElement.classList.add('dark');
     }catch{}})();
   </script>
 
   <style>
-    :root{
-      --primary:#2b6cff; --text:#0b1020; --muted:#5a6475; --card:#fff;
-      --bg:#f7f9ff; --shadow: 0 10px 25px rgba(17,24,39,.08);
+    .wrap{ max-width:1100px; margin:0 auto; padding:40px 20px; text-align:center; }
+    .title{ font-size:42px; font-weight:800; margin:0 0 20px; color:var(--primary); }
+    .timer{
+      font-size:100px; font-weight:800; color:var(--primary);
+      text-shadow:0 4px 12px rgba(0,0,0,.25); margin:30px 0;
     }
-    .dark{
-      --primary:#6aa3ff; --text:#eaf0ff; --muted:#b9c2d3; --card:rgba(255,255,255,.08);
-      --bg:#0b1020; --shadow: 0 10px 35px rgba(0,0,0,.35);
-    }
-    *{box-sizing:border-box}
-    body{
-      margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      background: var(--bg); color: var(--text); display:grid; place-items:center; min-height:100dvh;
-    }
-    .card{
-      background:var(--card); border-left:5px solid var(--primary);
-      border-radius:14px; box-shadow:var(--shadow); padding:28px 32px; max-width:680px;
-      text-align:center;
-    }
-    h1{margin:0 0 10px; font-size:26px; color:var(--primary)}
-    p{margin:6px 0; color:var(--muted); font-size:16px}
-    .timer{font-weight:800; font-size:22px; margin-top:12px}
   </style>
 </head>
 <body>
-  <div class="card" role="status" aria-live="polite">
-    <h1>Подготовка следующего шага…</h1>
-    <p id="info">Сейчас откроется следующее задание.</p>
-    <div class="timer">Переход через <span id="sec">3</span>…</div>
+  <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
+
+  <div class="wrap">
+    <div id="title" class="title">Task</div>
+    <div id="timer" class="timer" aria-live="polite">3</div>
   </div>
 
   <script type="module">
-    import { toggleThemeInit, examModeInit, navigateOnce } from './common.js';
+    import { toggleThemeInit, navigateOnce } from './common.js';
     toggleThemeInit();
-    examModeInit(); // включит exam_flow, если есть ?exam=1
 
-    // --- Параметры URL / sessionStorage
-    const qs = new URLSearchParams(location.search);
-    const next = Math.max(2, Math.min(4, parseInt(qs.get('next') || '2', 10) || 2));
-    const variantQs = (qs.get('variant') || '').replace(/\D+/g,'');
-    const variantSS = (sessionStorage.getItem('exam_variant') || '').replace(/\D+/g,'');
-    const variant = variantQs || variantSS || '1';
+    const params     = new URLSearchParams(location.search);
+    const nextRaw    = Number(params.get('next') || '2');      // ожидали 2..4
+    const next       = Math.max(2, Math.min(4, nextRaw));      // страховка
+    const variantQ   = params.get('variant');
+    const variantS   = sessionStorage.getItem('exam_variant') || '';
+    const variant    = variantQ || variantS || '1';
+    const examFlowOn = sessionStorage.getItem('exam_flow') === '1';
 
-    // Инфо для пользователя
-    const names = {2:'Task 2', 3:'Task 3', 4:'Task 4'};
-    document.getElementById('info').textContent = `Открываем ${names[next] || 'следующий шаг'} для варианта ${variant}…`;
+    // если пришли сюда не из «экзамен полностью» — отправим к выбору варианта
+    if (!examFlowOn) {
+      const fallback = './exams.html';
+      navigateOnce(fallback);
+    }
 
-    // --- Формирование следующего URL c exam=1
+    // Заголовок и title
+    document.getElementById('title').textContent = `Task ${next}`;
+    try { document.title = `Экзамен полностью — Task ${next}`; } catch {}
+
+    // Куда идти после отсчёта (с прокидыванием ?exam=1&variant=)
     function nextPrepareUrl(){
+      // после Task 4 этим экраном уже не пользуемся — на всякий случай отправим на общий результат
       if (next > 4) {
-        // страховка; обычно сюда не попадаем
         return `./exams_result.html?exam=1&variant=${encodeURIComponent(variant)}`;
       }
       return `./task${next}/variants/variant${variant}/ege${next}_var${variant}_1_prepare.html?exam=1&variant=${encodeURIComponent(variant)}`
         .replace(/\/{2,}/g,'/').replace(':/','://');
     }
 
-    const target = nextPrepareUrl();
-
-    // --- 3-секундный отсчёт и переход
-    const secEl = document.getElementById('sec');
-    let left = 3;
-    const iv = setInterval(()=>{
-      left -= 1;
-      if (left <= 0){
-        clearInterval(iv);
-        navigateOnce(target);
-      } else {
-        secEl.textContent = String(left);
+    // Отсчёт 3-2-1
+    const timerEl = document.getElementById('timer');
+    let n = 3;
+    timerEl.textContent = n;
+    const id = setInterval(()=>{
+      timerEl.textContent = n;
+      n--;
+      if (n < 0){
+        clearInterval(id);
+        navigateOnce(nextPrepareUrl());
       }
-    }, 1000);
+    },1000);
 
-    // Снять «замок» при возврате из BFCache
+    // Чистим интервал при уходе/перезагрузке
+    window.addEventListener('beforeunload', ()=>{ try{ clearInterval(id); }catch{} });
     window.addEventListener('pageshow', ()=>{ navigateOnce.lock = false; });
   </script>
 </body>

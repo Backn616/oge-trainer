@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Task 4 — Variant 1</title>
+  <title>Task 4 — Variant 2</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
 
@@ -185,8 +185,18 @@
     const endBtn = document.getElementById("endBtn");
     const taskContainer = document.getElementById("taskContainer");
 
-    // ✅ Решение «через n»: ege4_varN_3_task.html → ege4_varN_4_result.html
-    const RESULT_URL = location.pathname.replace(/_3_task\.html$/i, '_4_result.html');
+    // ==== Навигация как в варианте 1 ====
+    const RESULT_LOCAL_URL = location.pathname.replace(/_3_task\.html$/i, '_4_result.html');
+    const inExam       = (sessionStorage.getItem('exam_flow') === '1');
+    const varFromSS    = sessionStorage.getItem('exam_variant') || '';
+    const varFromURL   = (location.pathname.match(/variant(\d+)/i) || [,''])[1];
+    const EXAM_VARIANT = varFromSS || varFromURL || '2';
+    const EXAM_RESULT_URL = `../../../exams_result.html?variant=${encodeURIComponent(EXAM_VARIANT)}`;
+
+    function getFinishURL(){
+      return inExam ? EXAM_RESULT_URL : RESULT_LOCAL_URL;
+    }
+    // ====================================
 
     let countdown = 3;
     let totalTime = 180;       // сек
@@ -309,8 +319,9 @@
 
     function gotoResult(){
       if (!navigating) navigating = true;
-      if (location.href.endsWith(RESULT_URL)) return;
-      location.href = RESULT_URL;
+      const target = getFinishURL();
+      if (location.href.endsWith(target)) return;
+      location.href = target;
     }
 
     function safeStopOrFinish(){

@@ -43,21 +43,17 @@ function prefersReducedMotion() {
 
 /**
  * == Таймер подготовки (унифицированный, rAF) ==
- * API совместим с прежним:
+ * API:
  *   startPrepareTimer({
  *     barEl,        // HTMLElement — полоса прогресса (width %)
  *     timeEl,       // HTMLElement — текст времени (MM:SS)
  *     totalMs,      // число — общее время, мс
  *     nextUrl,      // строка — куда переходить по завершению
- *     key,          // строка — ключ в sessionStorage для сохранения endTime
+ *     key,          // строка — ключ в sessionStorage для endTime
+ *     textEveryMs?, // частота обновления текста (по умолчанию 250)
+ *     persist?,     // сохранять endTime (по умолчанию true)
+ *     useRAF?,      // rAF (по умолчанию true)
  *   })
- *
- * Доп. параметры (необязательные):
- *   textEveryMs:  число, частота обновления текста (по умолчанию 250)
- *   persist:      boolean, сохранять endTime в sessionStorage (по умолчанию true)
- *   useRAF:       boolean, использовать requestAnimationFrame (по умолчанию true)
- *
- * Возвращает функцию stop(), чтобы руками остановить таймер при необходимости.
  */
 export function startPrepareTimer(opts) {
   const {
@@ -75,11 +71,8 @@ export function startPrepareTimer(opts) {
     console.warn('[startPrepareTimer] Missing required options.');
   }
 
-  // Визуально убираем возможную CSS-инерцию ширины,
-  // чтобы не спорила с покадровым обновлением.
-  try {
-    barEl.style.transition = 'none';
-  } catch {}
+  // Уберём возможную CSS-инерцию ширины
+  try { barEl.style.transition = 'none'; } catch {}
 
   const reduced = prefersReducedMotion();
 
@@ -94,35 +87,30 @@ export function startPrepareTimer(opts) {
     endTime = parseInt(endTime, 10);
   }
 
-  // Первичный рендер.
   function setProgress(leftMs) {
     const pct = Math.max(0, Math.min(100, (leftMs / totalMs) * 100));
     barEl.style.width = `${pct}%`;
   }
   function setTime(leftMs) { timeEl.textContent = fmtTime(leftMs); }
 
-  // Состояние цикла.
   let rafId = null;
   let ivId = null;
   let lastTextAt = 0;
 
   function finish() {
     stop();
-    // Очистим сохранённое endTime, чтобы при следующем заходе таймер стартовал "с нуля".
     if (persist) {
       try { sessionStorage.removeItem(key); } catch {}
     }
     navigateOnce(nextUrl);
   }
 
-  function frame(nowTs) {
-    const now = Date.now(); // для стабильности при восстановлении/свертывании
+  function frame() {
+    const now = Date.now();
     const left = Math.max(0, endTime - now);
 
-    // Ширину обновляем каждый тик (даже при reduced-motion — без анимации просто мгновенно).
     setProgress(left);
 
-    // Текст обновляем не чаще textEveryMs (уменьшаем «болтливость» для скринридеров).
     if (!lastTextAt || now - lastTextAt >= textEveryMs) {
       setTime(left);
       lastTextAt = now;
@@ -151,29 +139,52 @@ export function startPrepareTimer(opts) {
     }
   }
 
-  // Запуск
+  // Старт
   setProgress(totalMs);
   setTime(totalMs);
 
   if (useRAF && typeof requestAnimationFrame === 'function' && !reduced) {
     rafId = requestAnimationFrame(frame);
   } else {
-    // Фолбэк на setInterval или при reduced-motion
     const step = Math.max(50, Math.min(1000 / 30, textEveryMs)); // 20–30 FPS достаточно
     ivId = setInterval(tick, step);
   }
 
-  // Стоппер
   function stop() {
-    if (rafId != null) {
-      cancelAnimationFrame(rafId);
-      rafId = null;
-    }
-    if (ivId != null) {
-      clearInterval(ivId);
-      ivId = null;
-    }
+    if (rafId != null) { cancelAnimationFrame(rafId); rafId = null; }
+    if (ivId != null)  { clearInterval(ivId);       ivId = null;  }
   }
 
   return stop;
+}
+
+// == Инициализация режима экзамена из URL (?exam=1&variant=N) ==
+export function examModeInit() {
+  try {
+    const qs = new URLSearchParams(location.search);
+    const isExam = qs.get('exam') === '1';
+
+    if (isExam) {
+      sessionStorage.setItem('exam_flow', '1');
+      const v = (qs.get('variant') || '').replace(/\D+/g, '');
+      if (v) sessionStorage.setItem('exam_variant', v);
+    } else {
+      // Если открыто без exam=1 — это одиночный запуск: гасим exam-флаг
+      sessionStorage.removeItem('exam_flow');
+      sessionStorage.removeItem('exam_variant');
+    }
+  } catch {}
+}
+
+// == Явная очистка экзамен-состояния (удобно вызывать при выходе на главную) ==
+export function clearExamState() {
+  try {
+    ['exam_flow','exam_variant','exam_started_at','exams_payload','exams_state']
+      .forEach(k => sessionStorage.removeItem(k));
+    ['ege1_','ege2_','ege3_','ege4_'].forEach(prefix=>{
+      Object.keys(sessionStorage).forEach(k=>{
+        if (k.startsWith(prefix)) sessionStorage.removeItem(k);
+      });
+    });
+  } catch {}
 }

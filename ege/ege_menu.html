@@ -146,6 +146,17 @@
     // Тема
     toggleThemeInit();
 
+    // 🔧 Сброс режима экзамена при входе в меню «по заданиям»
+    try {
+      sessionStorage.removeItem('exam_flow');
+      sessionStorage.removeItem('exam_variant');
+      ['ege1_','ege2_','ege3_','ege4_'].forEach(prefix=>{
+        Object.keys(sessionStorage).forEach(k=>{
+          if (k.startsWith(prefix)) sessionStorage.removeItem(k);
+        });
+      });
+    } catch {}
+
     // Логотип → на главную / кнопка «К выбору формата» → на ege.html
     document.querySelectorAll('.brand, .back').forEach(a=>{
       const url = a.getAttribute('href');

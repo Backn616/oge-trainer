@@ -65,10 +65,9 @@
     .theme-toggle:active{transform:scale(.98)}
     .theme-toggle:focus-visible{ box-shadow:0 0 0 4px var(--ring); outline:none }
 
-    /* Видимая, контрастная ссылка "На главную" в тёмной теме (и светлой тоже) */
     .back{
       border:1px dashed #ffffff28;
-      background:#ffffff08;              /* лёгкая подложка, не ломает дизайн */
+      background:#ffffff08;
       padding:10px 14px;
       border-radius:10px;
       text-decoration:none;
@@ -106,7 +105,7 @@
     .btn:last-child{margin-bottom:0}
     .btn:hover{transform:translateY(-2px); filter:brightness(1.03)}
     .btn:active{transform:translateY(0)}
-    .btn:focus-visible{box-shadow:0 0 0 4px var(--ring); outline:none}
+    .btn:focus-visible{box-shadow:0 0 0 4px var(--ring); outline:none }
 
     footer{padding:20px 0 10px; color:var(--muted); font-size:13px; text-align:center}
   </style>
@@ -140,12 +139,17 @@
     <footer>© 2025 — Демо-версия тренажёра ЕГЭ.</footer>
   </div>
 
-  <!-- Общий модуль -->
   <script type="module">
     import { toggleThemeInit, navigateOnce } from './common.js';
 
     // Тема
     toggleThemeInit();
+
+    // 🔧 Сброс exam_flow при входе (чтобы «по заданиям» не подхватывали режим экзамена)
+    try {
+      sessionStorage.removeItem('exam_flow');
+      sessionStorage.removeItem('exam_variant');
+    } catch {}
 
     // Переходы: логотип и "На главную"
     document.querySelectorAll('.brand, .back').forEach(a=>{
@@ -153,7 +157,7 @@
       a.addEventListener('click', (e)=>{ e.preventDefault(); navigateOnce(url); });
     });
 
-    // Кнопки выбора режима — тоже через navigateOnce
+    // Кнопки выбора режима — через navigateOnce
     document.querySelectorAll('.card .btn').forEach(a=>{
       const url = a.getAttribute('href');
       a.addEventListener('click', (e)=>{ e.preventDefault(); navigateOnce(url); });

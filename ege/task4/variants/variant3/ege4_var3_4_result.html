@@ -5,7 +5,7 @@
   <title id="pageTitle">Результат — Задание 4</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- Шрифт: ускорение загрузки -->
+  <!-- Шрифт -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
@@ -29,13 +29,13 @@
     .status{ font-size:22px; color:#1f7a2e; text-align:center; margin:10px 0 26px; }
     .dark .status{ color:#5ee397; }
 
-    /* Плеер + волна (как в задании 2) */
+    /* Плеер + волна */
     audio{ margin:20px auto 10px; width:min(900px, 90%); display:block; }
     .wave-wrap{ width:min(900px,90%); margin:0 auto 18px; display:none; }
     .wave{ width:100%; height:48px; display:block; background:#e9edf7; border-radius:10px; box-shadow:var(--shadow); }
     .dark .wave{ background:#1f2a3d; }
 
-    /* Цвета волны для светлой/тёмной темы */
+    /* Цвета волны */
     :root{
       --wave-base: rgba(0,0,0,.28);
       --wave-prog: var(--primary);
@@ -136,13 +136,23 @@
     toggleThemeInit();
     examModeInit(); // включает/сбрасывает exam_flow по ?exam=1
 
-    // 👉 Если это запуск в режиме «Экзамен полностью» — сразу уходим на общий результат
+    /* === Экзамен полностью: мгновенный переход на общий итог === */
     try {
-      if (sessionStorage.getItem('exam_flow') === '1') {
-        const vSS  = sessionStorage.getItem('exam_variant') || '';
+      const qs = new URLSearchParams(location.search);
+      const inExam = qs.get('exam') === '1' || sessionStorage.getItem('exam_flow') === '1';
+      if (inExam) {
+        const vSS  = (sessionStorage.getItem('exam_variant') || '').replace(/\D+/g,'');
         const vURL = (location.pathname.match(/variant(\d+)/i) || [,''])[1] || '';
-        const v    = vSS || vURL;
-        if (v) navigateOnce(`../../../exams_result.html?exam=1&variant=${encodeURIComponent(v)}`);
+        const v    = vSS || vURL || '';
+        // Гарантируем, что downstream-страницы видят флаги
+        try {
+          sessionStorage.setItem('exam_flow','1');
+          if (v) sessionStorage.setItem('exam_variant', v);
+        } catch {}
+        if (v) {
+          navigateOnce(`../../../exams_result.html?exam=1&variant=${encodeURIComponent(v)}`);
+          throw new Error('redirected');
+        }
       }
     } catch {}
 
@@ -263,7 +273,7 @@
     window.addEventListener('pagehide', ()=>{ if (objectURL) URL.revokeObjectURL(objectURL); });
     window.addEventListener('beforeunload', ()=>{ if (objectURL) URL.revokeObjectURL(objectURL); });
 
-    // ===== Волновой бегунок
+    // ===== Волна
     async function initWaveformFromBlob(blob){
       const arr = await blob.arrayBuffer();
       await renderWave(arr);

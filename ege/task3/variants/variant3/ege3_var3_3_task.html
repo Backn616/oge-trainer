@@ -110,15 +110,18 @@
     import { toggleThemeInit, navigateOnce, fmtTime } from "../../../common.js";
     toggleThemeInit();
 
-    const inExam         = (sessionStorage.getItem('exam_flow') === '1');
-    const varFromSS      = sessionStorage.getItem('exam_variant') || '';
-    const varFromURL     = (location.pathname.match(/variant(\d+)/i) || [,''])[1];
-    const EXAM_VARIANT   = varFromSS || varFromURL || '';
-    const RESULT_URL     = location.pathname.replace(/_3_task\.html$/i, '_4_result.html');
-    const EXAM_NEXT_URL  = `../../../exams_countdown.html?exam=1&next=4&variant=${encodeURIComponent(EXAM_VARIANT)}`;
+    // --- РЕЖИМ ЭКЗАМЕНА: читаем и из URL, и из sessionStorage
+    const qs            = new URLSearchParams(location.search);
+    const inExam        = (qs.get('exam') === '1') || (sessionStorage.getItem('exam_flow') === '1');
 
+    const varFromSS     = sessionStorage.getItem('exam_variant') || '';
+    const varFromURL    = (location.pathname.match(/variant(\d+)/i) || [,''])[1];
+    const EXAM_VARIANT  = (qs.get('variant') || varFromSS || varFromURL || '').replace(/\D+/g,'');
 
-    /* === редирект на mic при reload (для автоплея) === */
+    const RESULT_URL    = location.pathname.replace(/_3_task\.html$/i, '_4_result.html');
+    const EXAM_NEXT_URL = `../../../exams_countdown.html?exam=1&next=4&variant=${encodeURIComponent(EXAM_VARIANT)}`;
+
+    /* --- редирект на mic при reload (для автоплея) --- */
     try {
       const nav = performance.getEntriesByType("navigation")[0];
       const isReload = nav ? (nav.type === "reload") : (performance.navigation && performance.navigation.type === 1);
@@ -339,6 +342,13 @@
 
     function cleanupAndNavigate(){
       try{ streamRef?.getTracks()?.forEach(t=>t.stop()); }catch{}
+      // 🔒 если идём по экзамену — гарантированно ставим флаги
+      if (inExam) {
+        try {
+          sessionStorage.setItem('exam_flow','1');
+          if (EXAM_VARIANT) sessionStorage.setItem('exam_variant', EXAM_VARIANT);
+        } catch {}
+      }
       navigateOnce(inExam ? EXAM_NEXT_URL : RESULT_URL);
     }
 

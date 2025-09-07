@@ -164,15 +164,13 @@ export function examModeInit() {
     const qs = new URLSearchParams(location.search);
     const isExam = qs.get('exam') === '1';
 
+    // ВАЖНО: только УСТАНАВЛИВАЕМ флаг, НО НЕ СБРАСЫВАЕМ, если параметра нет.
     if (isExam) {
       sessionStorage.setItem('exam_flow', '1');
       const v = (qs.get('variant') || '').replace(/\D+/g, '');
       if (v) sessionStorage.setItem('exam_variant', v);
-    } else {
-      // Если открыто без exam=1 — это одиночный запуск: гасим exam-флаг
-      sessionStorage.removeItem('exam_flow');
-      sessionStorage.removeItem('exam_variant');
     }
+    // Если ?exam не пришёл — ничего не делаем, чтобы не потерять режим между шагами.
   } catch {}
 }
 

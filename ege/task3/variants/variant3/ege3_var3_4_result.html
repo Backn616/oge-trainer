@@ -119,6 +119,17 @@
     import { toggleThemeInit, navigateOnce } from '../../../common.js';
     toggleThemeInit();
 
+    /* === Универсальный редирект для режима "экзамен полностью" === */
+    try {
+      const inExam = (sessionStorage.getItem('exam_flow') === '1');
+      if (inExam) {
+        const varFromSS  = sessionStorage.getItem('exam_variant') || '';
+        const varFromURL = (location.pathname.match(/variant(\d+)/i) || [,''])[1];
+        const EXAM_VARIANT = varFromSS || varFromURL || '';
+        navigateOnce(`../../../exams_result.html?variant=${encodeURIComponent(EXAM_VARIANT)}`);
+      }
+    } catch {}
+
     // ===== Заголовок/номер варианта =====
     const path = location.pathname;
     const m = path.match(/variant(\d+)/i);

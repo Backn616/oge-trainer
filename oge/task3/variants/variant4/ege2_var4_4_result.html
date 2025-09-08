@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title id="pageTitle">Результат — Задание 2</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Шрифт -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+
+  <!-- Общие стили -->
+  <link rel="stylesheet" href="../../../style_common.css" />
+
+  <!-- Анти-мигание темы -->
+  <script>
+    (function(){
+      try{
+        const saved = localStorage.getItem('pref-theme') || 'light';
+        if (saved === 'dark') document.documentElement.classList.add('dark');
+      }catch(_){}
+    })();
+  </script>
+
+  <style>
+    .wrap{ max-width:1500px; margin:0 auto; }
+
+    /* ===== ЧАСТЬ 1 — заголовок, плеер, 3 кнопки ===== */
+    h1{ color:var(--primary); font-size:36px; margin:12px 0 6px; text-align:center; }
+    .status{ font-size:20px; color:#1f7a2e; text-align:center; margin:10px 0 18px; }
+    .dark .status{ color:#5ee397; }
+
+    audio{ margin:20px auto; width:min(900px,95%); display:block; }
+    .wave-wrap{ width:min(900px,95%); margin:-6px auto 12px; display:none; }
+    .wave{ width:100%; height:48px; display:block; background:#e9edf7; border-radius:10px; box-shadow:var(--shadow); }
+    .dark .wave{ background:#1f2a3d; }
+
+    /* Цвета волны для тем/света */
+    :root{
+      --wave-base: rgba(0,0,0,.28);
+      --wave-prog: var(--primary);
+      --wave-glow: rgba(43,108,255,.45);
+    }
+    html.dark{
+      --wave-base: rgba(255,255,255,.52);
+      --wave-prog: #5bb8ff;
+      --wave-glow: rgba(91,184,255,.65);
+    }
+
+    /* КНОПКИ */
+    .btn{
+      display:inline-block; padding:16px 32px; margin:12px;
+      font-size:20px; font-weight:600; color:#fff; text-decoration:none; cursor:pointer;
+      border:none; border-radius:12px;
+      background:linear-gradient(135deg, var(--primary), var(--primary-600));
+      box-shadow:0 10px 22px rgba(43,108,255,.3);
+      transition: transform .06s ease, filter .2s ease, box-shadow .2s ease;
+    }
+    .btn:hover{ transform: translateY(-1px); filter: brightness(1.03); }
+    .btn:disabled{ opacity:.6; cursor:not-allowed; transform:none; }
+
+    /* ===== ЧАСТЬ 2 — задание как в prepare ===== */
+    .ad-layout{
+      display:grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap:28px 36px;
+      align-items:start;
+      max-width:1500px;
+      margin:18px auto 0;
+    }
+    .task-header.card{
+      background:var(--card);
+      border-left:5px solid var(--primary);
+      box-shadow:var(--shadow);
+      border-radius:12px;
+      padding:20px 24px;
+      grid-column:1 / -1;
+      text-align:center;
+      font-size:20px; line-height:1.7;
+    }
+    .task-header b{ display:block; }
+    .left-free{ font-size:22px; line-height:1.55; text-align:left; }
+    .plain-list{ list-style:none; margin:0 0 24px 0; padding:0; }
+    .plain-list li{ margin:10px 0; }
+
+    .ad-title{ font-weight:800; font-size:30px; margin:6px 0 12px; text-align:center; }
+    .ad-figure{ width:100%; aspect-ratio:3/2; border-radius:12px; overflow:hidden; box-shadow:var(--shadow); background:#ddd; }
+    .ad-figure>img{ width:100%; height:100%; object-fit:cover; object-position:center; display:block; }
+
+    @media (max-width:1100px){ .ad-layout{ grid-template-columns:1fr; gap:22px; } }
+
+    /* ===== ЧАСТЬ 3 — нижние нав-кнопки ===== */
+    .nav-row{ text-align:center; margin:16px 0 24px; }
+
+    .spacer{ height: calc(var(--footer-h, 72px) + 16px); }
+  </style>
+</head>
+<body>
+  <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
+
+  <div class="wrap">
+    <!-- ===== ЧАСТЬ 1 ===== -->
+    <h1 id="h1">Результат — Вариант <span id="varNum">?</span></h1>
+    <div class="status" id="statusText" aria-live="polite">
+      ✅ Вы завершили задание 2. Ниже вы можете прослушать и скачать запись.
+    </div>
+
+    <audio id="audio" controls></audio>
+    <div id="waveWrap" class="wave-wrap">
+      <canvas id="wave" class="wave"></canvas>
+    </div>
+
+    <div style="text-align:center;">
+      <button class="btn" id="playBtn" type="button" aria-label="Проиграть запись" disabled>▶️ Прослушать</button>
+      <button class="btn" id="downloadBtn" type="button" aria-label="Скачать запись" disabled>⬇️ Скачать запись</button>
+      <a class="btn" id="repeatBtn" href="#" role="button" aria-label="Повторить этот вариант">🔁 Повторить этот вариант</a>
+    </div>
+
+    <!-- ===== ЧАСТЬ 2 ===== -->
+    <div class="ad-layout" aria-labelledby="taskTitle">
+      <section class="task-header card">
+        <b id="taskTitle">Task 2. Study the advertisement.</b>
+        <b>
+          You are considering celebrating your birthday party in this café and now you’d like to get more information.
+          In 1.5 minutes you are to ask four direct questions to find out about the following:
+        </b>
+      </section>
+
+      <div class="left-free">
+        <ol class="plain-list">
+          <li>1) types of food served;</li>
+          <li>2) vegetarian dishes;</li>
+          <li>3) music or dancing area;</li>
+          <li>4) birthday discounts.</li>
+        </ol>
+        <p><b>You have 20 seconds to ask each question.</b></p>
+      </div>
+
+      <aside aria-label="Advertisement">
+        <h3 class="ad-title">Celebrate your birthday in our café!</h3>
+        <figure class="ad-figure">
+          <img src="1.jpg" alt="club advertisement image" loading="lazy">
+        </figure>
+      </aside>
+    </div>
+
+    <!-- ===== ЧАСТЬ 3 ===== -->
+    <div class="nav-row">
+      <a class="btn nav-btn" id="toVariants" href="#">Перейти к выбору варианта</a>
+      <a class="btn nav-btn" id="toModeMenu" href="#">Перейти к выбору задания</a>
+      <a class="btn nav-btn" id="toTaskMenu" href="#">Перейти к выбору режима</a>
+      <a class="btn nav-btn" id="toHome" href="#">Перейти на главную</a>
+    </div>
+
+    <div class="spacer"></div>
+  </div>
+
+  <script type="module">
+    import { toggleThemeInit, navigateOnce } from '../../../common.js';
+    toggleThemeInit();
+
+    // ===== Номер варианта
+    const path = location.pathname;
+    const m = path.match(/variant(\d+)/i);
+    const varNum = m ? m[1] : '?';
+    document.getElementById('varNum').textContent = varNum;
+    document.title = `Результат — Задание 2 · Вариант ${varNum}`;
+
+    // Навигация
+    const { ROOT_BASE, EGE_BASE } = (() => {
+      const i = path.indexOf('/ege/');
+      if (i >= 0) return { ROOT_BASE: path.slice(0,i+1), EGE_BASE: path.slice(0,i+5) };
+      return { ROOT_BASE: '/', EGE_BASE: '/ege/' };
+    })();
+    document.getElementById('toVariants').href = path.replace(/\/variants\/variant\d+\/[^/]+$/i, '/variants/ege2.html');
+    document.getElementById('toModeMenu').href = `${EGE_BASE}ege_menu.html`;
+    document.getElementById('toTaskMenu').href = `${EGE_BASE}ege.html`;
+    document.getElementById('toHome').href     = `${ROOT_BASE}index.html`;
+
+    function clearTask2State(){
+      try{ Object.keys(sessionStorage).forEach(k=>{ if(k.startsWith('ege2_')) sessionStorage.removeItem(k); }); }catch{}
+    }
+    function clearAndGo(url){ clearTask2State(); navigateOnce(url); }
+    document.querySelectorAll('.nav-btn').forEach(a=>{
+      a.addEventListener('click', e=>{ e.preventDefault(); clearAndGo(a.href); });
+    });
+    const repeat = document.getElementById('repeatBtn');
+    if (repeat){
+      const href = path.replace(/_4_result\.html$/i, '_1_prepare.html');
+      repeat.href = href;
+      repeat.addEventListener('click', e=>{ e.preventDefault(); clearAndGo(href); });
+    }
+    window.addEventListener('pageshow', ()=>{ navigateOnce.lock=false; });
+
+    // ===== Аудио + волна
+    const audioEl=document.getElementById('audio');
+    const playBtn=document.getElementById('playBtn');
+    const downloadBtn=document.getElementById('downloadBtn');
+    const statusText=document.getElementById('statusText');
+    const waveWrap=document.getElementById('waveWrap');
+    const waveCanvas=document.getElementById('wave');
+
+    const base64=sessionStorage.getItem('ege2_audio_base64');
+    const mimeStored=(sessionStorage.getItem('ege2_audio_mime')||'audio/webm').toLowerCase();
+
+    let objectURL=null;
+    const extByMime={'audio/webm':'webm','audio/webm;codecs=opus':'webm','audio/ogg':'ogg','audio/ogg;codecs=opus':'ogg','audio/mp4':'m4a','audio/mpeg':'mp3','audio/wav':'wav'};
+    const fileExt=extByMime[mimeStored]||'webm';
+    const fileName=`ege2_variant${varNum}.${fileExt}`;
+
+    function dataURLtoBlob(dataURL){
+      const parts=(dataURL||'').split(',');
+      if(parts.length<2) return null;
+      const type=(parts[0].match(/data:(.*?);base64/)||[,'application/octet-stream'])[1];
+      const bin=atob(parts[1]); const bytes=new Uint8Array(bin.length);
+      for(let i=0;i<bin.length;i++) bytes[i]=bin.charCodeAt(i);
+      return new Blob([bytes],{type});
+    }
+    function setButtonsEnabled(en){ playBtn.disabled=!en; downloadBtn.disabled=!en; }
+
+    (async function initAudio(){
+      if(!base64){ statusText.textContent='⚠️ Запись не найдена.'; setButtonsEnabled(false); return; }
+      try{
+        const blob=dataURLtoBlob(base64);
+        objectURL=URL.createObjectURL(blob);
+        audioEl.src=objectURL; audioEl.type=blob.type||mimeStored;
+        await initWaveformFromURL(objectURL);
+        setButtonsEnabled(true);
+      }catch{ audioEl.src=base64; audioEl.type=mimeStored; setButtonsEnabled(true); }
+    })();
+
+    playBtn.addEventListener('click',()=>{ if(audioEl.src) audioEl.play(); });
+    downloadBtn.addEventListener('click',()=>{
+      if(!audioEl.src) return;
+      const a=document.createElement('a');
+      a.href=objectURL||base64; a.download=fileName; a.click();
+    });
+    window.addEventListener('pagehide',()=>{ if(objectURL) URL.revokeObjectURL(objectURL); });
+    window.addEventListener('beforeunload',()=>{ if(objectURL) URL.revokeObjectURL(objectURL); });
+
+    // ===== Волновой бегунок
+    async function initWaveformFromURL(url){
+      try{
+        const resp=await fetch(url); const buf=await resp.arrayBuffer();
+        const AC=window.AudioContext||window.webkitAudioContext;
+        const ctx=new AC(); const audioBuf=await ctx.decodeAudioData(buf);
+
+        const peaks=buildPeaks(audioBuf,1000);
+        drawWave(peaks,0); waveWrap.style.display='block';
+
+        let raf;
+        const tick=()=>{ const p=audioEl.currentTime/(audioBuf.duration||1); drawWave(peaks,p); raf=requestAnimationFrame(tick); };
+        audioEl.addEventListener('play',()=>{ cancelAnimationFrame(raf); tick(); });
+        audioEl.addEventListener('pause',()=>{ cancelAnimationFrame(raf); drawWave(peaks,audioEl.currentTime/(audioBuf.duration||1)); });
+        audioEl.addEventListener('ended',()=>{ cancelAnimationFrame(raf); drawWave(peaks,1); });
+
+        waveCanvas.addEventListener('pointerdown',e=>{
+          const r=waveCanvas.getBoundingClientRect();
+          const x=Math.max(0,Math.min(1,(e.clientX-r.left)/r.width));
+          audioEl.currentTime=x*audioBuf.duration;
+          drawWave(peaks,x);
+        },{passive:true});
+      }catch(err){ waveWrap.style.display='none'; }
+    }
+    function buildPeaks(audioBuf,width){
+      const ch0=audioBuf.getChannelData(0);
+      const ch1=audioBuf.numberOfChannels>1?audioBuf.getChannelData(1):null;
+      const total=ch0.length, block=Math.floor(total/width)||1;
+      const peaks=new Array(width);
+      for(let i=0;i<width;i++){ const start=i*block,end=Math.min(total,start+block); let min=1,max=-1;
+        for(let j=start;j<end;j++){ const s=ch1?(ch0[j]+ch1[j])*0.5:ch0[j]; if(s<min) min=s; if(s>max) max=s; }
+        peaks[i]=[min,max]; }
+      return peaks;
+    }
+    function drawWave(peaks,progress){
+      const c=waveCanvas,dpr=Math.max(1,Math.floor(window.devicePixelRatio||1));
+      const cssW=c.clientWidth||600, cssH=c.clientHeight||48;
+      if(c.width!==cssW*dpr) c.width=cssW*dpr;
+      if(c.height!==cssH*dpr) c.height=cssH*dpr;
+      const ctx=c.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0);
+
+      const rs=getComputedStyle(document.documentElement);
+      const waveBase=rs.getPropertyValue('--wave-base').trim();
+      const waveProg=rs.getPropertyValue('--wave-prog').trim();
+      const waveGlow=rs.getPropertyValue('--wave-glow').trim();
+      const bg=getComputedStyle(c).backgroundColor;
+
+      ctx.clearRect(0,0,cssW,cssH);
+      ctx.fillStyle=bg; ctx.fillRect(0,0,cssW,cssH);
+
+      const mid=cssH/2;
+      ctx.fillStyle=waveBase;
+      for(let i=0;i<peaks.length;i++){ const x=i/peaks.length*cssW; const[min,max]=peaks[i]; const hT=Math.abs(max)*mid,hB=Math.abs(min)*mid;
+        ctx.fillRect(x,mid-hT,1,hT+hB||1); }
+
+      const progW=Math.max(0,Math.min(cssW,progress*cssW));
+      ctx.save(); ctx.beginPath(); ctx.rect(0,0,progW,cssH); ctx.clip();
+      ctx.fillStyle=waveProg; ctx.shadowColor=waveGlow; ctx.shadowBlur=8;
+      for(let i=0;i<peaks.length;i++){ const x=i/peaks.length*cssW; const[min,max]=peaks[i]; const hT=Math.abs(max)*mid,hB=Math.abs(min)*mid;
+        ctx.fillRect(x,mid-hT,1,hT+hB||1); }
+      ctx.restore();
+    }
+  </script>
+</body>
+</html>

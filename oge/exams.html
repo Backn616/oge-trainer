@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>ОГЭ — Экзамен полностью: выбор варианта</title>
-  <meta name="description" content="Выбор варианта для прохождения полного экзамена (задания 1–4) устной части ОГЭ." />
+  <meta name="description" content="Выбор варианта для прохождения полного экзамена (задания 1–3) устной части ОГЭ." />
 
   <!-- Шрифты + preconnect -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -137,7 +137,7 @@
     <main>
       <section class="card">
         <h1 class="h1">ОГЭ — экзамен полностью: выбери вариант</h1>
-        <p class="sub">Начнём с задания 1 этого варианта, затем автоматически продолжим 1 → 2 → 3 → 4.</p>
+        <p class="sub">Начнём с задания 1 этого варианта, затем автоматически продолжим 1 → 2 → 3.</p>
 
         <div class="frame">
           <nav id="variants" class="grid" aria-label="Варианты полного экзамена"></nav>
@@ -200,7 +200,7 @@
         sessionStorage.setItem('exam_type','oge');
         sessionStorage.removeItem('exam_flow');
         sessionStorage.removeItem('exam_variant');
-        ['oge1_','oge2_','oge3_','oge4_'].forEach(prefix=>{
+        ['oge1_','oge2_','oge3_'].forEach(prefix=>{
           Object.keys(sessionStorage).forEach(k=>{ if(k.startsWith(prefix)) sessionStorage.removeItem(k); });
         });
       } catch {}
@@ -238,7 +238,7 @@
               sessionStorage.setItem('exam_flow', '1');
               sessionStorage.setItem('exam_variant', String(n));
               // очистка хвостов ОГЭ
-              ['oge1_','oge2_','oge3_','oge4_'].forEach(prefix=>{
+              ['oge1_','oge2_','oge3_'].forEach(prefix=>{
                 Object.keys(sessionStorage).forEach(k=>{ if(k.startsWith(prefix)) sessionStorage.removeItem(k); });
               });
             } catch {}

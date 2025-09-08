@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Экзамен полностью — общий результат</title>
+  <title>ОГЭ — Экзамен полностью: общий результат</title>
 
   <!-- Шрифты -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -11,8 +11,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
-  <!-- Общий стиль проекта -->
-  <link rel="stylesheet" href="./style_common.css" />
+  <!-- Общий стиль ОГЭ -->
+  <link rel="stylesheet" href="./style_common_oge.css" />
 
   <!-- Анти-мигание темы -->
   <script>
@@ -41,12 +41,12 @@
     :root{
       --wave-base: rgba(0,0,0,.28);
       --wave-prog: var(--primary);
-      --wave-glow: rgba(43,108,255,.45);
+      --wave-glow: rgba(0,168,107,.45);
     }
     html.dark{
       --wave-base: rgba(255,255,255,.52);
-      --wave-prog: #5bb8ff;
-      --wave-glow: rgba(91,184,255,.65);
+      --wave-prog: #00c2a8;
+      --wave-glow: rgba(0,194,168,.65);
     }
 
     .status{ font-size:14px; color:var(--muted); margin-bottom:4px; }
@@ -73,7 +73,7 @@
       .reading-box{ font-size:18px; line-height:1.55; padding:18px 16px; max-width:100%; }
     }
 
-    /* Task 2 — как в result 2 */
+    /* Task 2 */
     .ad-layout{
       display:grid;
       grid-template-columns: 1.05fr 0.95fr;
@@ -135,39 +135,11 @@
       .t3-container{ font-size:18px; line-height:1.55; padding:16px 18px; }
     }
 
-    /* Task 4 */
-    .t4-container{
-      background:var(--card);
-      border-left:5px solid var(--primary);
-      padding:20px 30px 10px 30px;
-      margin:0 auto 30px;
-      font-family: Inter, system-ui, Segoe UI, Roboto, Arial, sans-serif;
-      font-size:20px;
-      line-height:1.6;
-      text-align:left;
-      box-shadow:var(--shadow); border-radius:12px;
-    }
-    .t4-container ul{ margin:10px 0 15px 20px; }
-    .t4-container li{ margin-bottom:8px; }
-    .t4-instruction{ font-weight:700; margin-top:10px; }
-
-    .t4-images{
-      display:flex; justify-content:center; align-items:flex-start; gap:30px; margin:30px 0;
-    }
-    .t4-images img{
-      max-width:100%; height:auto; width:48%;
-      border-radius:12px; box-shadow:var(--shadow);
-    }
-    @media (max-width:800px){
-      .t4-images{ flex-direction:column; align-items:center; }
-      .t4-images img{ width:100%; }
-    }
-
     .navs{ text-align:center; margin-top:22px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
     .btn{
       display:inline-block; padding:12px 18px; font-weight:600; color:#fff;
       background:linear-gradient(135deg, var(--primary), var(--primary-600));
-      border:none; border-radius:10px; box-shadow:0 10px 22px rgba(43,108,255,.3);
+      border:none; border-radius:10px; box-shadow:0 10px 22px rgba(0,168,107,.3);
       cursor:pointer; text-decoration:none;
     }
   </style>
@@ -176,12 +148,12 @@
   <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
 
   <div class="wrap">
-    <h1>Экзамен полностью — общий результат</h1>
+    <h1>ОГЭ — общий результат по варианту</h1>
 
     <!-- Task 1 -->
     <section class="block" id="t1">
       <h2>Task 1 — Reading the text aloud</h2>
-      <p class="desc">Вы прочитали текст вслух (до 1.5 минуты).</p>
+      <p class="desc">Вы прочитали текст вслух (до ~1.5 минуты).</p>
       <div class="status" id="s1">Загрузка записи…</div>
       <audio id="a1" controls></audio>
       <div class="wave-wrap"><canvas id="w1" class="wave"></canvas></div>
@@ -191,7 +163,7 @@
     <!-- Task 2 -->
     <section class="block" id="t2">
       <h2>Task 2 — Questions to advertisement</h2>
-      <p class="desc">Вы задали 4 вопроса по объявлению (по 20 сек на ответ).</p>
+      <p class="desc">Вы задали вопросы по объявлению (на каждый ограничение по времени).</p>
       <div class="status" id="s2">Загрузка записи…</div>
       <audio id="a2" controls></audio>
       <div class="wave-wrap"><canvas id="w2" class="wave"></canvas></div>
@@ -201,27 +173,17 @@
     <!-- Task 3 -->
     <section class="block" id="t3">
       <h2>Task 3 — Interview</h2>
-      <p class="desc">Диалог-интервью из 5 вопросов (40 сек на ответ).</p>
+      <p class="desc">Диалог-интервью из нескольких вопросов (лимит времени на ответ).</p>
       <div class="status" id="s3">Загрузка записи…</div>
       <audio id="a3" controls></audio>
       <div class="wave-wrap"><canvas id="w3" class="wave"></canvas></div>
       <div class="task-snippet task-snippet--plain" id="snip3">Загрузка вопросов…</div>
     </section>
 
-    <!-- Task 4 -->
-    <section class="block" id="t4">
-      <h2>Task 4 — Monologue (project)</h2>
-      <p class="desc">Монолог по проекту (до 3 минут, 12–15 предложений).</p>
-      <div class="status" id="s4">Загрузка записи…</div>
-      <audio id="a4" controls></audio>
-      <div class="wave-wrap"><canvas id="w4" class="wave"></canvas></div>
-      <div class="task-snippet" id="snip4">Загрузка инструкции…</div>
-    </section>
-
     <div class="navs">
       <a id="repeatExam" class="btn" href="#" role="button">🔁 Пройти этот вариант заново</a>
       <a id="toVariants" class="btn" href="./exams.html" role="button">← К выбору варианта</a>
-      <a id="toFormat"   class="btn" href="./ege_menu.html" role="button">← К выбору формата</a>
+      <a id="toFormat"   class="btn" href="./oge.html" role="button">← К выбору режима</a>
       <a id="toHome"     class="btn" href="../index.html" role="button">← На главную</a>
     </div>
   </div>
@@ -234,12 +196,12 @@
     const q = new URLSearchParams(location.search);
     const variant = (q.get('variant') || sessionStorage.getItem('exam_variant') || '1').replace(/\D+/g,'');
 
-    // ==== Универсальные утилиты ====
+    // ==== Утилиты ====
     function clearExamState(){
       try{
         ['exam_flow','exam_variant','exam_started_at','exams_payload','exams_state']
           .forEach(k => sessionStorage.removeItem(k));
-        ['ege1_','ege2_','ege3_','ege4_'].forEach(prefix=>{
+        ['oge1_','oge2_','oge3_'].forEach(prefix=>{
           Object.keys(sessionStorage).forEach(k=>{ if(k.startsWith(prefix)) sessionStorage.removeItem(k); });
         });
       }catch{}
@@ -306,8 +268,8 @@
 
       const rs = getComputedStyle(document.documentElement);
       const waveBase = (rs.getPropertyValue('--wave-base') || 'rgba(0,0,0,.28)').trim();
-      const waveProg = (rs.getPropertyValue('--wave-prog') || '#2b6cff').trim();
-      const waveGlow = (rs.getPropertyValue('--wave-glow') || 'rgba(43,108,255,.45)').trim();
+      const waveProg = (rs.getPropertyValue('--wave-prog') || '#00a86b').trim();
+      const waveGlow = (rs.getPropertyValue('--wave-glow') || 'rgba(0,168,107,.45)').trim();
       const bg = getComputedStyle(c).backgroundColor;
 
       ctx.clearRect(0,0,cssW,cssH);
@@ -375,7 +337,7 @@
       }
     }
 
-    // ==== Подгрузка сниппетов с отдельных результатов ====
+    // ==== Подгрузка сниппетов с отдельных результатов (ОГЭ) ====
     const domParse = (html, baseUrl='.')=>{
       const parser = new DOMParser();
       const doc = parser.parseFromString(html, 'text/html');
@@ -391,7 +353,7 @@
     // Task 1
     (async ()=>{
       try{
-        const url  = `./task1/variants/variant${variant}/ege1_var${variant}_4_result.html`;
+        const url  = `./task1/variants/variant${variant}/oge1_var${variant}_4_result.html`;
         const html = await (await fetch(url)).text();
         const doc  = domParse(html, `./task1/variants/variant${variant}`);
         const rb   = doc.querySelector('.reading-box');
@@ -404,7 +366,7 @@
     (async ()=>{
       const mount = document.getElementById('snip2');
       try{
-        const url  = `./task2/variants/variant${variant}/ege2_var${variant}_4_result.html`;
+        const url  = `./task2/variants/variant${variant}/oge2_var${variant}_4_result.html`;
         const html = await (await fetch(url)).text();
         const doc  = domParse(html, `./task2/variants/variant${variant}`);
         const ad = doc.querySelector('.ad-layout');
@@ -418,7 +380,7 @@
     // Task 3
     (async ()=>{
       try{
-        const url  = `./task3/variants/variant${variant}/ege3_var${variant}_4_result.html`;
+        const url  = `./task3/variants/variant${variant}/oge3_var${variant}_4_result.html`;
         const html = await (await fetch(url)).text();
         const doc  = domParse(html, `./task3/variants/variant${variant}`);
         const tc   = doc.querySelector('.task-container');
@@ -431,38 +393,11 @@
       }catch{ document.getElementById('snip3').textContent='Не удалось загрузить вопросы.'; }
     })();
 
-    // Task 4
-    (async ()=>{
-      const mount = document.getElementById('snip4');
-      try{
-        const url  = `./task4/variants/variant${variant}/ege4_var${variant}_4_result.html`;
-        const html = await (await fetch(url)).text();
-        const doc  = domParse(html, `./task4/variants/variant${variant}`);
-        const container = doc.querySelector('.task-container');
-        const images    = doc.querySelector('.images');
-        if (container){
-          const cont = container.cloneNode(true);
-          cont.className='t4-container';
-          const instr= cont.querySelector('.instruction');
-          if (instr) instr.className='t4-instruction';
-          mount.innerHTML=''; mount.appendChild(cont);
-          if (images){
-            const imgs= images.cloneNode(true);
-            imgs.className='t4-images';
-            mount.appendChild(imgs);
-          }
-        } else {
-          mount.textContent='Не удалось загрузить инструкцию.';
-        }
-      }catch{ mount.textContent='Не удалось загрузить инструкцию.'; }
-    })();
-
     // ==== Аудио-вклейка + волны ====
     const rows = [
-      { key:'ege1', a:'a1', s:'s1', w:'w1' },
-      { key:'ege2', a:'a2', s:'s2', w:'w2' },
-      { key:'ege3', a:'a3', s:'s3', w:'w3' },
-      { key:'ege4', a:'a4', s:'s4', w:'w4' },
+      { key:'oge1', a:'a1', s:'s1', w:'w1' },
+      { key:'oge2', a:'a2', s:'s2', w:'w2' },
+      { key:'oge3', a:'a3', s:'s3', w:'w3' },
     ];
     rows.reduce((p,row)=> p.then(()=>setupRow(row)), Promise.resolve());
 
@@ -471,16 +406,16 @@
       e.preventDefault();
       try{
         // чистим хвосты заданий, НО сохраняем exam_flow/exam_variant (перезапуск текущего варианта)
-        ['ege1_','ege2_','ege3_','ege4_'].forEach(prefix=>{
+        ['oge1_','oge2_','oge3_'].forEach(prefix=>{
           Object.keys(sessionStorage).forEach(k=>{ if(k.startsWith(prefix)) sessionStorage.removeItem(k); });
         });
       }catch{}
-      const v = sessionStorage.getItem('exam_variant') || variant;
-      navigateOnce(`./task1/variants/variant${v}/ege1_var${v}_1_prepare.html?variant=${v}`);
+      const v = (sessionStorage.getItem('exam_variant') || variant || '1').replace(/\D+/g,'') || '1';
+      navigateOnce(`./task1/variants/variant${v}/oge1_var${v}_1_prepare.html?exam=1&variant=${encodeURIComponent(v)}`);
     });
 
     // На все «уходящие» ссылки — сброс режима экзамена
-    [['toVariants','./exams.html'], ['toFormat','./ege_menu.html'], ['toHome','../index.html']]
+    [['toVariants','./exams.html'], ['toFormat','./oge.html'], ['toHome','../index.html']]
       .forEach(([id,href])=>{
         const a = document.getElementById(id);
         if (!a) return;

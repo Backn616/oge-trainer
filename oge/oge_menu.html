@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>ОГЭ — Выбор задания</title>
-  <meta name="description" content="Меню тренажёра устной части ОГЭ по английскому: задания 1–4, таймер, запись голоса." />
+  <meta name="description" content="Меню тренажёра устной части ОГЭ по английскому: задания 1–3, таймер, запись голоса." />
 
   <!-- Шрифты + preconnect -->
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -112,7 +112,7 @@
       </a>
       <div style="display:flex; gap:10px; align-items:center">
         <!-- назад именно к oge.html -->
-        <a class="back" href="oge.html" aria-label="К выбору формата">← К выбору формата</a>
+        <a class="back" href="oge.html" aria-label="К выбору режима">← К выбору режима</a>
         <button class="theme-toggle" id="themeBtn" aria-label="Переключить тему">🌓 Тема</button>
       </div>
     </header>
@@ -120,14 +120,13 @@
     <main role="main">
       <section class="card" role="region" aria-labelledby="title" aria-describedby="subtitle">
         <h1 id="title" class="h1">ОГЭ — выбери задание</h1>
-        <p id="subtitle" class="sub">Тренируй каждое задание отдельно. Хронометраж и логика как на реальном экзамене.</p>
+        <p id="subtitle" class="sub">Тренируй каждое задание отдельно. Хронометраж и логика как на реальном экзамене (1 → 2 → 3).</p>
 
         <div class="button-frame">
           <nav class="grid" aria-label="Список заданий ОГЭ">
             <a class="btn" href="task1/variants/oge1.html" aria-label="Перейти к заданию 1">📄 Задание 1</a>
             <a class="btn" href="task2/variants/oge2.html" aria-label="Перейти к заданию 2">🎧 Задание 2</a>
             <a class="btn" href="task3/variants/oge3.html" aria-label="Перейти к заданию 3">🗣 Задание 3</a>
-            <a class="btn" href="task4/variants/oge4.html" aria-label="Перейти к заданию 4">📷 Задание 4</a>
           </nav>
         </div>
 
@@ -151,16 +150,15 @@
     try {
       sessionStorage.removeItem('exam_flow');
       sessionStorage.removeItem('exam_variant');
-      ['oge1_','oge2_','oge3_','oge4_'].forEach(prefix=>{
+      ['oge1_','oge2_','oge3_'].forEach(prefix=>{
         Object.keys(sessionStorage).forEach(k=>{
           if (k.startsWith(prefix)) sessionStorage.removeItem(k);
         });
       });
-      // пометим тип экзамена (если дальше где-то нужно)
       sessionStorage.setItem('exam_type','oge');
     } catch {}
 
-    // Логотип → на главную / кнопка «К выбору формата» → на oge.html
+    // Логотип → на главную / кнопка «К выбору режима» → на oge.html
     document.querySelectorAll('.brand, .back').forEach(a=>{
       const url = a.getAttribute('href');
       a.addEventListener('click', (e)=>{ e.preventDefault(); navigateOnce(url); });

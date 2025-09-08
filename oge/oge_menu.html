@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>ЕГЭ — Выбор задания</title>
-  <meta name="description" content="Меню тренажёра устной части ЕГЭ по английскому: задания 1–4, таймер, запись голоса." />
+  <title>ОГЭ — Выбор задания</title>
+  <meta name="description" content="Меню тренажёра устной части ОГЭ по английскому: задания 1–4, таймер, запись голоса." />
 
   <!-- Шрифты + preconnect -->
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -23,17 +23,18 @@
 
   <style>
     :root{
-      --bg:#f7f9ff; --card:#ffffff; --text:#0b1020; --muted:#5a6475;
-      --primary:#2b6cff; --primary-600:#1f58d9; --ring:#bfd3ff;
+      /* OGE palette (Variant 1) */
+      --bg:#f6fffb; --card:#ffffff; --text:#0b1020; --muted:#5a6475;
+      --primary:#00a86b; --primary-600:#00935e; --ring:#bfeee0;
       --success:#25c26e; --shadow: 0 10px 25px rgba(17,24,39,.08);
-      --btn-1:#6d95ff; --btn-2:#4f7dff; --btn-text:#ffffff;
+      --btn-1:#00b276; --btn-2:#00c2a8; --btn-text:#ffffff;
       --btn-fs:20px; --btn-pad-y:18px; --btn-pad-x:26px; --btn-minh:56px; --btn-radius:14px;
       --grid-gap:28px; --btn-scale:1;
     }
     .dark{
       --bg:#0b1020; --card:rgba(255,255,255,.08); --text:#eaf0ff; --muted:#b9c2d3;
-      --primary:#6aa3ff; --primary-600:#4b8dff; --ring:#a9c6ff; --success:#5ee397; --shadow: 0 10px 35px rgba(0,0,0,.35);
-      --btn-1:#aecdff; --btn-2:#86b8ff; --btn-text:#ffffff;
+      --primary:#00c2a8; --primary-600:#00b276; --ring:#174f3d; --success:#5ee397; --shadow: 0 10px 35px rgba(0,0,0,.35);
+      --btn-1:#00c2a8; --btn-2:#00b276; --btn-text:#ffffff;
     }
 
     *{box-sizing:border-box}
@@ -41,8 +42,8 @@
     body{
       margin:0; font-family:Inter, system-ui, Segoe UI, Roboto, Arial, sans-serif; color:var(--text);
       background:
-        radial-gradient(1200px 600px at 70% -10%, #29417a40, transparent),
-        radial-gradient(900px 500px at -10% 10%, #344b9340, transparent),
+        radial-gradient(1200px 600px at 70% -10%, #0a6b4a40, transparent),
+        radial-gradient(900px 500px at -10% 10%, #0a7f8b40, transparent),
         var(--bg);
     }
     a{color:inherit; text-decoration:none}
@@ -51,7 +52,7 @@
     .brand{display:flex; align-items:center; gap:12px}
     .logo{
       width:42px; height:42px; border-radius:12px;
-      background: linear-gradient(135deg, var(--primary), #9bd0ff);
+      background: linear-gradient(135deg, var(--primary), #76e7c7);
       box-shadow: 0 6px 18px rgba(0,0,0,.25), inset 0 0 12px #ffffff33;
       display:grid; place-items:center; color:#001133; font-weight:800;
     }
@@ -87,7 +88,7 @@
       border:1px solid rgba(255,255,255,.18); outline:none;
       background: linear-gradient(135deg, var(--btn-1), var(--btn-2));
       color:var(--btn-text); text-shadow: 0 1px 0 rgba(0,0,0,.15);
-      box-shadow: 0 12px 24px rgba(75, 141, 255, .28);
+      box-shadow: 0 12px 24px rgba(0, 178, 118, .28);
       transition: transform .06s ease, box-shadow .2s ease, filter .2s ease;
     }
     .btn:hover{transform: translateY(-2px); filter: brightness(1.03)}
@@ -106,27 +107,27 @@
         <div class="logo">A</div>
         <div>
           <div class="brand-title">Онлайн-тренажёр «Говорение»</div>
-          <div class="badge">ЕГЭ по английскому</div>
+          <div class="badge">ОГЭ по английскому</div>
         </div>
       </a>
       <div style="display:flex; gap:10px; align-items:center">
-        <!-- назад именно к ege.html -->
-        <a class="back" href="ege.html" aria-label="К выбору формата">← К выбору формата</a>
+        <!-- назад именно к oge.html -->
+        <a class="back" href="oge.html" aria-label="К выбору формата">← К выбору формата</a>
         <button class="theme-toggle" id="themeBtn" aria-label="Переключить тему">🌓 Тема</button>
       </div>
     </header>
 
     <main role="main">
       <section class="card" role="region" aria-labelledby="title" aria-describedby="subtitle">
-        <h1 id="title" class="h1">ЕГЭ — выбери задание</h1>
+        <h1 id="title" class="h1">ОГЭ — выбери задание</h1>
         <p id="subtitle" class="sub">Тренируй каждое задание отдельно. Хронометраж и логика как на реальном экзамене.</p>
 
         <div class="button-frame">
-          <nav class="grid" aria-label="Список заданий ЕГЭ">
-            <a class="btn" href="task1/variants/ege1.html" aria-label="Перейти к заданию 1">📄 Задание 1</a>
-            <a class="btn" href="task2/variants/ege2.html" aria-label="Перейти к заданию 2">🎧 Задание 2</a>
-            <a class="btn" href="task3/variants/ege3.html" aria-label="Перейти к заданию 3">🗣 Задание 3</a>
-            <a class="btn" href="task4/variants/ege4.html" aria-label="Перейти к заданию 4">📷 Задание 4</a>
+          <nav class="grid" aria-label="Список заданий ОГЭ">
+            <a class="btn" href="task1/variants/oge1.html" aria-label="Перейти к заданию 1">📄 Задание 1</a>
+            <a class="btn" href="task2/variants/oge2.html" aria-label="Перейти к заданию 2">🎧 Задание 2</a>
+            <a class="btn" href="task3/variants/oge3.html" aria-label="Перейти к заданию 3">🗣 Задание 3</a>
+            <a class="btn" href="task4/variants/oge4.html" aria-label="Перейти к заданию 4">📷 Задание 4</a>
           </nav>
         </div>
 
@@ -135,29 +136,31 @@
     </main>
 
     <footer>
-      <div>© 2025 — Демо-версия тренажёра ЕГЭ.</div>
+      <div>© 2025 — Демо-версия тренажёра ОГЭ.</div>
     </footer>
   </div>
 
-  <!-- ЕДИНЫЕ обработчики из /ege/common.js -->
+  <!-- ЕДИНЫЕ обработчики из /oge/common.js -->
   <script type="module">
     import { toggleThemeInit, navigateOnce } from './common.js';
 
     // Тема
     toggleThemeInit();
 
-    // 🔧 Сброс режима экзамена при входе в меню «по заданиям»
+    // Сброс режима экзамена при входе в меню «по заданиям»
     try {
       sessionStorage.removeItem('exam_flow');
       sessionStorage.removeItem('exam_variant');
-      ['ege1_','ege2_','ege3_','ege4_'].forEach(prefix=>{
+      ['oge1_','oge2_','oge3_','oge4_'].forEach(prefix=>{
         Object.keys(sessionStorage).forEach(k=>{
           if (k.startsWith(prefix)) sessionStorage.removeItem(k);
         });
       });
+      // пометим тип экзамена (если дальше где-то нужно)
+      sessionStorage.setItem('exam_type','oge');
     } catch {}
 
-    // Логотип → на главную / кнопка «К выбору формата» → на ege.html
+    // Логотип → на главную / кнопка «К выбору формата» → на oge.html
     document.querySelectorAll('.brand, .back').forEach(a=>{
       const url = a.getAttribute('href');
       a.addEventListener('click', (e)=>{ e.preventDefault(); navigateOnce(url); });

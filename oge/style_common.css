@@ -1,0 +1,147 @@
+:root {
+  --bg:#f7f9ff;
+  --card:#ffffff;
+  --text:#0b1020;
+  --muted:#5a6475;
+  --primary:#2b6cff;
+  --primary-600:#1f58d9;
+  --ring:#bfd3ff;
+  --shadow:0 10px 25px rgba(17,24,39,.08);
+  --footer-h:32px; /* высота нижнего фикс-бара */
+  --danger:#b30000; /* для заголовков предупреждений (mic) */
+}
+
+.dark{
+  --bg:#0b1020;
+  --card:rgba(255,255,255,.08);
+  --text:#eaf0ff;
+  --muted:#b9c2d3;
+  --primary:#6aa3ff;
+  --primary-600:#4b8dff;
+  --ring:#a9c6ff;
+  --shadow:0 10px 35px rgba(0,0,0,.35);
+  --danger:#ff6b6b;
+}
+
+/* Фон и базовые отступы (как в var2, без перекрытий) */
+body{
+  font-family:'Roboto', system-ui, sans-serif;
+  margin:0;
+  /* 40px «воздуха» + высота фикс-бара + safe-area */
+  padding:40px 30px calc(35px + var(--footer-h) + env(safe-area-inset-bottom, 0px));
+  color:var(--text);
+  background:
+    radial-gradient(1200px 600px at 70% -10%, #29417a40, transparent),
+    radial-gradient(900px 500px at -10% 10%, #344b9340, transparent),
+    var(--bg);
+  background-repeat: no-repeat, no-repeat, no-repeat;  /* запрет повторов */
+  background-attachment: scroll, scroll, scroll;
+  min-height: 100svh;   /* фон всегда минимум на высоту экрана */
+  display:flex;
+  justify-content:center;
+  text-align:center;
+}
+
+a,button{ color:inherit; text-decoration:none; }
+:focus-visible{ outline:none; box-shadow:0 0 0 4px var(--ring) }
+
+.content-wrapper{ max-width:1500px; width:100%; }
+
+/* Карточка задания (prepare/task) */
+.task-container{
+  background:var(--card);
+  border-left:5px solid var(--primary);
+  padding:20px 30px 10px 30px;
+  margin-bottom:30px;
+  font-size:20px; line-height:1.7; text-align:left;
+  box-shadow:var(--shadow); border-radius:12px;
+}
+.task-container ul{ margin:10px 0 15px 20px; }
+.task-container li{ margin-bottom:8px; }
+.task-container .instruction{ font-weight:700; margin-top:10px; }
+
+/* Блок изображений (prepare) */
+.images{
+  display:flex; justify-content:center; align-items:flex-start;
+  gap:30px; margin-bottom:30px;
+}
+.images img{
+  max-width:100%; height:auto; width:48%;
+  border-radius:12px; box-shadow:var(--shadow);
+}
+
+/* Кнопка */
+.button{
+  font-size:20px; padding:16px 32px;
+  background:linear-gradient(135deg, var(--primary), var(--primary-600));
+  color:#fff; border:none; border-radius:12px; cursor:pointer;
+  box-shadow:0 10px 22px rgba(43,108,255,.3);
+  transition: transform .06s ease, box-shadow .2s ease, filter .2s ease;
+  display:inline-block;
+}
+.button:hover{ transform:scale(1.05); filter:brightness(1.03); }
+
+/* Тумблер темы */
+.theme-toggle{
+  position:fixed; top:16px; right:16px; z-index:10000;
+  border:1px solid #ffffff22; background:transparent; color:var(--text);
+  padding:10px 14px; border-radius:10px; cursor:pointer; backdrop-filter: blur(6px);
+  transition:transform .08s ease, filter .2s ease;
+}
+.theme-toggle:hover{ transform: translateY(-1px); filter: brightness(1.03); }
+
+/* Фиксированный прогресс-бар снизу (prepare/task) */
+#progressContainerFixed{
+  position:fixed; bottom:0; left:0; width:100%; height:var(--footer-h);
+  background:#eee; z-index:9999;
+}
+.dark #progressContainerFixed{ background:#222; }
+#progressBarFixed{
+  height:100%; width:0%;
+  background: linear-gradient(to right, #0066ff, #00cfff);
+  position:relative;
+  transition: width .5s linear;
+}
+/* rAF-страницы отключают CSS-инерцию */
+#progressBarFixed.rAF { transition: none; }
+
+.progress-time{
+  position:absolute; right:14px; top:50%; transform:translateY(-50%);
+  color:#fff; font-weight:700; font-size:20px; user-select:none;
+  text-shadow:0 1px 2px rgba(0,0,0,.35);
+}
+
+/* === MIC-страницы: центрированная карточка предупреждения (SCOPED) === */
+.page-center{
+  min-height:100svh;
+  width:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+/* было .card … — теперь только mic-card, чтобы не трогать меню/начало/и т.д. */
+.mic-card{
+  background:var(--card);
+  border-radius:16px;
+  padding:40px;
+  max-width:800px; width:95%;
+  box-shadow:var(--shadow);
+  text-align:center;
+}
+.mic-card h1{ font-size:32px; color:var(--danger); margin:0 0 16px; }
+.mic-card p{ font-size:20px; line-height:1.6; margin:0 0 28px; }
+
+/* Адаптив */
+@media (max-width:800px){
+  .images{ flex-direction:column; align-items:center; }
+  .images img{ width:100%; }
+}
+
+/* Уважение prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+}

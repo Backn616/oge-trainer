@@ -3,13 +3,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Экзамен полностью — переход к следующему заданию</title>
+  <title>ОГЭ — Экзамен полностью: переход к следующему заданию</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./style_common.css" />
+  <!-- OGE-стили -->
+  <link rel="stylesheet" href="./style_common_oge.css" />
 
+  <!-- анти-мигание темы -->
   <script>
     (function(){ try{
       const saved = localStorage.getItem('pref-theme') || 'light';
@@ -30,7 +32,7 @@
   <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
 
   <div class="wrap">
-    <div id="title" class="title">Task</div>
+    <div id="title" class="title">Задание</div>
     <div id="timer" class="timer" aria-live="polite">3</div>
   </div>
 
@@ -38,39 +40,44 @@
     import { toggleThemeInit, navigateOnce } from './common.js';
     toggleThemeInit();
 
+    // читаем параметры
     const params   = new URLSearchParams(location.search);
-    const nextRaw  = Number(params.get('next') || '2');          // ожидаем 2..4
-    const next     = Math.max(2, Math.min(4, nextRaw));          // страховка
+    const nextRaw  = Number(params.get('next') || '2');          // ожидаем 2..3
+    const next     = Math.max(2, Math.min(3, nextRaw));          // страховка под ОГЭ (всего 3 задания)
     const vQ       = (params.get('variant') || '').replace(/\D+/g,'');
     const vS       = (sessionStorage.getItem('exam_variant') || '').replace(/\D+/g,'');
     const variant  = vQ || vS || '1';
 
-    // 🔒 Всегда фиксируем флаги экзамена и вариант — это "шарнир" всего флоу
+    // фиксируем режим экзамена и вариант (шарнир флоу)
     try {
+      sessionStorage.setItem('exam_type', 'oge');
       sessionStorage.setItem('exam_flow', '1');
       sessionStorage.setItem('exam_variant', variant);
     } catch {}
 
+    // если сюда попали вне режима «экзамен полностью» — возвращаем к выбору
     const examFlowOn = sessionStorage.getItem('exam_flow') === '1';
     if (!examFlowOn) {
-      // Если каким-то образом сюда попали не из "экзамен полностью" — отправим к выбору
       navigateOnce('./exams.html');
     }
 
-    // Заголовки
-    document.getElementById('title').textContent = `Task ${next}`;
-    try { document.title = `Экзамен полностью — Task ${next}`; } catch {}
+    // заголовки
+    document.getElementById('title').textContent = `Задание ${next}`;
+    try { document.title = `ОГЭ — Экзамен полностью: Задание ${next}`; } catch {}
 
-    // Куда идти после отсчёта (всегда прокидываем ?exam=1&variant=)
+    // следующая страница (всегда прокидываем ?exam=1&variant=)
     function nextPrepareUrl(){
-      if (next > 4) {
-        return `./exams_result.html?exam=1&variant=${encodeURIComponent(variant)}`;
+      // после 3-го — итоговая страница экзамена
+      if (next > 3) {
+        return `./exams_result.html?exam=1&variant=${encodeURIComponent(variant)}`
+          .replace(/\/{2,}/g,'/').replace(':/','://');
       }
-      return `./task${next}/variants/variant${variant}/ege${next}_var${variant}_1_prepare.html?exam=1&variant=${encodeURIComponent(variant)}`
+      // путь к prepare выбранного задания и варианта
+      return `./task${next}/variants/variant${variant}/oge${next}_var${variant}_1_prepare.html?exam=1&variant=${encodeURIComponent(variant)}`
         .replace(/\/{2,}/g,'/').replace(':/','://');
     }
 
-    // Отсчёт 3-2-1
+    // отсчёт 3-2-1
     const timerEl = document.getElementById('timer');
     let n = 3;
     timerEl.textContent = n;
@@ -83,7 +90,7 @@
       }
     },1000);
 
-    // Сброс блокировки навигации и очистка интервала на всякий
+    // сбросы
     window.addEventListener('beforeunload', ()=>{ try{ clearInterval(id); }catch{} });
     window.addEventListener('pageshow', ()=>{ navigateOnce.lock = false; });
   </script>

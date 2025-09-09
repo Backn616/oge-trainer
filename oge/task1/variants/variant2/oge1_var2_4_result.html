@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Результат — ОГЭ · Задание 1</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="../../../style_common.css" />
+</head>
+<body>
+  <button id="themeBtn" class="theme-toggle">🌓 Тема</button>
+  <div class="wrap">
+    <h1>Результат — ОГЭ · Задание 1</h1>
+    <audio id="audio" controls></audio>
+    <div style="text-align:center;">
+      <button id="playBtn" class="btn" disabled>▶️ Прослушать</button>
+      <button id="downloadBtn" class="btn" disabled>⬇️ Скачать</button>
+      <a id="repeatBtn" class="btn" href="#">🔁 Повторить</a>
+    </div>
+
+    <div class="reading-box">
+Football is the most popular sport in the world. It is played by millions of people on every continent. The game is simple: two teams try to score goals by kicking a ball into the opponent’s net. However, professional football requires a lot of training and special skills. Players must be strong, fast, and coordinated. The biggest football event is the World Cup, which is organised every four years. The matches are watched by billions of fans. Modern football has also become a huge industry, where clubs spend enormous sums of money on stadiums, equipment, and famous players. Nevertheless, football is not only about business but also about teamwork and national pride.
+    </div>
+
+    <div class="helper-box">
+      <details>
+        <summary>🔎 Сложные слова</summary>
+        <table class="wordlist"><tbody id="hardWordsTbody"></tbody></table>
+      </details>
+    </div>
+  </div>
+
+  <script type="module">
+    import { toggleThemeInit } from "../../../common.js";
+    toggleThemeInit();
+
+    const HARD_WORDS = [
+      {w:'continent', ipa:'/ˈkɒntɪnənt/'},
+      {w:'opponent', ipa:'/əˈpoʊnənt/'},
+      {w:'professional', ipa:'/prəˈfeʃənl/'},
+      {w:'coordinated', ipa:'/koʊˈɔːrdɪneɪtɪd/'},
+      {w:'World Cup', ipa:'/ˌwɜːrld ˈkʌp/'},
+      {w:'organised', ipa:'/ˈɔːrɡənaɪzd/'},
+      {w:'industry', ipa:'/ˈɪndəstri/'},
+      {w:'equipment', ipa:'/ɪˈkwɪpmənt/'},
+      {w:'nevertheless', ipa:'/ˌnevərðəˈles/'},
+      {w:'pride', ipa:'/praɪd/'}
+    ];
+    const tbody=document.getElementById('hardWordsTbody');
+    HARD_WORDS.forEach(item=>{
+      const tr=document.createElement('tr');
+      tr.innerHTML=`<td>${item.w}</td><td>${item.ipa}</td><td><button>▶︎</button></td>`;
+      tr.querySelector('button').addEventListener('click',()=>speakWord(item.w));
+      tbody.appendChild(tr);
+    });
+
+    let voices=[]; function loadVoices(){voices=window.speechSynthesis.getVoices();}
+    loadVoices(); window.speechSynthesis.addEventListener('voiceschanged', loadVoices);
+    function speakWord(word){
+      const u=new SpeechSynthesisUtterance(word);
+      u.voice=voices.find(v=>v.lang.startsWith('en'))||null;
+      u.lang='en-GB'; u.rate=0.95;
+      window.speechSynthesis.cancel(); window.speechSynthesis.speak(u);
+    }
+  </script>
+</body>
+</html>

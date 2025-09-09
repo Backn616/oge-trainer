@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>OGE Task 1 — Preparation</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Шрифт -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <!-- Общие стили -->
+  <link rel="stylesheet" href="../../../style_common.css" />
+
+  <!-- Анти-мигание темы -->
+  <script>
+    (function(){
+      try{
+        const saved = localStorage.getItem('pref-theme') || 'light';
+        if (saved === 'dark') document.documentElement.classList.add('dark');
+      }catch(_){}
+    })();
+  </script>
+</head>
+<body>
+  <button id="themeBtn" class="theme-toggle">🌓 Тема</button>
+
+  <div class="content-wrapper">
+    <div class="task-container">
+      <p><strong>Task 1.</strong> You are going to read the text aloud.  
+        You have <strong>1.5 minutes</strong> to read it silently. Then be ready to read it aloud.  
+        You will not have more than <strong>2 minutes</strong> to read it aloud.
+      </p>
+    </div>
+
+    <div class="reading-box" id="readingBox">
+Football is the most popular sport in the world. It is played by millions of people on every continent. The game is simple: two teams try to score goals by kicking a ball into the opponent’s net. However, professional football requires a lot of training and special skills. Players must be strong, fast, and coordinated. The biggest football event is the World Cup, which is organised every four years. The matches are watched by billions of fans. Modern football has also become a huge industry, where clubs spend enormous sums of money on stadiums, equipment, and famous players. Nevertheless, football is not only about business but also about teamwork and national pride.
+    </div>
+
+    <!-- Сложные слова -->
+    <div class="task-container helper-box">
+      <details>
+        <summary>🔎 Сложные слова (подсказка)</summary>
+        <table class="wordlist">
+          <thead>
+            <tr><th>Word</th><th>IPA</th><th>Audio</th></tr>
+          </thead>
+          <tbody id="hardWordsTbody"></tbody>
+        </table>
+      </details>
+    </div>
+
+    <div style="text-align:center; margin:22px 0;">
+      <button id="goBtn" class="button">Перейти к выполнению</button>
+    </div>
+  </div>
+
+  <!-- Прогресс-бар -->
+  <div id="progressContainerFixed">
+    <div id="progressBarFixed"><span id="progressTime">01:30</span></div>
+  </div>
+
+  <script type="module">
+    import { toggleThemeInit, navigateOnce, startPrepareTimer, fmtTime } from "../../../common.js";
+
+    toggleThemeInit();
+    const NEXT_URL = location.pathname.replace(/_1_prepare\.html$/i, '_2_mic.html');
+    document.getElementById('goBtn').addEventListener('click', ()=>navigateOnce(NEXT_URL));
+
+    sessionStorage.removeItem('oge1_audio_base64');
+    sessionStorage.removeItem('oge1_audio_mime');
+    sessionStorage.setItem('oge1_prepared','1');
+    sessionStorage.setItem('oge1_meta', JSON.stringify({preparedAt: Date.now(), prepareDurationSec: 90}));
+
+    const TOTAL_MS = 90_000;
+    const barEl = document.getElementById('progressBarFixed');
+    const timeEl = document.getElementById('progressTime');
+    function startTimer(){
+      startPrepareTimer({barEl,timeEl,totalMs:TOTAL_MS,nextUrl:NEXT_URL,key:'oge1_prepare_end',persist:false,textEveryMs:250,useRAF:true});
+    }
+    startTimer();
+
+    const HARD_WORDS = [
+      {w:'continent', ipa:'/ˈkɒntɪnənt/'},
+      {w:'opponent', ipa:'/əˈpoʊnənt/'},
+      {w:'professional', ipa:'/prəˈfeʃənl/'},
+      {w:'coordinated', ipa:'/koʊˈɔːrdɪneɪtɪd/'},
+      {w:'World Cup', ipa:'/ˌwɜːrld ˈkʌp/'},
+      {w:'organised', ipa:'/ˈɔːrɡənaɪzd/'},
+      {w:'industry', ipa:'/ˈɪndəstri/'},
+      {w:'equipment', ipa:'/ɪˈkwɪpmənt/'},
+      {w:'nevertheless', ipa:'/ˌnevərðəˈles/'},
+      {w:'pride', ipa:'/praɪd/'}
+    ];
+    const tbody=document.getElementById('hardWordsTbody');
+    HARD_WORDS.forEach(item=>{
+      const tr=document.createElement('tr');
+      tr.innerHTML=`<td>${item.w}</td><td>${item.ipa}</td><td><button class="play">▶︎</button></td>`;
+      tr.querySelector('button').addEventListener('click',()=>speakWord(item.w));
+      tbody.appendChild(tr);
+    });
+
+    let voices=[];
+    function loadVoices(){ voices=window.speechSynthesis.getVoices(); }
+    loadVoices();
+    window.speechSynthesis.addEventListener('voiceschanged', loadVoices);
+    function pickVoice(){return voices.find(v=>v.lang.startsWith('en-GB'))||voices.find(v=>v.lang.startsWith('en'));}
+    function speakWord(word){
+      const u=new SpeechSynthesisUtterance(word); u.voice=pickVoice(); u.rate=0.95; u.lang='en-GB';
+      window.speechSynthesis.cancel(); window.speechSynthesis.speak(u);
+    }
+  </script>
+</body>
+</html>

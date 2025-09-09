@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <title>Предупреждение — доступ к микрофону</title>
+  <title>Предупреждение — доступ к микрофону (ОГЭ)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <!-- Шрифт -->
@@ -36,11 +36,11 @@
       <p id="warnText">
         На следующем этапе тренажёр попытается получить доступ к микрофону.<br><br>
         Браузер покажет системный запрос на использование микрофона.<br><br>
-        Если вы готовы выполнить устную часть <strong>задания 1</strong>, пожалуйста,<br>
+        Если вы готовы выполнить устную часть <strong>задания 1 (ОГЭ)</strong>, пожалуйста,<br>
         <strong>разрешите сайту использовать микрофон</strong>, чтобы начать запись ответа.
       </p>
 
-      <!-- href ставим как fallback, переход дублируем через JS c navigateOnce -->
+      <!-- href как fallback; переход дублируем через JS с navigateOnce -->
       <a id="nextLink"
          class="button"
          type="button"
@@ -64,14 +64,14 @@
       ? location.pathname.replace(/_2_mic\.html$/i, '_3_task.html')
       : location.pathname.replace(/\.html$/i, '_3_task.html');
 
-    // Подготовка sessionStorage для задания 1
+    // Подготовка sessionStorage для ОГЭ — задание 1
     try {
-      sessionStorage.removeItem('ege1_audio_base64');
-      sessionStorage.removeItem('ege1_audio_mime');
-      sessionStorage.setItem('ege1_warned', '1');
-      const meta = JSON.parse(sessionStorage.getItem('ege1_meta') || '{}');
+      sessionStorage.removeItem('oge1_audio_base64');
+      sessionStorage.removeItem('oge1_audio_mime');
+      sessionStorage.setItem('oge1_warned', '1');
+      const meta = JSON.parse(sessionStorage.getItem('oge1_meta') || '{}');
       meta.warnedAt = Date.now();
-      sessionStorage.setItem('ege1_meta', JSON.stringify(meta));
+      sessionStorage.setItem('oge1_meta', JSON.stringify(meta));
     } catch {}
 
     // Кнопка «ОК» — единая точка перехода

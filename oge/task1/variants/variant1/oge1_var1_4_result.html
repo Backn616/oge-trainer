@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <title>Результат — Задание 1</title>
+  <title>Результат — ОГЭ · Задание 1</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <!-- Шрифт как в prepare/task -->
@@ -78,7 +78,7 @@
       .reading-box{ font-size:18px; padding:18px 16px; max-width:100%; }
     }
 
-    /* Рамка со словами + таблица (как в эталоне) */
+    /* Рамка со словами + таблица */
     .helper-box{
       border:1px solid #ccc;
       border-radius:8px;
@@ -128,7 +128,7 @@
   <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
 
   <div class="wrap">
-    <h1 id="h1">Результат — Вариант <span id="varNum">?</span></h1>
+    <h1 id="h1">Результат — ОГЭ · Вариант <span id="varNum">?</span></h1>
     <div class="status" id="statusText" aria-live="polite">
       ✅ Запись готова. Вы можете прослушать её ниже или сохранить файл.
     </div>
@@ -149,22 +149,19 @@
     <!-- Инструкция -->
     <div class="task-container" aria-labelledby="taskTitle" aria-describedby="inst">
       <p id="taskTitle" style="margin-top:0;">
-        <strong>Task 1.</strong> Imagine that you are preparing a project with your friend.
-        You have found some interesting material for the presentation and you want to read this text to your friend.
-        You have <strong>1.5 minutes</strong> to read the text silently, then be ready to read it out loud.
-        You will not have more than <strong>1.5 minutes</strong> to read it.
+        <strong>Task 1.</strong> You are going to read the text aloud.
+        You have <strong>1.5 minutes</strong> to read it silently. Then be ready to read it aloud.
+        You will not have more than <strong>2 minutes</strong> to read it aloud.
       </p>
-      <div class="instruction" id="inst">You will read the text aloud for not more than 1.5 minutes.</div>
+      <div class="instruction" id="inst">You will read the text aloud for not more than 2 minutes.</div>
     </div>
 
     <!-- Текст -->
-    <div class="reading-box" id="textBox">Sherlock Holmes is a famous fictional character from British literature. He was created by Sir Arthur Conan Doyle. Holmes is a private detective who lives in London. Many people know him because of his great mind and amazing logical thinking. He solves difficult crimes that others cannot.
+    <div class="reading-box" id="textBox">
+Dolphins are intelligent sea animals. They live in groups and communicate with each other using special sounds. Scientists believe that dolphins have their own language. They are friendly to people and often swim near ships. Some dolphins are trained to help humans, for example in rescue operations. However, life in the wild is difficult for them. Water pollution and plastic waste are dangerous for marine animals. In some regions, dolphins are even hunted, which is considered a crime against nature. Fortunately, international organisations are trying to protect these wonderful animals. Nowadays, dolphins are often used in scientific research to study communication and intelligence.
+    </div>
 
-In the stories, Holmes is usually described as tall and thin. He often wears a hat and smokes a pipe. He is very intelligent and notices the smallest details. He doesn’t talk much and prefers to work alone or with his friend Dr Watson. Holmes likes music and sometimes plays the violin.
-
-Although Holmes is not a real person, he has become a symbol of clever thinking and observation. People all over the world read stories about him and watch films and series. Many believe that Sherlock Holmes is the best detective character ever created.</div>
-
-    <!-- Сложные слова (как в эталоне) -->
+    <!-- Сложные слова -->
     <div class="task-container helper-box" role="region" aria-labelledby="hardWordsTitle">
       <details>
         <summary id="hardWordsTitle" style="cursor:pointer; font-weight:700;">
@@ -202,31 +199,31 @@ Although Holmes is not a real person, he has become a symbol of clever thinking 
     const m = path.match(/variant(\d+)/i);
     const varNum = m ? m[1] : '?';
     document.getElementById('varNum').textContent = varNum;
-    document.title = `Результат — Задание 1 · Вариант ${varNum}`;
+    document.title = `Результат — ОГЭ · Задание 1 · Вариант ${varNum}`;
 
     function getBases(p){
-      const i = p.indexOf('/ege/');
+      const i = p.indexOf('/oge/');
       if (i >= 0){
         const ROOT_BASE = p.slice(0, i + 1);
-        const EGE_BASE  = p.slice(0, i + 5);
-        return { ROOT_BASE, EGE_BASE };
+        const OGE_BASE  = p.slice(0, i + 5);
+        return { ROOT_BASE, OGE_BASE };
       }
-      return { ROOT_BASE: '/', EGE_BASE: '/ege/' };
+      return { ROOT_BASE: '/', OGE_BASE: '/oge/' };
     }
-    const { ROOT_BASE, EGE_BASE } = getBases(path);
+    const { ROOT_BASE, OGE_BASE } = getBases(path);
 
     const toVariants = document.getElementById('toVariants');
     if (toVariants){
-      toVariants.href = path.replace(/\/variants\/variant\d+\/[^/]+$/i, '/variants/ege1.html');
+      toVariants.href = path.replace(/\/variants\/variant\d+\/[^/]+$/i, '/variants/oge1.html');
     }
-    document.getElementById('toModeMenu').href = `${EGE_BASE}ege_menu.html`;
-    document.getElementById('toTaskMenu').href = `${EGE_BASE}ege.html`;
+    document.getElementById('toModeMenu').href = `${OGE_BASE}oge_menu.html`;
+    document.getElementById('toTaskMenu').href = `${OGE_BASE}oge.html`;
     document.getElementById('toHome').href     = `${ROOT_BASE}index.html`;
 
     function clearTask1State(){
       try{
-        Object.keys(sessionStorage).forEach(k => { if (k.startsWith('ege1_')) sessionStorage.removeItem(k); });
-        if (varNum && /^\d+$/.test(varNum)) sessionStorage.removeItem(`ege1_var${varNum}_prepare_endtime`);
+        Object.keys(sessionStorage).forEach(k => { if (k.startsWith('oge1_')) sessionStorage.removeItem(k); });
+        if (varNum && /^\d+$/.test(varNum)) sessionStorage.removeItem(`oge1_var${varNum}_prepare_endtime`);
       }catch{}
     }
     function clearAndGo(url){ clearTask1State(); navigateOnce(url); }
@@ -252,8 +249,8 @@ Although Holmes is not a real person, he has become a symbol of clever thinking 
     const waveWrap    = document.getElementById('waveWrap');
     const waveCanvas  = document.getElementById('wave');
 
-    const base64     = sessionStorage.getItem('ege1_audio_base64');
-    const mimeStored = (sessionStorage.getItem('ege1_audio_mime') || 'audio/webm').toLowerCase();
+    const base64     = sessionStorage.getItem('oge1_audio_base64');
+    const mimeStored = (sessionStorage.getItem('oge1_audio_mime') || 'audio/webm').toLowerCase();
 
     let objectURL = null;
     const extByMime = {
@@ -262,7 +259,7 @@ Although Holmes is not a real person, he has become a symbol of clever thinking 
       'audio/mp4':'m4a','audio/mpeg':'mp3','audio/wav':'wav'
     };
     const fileExt  = extByMime[mimeStored] || 'webm';
-    const fileName = `ege1_variant${varNum}.${fileExt}`;
+    const fileName = `oge1_variant${varNum}.${fileExt}`;
 
     function dataURLtoBlob(dataURL){
       const parts = (dataURL || '').split(',');
@@ -280,7 +277,7 @@ Although Holmes is not a real person, he has become a symbol of clever thinking 
       downloadBtn.disabled = !en;
     }
 
-    // === Инициализация аудио + волны (асинхронно)
+    // === Инициализация аудио + волны
     (async function initAudio(){
       if (!base64){
         statusText.textContent = '⚠️ Запись не найдена. Возможно, вы запретили доступ к микрофону или страница была закрыта до завершения.';
@@ -422,18 +419,18 @@ Although Holmes is not a real person, he has become a symbol of clever thinking 
       ctx.restore();
     }
 
-    /* Блок "Сложные слова" — слова из prepare */
+    /* Сложные слова — под текст про дельфинов */
     const HARD_WORDS = [
-      { w: 'Sherlock Holmes', ipa: '/ˈʃɜːrlɒk hoʊmz/' },
-      { w: 'fictional',       ipa: '/ˈfɪkʃənəl/' },
-      { w: 'literature',      ipa: '/ˈlɪtərətʃər/' },
-      { w: 'detective',       ipa: '/dɪˈtɛktɪv/' },
-      { w: 'logical',         ipa: '/ˈlɒdʒɪkəl/' },
-      { w: 'intelligent',     ipa: '/ɪnˈtɛlɪdʒənt/' },
-      { w: 'details',         ipa: '/ˈdiːteɪlz/' },
-      { w: 'violin',          ipa: '/ˌvaɪəˈlɪn/' },
-      { w: 'observation',     ipa: '/ˌɒbzərˈveɪʃən/' },
-      { w: 'series',          ipa: '/ˈsɪəriːz/' }
+      { w: 'intelligent',    ipa: '/ɪnˈtelɪdʒənt/' },
+      { w: 'communicate',    ipa: '/kəˈmjuːnɪkeɪt/' },
+      { w: 'scientists',     ipa: '/ˈsaɪəntɪsts/' },
+      { w: 'pollution',      ipa: '/pəˈluːʃən/' },
+      { w: 'plastic',        ipa: '/ˈplæstɪk/' },
+      { w: 'marine',         ipa: '/məˈriːn/' },
+      { w: 'hunted',         ipa: '/ˈhʌntɪd/' },
+      { w: 'organisations',  ipa: '/ˌɔːɡənaɪˈzeɪʃənz/' },
+      { w: 'protect',        ipa: '/prəˈtekt/' },
+      { w: 'research',       ipa: '/rɪˈsɜːrtʃ/' }
     ];
 
     (function renderHardWords(){
@@ -452,7 +449,7 @@ Although Holmes is not a real person, he has become a symbol of clever thinking 
       });
     })();
 
-    // Озвучка слов
+    // Озвучка слов (TTS)
     let voices = [];
     function loadVoices(){ voices = window.speechSynthesis?.getVoices?.() || []; }
     loadVoices();

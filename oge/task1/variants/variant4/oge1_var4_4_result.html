@@ -78,7 +78,7 @@
       .reading-box{ font-size:18px; padding:18px 16px; max-width:100%; }
     }
 
-    /* Рамка со словами + таблица (как в эталоне) */
+    /* Рамка со словами + таблица */
     .helper-box{
       border:1px solid #ccc;
       border-radius:8px;
@@ -158,7 +158,7 @@
 
     <!-- Текст -->
     <div class="reading-box" id="textBox">
-Theatre is one of the oldest forms of art. In the past, it was an important way to share stories and traditions. Nowadays, many people still enjoy visiting theatres, although cinema and television are more popular. A theatre performance requires great imagination from both the actors and the audience. Actors spend weeks preparing, and a lot of rehearsals are needed before the play is shown. Costumes and stage design are also very important. A good performance can influence people’s emotions strongly. However, theatre is often considered expensive, and tickets are not always available for everyone. Still, the art of theatre remains a unique cultural experience.
+Since the early 2000s, high-speed trains have become popular in Europe and Asia. These trains can travel at more than 300 kilometres an hour. For passengers, the journey is fast and comfortable, because modern carriages are designed to be soundproof. However, the problem for engineers is the loud noise outside. People living near the railway often complain about it. The trains are usually built with the help of the latest technologies and require expensive equipment. Nevertheless, they are considered to be more efficient than cars and planes, because they save time and reduce pollution. In the future, high-speed railways may connect most European capitals.
     </div>
 
     <!-- Сложные слова -->
@@ -427,18 +427,18 @@ Theatre is one of the oldest forms of art. In the past, it was an important way 
       ctx.restore();
     }
 
-    /* Сложные слова — под текст про театр */
+    /* Сложные слова — под текст про скоростные поезда */
     const HARD_WORDS = [
-      { w: 'theatre',       ipa: '/ˈθiːətər/' },
-      { w: 'traditions',    ipa: '/trəˈdɪʃənz/' },
-      { w: 'performance',   ipa: '/pərˈfɔːrməns/' },
-      { w: 'imagination',   ipa: '/ɪˌmædʒɪˈneɪʃən/' },
-      { w: 'rehearsals',    ipa: '/rɪˈhɜːrsəlz/' },
-      { w: 'costumes',      ipa: '/ˈkɑːstuːmz/' },
-      { w: 'stage design',  ipa: '/steɪdʒ dɪˈzaɪn/' },
-      { w: 'influence',     ipa: '/ˈɪnfluəns/' },
-      { w: 'emotions',      ipa: '/ɪˈmoʊʃənz/' },
-      { w: 'cultural',      ipa: '/ˈkʌltʃərəl/' }
+      { w: 'high-speed',   ipa: '/ˌhaɪ ˈspiːd/' },
+      { w: 'kilometres',   ipa: '/kɪˈlɒmɪtərz/' },
+      { w: 'carriages',    ipa: '/ˈkærɪdʒɪz/' },
+      { w: 'soundproof',   ipa: '/ˈsaʊndpruːf/' },
+      { w: 'engineers',    ipa: '/ˌendʒɪˈnɪrz/' },
+      { w: 'technologies', ipa: '/tekˈnɒlədʒiz/' },
+      { w: 'equipment',    ipa: '/ɪˈkwɪpmənt/' },
+      { w: 'efficient',    ipa: '/ɪˈfɪʃənt/' },
+      { w: 'pollution',    ipa: '/pəˈluːʃən/' },
+      { w: 'capitals',     ipa: '/ˈkæpɪtlz/' }
     ];
 
     (function renderHardWords(){

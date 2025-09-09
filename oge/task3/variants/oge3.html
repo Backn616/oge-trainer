@@ -263,7 +263,7 @@
           btn.setAttribute('aria-label', `Перейти к варианту ${n}`);
           btn.addEventListener('click', () => {
             const url = `${VARIANTS_BASE}variant${n}/oge3_var${n}_1_prepare.html`
-              .replace(/\/{2,}/g, '/').replace(':/', '://');
+              .replace(/\/{2,}/g, '/').replace(':/', '://');  // ← добавлена санитация URL
             navigateOnce(url);
           });
           frag.appendChild(btn);

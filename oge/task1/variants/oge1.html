@@ -23,19 +23,19 @@
 
   <style>
     :root {
-      /* OGE palette */
-      --bg:#f6fffb; --card:#fff; --text:#0b1020; --muted:#5a6475;
-      --primary:#00a86b; --primary-600:#00935e; --ring:#bfeee0;
+      /* EGE palette (синяя) */
+      --bg:#f7f9ff; --card:#fff; --text:#0b1020; --muted:#5a6475;
+      --primary:#2b6cff; --primary-600:#1f58d9; --ring:#bfd3ff;
       --success:#25c26e; --shadow:0 10px 25px rgba(17,24,39,.08);
-      --btn-1:#00b276; --btn-2:#00c2a8; --btn-text:#fff;
+      --btn-1:#6d95ff; --btn-2:#4f7dff; --btn-text:#fff;
       --radius-xl:20px; --grid-gap:40px;
       --btn-fs:20px; --btn-pad-y:18px; --btn-pad-x:24px; --btn-minh:56px; --btn-radius:14px;
     }
     .dark{
       --bg:#0b1020; --card:rgba(255,255,255,.08); --text:#eaf0ff; --muted:#b9c2d3;
-      --primary:#00c2a8; --primary-600:#00b276; --ring:#174f3d;
+      --primary:#6aa3ff; --primary-600:#4b8dff; --ring:#a9c6ff;
       --success:#5ee397; --shadow:0 10px 35px rgba(0,0,0,.35);
-      --btn-1:#00c2a8; --btn-2:#00b276; --btn-text:#fff;
+      --btn-1:#aecdff; --btn-2:#86b8ff; --btn-text:#fff;
     }
 
     *{box-sizing:border-box}
@@ -43,8 +43,8 @@
     body{
       margin:0; font-family:Inter, system-ui, Segoe UI, Roboto, Arial, sans-serif; color:var(--text);
       background:
-        radial-gradient(1200px 600px at 70% -10%, #0a6b4a40, transparent),
-        radial-gradient(900px 500px at -10% 10%, #0a7f8b40, transparent),
+        radial-gradient(1200px 600px at 70% -10%, #29417a40, transparent),
+        radial-gradient(900px 500px at -10% 10%, #344b9340, transparent),
         var(--bg);
     }
     a{color:inherit; text-decoration:none}
@@ -54,7 +54,7 @@
     .brand{display:flex; align-items:center; gap:12px}
     .logo{
       width:42px; height:42px; border-radius:12px;
-      background: linear-gradient(135deg, var(--primary), #76e7c7);
+      background: linear-gradient(135deg, var(--primary), #9bd0ff);
       box-shadow: 0 6px 18px rgba(0,0,0,.25), inset 0 0 12px #ffffff33;
       display:grid; place-items:center; color:#001133; font-weight:800;
     }
@@ -97,7 +97,7 @@
       border:1px solid rgba(255,255,255,.18);
       background: linear-gradient(135deg, var(--btn-1), var(--btn-2));
       color: var(--btn-text); text-shadow: 0 1px 0 rgba(0,0,0,.15);
-      box-shadow: 0 12px 24px rgba(0, 178, 118, .28);
+      box-shadow: 0 12px 24px rgba(75,141,255,.28);
       transition: transform .06s ease, filter .2s ease, box-shadow .2s ease; cursor: pointer;
     }
     .variant:hover{ transform: translateY(-2px); filter: brightness(1.03) }
@@ -127,7 +127,7 @@
       padding: var(--btn-pad-y) var(--btn-pad-x); min-height: var(--btn-minh);
       border-radius: var(--btn-radius); background: linear-gradient(135deg, var(--btn-1), var(--btn-2));
       color:var(--btn-text); text-decoration:none; font-weight:600;
-      box-shadow: 0 12px 24px rgba(0, 178, 118, .28);
+      box-shadow: 0 12px 24px rgba(75,141,255,.28);
     }
   </style>
 </head>
@@ -270,7 +270,7 @@
         }
         variantsEl.appendChild(frag);
 
-        pagerInfo.textContent = `Стр. ${currentPage} из ${totalPages} · ${start}–${end} из ${TOTAL_VARIАНTS}`;
+        pagerInfo.textContent = `Стр. ${currentPage} из ${totalPages} · ${start}–${end} из ${TOTAL_VARIANTS}`;
         prevBtn.disabled = currentPage === 1;
         nextBtn.disabled = currentPage === totalPages;
         prevBtn.setAttribute('aria-disabled', String(prevBtn.disabled));

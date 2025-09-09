@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <title>Task 1 — Preparation</title>
+  <title>OGE Task 1 — Preparation</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <!-- Шрифт Inter -->
@@ -24,7 +24,6 @@
   </script>
 
   <style>
-    /* Рамка текста */
     .reading-box{
       background:var(--card);
       border:1px solid #ccc;
@@ -42,8 +41,6 @@
     @media (max-width:900px){
       .reading-box{ font-size:18px; padding:18px 16px; max-width:100%; }
     }
-
-    /* Подсказка-рамка — компактная */
     .helper-box{
       border:1px solid #ccc;          
       border-radius:8px;              
@@ -59,8 +56,6 @@
     @media (max-width:900px){
       .helper-box{ font-size:16px; padding:12px 14px; max-width:100%; }
     }
-
-    /* Компактная таблица слов */
     .wordlist{
       width:100%;
       border-collapse: collapse;
@@ -80,8 +75,6 @@
     .wordlist td:nth-child(2){ width:45%; }
     .wordlist td:nth-child(3){ width:20%; text-align:center; }
     .wordlist th:nth-child(3){ text-align:center; }
-
-    /* Кнопка озвучки компактнее */
     .wordlist button.play{
       display:inline-flex;
       align-items:center;
@@ -89,7 +82,6 @@
       line-height:1;
       min-width:36px;
       height:28px;
-
       border:none;
       background:linear-gradient(135deg, var(--primary), var(--primary-600));
       color:#fff;
@@ -104,28 +96,22 @@
   </style>
 </head>
 <body>
-  <!-- Тумблер темы -->
   <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
 
   <div class="content-wrapper">
-    <!-- Инструкция -->
     <div class="task-container" role="region" aria-labelledby="taskTitle">
       <p id="taskTitle" style="margin-top:0;">
-        <strong>Task 1.</strong> Imagine that you are preparing a project with your friend.
-        You have found some interesting material for the presentation and you want to read this text to your friend.
-        You have <strong>1.5 minutes</strong> to read the text silently, then be ready to read it out loud.
-        You will not have more than <strong>1.5 minutes</strong> to read it.
+        <strong>Task 1.</strong> You are going to read the text aloud. 
+        You have <strong>1.5 minutes</strong> to read it silently, 
+        and then you will have to read it aloud. 
+        You will not have more than <strong>2 minutes</strong> to read it aloud.
       </p>
     </div>
 
-    <!-- Текст -->
-    <div class="reading-box" id="readingBox">Sherlock Holmes is a famous fictional character from British literature. He was created by Sir Arthur Conan Doyle. Holmes is a private detective who lives in London. Many people know him because of his great mind and amazing logical thinking. He solves difficult crimes that others cannot.
+    <div class="reading-box" id="readingBox">
+Dolphins are intelligent sea animals. They live in groups and communicate with each other using special sounds. Scientists believe that dolphins have their own language. They are friendly to people and often swim near ships. Some dolphins are trained to help humans, for example in rescue operations. However, life in the wild is difficult for them. Water pollution and plastic waste are dangerous for marine animals. In some regions, dolphins are even hunted, which is considered a crime against nature. Fortunately, international organisations are trying to protect these wonderful animals. Nowadays, dolphins are often used in scientific research to study communication and intelligence.
+    </div>
 
-In the stories, Holmes is usually described as tall and thin. He often wears a hat and smokes a pipe. He is very intelligent and notices the smallest details. He doesn’t talk much and prefers to work alone or with his friend Dr Watson. Holmes likes music and sometimes plays the violin.
-
-Although Holmes is not a real person, he has become a symbol of clever thinking and observation. People all over the world read stories about him and watch films and series. Many believe that Sherlock Holmes is the best detective character ever created.</div>
-
-    <!-- Сложные слова -->
     <div class="task-container helper-box" role="region" aria-labelledby="hardWordsTitle">
       <details>
         <summary id="hardWordsTitle" style="cursor:pointer; font-weight:700;">
@@ -151,39 +137,32 @@ Although Holmes is not a real person, he has become a symbol of clever thinking 
     </div>
   </div>
 
-  <!-- Проставка -->
   <div style="height: calc(var(--footer-h) + 24px);"></div>
 
-  <!-- Прогресс-бар -->
   <div id="progressContainerFixed" role="timer" aria-live="polite" aria-atomic="true" aria-label="Оставшееся время подготовки">
     <div id="progressBarFixed" class="rAF">
       <span id="progressTime" class="progress-time">01:30</span>
     </div>
   </div>
 
-  <!-- Логика -->
   <script type="module">
     import { toggleThemeInit, navigateOnce, startPrepareTimer, fmtTime } from "../../../common.js";
 
-    // Тема
     toggleThemeInit();
 
-    // Навигация
     const NEXT_URL = location.pathname.replace(/_1_prepare\.html$/i, '_2_mic.html');
     document.getElementById('goBtn')?.addEventListener('click', () => navigateOnce(NEXT_URL));
 
-    // Метаданные
     try{
-      sessionStorage.removeItem('ege1_audio_base64');
-      sessionStorage.removeItem('ege1_audio_mime');
-      sessionStorage.setItem('ege1_prepared', '1');
-      sessionStorage.setItem('ege1_meta', JSON.stringify({
+      sessionStorage.removeItem('oge1_audio_base64');
+      sessionStorage.removeItem('oge1_audio_mime');
+      sessionStorage.setItem('oge1_prepared', '1');
+      sessionStorage.setItem('oge1_meta', JSON.stringify({
         preparedAt: Date.now(),
         prepareDurationSec: 90
       }));
     }catch{}
 
-    // Таймер
     const TOTAL_MS = 90_000;
     const barEl  = document.getElementById('progressBarFixed');
     const timeEl = document.getElementById('progressTime');
@@ -198,7 +177,7 @@ Although Holmes is not a real person, he has become a symbol of clever thinking 
         timeEl,
         totalMs: TOTAL_MS,
         nextUrl: NEXT_URL,
-        key: 'ege1_prepare_end',
+        key: 'oge1_prepare_end',
         persist: false,
         textEveryMs: 250,
         useRAF: true
@@ -211,18 +190,17 @@ Although Holmes is not a real person, he has become a symbol of clever thinking 
       if (e.persisted) startTimerFresh();
     });
 
-    // Сложные слова (обновлено)
     const HARD_WORDS = [
-      { w: 'Sherlock Holmes', ipa: '/ˈʃɜːrlɒk hoʊmz/' },
-      { w: 'fictional',       ipa: '/ˈfɪkʃənəl/' },
-      { w: 'literature',      ipa: '/ˈlɪtərətʃər/' },
-      { w: 'detective',       ipa: '/dɪˈtɛktɪv/' },
-      { w: 'logical',         ipa: '/ˈlɒdʒɪkəl/' },
-      { w: 'intelligent',     ipa: '/ɪnˈtɛlɪdʒənt/' },
-      { w: 'details',         ipa: '/ˈdiːteɪlz/' },
-      { w: 'violin',          ipa: '/ˌvaɪəˈlɪn/' },
-      { w: 'observation',     ipa: '/ˌɒbzərˈveɪʃən/' },
-      { w: 'series',          ipa: '/ˈsɪəriːz/' }
+      { w: 'intelligent',    ipa: '/ɪnˈtelɪdʒənt/' },
+      { w: 'communicate',    ipa: '/kəˈmjuːnɪkeɪt/' },
+      { w: 'scientists',     ipa: '/ˈsaɪəntɪsts/' },
+      { w: 'pollution',      ipa: '/pəˈluːʃən/' },
+      { w: 'plastic',        ipa: '/ˈplæstɪk/' },
+      { w: 'marine',         ipa: '/məˈriːn/' },
+      { w: 'hunted',         ipa: '/ˈhʌntɪd/' },
+      { w: 'organisations',  ipa: '/ˌɔːɡənaɪˈzeɪʃənz/' },
+      { w: 'protect',        ipa: '/prəˈtekt/' },
+      { w: 'research',       ipa: '/rɪˈsɜːrtʃ/' }
     ];
 
     (function renderHardWords(){
@@ -241,7 +219,6 @@ Although Holmes is not a real person, he has become a symbol of clever thinking 
       });
     })();
 
-    // Озвучка
     let voices = [];
     function loadVoices(){ voices = window.speechSynthesis?.getVoices?.() || []; }
     loadVoices();

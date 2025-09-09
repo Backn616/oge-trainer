@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <title>Task 1 — Reading</title>
+  <title>OGE Task 1 — Reading</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <!-- Шрифт -->
@@ -32,20 +32,20 @@
     }
     @media (prefers-reduced-motion: reduce) { .timer{ transition:none; } }
 
-    /* Текст для чтения — как в prepare (компактная рамка) */
+    /* Текст для чтения — компактная рамка */
     .reading-box{
       background:var(--card);
       border:1px solid #ccc;
       border-radius:12px;
       box-shadow:var(--shadow);
-      padding:24px 28px;                 /* было 40px */
+      padding:24px 28px;
       text-align:left;
       font-family: Inter, system-ui, Segoe UI, Roboto, Arial, sans-serif;
-      font-size:25px;                     /* было 32px */
+      font-size:25px;
       line-height:1.7;
-      max-width:1200px;                   /* было 2500px */
+      max-width:1200px;
       margin:0 auto 24px;
-      white-space:pre-line;               /* переносы строк как абзацы */
+      white-space:pre-line;
     }
     @media (max-width:900px){
       .reading-box{ font-size:18px; padding:18px 16px; max-width:100%; }
@@ -71,21 +71,18 @@
   <div class="content-wrapper">
     <!-- Формулировка задания: скрыта до конца отсчёта -->
     <div class="task-container" id="instructionBox" style="display:none" aria-labelledby="taskTitle" aria-describedby="inst">
-      <b id="taskTitle">Task 1. Imagine that you are preparing a project with your friend.</b>
-      You have found some interesting material for the presentation and you want to read this text to your friend.
-      You have 1.5 minutes to read the text silently, then be ready to read it out loud. You will not have more than 1.5 minutes to read it.
-      <div class="instruction" id="inst">You will read the text aloud for not more than 1.5 minutes.</div>
+      <b id="taskTitle">Task 1. You are going to read the text aloud.</b>
+      You have 1.5 minutes to read it silently. Then be ready to read it aloud.
+      You will not have more than <b>2 minutes</b> to read it aloud.
+      <div class="instruction" id="inst">You will read the text aloud for not more than 2 minutes.</div>
     </div>
 
     <!-- Отсчёт -->
     <div id="timer" class="timer" aria-live="polite">3</div>
 
     <!-- Текст для чтения: скрыт до конца отсчёта -->
-    <div class="reading-box" id="textBox" style="display:none">Sherlock Holmes is a famous fictional character from British literature. He was created by Sir Arthur Conan Doyle. Holmes is a private detective who lives in London. Many people know him because of his great mind and amazing logical thinking. He solves difficult crimes that others cannot.
-
-In the stories, Holmes is usually described as tall and thin. He often wears a hat and smokes a pipe. He is very intelligent and notices the smallest details. He doesn’t talk much and prefers to work alone or with his friend Dr Watson. Holmes likes music and sometimes plays the violin.
-
-Although Holmes is not a real person, he has become a symbol of clever thinking and observation. People all over the world read stories about him and watch films and series. Many believe that Sherlock Holmes is the best detective character ever created.
+    <div class="reading-box" id="textBox" style="display:none">
+Dolphins are intelligent sea animals. They live in groups and communicate with each other using special sounds. Scientists believe that dolphins have their own language. They are friendly to people and often swim near ships. Some dolphins are trained to help humans, for example in rescue operations. However, life in the wild is difficult for them. Water pollution and plastic waste are dangerous for marine animals. In some regions, dolphins are even hunted, which is considered a crime against nature. Fortunately, international organisations are trying to protect these wonderful animals. Nowadays, dolphins are often used in scientific research to study communication and intelligence.
     </div>
 
     <!-- Кнопка завершения -->
@@ -101,7 +98,7 @@ Although Holmes is not a real person, he has become a symbol of clever thinking 
   <div id="progressContainerFixed" role="timer" aria-live="polite" aria-atomic="true"
        aria-label="Оставшееся время ответа" style="display:none">
     <div id="progressBarFixed">
-      <span id="progressTime" class="progress-time">01:30</span>
+      <span id="progressTime" class="progress-time">02:00</span>
     </div>
   </div>
 
@@ -120,11 +117,11 @@ Although Holmes is not a real person, he has become a symbol of clever thinking 
 
     const RESULT_URL = location.pathname.replace(/_3_task\.html$/i, '_4_result.html');
 
-    const inExam      = (sessionStorage.getItem('exam_flow') === '1');
-    const varFromSS   = sessionStorage.getItem('exam_variant') || '';
-    const varFromURL  = (location.pathname.match(/variant(\d+)/i) || [,''])[1];
-    const EXAM_VARIANT= varFromSS || varFromURL || '';
-    const EXAM_NEXT_URL = `../../../exams_countdown.html?next=2&variant=${encodeURIComponent(EXAM_VARIANT)}`;
+    const inExam       = (sessionStorage.getItem('exam_flow') === '1');
+    const varFromSS    = sessionStorage.getItem('exam_variant') || '';
+    const varFromURL   = (location.pathname.match(/variant(\d+)/i) || [,''])[1];
+    const EXAM_VARIANT = varFromSS || varFromURL || '';
+    const EXAM_NEXT_URL= `../../../exams_countdown.html?next=2&variant=${encodeURIComponent(EXAM_VARIANT)}`;
 
     /* === Микрофон и запись === */
     let mediaRecorder = null, audioChunks = [], streamRef = null;
@@ -157,8 +154,8 @@ Although Holmes is not a real person, he has become a symbol of clever thinking 
           const reader = new FileReader();
           reader.onloadend = () => {
             try{
-              sessionStorage.setItem('ege1_audio_base64', reader.result);
-              sessionStorage.setItem('ege1_audio_mime', blobType);
+              sessionStorage.setItem('oge1_audio_base64', reader.result);
+              sessionStorage.setItem('oge1_audio_mime', blobType);
             }catch{}
             navigateOnce(inExam ? EXAM_NEXT_URL : RESULT_URL);
           };
@@ -195,8 +192,8 @@ Although Holmes is not a real person, he has become a symbol of clever thinking 
       },1000);
     }
 
-    /* === Таймер ответа 1:30 на rAF === */
-    const TOTAL_MS = 90_000;
+    /* === Таймер ответа 2:00 на rAF === */
+    const TOTAL_MS = 120_000;
     let endTs = 0, rafId = 0, lastAnnounce = 0;
 
     function startTask(){

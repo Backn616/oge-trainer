@@ -11,8 +11,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
-  <!-- Общий стиль ОГЭ -->
-  <link rel="stylesheet" href="./style_common_oge.css" />
+  <!-- Общий стиль (ЕГЭ-палитра) -->
+  <link rel="stylesheet" href="./style_common.css" />
 
   <!-- Анти-мигание темы -->
   <script>
@@ -38,15 +38,16 @@
     .wave{ width:100%; height:56px; display:block; background:#e9edf7; border-radius:10px; box-shadow:var(--shadow); }
     .dark .wave{ background:#1f2a3d; }
 
+    /* волны — ЕГЭ-синяя палитра */
     :root{
       --wave-base: rgba(0,0,0,.28);
-      --wave-prog: var(--primary);
-      --wave-glow: rgba(0,168,107,.45);
+      --wave-prog: var(--primary);               /* #2b6cff из style_common.css */
+      --wave-glow: rgba(43,108,255,.45);
     }
     html.dark{
       --wave-base: rgba(255,255,255,.52);
-      --wave-prog: #00c2a8;
-      --wave-glow: rgba(0,194,168,.65);
+      --wave-prog: #5bb8ff;
+      --wave-glow: rgba(91,184,255,.65);
     }
 
     .status{ font-size:14px; color:var(--muted); margin-bottom:4px; }
@@ -139,7 +140,7 @@
     .btn{
       display:inline-block; padding:12px 18px; font-weight:600; color:#fff;
       background:linear-gradient(135deg, var(--primary), var(--primary-600));
-      border:none; border-radius:10px; box-shadow:0 10px 22px rgba(0,168,107,.3);
+      border:none; border-radius:10px; box-shadow:0 10px 22px rgba(43,108,255,.30);
       cursor:pointer; text-decoration:none;
     }
   </style>
@@ -268,8 +269,8 @@
 
       const rs = getComputedStyle(document.documentElement);
       const waveBase = (rs.getPropertyValue('--wave-base') || 'rgba(0,0,0,.28)').trim();
-      const waveProg = (rs.getPropertyValue('--wave-prog') || '#00a86b').trim();
-      const waveGlow = (rs.getPropertyValue('--wave-glow') || 'rgba(0,168,107,.45)').trim();
+      const waveProg = (rs.getPropertyValue('--wave-prog') || '#2b6cff').trim();
+      const waveGlow = (rs.getPropertyValue('--wave-glow') || 'rgba(43,108,255,.45)').trim();
       const bg = getComputedStyle(c).backgroundColor;
 
       ctx.clearRect(0,0,cssW,cssH);

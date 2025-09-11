@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>ОГЭ — Задание 2: выбор варианта</title>
-  <meta name="description" content="Выбор варианта для задания 2 устной части ОГЭ. Выполнение задания и прослушивание ответа." />
+  <title>ОГЭ — Задание 3: выбор варианта</title>
+  <meta name="description" content="Выбор варианта для задания 3 устной части ОГЭ. Запись ответа и прослушивание." />
 
   <!-- Шрифты + preconnect -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -138,7 +138,7 @@
         <div class="logo">A</div>
         <div>
           <div class="brand-title">Онлайн-тренажёр «Говорение»</div>
-          <div class="badge">ОГЭ · задание 2</div>
+          <div class="badge">ОГЭ · задание 3</div>
         </div>
       </a>
       <div style="display:flex; gap:10px; align-items:center">
@@ -149,11 +149,11 @@
 
     <main>
       <section class="card">
-        <h1 class="h1">ОГЭ — задание 2: выбери вариант</h1>
+        <h1 class="h1">ОГЭ — задание 3: выбери вариант</h1>
         <p class="sub">Нажми на вариант, затем выполни задание и прослушай свой ответ.</p>
 
         <div class="frame">
-          <nav id="variants" class="grid" aria-label="Варианты задания 2"></nav>
+          <nav id="variants" class="grid" aria-label="Варианты задания 3"></nav>
 
           <div class="pager" aria-label="Пагинация вариантов">
             <button id="prevBtn" class="pager-btn" type="button" aria-label="← Назад" aria-controls="variants">← Назад</button>
@@ -167,21 +167,21 @@
         <noscript>
           <div class="frame">
             <nav class="grid" aria-label="Варианты (без JS)">
-              <a href="./variant1/oge2_var1_1_prepare.html">Вариант 1</a>
-              <a href="./variant2/oge2_var2_1_prepare.html">Вариант 2</a>
-              <a href="./variant3/oge2_var3_1_prepare.html">Вариант 3</a>
-              <a href="./variant4/oge2_var4_1_prepare.html">Вариант 4</a>
-              <a href="./variant5/oge2_var5_1_prepare.html">Вариант 5</a>
-              <a href="./variant6/oge2_var6_1_prepare.html">Вариант 6</a>
-              <a href="./variant7/oge2_var7_1_prepare.html">Вариант 7</a>
-              <a href="./variant8/oge2_var8_1_prepare.html">Вариант 8</a>
-              <a href="./variant9/oge2_var9_1_prepare.html">Вариант 9</a>
-              <a href="./variant10/oge2_var10_1_prepare.html">Вариант 10</a>
-              <a href="./variant11/oge2_var11_1_prepare.html">Вариант 11</a>
-              <a href="./variant12/oge2_var12_1_prepare.html">Вариант 12</a>
-              <a href="./variant13/oge2_var13_1_prepare.html">Вариант 13</a>
-              <a href="./variant14/oge2_var14_1_prepare.html">Вариант 14</a>
-              <a href="./variant15/oge2_var15_1_prepare.html">Вариант 15</a>
+              <a href="./variant1/oge3_var1_1_prepare.html">Вариант 1</a>
+              <a href="./variant2/oge3_var2_1_prepare.html">Вариант 2</a>
+              <a href="./variant3/oge3_var3_1_prepare.html">Вариант 3</a>
+              <a href="./variant4/oge3_var4_1_prepare.html">Вариант 4</a>
+              <a href="./variant5/oge3_var5_1_prepare.html">Вариант 5</a>
+              <a href="./variant6/oge3_var6_1_prepare.html">Вариант 6</a>
+              <a href="./variant7/oge3_var7_1_prepare.html">Вариант 7</a>
+              <a href="./variant8/oge3_var8_1_prepare.html">Вариант 8</a>
+              <a href="./variant9/oge3_var9_1_prepare.html">Вариант 9</a>
+              <a href="./variant10/oge3_var10_1_prepare.html">Вариант 10</a>
+              <a href="./variant11/oge3_var11_1_prepare.html">Вариант 11</a>
+              <a href="./variant12/oge3_var12_1_prepare.html">Вариант 12</a>
+              <a href="./variant13/oge3_var13_1_prepare.html">Вариант 13</a>
+              <a href="./variant14/oge3_var14_1_prepare.html">Вариант 14</a>
+              <a href="./variant15/oge3_var15_1_prepare.html">Вариант 15</a>
             </nav>
           </div>
         </noscript>
@@ -233,8 +233,8 @@
       });
 
       // Рендер вариантов + пагинация
-      // Файл лежит в /oge/task2/variants/oge2.html → база на каталог variants/
-      const VARIANTS_BASE  = location.pathname.replace(/oge2\.html$/i, '');
+      // Файл лежит в /oge/task3/variants/oge3.html → база на каталог variants/
+      const VARIANTS_BASE  = location.pathname.replace(/oge3\.html$/i, '');
       const TOTAL_VARIANTS = 60;   // при необходимости обнови
       const PAGE_SIZE      = 15;
 
@@ -262,7 +262,7 @@
           btn.textContent = `Вариант ${n}`;
           btn.setAttribute('aria-label', `Перейти к варианту ${n}`);
           btn.addEventListener('click', () => {
-            const url = `${VARIANTS_BASE}variant${n}/oge2_var${n}_1_prepare.html`
+            const url = `${VARIANTS_BASE}variant${n}/oge3_var${n}_1_prepare.html`
               .replace(/\/{2,}/g, '/').replace(':/', '://');
             navigateOnce(url);
           });

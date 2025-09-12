@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <title>Task 3 — Interview</title>
+  <title>Task 2 — Electronic assistant</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <!-- Шрифт -->
@@ -81,7 +81,11 @@
 
   <main class="content-wrapper" id="mainWrap" style="display:none">
     <section class="task-container" id="introBox" aria-live="polite">
-      <b>Task 3.</b> Interviewer
+      <b>Task 2.</b> Electronic assistant
+      <div style="margin-top:8px;">
+        You are going to take part in a telephone survey. You have to answer six questions.<br/>
+        Remember that you have 40 seconds to answer each question.
+      </div>
       <div id="introNextWrap">
         <button id="introNextBtn" class="button" type="button">Перейти к выполнению</button>
       </div>
@@ -130,13 +134,17 @@
       }
     } catch(_) {}
 
+    // Переход на ключи ОГЭ-2
     try{
-      sessionStorage.removeItem('ege3_audio_base64');
-      sessionStorage.removeItem('ege3_audio_mime');
+      sessionStorage.removeItem('oge2_audio_base64');
+      sessionStorage.removeItem('oge2_audio_mime');
     }catch{}
 
+    const TOTAL_Q     = 6;
+    const ANSWER_MS   = 40_000;
+
     const INTRO_AUDIO = "intro.mp3";
-    const Q_AUDIO     = ["q1.mp3","q2.mp3","q3.mp3","q4.mp3","q5.mp3"];
+    const Q_AUDIO     = ["q1.mp3","q2.mp3","q3.mp3","q4.mp3","q5.mp3","q6.mp3"];
     const SIG_SRC     = "../not.mp3"; // сигнал из общей папки variants
 
     // DOM
@@ -160,10 +168,8 @@
 
     const recIndicator = document.getElementById('recIndicator');
 
-    const ANSWER_MS = 40_000;
-
     // Два аудио-объекта: озвучка вопроса и сигнал
-    const audio = new Audio();          // для intro/q1..q5
+    const audio = new Audio();          // для intro/q1..q6
     audio.preload = 'auto';
     const sig   = new Audio(SIG_SRC);   // сигнал
     sig.preload = 'auto';
@@ -196,7 +202,7 @@
     function startAnswerWindow(){
       barWrap.style.display = 'block';
       nextBtnWrap.style.display = 'block';
-      nextBtn.textContent = (qIdx === 4) ? 'Закончить' : 'Дальше';
+      nextBtn.textContent = (qIdx === TOTAL_Q-1) ? 'Закончить' : 'Дальше';
       timeEl.textContent = fmtTime(ANSWER_MS);
       barEl.style.width = '100%';
       answering = true;
@@ -304,7 +310,7 @@
 
     function proceedNext(){
       qIdx++;
-      if (qIdx < 5){ playQuestion(qIdx+1); }
+      if (qIdx < TOTAL_Q){ playQuestion(qIdx+1); }
       else { finishAll(); }
     }
 
@@ -330,8 +336,8 @@
           const reader = new FileReader();
           reader.onloadend = () => {
             try{
-              sessionStorage.setItem('ege3_audio_base64', reader.result.toString());
-              sessionStorage.setItem('ege3_audio_mime', blob.type || 'audio/webm');
+              sessionStorage.setItem('oge2_audio_base64', reader.result.toString());
+              sessionStorage.setItem('oge2_audio_mime', blob.type || 'audio/webm');
             }catch{}
             cleanupAndNavigate();
           };

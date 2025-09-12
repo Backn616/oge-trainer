@@ -36,7 +36,7 @@
       <p id="warnText">
         На следующем этапе тренажёр попытается получить доступ к микрофону.<br><br>
         Браузер покажет системный запрос на использование микрофона.<br><br>
-        Если вы готовы выполнить устную часть <strong>задания 2</strong>, пожалуйста,<br>
+        Если вы готовы выполнить устную часть <strong>задания 3</strong>, пожалуйста,<br>
         <strong>разрешите сайту использовать микрофон</strong>, чтобы начать запись ответа.
       </p>
 
@@ -63,14 +63,14 @@
       ? location.pathname.replace(/_2_mic\.html$/i, '_3_task.html')
       : location.pathname.replace(/\.html$/i, '_3_task.html');
 
-    // Подготовим sessionStorage для задания 2
+    // Подготовим sessionStorage для задания 3 (OGE)
     try {
-      sessionStorage.removeItem('ege2_audio_base64');
-      sessionStorage.removeItem('ege2_audio_mime');
-      sessionStorage.setItem('ege2_warned', '1');
-      const meta = JSON.parse(sessionStorage.getItem('ege2_meta') || '{}');
+      sessionStorage.removeItem('oge3_audio_base64');
+      sessionStorage.removeItem('oge3_audio_mime');
+      sessionStorage.setItem('oge3_warned', '1');
+      const meta = JSON.parse(sessionStorage.getItem('oge3_meta') || '{}');
       meta.warnedAt = Date.now();
-      sessionStorage.setItem('ege2_meta', JSON.stringify(meta));
+      sessionStorage.setItem('oge3_meta', JSON.stringify(meta));
     } catch {}
 
     // Кнопка «ОК»
@@ -78,8 +78,8 @@
     a.href = NEXT_URL; // fallback, если JS отключён
     a.addEventListener('click', (e) => {
       e.preventDefault();
-      // ⚡ Ставим флаг для автозапуска озвучки на странице task
-      try { sessionStorage.setItem('t2_autostart', '1'); } catch {}
+      // ⚡ Флаг для автозапуска озвучки/логики на странице task
+      try { sessionStorage.setItem('t3_autostart', '1'); } catch {}
       navigateOnce(NEXT_URL);
     });
 

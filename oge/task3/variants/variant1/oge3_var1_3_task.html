@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
-  <!-- Общие стили -->
+  <!-- Общие стили проекта -->
   <link rel="stylesheet" href="../../../style_common.css" />
 
   <!-- Анти-мигание темы -->
@@ -24,6 +24,15 @@
   </script>
 
   <style>
+    /* Таймер-цифры 3-2-1-0 — как в Task 1 */
+    .timer{
+      font-size:70px; margin:30px 0; font-weight:700; color:var(--primary);
+      letter-spacing:4px; text-shadow:0 4px 12px rgba(0,0,0,.25);
+      transition:transform .25s ease; will-change:transform; text-align:center;
+    }
+    @media (prefers-reduced-motion: reduce) { .timer{ transition:none; } }
+
+    /* План монолога — компактная рамка как в Task 1 */
     .reading-box{
       background:var(--card);
       border:1px solid #ccc;
@@ -35,51 +44,26 @@
       font-size:22px;
       line-height:1.7;
       max-width:1200px;
-      margin:0 auto 18px;
+      margin:0 auto 24px;
       display:none; /* покажем после отсчёта */
     }
-    .reading-box ul{ margin: 12px 0 0 22px; }
-    .reading-box li{ margin: 6px 0; }
-
-    .status{
-      max-width: 900px; margin: 12px auto 20px; text-align:center;
-      font-family: Inter, system-ui, Segoe UI, Roboto, Arial, sans-serif;
-      color: var(--muted-fg);
-      font-size: 14px;
-      display:none; /* минималистично: показываем только в процессе/ошибке */
+    .reading-box ul{ margin:12px 0 0 22px; }
+    .reading-box li{ margin:6px 0; }
+    @media (max-width:900px){
+      .reading-box{ font-size:18px; padding:18px 16px; max-width:100%; }
     }
 
-    /* Иконка записи */
-    .rec-dot{
-      display:inline-block; width:10px; height:10px; border-radius:50%;
-      background:#ef4444; box-shadow:0 0 0 0 rgba(239,68,68,.6);
-      animation:pulse 1.4s infinite; vertical-align: middle; margin-right:8px;
+    /* Кнопка завершения — как в Task 1 */
+    .btn{
+      display:inline-block; padding:16px 32px; margin:12px;
+      font-size:20px; font-weight:600; color:#fff; text-decoration:none; cursor:pointer;
+      border:none; border-radius:12px;
+      background:linear-gradient(135deg, var(--primary), var(--primary-600));
+      box-shadow:0 10px 22px rgba(43,108,255,.3);
+      transition: transform .06s ease, filter .2s ease, box-shadow .2s ease;
     }
-    @keyframes pulse{
-      0%{ box-shadow:0 0 0 0 rgba(239,68,68,.6); }
-      70%{ box-shadow:0 0 0 10px rgba(239,68,68,0); }
-      100%{ box-shadow:0 0 0 0 rgba(239,68,68,0); }
-    }
-
-    /* Оверлей 3-2-1-0 */
-    .countdown{
-      position:fixed; inset:0; display:flex; align-items:center; justify-content:center;
-      background:rgba(0,0,0,.6); color:#fff; z-index:9999; user-select:none;
-    }
-    .countdown .num{
-      font-family: Inter, system-ui, Segoe UI, Roboto, Arial, sans-serif;
-      font-weight:800; font-size: clamp(64px, 14vw, 180px);
-      line-height:1; letter-spacing:.02em;
-      text-shadow: 0 8px 40px rgba(0,0,0,.45);
-      transform: scale(1); opacity:1;
-      animation: pop 1s ease forwards;
-    }
-    @keyframes pop{
-      0%{ transform:scale(0.7); opacity:.2; }
-      35%{ transform:scale(1.08); opacity:1; }
-      70%{ transform:scale(1); opacity:1; }
-      100%{ transform:scale(0.98); opacity:.92; }
-    }
+    .btn:hover{ transform: translateY(-1px); filter: brightness(1.03); }
+    .btn:disabled{ opacity:.6; cursor:not-allowed; transform:none; }
   </style>
 </head>
 <body>
@@ -87,14 +71,18 @@
   <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
 
   <div class="content-wrapper">
-    <div class="task-container" role="region" aria-labelledby="taskTitle">
-      <p id="taskTitle" style="margin-top:0;">
-        <strong>Task 3.</strong> You are going to give a talk. You must speak for not more than <strong>2 minutes</strong> (10–12 sentences).
-      </p>
+    <!-- Короткая формулировка — будет показана после отсчёта вместе с планом -->
+    <div class="task-container" id="instructionBox" style="display:none" aria-labelledby="taskTitle" aria-describedby="inst">
+      <b id="taskTitle">Task 3. You are going to give a talk.</b>
+      You must speak for not more than <b>2 minutes</b> (10–12 sentences).
+      <div class="instruction" id="inst">Speak continuously; follow the plan.</div>
     </div>
 
-    <!-- План монолога (без "Topic:") -->
-    <section id="readingBox" class="reading-box" aria-label="План монолога">
+    <!-- Отсчёт 3-2-1-0 (как в Task 1) -->
+    <div id="timer" class="timer" aria-live="polite">3</div>
+
+    <!-- План монолога (без Topic:) -->
+    <div class="reading-box" id="textBox" aria-label="План монолога">
       <p>You are going to give a talk about animals. You will have to start in 1.5 minutes and speak for not more than 2 minutes (10–12 sentences). Remember to say:</p>
       <ul>
         <li>what wild animals live in your region;</li>
@@ -103,210 +91,237 @@
         <li>what your attitude to zoos is.</li>
       </ul>
       <p>You have to talk continuously.</p>
-    </section>
+    </div>
 
-    <!-- Статус (без инструкций про кнопки) -->
-    <div class="status" id="status" aria-live="polite" aria-atomic="true"></div>
+    <!-- Кнопка завершения (можно нажать раньше 2:00) -->
+    <div style="text-align:center; margin-bottom:30px;">
+      <button class="btn" id="endBtn" type="button" aria-label="Закончить запись" style="display:none">✅ Закончить</button>
+    </div>
   </div>
 
+  <!-- Проставка над фикс-баром -->
   <div style="height: calc(var(--footer-h) + 24px);"></div>
 
-  <!-- Фиксированный прогресс-бар ответа (2:00) -->
-  <div id="progressContainerFixed" role="timer" aria-live="polite" aria-atomic="true" aria-label="Оставшееся время ответа" style="visibility:hidden;">
+  <!-- Фиксированный прогресс-бар времени ответа (2:00) — как в Task 1 -->
+  <div id="progressContainerFixed" role="timer" aria-live="polite" aria-atomic="true"
+       aria-label="Оставшееся время ответа" style="display:none">
     <div id="progressBarFixed" class="rAF">
       <span id="progressTime" class="progress-time">02:00</span>
     </div>
   </div>
 
-  <!-- Оверлей отсчёта 3-2-1-0 -->
-  <div id="countdown" class="countdown" aria-hidden="true">
-    <div id="countNum" class="num">3</div>
-  </div>
-
   <script type="module">
-    import { toggleThemeInit, navigateOnce, fmtTime } from "../../../common.js";
+    import { toggleThemeInit, navigateOnce, fmtTime } from '../../../common.js';
 
     toggleThemeInit();
 
-    // === Навигация после записи: одиночное/экзамен полностью ===
-    function getVariantFromUrlOrState() {
+    const timerEl        = document.getElementById('timer');
+    const instructionBox = document.getElementById('instructionBox');
+    const textBox        = document.getElementById('textBox');
+    const endBtn         = document.getElementById('endBtn');
+    const progressWrap   = document.getElementById('progressContainerFixed');
+    const progressBar    = document.getElementById('progressBarFixed');
+    const progressTime   = document.getElementById('progressTime');
+
+    // ==== Куда переходим после записи ====
+    function getVariantFromUrlOrState(){
       const q = new URLSearchParams(location.search);
       const vQ = (q.get('variant') || '').replace(/\D+/g,'');
       const vS = (sessionStorage.getItem('exam_variant') || '').replace(/\D+/g,'');
-      return vQ || vS || '1';
+      return vQ || vS || '';
     }
-    function inExamFlow() {
+    function inExamFlow(){
       const q = new URLSearchParams(location.search);
       return q.get('exam') === '1' || sessionStorage.getItem('exam_flow') === '1';
     }
-    function examsResultUrl() {
+    function examsResultUrl(){
       const root = location.pathname.replace(/\/task3\/.*/i, '/');
-      const variant = getVariantFromUrlOrState();
-      return `${root}exams_result.html?variant=${encodeURIComponent(variant)}`;
+      const v = getVariantFromUrlOrState();
+      return `${root}exams_result.html${v ? `?variant=${encodeURIComponent(v)}` : ''}`;
     }
-    function standaloneResultUrl() {
+    function standaloneResultUrl(){
       return /_3_task\.html$/i.test(location.pathname)
         ? location.pathname.replace(/_3_task\.html$/i, '_4_result.html')
         : location.pathname.replace(/\.html$/i, '_4_result.html');
     }
-    const NEXT_URL = inExamFlow() ? examsResultUrl() : standaloneResultUrl();
-    try {
+    const RESULT_URL = inExamFlow() ? examsResultUrl() : standaloneResultUrl();
+    try{
       if (new URLSearchParams(location.search).get('exam') === '1') {
-        sessionStorage.setItem('exam_flow', '1');
-        sessionStorage.setItem('exam_variant', getVariantFromUrlOrState());
+        sessionStorage.setItem('exam_flow','1');
+        const v = getVariantFromUrlOrState(); if (v) sessionStorage.setItem('exam_variant', v);
       }
-    } catch {}
+    }catch{}
 
-    // === DOM ===
-    const boxEl   = document.getElementById('readingBox');
-    const barEl   = document.getElementById('progressBarFixed');
-    const timeEl  = document.getElementById('progressTime');
-    const statusEl= document.getElementById('status');
-    const cdWrap  = document.getElementById('countdown');
-    const cdNum   = document.getElementById('countNum');
-    const progWrap= document.getElementById('progressContainerFixed');
+    /* === Микрофон и запись === */
+    let mediaRecorder = null, audioChunks = [], streamRef = null;
+    let chosenMime = '', hasStopped = false;
 
-    // === Состояние ===
-    const TOTAL_MS = 120_000; // 2:00
-    let mediaStream = null;
-    let mediaRec    = null;
-    let chunks      = [];
-    let rafId       = null;
-    let stopped     = false;
+    function pickMimeType(){
+      const candidates = [
+        'audio/webm;codecs=opus','audio/webm','audio/mp4',
+        'audio/ogg;codecs=opus','audio/ogg'
+      ];
+      for (const t of candidates){ if (window.MediaRecorder?.isTypeSupported?.(t)) return t; }
+      return '';
+    }
 
-    // Аудио-сигнал короткий
-    function beep(freq=880, dur=140, vol=0.25) {
+    async function initMic(){
+      // Сразу просим доступ, как в твоём Task 1
       try{
-        const AC = window.AudioContext || window.webkitAudioContext;
-        const a = new AC(), o = a.createOscillator(), g = a.createGain();
-        o.type='sine'; o.frequency.value=freq; g.gain.value=vol;
-        o.connect(g); g.connect(a.destination); o.start();
-        setTimeout(()=>{ o.stop(); a.close(); }, dur);
-      }catch{}
-    }
+        const stream = await navigator.mediaDevices.getUserMedia({ audio:true });
+        streamRef = stream;
+        chosenMime = pickMimeType();
+        mediaRecorder = chosenMime ? new MediaRecorder(stream, { mimeType: chosenMime }) : new MediaRecorder(stream);
 
-    function setStatus(text, warn=false){
-      statusEl.style.display = text ? 'block' : 'none';
-      statusEl.innerHTML = (mediaRec && mediaRec.state === 'recording')
-        ? `<span class="rec-dot" aria-hidden="true"></span>${text}`
-        : text;
-      statusEl.style.color = warn ? 'var(--danger)' : 'var(--muted-fg)';
-    }
+        mediaRecorder.ondataavailable = (e)=>{ if (e.data?.size) audioChunks.push(e.data); };
+        mediaRecorder.onstop = () => {
+          if (hasStopped) return;
+          hasStopped = true;
+          try{ streamRef?.getTracks()?.forEach(t=>t.stop()); }catch{}
+          const blobType = chosenMime || mediaRecorder.mimeType || 'audio/webm';
+          const audioBlob = new Blob(audioChunks, { type: blobType });
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            try{
+              // Сохраняем как Data URL — именно так ожидает exams_result.html
+              sessionStorage.setItem('oge3_audio_base64', reader.result);
+              sessionStorage.setItem('oge3_audio_mime', blobType);
+              const meta = JSON.parse(sessionStorage.getItem('oge3_meta') || '{}');
+              meta.recordedAt = Date.now();
+              sessionStorage.setItem('oge3_meta', JSON.stringify(meta));
+            }catch{}
+            navigateOnce(RESULT_URL);
+          };
+          reader.readAsDataURL(audioBlob);
+        };
 
-    function startTimer() {
-      try { cancelAnimationFrame(rafId); } catch {}
-      const startTs = performance.now();
-      const endTs = startTs + TOTAL_MS;
-      timeEl.textContent = '02:00';
-      barEl.style.width = '100%';
-      progWrap.style.visibility = 'visible';
-
-      const tick = (now) => {
-        const left = Math.max(0, endTs - now);
-        timeEl.textContent = fmtTime(left);
-        const pct = (left / TOTAL_MS) * 100;
-        barEl.style.width = Math.max(0, pct) + '%';
-        if (left <= 0) {
-          stopRecording('Время ответа закончилось.');
-          return;
-        }
-        rafId = requestAnimationFrame(tick);
-      };
-      rafId = requestAnimationFrame(tick);
-    }
-
-    function saveToSession(blob){
-      const reader = new FileReader();
-      reader.onloadend = ()=>{
-        const base64 = (reader.result || '').toString().split(',')[1] || '';
-        try{
-          sessionStorage.setItem('oge3_audio_base64', base64);
-          sessionStorage.setItem('oge3_audio_mime', blob.type || 'audio/webm');
-          const meta = JSON.parse(sessionStorage.getItem('oge3_meta') || '{}');
-          meta.recordedAt = Date.now();
-          sessionStorage.setItem('oge3_meta', JSON.stringify(meta));
-        }catch{}
-      };
-      reader.readAsDataURL(blob);
-    }
-
-    async function getMic(){
-      try{ return await navigator.mediaDevices.getUserMedia({ audio: true }); }
-      catch{
-        setStatus('Не удалось получить доступ к микрофону. Разрешите доступ и перезагрузите страницу.', true);
-        return null;
+        startCountdown(); // после готовности микрофона — старт отсчёта
+      }catch(err){
+        // Даже если доступа нет — не блокируем процесс (как у тебя в Task 1)
+        alert('❌ Не удалось получить доступ к микрофону: ' + (err?.message || err));
+        startCountdown();
       }
     }
 
-    async function startRecording() {
-      if (mediaRec && mediaRec.state === 'recording') return;
-      mediaStream = mediaStream || await getMic();
-      if (!mediaStream) return;
+    /* === Отсчёт 3-2-1-0 — как в Task 1 === */
+    let countdown = 3;
+    let cdInterval = 0;
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-      chunks = [];
-      mediaRec = new MediaRecorder(mediaStream, { mimeType: 'audio/webm' });
-      mediaRec.ondataavailable = e => { if (e.data && e.data.size) chunks.push(e.data); };
-      mediaRec.onstop = () => {
-        try{
-          const blob = new Blob(chunks, { type: mediaRec.mimeType || 'audio/webm' });
-          saveToSession(blob);
-        }catch{}
-      };
+    function startCountdown(){
+      timerEl.style.display = 'block';
+      timerEl.textContent = countdown;
+      cdInterval = setInterval(()=>{
+        timerEl.style.color = (countdown > 1) ? '#2b6cff' : '#b30000';
+        timerEl.textContent = countdown;
+        if (!reduceMotion){
+          timerEl.style.transform = 'scale(1.2)';
+          setTimeout(()=>{ timerEl.style.transform = 'scale(1)'; }, 200);
+        }
+        countdown--;
+        if (countdown < 0){
+          clearInterval(cdInterval);
+          startTask();
+        }
+      },1000);
+    }
+
+    /* === Таймер ответа 2:00 на rAF — как в Task 1 === */
+    const TOTAL_MS = 120_000;
+    let endTs = 0, rafId = 0, lastAnnounce = 0;
+
+    function startTask(){
+      instructionBox.style.display = 'block';
+      textBox.style.display        = 'block';
+      endBtn.style.display         = 'inline-block';
+      progressWrap.style.display   = 'block';
+      timerEl.style.display        = 'none';
+
+      audioChunks = [];
+      // отметим старт в метаданных
       try{
         const meta = JSON.parse(sessionStorage.getItem('oge3_meta') || '{}');
         meta.startedAt = Date.now();
         sessionStorage.setItem('oge3_meta', JSON.stringify(meta));
       }catch{}
 
-      mediaRec.start(250);
-      setStatus('Запись идёт. У вас 2 минуты.');
-      startTimer();
+      try{ if (mediaRecorder && mediaRecorder.state !== 'recording') mediaRecorder.start(); }catch{}
+
+      progressBar.classList.add('rAF');
+      endTs = performance.now() + TOTAL_MS;
+      progressTime.textContent = fmtTime(TOTAL_MS);
+      progressBar.style.width  = '100%';
+
+      tick();
+      endBtn.onclick = ()=> safeStopOrFinish();
     }
 
-    function stopRecording(reason='Запись остановлена.'){
-      if (stopped) return;
-      stopped = true;
-      try { cancelAnimationFrame(rafId); } catch {}
-      try { mediaRec && mediaRec.state === 'recording' && mediaRec.stop(); } catch {}
-      try { mediaStream && mediaStream.getTracks().forEach(t=>t.stop()); } catch {}
-      setStatus(reason);
-      setTimeout(()=> navigateOnce(NEXT_URL), 600);
+    function tick(){
+      const left = Math.max(0, endTs - performance.now());
+      progressBar.style.width = `${(left / TOTAL_MS) * 100}%`;
+      if (!lastAnnounce || performance.now() - lastAnnounce > 250){
+        progressTime.textContent = fmtTime(left);
+        lastAnnounce = performance.now();
+      }
+      if (left <= 0){ safeStopOrFinish(); }
+      else { rafId = requestAnimationFrame(tick); }
     }
 
-    // Отсчёт 3-2-1-0 с автостартом
-    async function runCountdownAndStart(){
-      const seq = ['3','2','1','0'];
-      let i = 0;
-      const step = () => {
-        if (i >= seq.length){
-          // скрываем оверлей, показываем задание, запускаем запись
-          cdWrap.style.display = 'none';
-          boxEl.style.display = 'block';
-          // чистим флаг автозапуска (если пришли из mic)
-          try { sessionStorage.removeItem('t3_autostart'); } catch {}
-          startRecording();
-          return;
+    function safeStopOrFinish(){
+      try{ cancelAnimationFrame(rafId); }catch{}
+      if (hasStopped){ navigateOnce(RESULT_URL); return; }
+      try{
+        if (mediaRecorder?.state === 'recording'){ mediaRecorder.stop(); }
+        else {
+          try{ streamRef?.getTracks()?.forEach(t=>t.stop()); }catch{}
+          navigateOnce(RESULT_URL);
         }
-        cdNum.textContent = seq[i++];
-        beep(880, 130, 0.25);
-        setTimeout(step, 1000);
-      };
-      step();
+      }catch{
+        try{ streamRef?.getTracks()?.forEach(t=>t.stop()); }catch{}
+        navigateOnce(RESULT_URL);
+      }
     }
 
-    // Автозапуск всего процесса
-    window.addEventListener('load', ()=>{
-      // Прячем текстовую панель до старта
-      boxEl.style.display = 'none';
-      setStatus('Подготовка…');
-      runCountdownAndStart();
+    window.addEventListener('beforeunload', ()=>{
+      try{ cancelAnimationFrame(rafId); }catch{}
+      try{ if (mediaRecorder?.state === 'recording') mediaRecorder.stop(); }catch{}
+      try{ streamRef?.getTracks()?.forEach(t=>t.stop()); }catch{}
     });
 
-    // BFCache unlock
-    window.addEventListener('pageshow', ()=>{ navigateOnce.lock = false; });
+    /* === BFCache: возврат → рестарт как в Task 1 === */
+    function isBackForwardNav(){
+      try{
+        const nav = performance.getEntriesByType('navigation')[0];
+        return nav && nav.type === 'back_forward';
+      }catch{ return false; }
+    }
+    function resetAndRestart(){
+      try { cancelAnimationFrame(rafId); } catch {}
+      try { clearInterval(cdInterval); } catch {}
+      try { if (mediaRecorder?.state === 'recording') mediaRecorder.stop(); } catch {}
+      try { streamRef?.getTracks()?.forEach(t=>t.stop()); } catch {}
 
-    // Безопасность: уход со страницы — останавливаем запись
-    window.addEventListener('beforeunload', ()=>{ try{ if(mediaRec && mediaRec.state==='recording') mediaRec.stop(); }catch{} });
+      timerEl.style.display        = 'block';
+      timerEl.textContent          = '3';
+      instructionBox.style.display = 'none';
+      textBox.style.display        = 'none';
+      endBtn.style.display         = 'none';
+      progressWrap.style.display   = 'none';
+      progressBar.style.width      = '100%';
+      progressTime.textContent     = fmtTime(TOTAL_MS);
+
+      audioChunks = [];
+      hasStopped  = false;
+      countdown   = 3;
+
+      initMic();
+    }
+    window.addEventListener('pageshow', (e)=>{
+      try { navigateOnce.lock = false; } catch {}
+      if (e.persisted || isBackForwardNav()) resetAndRestart();
+    });
+
+    window.onload = initMic;
   </script>
 </body>
 </html>

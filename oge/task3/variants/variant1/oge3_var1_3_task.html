@@ -2,43 +2,16 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <title>Task 2 — Questions</title>
+  <title>OGE Task 3 — Speaking</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <!-- Шрифт -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
-  <!-- Общие стили проекта -->
+  <!-- Общие стили -->
   <link rel="stylesheet" href="../../../style_common.css" />
-
-  <style>
-    .q-layout{
-      display:grid;
-      grid-template-columns: 1.05fr 0.95fr;
-      gap:28px 36px;
-      align-items:start;
-      max-width:1500px;
-      margin-inline:auto;
-    }
-    .q-left h2{ margin:0 0 10px; font-size:28px; line-height:1.2; }
-    .q-left p{ font-size:22px; line-height:1.55; margin:0 0 10px; }
-
-    .ad-title{ font-weight:800; font-size:30px; margin:6px 0 12px; text-align:center; }
-    .ad-figure{ width:100%; aspect-ratio:3/2; border-radius:12px; overflow:hidden; box-shadow:var(--shadow); background:#ddd; }
-    .ad-figure>img{ width:100%; height:100%; object-fit:cover; object-position:center; display:block; }
-
-    .actions{ grid-column:1 / -1; text-align:center; margin-top:10px; margin-bottom:6px; display:none; }
-
-    @media (max-width:1100px){ .q-layout{ grid-template-columns:1fr; gap:22px; } }
-
-    .timer{
-      font-size:70px; margin:30px 0; font-weight:700;
-      color:var(--primary); letter-spacing:4px; text-shadow:0 4px 12px rgba(0,0,0,.25);
-      text-align:center;
-    }
-  </style>
 
   <!-- Анти-мигание темы -->
   <script>
@@ -49,355 +22,250 @@
       }catch(_){}
     })();
   </script>
+
+  <style>
+    .reading-box{
+      background:var(--card);
+      border:1px solid #ccc;
+      border-radius:12px;
+      box-shadow:var(--shadow);
+      padding:24px 28px;
+      text-align:left;
+      font-family: Inter, system-ui, Segoe UI, Roboto, Arial, sans-serif;
+      font-size:22px;
+      line-height:1.7;
+      max-width:1200px;
+      margin:0 auto 18px;
+    }
+    .reading-box ul{ margin: 12px 0 0 22px; }
+    .reading-box li{ margin: 6px 0; }
+
+    .status{
+      max-width: 900px; margin: 12px auto 20px; text-align:center;
+      font-family: Inter, system-ui, Segoe UI, Roboto, Arial, sans-serif;
+      color: var(--muted-fg);
+      font-size: 14px;
+    }
+
+    .controls{ text-align:center; margin:18px 0 8px; }
+    .controls .button{ display:inline-block; min-width:220px; }
+    .small{ font-size: 13px; color: var(--muted-fg); margin-top: 6px; }
+
+    /* Иконка записи */
+    .rec-dot{
+      display:inline-block; width:10px; height:10px; border-radius:50%;
+      background:#ef4444; box-shadow:0 0 0 0 rgba(239,68,68,.6);
+      animation:pulse 1.4s infinite; vertical-align: middle; margin-right:8px;
+    }
+    @keyframes pulse{
+      0%{ box-shadow:0 0 0 0 rgba(239,68,68,.6); }
+      70%{ box-shadow:0 0 0 10px rgba(239,68,68,0); }
+      100%{ box-shadow:0 0 0 0 rgba(239,68,68,0); }
+    }
+  </style>
 </head>
 <body>
-  <!-- Переключатель темы -->
+  <!-- Тумблер темы -->
   <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
 
-  <!-- Плеер для MP3 с вопросами -->
-  <audio id="qAudio" preload="auto" playsinline webkit-playsinline></audio>
+  <div class="content-wrapper">
+    <div class="task-container" role="region" aria-labelledby="taskTitle">
+      <p id="taskTitle" style="margin-top:0;">
+        <strong>Task 3.</strong> You are going to give a talk. You must speak for not more than <strong>2 minutes</strong> (10–12 sentences).
+      </p>
+    </div>
 
-  <!-- ВЕРХ: отсчёт 3-2-1 -->
-  <div class="content-wrapper" id="countdownWrap">
-    <div id="timer" class="timer" aria-live="polite">3</div>
+    <!-- План монолога (без "Topic:") -->
+    <section class="reading-box" aria-label="План монолога">
+      <p>You are going to give a talk about animals. You will have to start in 1.5 minutes and speak for not more than 2 minutes (10–12 sentences). Remember to say:</p>
+      <ul>
+        <li>what wild animals live in your region;</li>
+        <li>whether it is a good idea to keep a wild animal as a pet, and why;</li>
+        <li>why people build zoos in cities and towns;</li>
+        <li>what your attitude to zoos is.</li>
+      </ul>
+      <p>You have to talk continuously.</p>
+    </section>
+
+    <!-- Контроль записи -->
+    <div class="controls">
+      <button id="startBtn" class="button" type="button" aria-label="Начать запись" hidden>Начать запись</button>
+      <button id="stopBtn" class="button danger" type="button" aria-label="Остановить запись" hidden>Остановить запись</button>
+      <div class="small" id="hint">Если запись не началась автоматически, нажмите «Начать запись».</div>
+    </div>
+
+    <!-- Статус -->
+    <div class="status" id="status">Ожидание разрешения на доступ к микрофону…</div>
   </div>
 
-  <!-- ОСНОВНОЙ БЛОК -->
-  <main class="page-center" id="mainWrap" style="display:none">
-    <section class="card task-card">
-      <div class="q-layout">
-        <!-- Лево — текст вопроса -->
-        <section class="q-left" aria-live="polite">
-          <h2 id="qTitle">Question 1.</h2>
-          <p id="qLine">1) Ask a direct question about the following: <b>location</b></p>
-        </section>
+  <div style="height: calc(var(--footer-h) + 24px);"></div>
 
-        <!-- Право — заголовок и картинка (можно тоже вынести в общую папку) -->
-        <aside aria-label="Advertisement">
-          <h3 class="ad-title" id="adTitle">Join our swimming club!</h3>
-          <figure class="ad-figure">
-            <img id="adImg" src="1.jpg" alt="image" loading="lazy">
-          </figure>
-        </aside>
-
-        <!-- Кнопка действия (появляется ТОЛЬКО во время ответа) -->
-        <div class="actions" id="actionsWrap">
-          <button id="nextBtn" class="button" type="button">Далее</button>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <!-- Проставка, чтобы фикс-бар не наезжал -->
-  <div style="height: calc(var(--footer-h, 72px) + 24px);"></div>
-
-  <!-- Фиксированный прогресс-бар снизу (20 сек) -->
-  <div id="progressContainerFixed" role="timer" aria-live="polite" style="display:none">
+  <!-- Фиксированный прогресс-бар ответа (2:00) -->
+  <div id="progressContainerFixed" role="timer" aria-live="polite" aria-atomic="true" aria-label="Оставшееся время ответа">
     <div id="progressBarFixed" class="rAF">
-      <span id="progressTime" class="progress-time">00:20</span>
+      <span id="progressTime" class="progress-time">02:00</span>
     </div>
   </div>
 
-  <!-- ЛОГИКА -->
   <script type="module">
     import { toggleThemeInit, navigateOnce, fmtTime } from "../../../common.js";
+
     toggleThemeInit();
 
-    /* ===== Маршрутизация и режимы ===== */
-    const inExam        = (sessionStorage.getItem('exam_flow') === '1');
-    const varFromSS     = sessionStorage.getItem('exam_variant') || '';
-    const varFromURL    = (()=>{ const m = location.pathname.match(/var(?:iant)?(\d+)/i); return m ? m[1] : ''; })();
-    const EXAM_VARIANT  = varFromSS || varFromURL || '';
-    const RESULT_URL    = location.pathname.replace(/_3_task\.html$/i, '_4_result.html');
-    const EXAM_NEXT_URL = `../../../exams_countdown.html?next=3&variant=${encodeURIComponent(EXAM_VARIANT)}`;
-    const MIC_URL       = location.pathname.replace(/_3_task\.html$/i, '_2_mic.html');
+    // === Константы ===
+    const TOTAL_MS = 120_000; // 2:00
+    const NEXT_URL = /_3_task\.html$/i.test(location.pathname)
+      ? location.pathname.replace(/_3_task\.html$/i, '_4_result.html')
+      : location.pathname.replace(/\.html$/i, '_4_result.html');
 
-    /* ===== Единая база для общих ресурсов из /task2/variants/ =====
-       /task2/variants/variantN/FILE.html → /task2/variants/
-    */
-    function getVariantsBase(){
-      const m = location.pathname.match(/^(.*?\/task2\/variants)\/variant\d+\/[^/]+$/i);
-      if (m) return m[1] + '/';
-      // fallback: найти последний /variants/
-      const i = location.pathname.toLowerCase().lastIndexOf('/variants/');
-      return (i !== -1) ? location.pathname.slice(0, i + '/variants/'.length) : './';
-    }
-    const VARIANTS_BASE = getVariantsBase();
+    // === DOM ===
+    const barEl   = document.getElementById('progressBarFixed');
+    const timeEl  = document.getElementById('progressTime');
+    const statusEl= document.getElementById('status');
+    const startBtn= document.getElementById('startBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const hintEl  = document.getElementById('hint');
 
-    /* ===== Анти-рефреш (как и раньше: при reload → на MIC) ===== */
-    function isReload(){
-      try{
-        const nav = performance.getEntriesByType('navigation')[0];
-        return nav && nav.type === 'reload';
-      }catch{
-        return (performance && performance.navigation && performance.navigation.type === 1);
-      }
-    }
-    if (isReload() && !sessionStorage.getItem('t2_reload_redirected')){
-      try { sessionStorage.setItem('t2_reload_redirected','1'); } catch {}
-      try { sessionStorage.setItem('t2_autostart','1'); } catch {}
-      location.replace(MIC_URL);
-      throw new Error('Redirecting to mic after reload');
-    }
+    // === Состояние ===
+    let mediaStream = null;
+    let mediaRec    = null;
+    let chunks      = [];
+    let timerId     = null;
+    let startTs     = 0;
+    let stopped     = false;
 
-    /* ===== Очистка предыдущей записи ===== */
-    try{
-      sessionStorage.removeItem('ege2_audio_base64');
-      sessionStorage.removeItem('ege2_audio_mime');
-      sessionStorage.removeItem('ege2_audio_parts');
-    }catch{}
+    // Обновление прогресса (rAF)
+    function startTimer() {
+      try { cancelAnimationFrame(timerId); } catch {}
+      startTs = performance.now();
+      const endTs = startTs + TOTAL_MS;
 
-    /* ===== Вопросы текущего варианта ===== */
-    const QUESTIONS = [
-      { title: "Question 1.", line: "1) Ask a direct question about the following: <b>location</b>" },
-      { title: "Question 2.", line: "2) Ask a direct question about the following: <b>timetable</b>" },
-      { title: "Question 3.", line: "3) Ask a direct question about the following: <b>coaches for beginners</b>" },
-      { title: "Question 4.", line: "4) Ask a direct question about the following: <b>membership fee</b>" }
-    ];
-
-    /* ===== DOM ===== */
-    const countdownWrap = document.getElementById('countdownWrap');
-    const mainWrap = document.getElementById('mainWrap');
-    const timerEl  = document.getElementById('timer');
-    const qTitleEl = document.getElementById('qTitle');
-    const qLineEl  = document.getElementById('qLine');
-    const nextBtn  = document.getElementById('nextBtn');
-    const actionsWrap = document.getElementById('actionsWrap');
-    const barWrap  = document.getElementById('progressContainerFixed');
-    const barEl    = document.getElementById('progressBarFixed');
-    const timeEl   = document.getElementById('progressTime');
-    const qAudio   = document.getElementById('qAudio');
-    const adImg    = document.getElementById('adImg');
-
-    const QUESTION_MS = 20_000;
-
-    /* ===== Аудио вопроса из общей папки /task2/variants/ ===== */
-    const AUDIO_SRC = [
-      `${VARIANTS_BASE}q1.mp3`,
-      `${VARIANTS_BASE}q2.mp3`,
-      `${VARIANTS_BASE}q3.mp3`,
-      `${VARIANTS_BASE}q4.mp3`,
-    ];
-
-    /* (опционально) Картинку тоже можно хранить единую: pool.jpg в /task2/variants/ */
-    // adImg.src = `${VARIANTS_BASE}pool.jpg`;
-
-    function renderQuestion(){
-      const q = QUESTIONS[qIdx];
-      qTitleEl.textContent = q.title;
-      qLineEl.innerHTML = q.line;
-    }
-
-    // Перед окном ответа проигрываем «Question N»
-    async function playQuestionAudio(n){
-      try{ qAudio.pause(); qAudio.currentTime = 0; }catch{}
-      qAudio.src = AUDIO_SRC[n-1];
-      try{
-        await qAudio.play();
-      }catch{
-        showUnlockOverlay(() => qAudio.play().catch(()=>{}));
-      }
-    }
-
-    /* ===== Микрофон ===== */
-    let streamRef=null, recorder=null, chosenMime='', recChunks=[];
-    function pickMimeType(){
-      const c=['audio/webm;codecs=opus','audio/webm','audio/ogg;codecs=opus','audio/ogg','audio/mp4'];
-      for (const t of c) if (window.MediaRecorder?.isTypeSupported?.(t)) return t;
-      return '';
-    }
-    async function initMic(){
-      streamRef = await navigator.mediaDevices.getUserMedia({ audio:true });
-      chosenMime = pickMimeType();
-      recorder = chosenMime ? new MediaRecorder(streamRef,{mimeType:chosenMime}) : new MediaRecorder(streamRef);
-      recChunks = [];
-      recorder.ondataavailable = e => { if (e.data && e.data.size) recChunks.push(e.data); };
-      recorder.start(1000);
-    }
-
-    /* ===== Состояния ===== */
-    let qIdx=0, answering=false, finishing=false;
-    let startedAt=0, deadlineMs=0, rafId=0, intId=0, hardTO=0;
-
-    function startAnswerWindow(){
-      barWrap.style.display = 'block';
-      actionsWrap.style.display = 'block';
-      nextBtn.textContent = (qIdx === QUESTIONS.length-1) ? 'Закончить' : 'Дальше';
-      timeEl.textContent = fmtTime(QUESTION_MS);
-      barEl.style.width = '100%';
-      answering = true;
-      startedAt = performance.now();
-      deadlineMs = startedAt + QUESTION_MS;
-
-      stopClocks();
-      tickRaf();
-      intId = setInterval(tickWall, 250);
-      hardTO = setTimeout(()=>{ if(answering) endAnswerWindow(); }, QUESTION_MS + 1500);
-    }
-
-    function tickRaf(){
-      const left = Math.max(0, deadlineMs - performance.now());
-      barEl.style.width = (left/QUESTION_MS*100)+'%';
-      if (!tickRaf._last || performance.now()-tickRaf._last>=250){
+      function tick(now){
+        const left = Math.max(0, endTs - now);
         timeEl.textContent = fmtTime(left);
-        tickRaf._last = performance.now();
-      }
-      if (left<=0){ endAnswerWindow(); }
-      else { rafId = requestAnimationFrame(tickRaf); }
-    }
-    function tickWall(){
-      const left = deadlineMs - performance.now();
-      if (left<=0) endAnswerWindow();
-      else timeEl.textContent = fmtTime(Math.max(0,left));
-    }
-    function stopClocks(){
-      if (rafId){ cancelAnimationFrame(rafId); rafId=0; }
-      if (intId){ clearInterval(intId); intId=0; }
-      if (hardTO){ clearTimeout(hardTO); hardTO=0; }
-    }
-    function endAnswerWindow(){
-      if (!answering) return;
-      answering = false;
-      stopClocks();
-      actionsWrap.style.display = 'none';
-      proceedNext();
-    }
+        const pct = (left / TOTAL_MS) * 100;
+        barEl.style.width = Math.max(0, pct) + '%';
 
-    nextBtn.addEventListener('click', () => endAnswerWindow());
-    qAudio.addEventListener('ended', startAnswerWindow);
-    qAudio.addEventListener('error', startAnswerWindow);
-
-    function proceedNext(){
-      qIdx++;
-      if (qIdx < QUESTIONS.length){
-        renderQuestion();
-        playQuestionAudio(qIdx+1);
-      }else{
-        finishAll();
-      }
-    }
-
-    async function finishAll(){
-      if (finishing) return;
-      finishing = true;
-      stopClocks();
-      try{ qAudio.pause(); }catch{}
-      try{
-        if (recorder && recorder.state !== 'inactive'){
-          recorder.onstop = saveAndGo;
-          recorder.stop();
-        }else{ saveAndGo(); }
-      }catch{ saveAndGo(); }
-    }
-
-    async function saveAndGo(){
-      try{
-        await new Promise(r=>setTimeout(r,0));
-        const blob = recChunks && recChunks.length ? new Blob(recChunks, { type: chosenMime || 'audio/webm' }) : null;
-        if (blob){
-          const reader = new FileReader();
-          reader.onloadend = () => {
-            try{
-              sessionStorage.setItem('ege2_audio_base64', reader.result.toString());
-              sessionStorage.setItem('ege2_audio_mime', blob.type || 'audio/webm');
-            }catch{}
-            cleanupAndNavigate();
-          };
-          reader.readAsDataURL(blob);
-        }else{ cleanupAndNavigate(); }
-      }catch{ cleanupAndNavigate(); }
-    }
-
-    function cleanupAndNavigate(){
-      try{ streamRef?.getTracks()?.forEach(t=>t.stop()); }catch{}
-      try{ sessionStorage.removeItem('t2_autostart'); }catch{}
-      try{ sessionStorage.removeItem('t2_reload_redirected'); }catch{}
-      navigateOnce(inExam ? EXAM_NEXT_URL : RESULT_URL);
-    }
-
-    /* ===== Старт страницы ===== */
-    function startCountdown(){
-      // заранее грузим 1-й трек
-      try{ qAudio.src = AUDIO_SRC[0]; qAudio.load(); }catch{}
-
-      let n = 3;
-      timerEl.textContent = n;
-      const id = setInterval(()=>{
-        timerEl.textContent = n;
-        n--;
-        if (n < 0){
-          clearInterval(id);
-          countdownWrap.style.display = 'none';
-          mainWrap.style.display = 'block';
-          startFlow();
+        if (left <= 0) {
+          stopRecording('Время ответа закончилось.');
+          return;
         }
-      }, 1000);
+        timerId = requestAnimationFrame(tick);
+      }
+      timerId = requestAnimationFrame(tick);
     }
 
-    async function startFlow(){
-      qIdx = 0;
-      renderQuestion();
-
+    async function getMic(){
       try{
-        await initMic();
-        if (sessionStorage.getItem('t2_autostart') === '1'){
-          // Chrome уже разрешит play после getUserMedia
-        }
-        await playQuestionAudio(1);
+        return await navigator.mediaDevices.getUserMedia({ audio: true });
       }catch(err){
-        console.warn('Mic init error:', err);
-        playQuestionAudio(1);
+        status('Не удалось получить доступ к микрофону. Разрешите доступ и перезагрузите страницу.', true);
+        startBtn.hidden = false; // позволим попробовать ещё раз
+        return null;
       }
-      try { sessionStorage.removeItem('t2_reload_redirected'); } catch {}
     }
 
-    function freshStart(){
-      countdownWrap.style.display = 'block';
-      mainWrap.style.display = 'none';
-      actionsWrap.style.display = 'none';
-      barWrap.style.display = 'none';
-      stopClocks(); answering=false; finishing=false;
-      startCountdown();
+    function status(text, warn=false){
+      statusEl.innerHTML = (mediaRec && mediaRec.state === 'recording')
+        ? `<span class="rec-dot" aria-hidden="true"></span>${text}`
+        : text;
+      statusEl.style.color = warn ? 'var(--danger)' : 'var(--muted-fg)';
     }
-    freshStart();
 
-    /* ===== Разблокировка автоплея по клику ===== */
-    function showUnlockOverlay(onUnlock){
-      if (document.getElementById('unlock-audio')) return;
-      const wrap = document.createElement('div');
-      wrap.id = 'unlock-audio';
-      wrap.style.cssText = 'position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.35);z-index:10000;';
-      const btn = document.createElement('button');
-      btn.className = 'button';
-      btn.textContent = 'Нажмите, чтобы включить звук';
-      wrap.appendChild(btn);
-      document.body.appendChild(wrap);
-      const unlock = async () => {
-        wrap.remove();
-        try{ await initMic(); }catch{}
-        if (onUnlock) onUnlock();
+    function saveToSession(blob){
+      const reader = new FileReader();
+      reader.onloadend = ()=>{
+        const base64 = (reader.result || '').toString().split(',')[1] || '';
+        try{
+          sessionStorage.setItem('oge3_audio_base64', base64);
+          sessionStorage.setItem('oge3_audio_mime', blob.type || 'audio/webm');
+          const meta = JSON.parse(sessionStorage.getItem('oge3_meta') || '{}');
+          meta.recordedAt = Date.now();
+          meta.durationMs = Math.min(TOTAL_MS, Date.now() - (meta.startedAt || Date.now()));
+          sessionStorage.setItem('oge3_meta', JSON.stringify(meta));
+        }catch{}
       };
-      btn.addEventListener('click', unlock, { once:true });
-      btn.addEventListener('touchstart', unlock, { once:true, passive:true });
+      reader.readAsDataURL(blob);
     }
 
-    /* ===== Возврат/вперёд в истории ===== */
-    function isBackForward(){
+    async function startRecording() {
+      if (mediaRec && mediaRec.state === 'recording') return;
+      status('Запись началась. Говорите чётко и по плану.');
+
+      mediaStream = mediaStream || await getMic();
+      if (!mediaStream) return;
+
+      chunks = [];
+      mediaRec = new MediaRecorder(mediaStream, { mimeType: 'audio/webm' });
+      mediaRec.ondataavailable = e => { if (e.data && e.data.size) chunks.push(e.data); };
+      mediaRec.onstop = () => {
+        try{
+          const blob = new Blob(chunks, { type: mediaRec.mimeType || 'audio/webm' });
+          saveToSession(blob);
+        }catch{}
+      };
+
+      // Метаданные
       try{
-        const nav = performance.getEntriesByType('navigation')[0];
-        return nav && nav.type === 'back_forward';
-      }catch{ return false; }
+        const meta = JSON.parse(sessionStorage.getItem('oge3_meta') || '{}');
+        meta.startedAt = Date.now();
+        sessionStorage.setItem('oge3_meta', JSON.stringify(meta));
+      }catch{}
+
+      mediaRec.start(250); // буферизация
+      startTimer();
+
+      // UI
+      startBtn.hidden = true;
+      stopBtn.hidden  = false;
+      hintEl.textContent = 'Остановите запись по необходимости. Иначе запись остановится автоматически через 2:00.';
     }
-    window.addEventListener('pageshow', (e)=>{
-      if (e.persisted || isBackForward()){
-        freshStart();
+
+    function stopRecording(reason='Запись остановлена.'){
+      if (stopped) return;
+      stopped = true;
+
+      try { cancelAnimationFrame(timerId); } catch {}
+      try { mediaRec && mediaRec.state === 'recording' && mediaRec.stop(); } catch {}
+      try { mediaStream && mediaStream.getTracks().forEach(t=>t.stop()); } catch {}
+
+      stopBtn.hidden = true;
+      status(reason);
+      // Переход к результату с защитой
+      setTimeout(()=> navigateOnce(NEXT_URL), 800);
+    }
+
+    // Кнопки
+    startBtn.addEventListener('click', startRecording);
+    stopBtn.addEventListener('click', ()=> stopRecording('Вы остановили запись.'));
+
+    // Автозапуск, если пришли с mic-страницы
+    window.addEventListener('load', async ()=>{
+      timeEl.textContent = '02:00';
+      barEl.style.width = '100%';
+      const auto = (sessionStorage.getItem('t3_autostart') === '1');
+
+      // Пытаемся стартовать автоматически
+      if (auto) {
+        await startRecording();
+        // Сбросим флаг, чтобы не зацикливалось
+        try { sessionStorage.removeItem('t3_autostart'); } catch {}
+      }
+
+      // Если автозапуск не удался — покажем кнопку Старт
+      if (!mediaRec || mediaRec.state !== 'recording') {
+        startBtn.hidden = false;
+        status('Нажмите «Начать запись», чтобы приступить к ответу.');
+      } else {
+        status('Запись идёт. У вас 2 минуты.');
       }
     });
 
-    window.addEventListener('beforeunload', ()=>{
-      try{ if (recorder && recorder.state==='recording') recorder.stop(); }catch{}
-      try{ streamRef?.getTracks()?.forEach(t=>t.stop()); }catch{}
-    });
+    // BFCache unlock
+    window.addEventListener('pageshow', () => { navigateOnce.lock = false; });
+
+    // Безопасность: уход со страницы — останавливаем запись
+    window.addEventListener('beforeunload', ()=>{ try{ if(mediaRec && mediaRec.state==='recording') mediaRec.stop(); }catch{} });
   </script>
 </body>
 </html>

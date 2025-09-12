@@ -2,35 +2,62 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <title>ОГЭ — Задание 3: монолог</title>
+  <title>OGE Task 3 — Preparation</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- Шрифты -->
+  <!-- Шрифт Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
-  <!-- Общие стили проекта -->
+  <!-- Общие стили -->
   <link rel="stylesheet" href="../../../style_common.css" />
 
+  <!-- Анти-мигание темы -->
+  <script>
+    (function(){
+      try{
+        const saved = localStorage.getItem('pref-theme') || 'light';
+        if (saved === 'dark') document.documentElement.classList.add('dark');
+      }catch(_){}
+    })();
+  </script>
+
   <style>
-    .task-container { max-width: 900px; margin: 0 auto; padding: 30px; }
-    .task-box { background: #f9f9f9; border-radius: 12px; padding: 20px; margin-bottom: 20px; }
-    .timer { font-size: 1.5rem; margin: 15px 0; }
-    .buttons { display: flex; gap: 10px; flex-wrap: wrap; }
-    button { padding: 10px 20px; border: none; border-radius: 8px; font-size: 1rem; cursor: pointer; }
-    button.start { background: #4caf50; color: #fff; }
-    button.answer { background: #2196f3; color: #fff; }
-    button.stop { background: #f44336; color: #fff; }
-    .progress-bar { width: 100%; height: 12px; background: #ddd; border-radius: 6px; overflow: hidden; margin-top: 10px; }
-    .progress { height: 100%; width: 0; background: #4caf50; transition: width 1s linear; }
+    .reading-box{
+      background:var(--card);
+      border:1px solid #ccc;
+      border-radius:12px;
+      box-shadow:var(--shadow);
+      padding:24px 28px;
+      text-align:left;
+      font-family: Inter, system-ui, Segoe UI, Roboto, Arial, sans-serif;
+      font-size:25px;
+      line-height:1.7;
+      max-width:1200px;
+      margin:0 auto 24px;
+    }
+    .reading-box ul{ margin: 12px 0 0 22px; }
+    .reading-box li{ margin: 6px 0; }
+    @media (max-width:900px){
+      .reading-box{ font-size:18px; padding:18px 16px; max-width:100%; }
+    }
   </style>
 </head>
 <body>
-  <div class="task-container">
-    <h1>ОГЭ — Задание 3: монолог</h1>
-    <div class="task-box">
-      <p><strong>Task 3.</strong> You are going to give a talk about <em>animals</em>. You will have to start in 1.5 minutes and speak for not more than 2 minutes (10–12 sentences). Remember to say:</p>
+  <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
+
+  <div class="content-wrapper">
+    <div class="task-container" role="region" aria-labelledby="taskTitle">
+      <p id="taskTitle" style="margin-top:0;">
+        <strong>Task 3.</strong> You are going to give a talk. 
+        You have <strong>1.5 minutes</strong> to prepare, then you will have to speak for not more than <strong>2 minutes</strong> (10–12 sentences).
+      </p>
+    </div>
+
+    <!-- Рамка с планом монолога -->
+    <div class="reading-box" id="readingBox" aria-label="План монолога">
+      <p>You are going to give a talk about animals. You will have to start in 1.5 minutes and speak for not more than 2 minutes (10–12 sentences). Remember to say:</p>
       <ul>
         <li>what wild animals live in your region;</li>
         <li>whether it is a good idea to keep a wild animal as a pet, and why;</li>
@@ -40,77 +67,66 @@
       <p>You have to talk continuously.</p>
     </div>
 
-    <div class="controls">
-      <div class="timer" id="timer">01:30</div>
-      <div class="progress-bar"><div class="progress" id="progress"></div></div>
-      <div class="buttons">
-        <button class="start" onclick="startPreparation()">Старт подготовки</button>
-        <button class="answer" onclick="startAnswer()" disabled>Начать ответ</button>
-        <button class="stop" onclick="stopAll()" disabled>Остановить запись</button>
-      </div>
+    <div style="text-align:center; margin:22px 0 30px;">
+      <button id="goBtn" class="button" type="button" aria-label="Перейти к выполнению">Перейти к выполнению</button>
     </div>
   </div>
 
-  <script>
-    let timerEl = document.getElementById("timer");
-    let progressEl = document.getElementById("progress");
-    let prepTime = 90; // 1.5 min
-    let answerTime = 120; // 2 min
-    let interval, total, phase;
+  <div style="height: calc(var(--footer-h) + 24px);"></div>
 
-    function startPreparation() {
-      phase = "prep";
-      total = prepTime;
-      document.querySelector(".answer").disabled = true;
-      document.querySelector(".stop").disabled = true;
-      runTimer();
+  <!-- Фиксированный прогресс-бар подготовки -->
+  <div id="progressContainerFixed" role="timer" aria-live="polite" aria-atomic="true" aria-label="Оставшееся время подготовки">
+    <div id="progressBarFixed" class="rAF">
+      <span id="progressTime" class="progress-time">01:30</span>
+    </div>
+  </div>
+
+  <script type="module">
+    import { toggleThemeInit, navigateOnce, startPrepareTimer, fmtTime } from "../../../common.js";
+
+    toggleThemeInit();
+
+    // Переход на страницу записи ответа (mic)
+    const NEXT_URL = location.pathname.replace(/_1_prepare\.html$/i, '_2_mic.html');
+    document.getElementById('goBtn')?.addEventListener('click', () => navigateOnce(NEXT_URL));
+
+    // Флаги подготовки для Task 3
+    try{
+      sessionStorage.setItem('oge3_prepared', '1');
+      sessionStorage.setItem('oge3_meta', JSON.stringify({
+        preparedAt: Date.now(),
+        prepareDurationSec: 90
+      }));
+    }catch{}
+
+    // 90 секунд — время подготовки
+    const TOTAL_MS = 90_000;
+    const barEl  = document.getElementById('progressBarFixed');
+    const timeEl = document.getElementById('progressTime');
+    let stopTimer = null;
+
+    function startTimerFresh(){
+      timeEl.textContent = fmtTime(TOTAL_MS);
+      barEl.style.width  = '100%';
+      try { stopTimer?.(); } catch {}
+      stopTimer = startPrepareTimer({
+        barEl,
+        timeEl,
+        totalMs: TOTAL_MS,
+        nextUrl: NEXT_URL,
+        key: 'oge3_prepare_end',
+        persist: false,
+        textEveryMs: 250,
+        useRAF: true
+      });
     }
+    startTimerFresh();
 
-    function startAnswer() {
-      phase = "answer";
-      total = answerTime;
-      document.querySelector(".answer").disabled = true;
-      document.querySelector(".stop").disabled = false;
-      runTimer();
-    }
-
-    function stopAll() {
-      clearInterval(interval);
-      timerEl.textContent = "Остановлено";
-      progressEl.style.width = "0";
-      document.querySelector(".stop").disabled = true;
-    }
-
-    function runTimer() {
-      clearInterval(interval);
-      let remaining = total;
-      updateDisplay(remaining);
-
-      interval = setInterval(() => {
-        remaining--;
-        if (remaining <= 0) {
-          clearInterval(interval);
-          if (phase === "prep") {
-            timerEl.textContent = "Время подготовки закончилось!";
-            document.querySelector(".answer").disabled = false;
-          } else {
-            timerEl.textContent = "Время ответа закончилось!";
-            document.querySelector(".stop").disabled = true;
-          }
-          progressEl.style.width = "0";
-        } else {
-          updateDisplay(remaining);
-        }
-      }, 1000);
-    }
-
-    function updateDisplay(sec) {
-      let m = Math.floor(sec / 60);
-      let s = sec % 60;
-      timerEl.textContent = `${m.toString().padStart(2,"0")}:${s.toString().padStart(2,"0")}`;
-      let percent = ((total - sec) / total) * 100;
-      progressEl.style.width = percent + "%";
-    }
+    // Повторный заход из bfcache
+    window.addEventListener('pageshow', (e)=>{
+      try { navigateOnce.lock = false; } catch {}
+      if (e.persisted) startTimerFresh();
+    });
   </script>
 </body>
 </html>

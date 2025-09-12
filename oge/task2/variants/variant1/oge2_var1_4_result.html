@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <title id="pageTitle">Результат — Задание 3</title>
+  <title id="pageTitle">Результат — Задание 2</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <!-- Шрифт -->
@@ -91,19 +91,20 @@
       <a class="btn" id="repeatBtn" href="#" role="button" aria-label="Повторить этот вариант">🔁 Повторить этот вариант</a>
     </div>
 
-    <!-- Карточка с условием и вопросами Task 3 -->
+    <!-- Карточка с условием и вопросами Task 2 -->
     <div class="task-container" aria-labelledby="taskTitle">
-      <b id="taskTitle">Task 3. You are going to give an interview.</b>
+      <b id="taskTitle">Task 2. You are going to take part in a telephone survey.</b>
       <div style="margin-top:10px;">
-        You have to answer five questions. Give full answers to the questions (2–3 sentences).
+        You have to answer six questions. Give full answers to the questions.
         Remember that you have 40 seconds to answer each question.
       </div>
       <ul>
-        <li>1. Why do people like visiting zoos?</li>
-        <li>2. What useful functions can modern zoos have?</li>
-        <li>3. Do you think zoos really help protect endangered animals? Why or why not?</li>
-        <li>4. What are the positive and negative sides of keeping animals in zoos?</li>
-        <li>5. Would you prefer to see wild animals in a zoo or in their natural habitat? Why?</li>
+        <li>1. [вопрос 1]</li>
+        <li>2. [вопрос 2]</li>
+        <li>3. [вопрос 3]</li>
+        <li>4. [вопрос 4]</li>
+        <li>5. [вопрос 5]</li>
+        <li>6. [вопрос 6]</li>
       </ul>
     </div>
 
@@ -118,9 +119,9 @@
   <script type="module">
     import { toggleThemeInit, navigateOnce, examModeInit } from '../../../common.js';
     toggleThemeInit();
-    examModeInit(); // синхронизирует exam_flow по ?exam=1 (или сбросит, если параметра нет)
+    examModeInit(); // синх по ?exam=1
 
-    /* === Экзамен полностью: после Task 3 → отсчёт перед Task 4 === */
+    /* === Экзамен полностью: при exam=1 уходим на общий отсчёт перед следующим этапом === */
     try {
       const qs = new URLSearchParams(location.search);
       const inExam = qs.get('exam') === '1' || sessionStorage.getItem('exam_flow') === '1';
@@ -128,14 +129,13 @@
         const vSS  = (sessionStorage.getItem('exam_variant') || '').replace(/\D+/g,'');
         const vURL = (location.pathname.match(/variant(\d+)/i) || [,''])[1] || '';
         const v    = vSS || vURL || '';
-        // На всякий — выставим флаги, чтобы downstream-страницы их точно увидели
         try {
           sessionStorage.setItem('exam_flow','1');
           if (v) sessionStorage.setItem('exam_variant', v);
         } catch {}
         if (v) {
           navigateOnce(`../../../exams_countdown.html?exam=1&next=4&variant=${encodeURIComponent(v)}`);
-          throw new Error('redirected'); // прерываем локальную инициализацию
+          throw new Error('redirected');
         }
       }
     } catch {}
@@ -145,37 +145,44 @@
     const m = path.match(/variant(\d+)/i);
     const varNum = m ? m[1] : '?';
     document.getElementById('varNum').textContent = varNum;
-    document.title = `Результат — Задание 3 · Вариант ${varNum}`;
+    document.title = `Результат — Задание 2 · Вариант ${varNum}`;
 
-    // ===== Базы путей =====
+    // ===== Базы путей (поддержка /oge/ и /ege/) =====
     function getBases(p){
-      const i = p.indexOf('/ege/');
-      if (i >= 0){
-        const ROOT_BASE = p.slice(0, i + 1);
-        const EGE_BASE  = p.slice(0, i + 5);
-        return { ROOT_BASE, EGE_BASE };
+      const iOGE = p.indexOf('/oge/');
+      const iEGE = p.indexOf('/ege/');
+      if (iOGE >= 0){
+        const ROOT_BASE = p.slice(0, iOGE + 1);
+        const OGE_BASE  = p.slice(0, iOGE + 5);
+        return { ROOT_BASE, EXAM_BASE: OGE_BASE, examKey: 'oge' };
       }
-      return { ROOT_BASE: '/', EGE_BASE: '/ege/' };
+      if (iEGE >= 0){
+        const ROOT_BASE = p.slice(0, iEGE + 1);
+        const EGE_BASE  = p.slice(0, iEGE + 5);
+        return { ROOT_BASE, EXAM_BASE: EGE_BASE, examKey: 'ege' };
+      }
+      // fallback
+      return { ROOT_BASE: '/', EXAM_BASE: '/', examKey: 'oge' };
     }
-    const { ROOT_BASE, EGE_BASE } = getBases(path);
+    const { ROOT_BASE, EXAM_BASE, examKey } = getBases(path);
 
-    // Навигация
+    // Навигация (переопредели, если у тебя другие файлы меню)
     const toVariants = document.getElementById('toVariants');
     if (toVariants){
-      // /variants/variantX/_4_result.html → /variants/ege3.html
-      toVariants.href = path.replace(/\/variants\/variant\d+\/[^/]+$/i, '/variants/ege3.html');
+      // /variants/variantX/_4_result.html → /variants/oge2.html
+      toVariants.href = path.replace(/\/variants\/variant\d+\/[^/]+$/i, '/variants/oge2.html');
     }
-    document.getElementById('toModeMenu').href = `${EGE_BASE}ege_menu.html`;
-    document.getElementById('toTaskMenu').href = `${EGE_BASE}ege.html`;
+    document.getElementById('toModeMenu').href = `${EXAM_BASE}${examKey}_menu.html`; // oge_menu.html
+    document.getElementById('toTaskMenu').href = `${EXAM_BASE}${examKey}.html`;       // oge.html
     document.getElementById('toHome').href     = `${ROOT_BASE}index.html`;
 
-    function clearTask3State(){
+    function clearTask2State(){
       try{
-        Object.keys(sessionStorage).forEach(k => { if (k.startsWith('ege3_')) sessionStorage.removeItem(k); });
-        if (varNum && /^\d+$/.test(varNum)) sessionStorage.removeItem(`ege3_var${varNum}_prepare_endtime`);
+        Object.keys(sessionStorage).forEach(k => { if (k.startsWith('oge2_')) sessionStorage.removeItem(k); });
+        if (varNum && /^\d+$/.test(varNum)) sessionStorage.removeItem(`oge2_var${varNum}_prepare_endtime`);
       }catch{}
     }
-    function clearAndGo(url){ clearTask3State(); navigateOnce(url); }
+    function clearAndGo(url){ clearTask2State(); navigateOnce(url); }
 
     const repeat = document.getElementById('repeatBtn');
     if (repeat){
@@ -188,7 +195,7 @@
     });
     window.addEventListener('pageshow', ()=>{ navigateOnce.lock = false; });
 
-    // ===== Аудио + волна (берём запись из Task 3)
+    // ===== Аудио + волна (берём запись из Task 2)
     const audioEl     = document.getElementById('audio');
     const playBtn     = document.getElementById('playBtn');
     const downloadBtn = document.getElementById('downloadBtn');
@@ -197,8 +204,8 @@
     const waveWrap    = document.getElementById('waveWrap');
     const waveCanvas  = document.getElementById('wave');
 
-    const base64     = sessionStorage.getItem('ege3_audio_base64');
-    const mimeStored = (sessionStorage.getItem('ege3_audio_mime') || 'audio/webm').toLowerCase();
+    const base64     = sessionStorage.getItem('oge2_audio_base64');
+    const mimeStored = (sessionStorage.getItem('oge2_audio_mime') || 'audio/webm').toLowerCase();
 
     let objectURL = null;
     const extByMime = {
@@ -207,7 +214,7 @@
       'audio/mp4':'m4a','audio/mpeg':'mp3','audio/wav':'wav'
     };
     const fileExt  = extByMime[mimeStored] || 'webm';
-    const fileName = `ege3_variant${varNum}.${fileExt}`;
+    const fileName = `oge2_variant${varNum}.${fileExt}`;
 
     function dataURLtoBlob(dataURL){
       const parts = (dataURL || '').split(',');

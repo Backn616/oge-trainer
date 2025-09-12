@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <title>Предупреждение — доступ к микрофону</title>
+  <title>Electronic assistant — доступ к микрофону</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <!-- Шрифт -->
@@ -36,8 +36,8 @@
       <p id="warnText">
         На следующем этапе тренажёр попытается получить доступ к микрофону.<br><br>
         Браузер покажет системный запрос на использование микрофона.<br><br>
-        Если вы готовы выполнить устную часть <strong>задания 3</strong>, пожалуйста,<br>
-        <strong>разрешите сайту использовать микрофон</strong>, чтобы начать запись ответа.
+        Если вы готовы выполнить устную часть <strong>задания 2</strong> (телефонный опрос — <em>Electronic assistant</em>), пожалуйста,<br>
+        <strong>разрешите сайту использовать микрофон</strong>, чтобы записать ваши ответы.
       </p>
 
       <!-- Ставим href (fallback без JS) и дублируем переход через JS с защитой -->
@@ -64,14 +64,17 @@
       ? location.pathname.replace(/_2_mic\.html$/i, '_3_task.html')
       : location.pathname.replace(/\.html$/i, '_3_task.html');
 
-    // Подготовка sessionStorage для задания 3
+    // Подготовка sessionStorage для ОГЭ-2
     try {
-      sessionStorage.removeItem('ege3_audio_base64');
-      sessionStorage.removeItem('ege3_audio_mime');
-      sessionStorage.setItem('ege3_warned', '1');
-      const meta = JSON.parse(sessionStorage.getItem('ege3_meta') || '{}');
+      sessionStorage.removeItem('oge2_audio_base64');
+      sessionStorage.removeItem('oge2_audio_mime');
+      sessionStorage.setItem('oge2_warned', '1');
+      const meta = JSON.parse(sessionStorage.getItem('oge2_meta') || '{}');
       meta.warnedAt = Date.now();
-      sessionStorage.setItem('ege3_meta', JSON.stringify(meta));
+      meta.task = 'OGE-2';
+      meta.questionsPlanned = meta.questionsPlanned ?? 6;
+      meta.perQuestionSec = meta.perQuestionSec ?? 40;
+      sessionStorage.setItem('oge2_meta', JSON.stringify(meta));
     } catch {}
 
     // Кнопка «ОК» — единственная точка перехода

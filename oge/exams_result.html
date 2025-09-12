@@ -11,7 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
-  <!-- Общий стиль (ЕГЭ-палитра) -->
+  <!-- Общие стили проекта -->
   <link rel="stylesheet" href="./style_common.css" />
 
   <!-- Анти-мигание темы -->
@@ -38,10 +38,10 @@
     .wave{ width:100%; height:56px; display:block; background:#e9edf7; border-radius:10px; box-shadow:var(--shadow); }
     .dark .wave{ background:#1f2a3d; }
 
-    /* волны — ЕГЭ-синяя палитра */
+    /* Цвета волн */
     :root{
       --wave-base: rgba(0,0,0,.28);
-      --wave-prog: var(--primary);               /* #2b6cff из style_common.css */
+      --wave-prog: var(--primary);
       --wave-glow: rgba(43,108,255,.45);
     }
     html.dark{
@@ -55,7 +55,7 @@
     .task-snippet{ margin-top:12px; padding:14px 16px; border:1px dashed var(--border); border-radius:12px; background:var(--card); }
     .task-snippet--plain{ border:none; padding:0; background:transparent; }
 
-    /* Task 1 */
+    /* Task 1 — рамка текста */
     .reading-box{
       background:var(--card);
       border:1px solid #ccc;
@@ -74,7 +74,7 @@
       .reading-box{ font-size:18px; line-height:1.55; padding:18px 16px; max-width:100%; }
     }
 
-    /* Task 2 */
+    /* Task 2 — макет объявки (если попадёт из сниппета) */
     .ad-layout{
       display:grid;
       grid-template-columns: 1.05fr 0.95fr;
@@ -99,28 +99,15 @@
     .plain-list li{ margin:10px 0; }
     .ad-title{ font-weight:800; font-size:30px; margin:6px 0 12px; text-align:center; }
 
-    .ad-figure{
-      width:100%;
-      aspect-ratio:3/2;
-      border-radius:12px;
-      overflow:hidden;
-      box-shadow:var(--shadow);
-      background:#ddd;
-    }
-    .ad-figure>img{
-      width:100%;
-      height:100%;
-      object-fit:cover;
-      object-position:center;
-      display:block;
-    }
+    .ad-figure{ width:100%; aspect-ratio:3/2; border-radius:12px; overflow:hidden; box-shadow:var(--shadow); background:#ddd; }
+    .ad-figure>img{ width:100%; height:100%; object-fit:cover; object-position:center; display:block; }
 
     @media (max-width:1100px){
       .ad-layout{ grid-template-columns:1fr; gap:22px; }
       .left-free{ font-size:18px; line-height:1.55; }
     }
 
-    /* Task 3 */
+    /* Task 3 — карточка плана */
     .t3-container{
       background:var(--card);
       border-left:5px solid var(--primary);
@@ -136,6 +123,7 @@
       .t3-container{ font-size:18px; line-height:1.55; padding:16px 18px; }
     }
 
+    /* Навигация */
     .navs{ text-align:center; margin-top:22px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
     .btn{
       display:inline-block; padding:12px 18px; font-weight:600; color:#fff;
@@ -193,7 +181,7 @@
     import { toggleThemeInit, navigateOnce } from './common.js';
     toggleThemeInit();
 
-    // ==== Безопасный разбор variant ====
+    // ==== Безопасный разбор номера варианта ====
     const q = new URLSearchParams(location.search);
     const variant = (q.get('variant') || sessionStorage.getItem('exam_variant') || '1').replace(/\D+/g,'');
 
@@ -323,8 +311,7 @@
           window.addEventListener('pagehide', ()=> URL.revokeObjectURL(url));
           window.addEventListener('beforeunload', ()=> URL.revokeObjectURL(url));
         }else{
-          // data: URL
-          audioEl.src  = base64;
+          audioEl.src  = base64; // data: URL
           audioEl.type = mimeStored;
           const resp = await fetch(base64);
           const arr  = await resp.arrayBuffer();
@@ -338,7 +325,7 @@
       }
     }
 
-    // ==== Подгрузка сниппетов с отдельных результатов (ОГЭ) ====
+    // ==== Подгрузка сниппетов из отдельных результатов ====
     const domParse = (html, baseUrl='.')=>{
       const parser = new DOMParser();
       const doc = parser.parseFromString(html, 'text/html');
@@ -351,7 +338,7 @@
       return doc;
     };
 
-    // Task 1
+    // Task 1 — берём .reading-box
     (async ()=>{
       try{
         const url  = `./task1/variants/variant${variant}/oge1_var${variant}_4_result.html`;
@@ -360,25 +347,37 @@
         const rb   = doc.querySelector('.reading-box');
         const mount= document.getElementById('snip1');
         if (rb && mount){ mount.innerHTML=''; mount.appendChild(rb.cloneNode(true)); }
+        else { mount.textContent = 'Не удалось загрузить текст.'; }
       }catch{ document.getElementById('snip1').textContent='Не удалось загрузить текст.'; }
     })();
 
-    // Task 2
+    // Task 2 — поддержка .ad-layout и .task-container (и запасных селекторов)
     (async ()=>{
       const mount = document.getElementById('snip2');
       try{
         const url  = `./task2/variants/variant${variant}/oge2_var${variant}_4_result.html`;
         const html = await (await fetch(url)).text();
         const doc  = domParse(html, `./task2/variants/variant${variant}`);
-        const ad = doc.querySelector('.ad-layout');
-        if (ad){ mount.innerHTML=''; mount.appendChild(ad.cloneNode(true)); }
-        else { mount.textContent='Не удалось загрузить объявление.'; }
+
+        const el =
+          doc.querySelector('.ad-layout') ||
+          doc.querySelector('.task-container') ||
+          doc.querySelector('#adRoot') ||
+          doc.querySelector('.task-header.card');
+
+        if (el && mount){
+          const clone = el.cloneNode(true);
+          mount.innerHTML = '';
+          mount.appendChild(clone);
+        } else {
+          mount.textContent='Не удалось загрузить объявление.';
+        }
       }catch{
         mount.textContent='Не удалось загрузить объявление.';
       }
     })();
 
-    // Task 3
+    // Task 3 — берём .task-container и стилизуем
     (async ()=>{
       try{
         const url  = `./task3/variants/variant${variant}/oge3_var${variant}_4_result.html`;
@@ -388,13 +387,15 @@
         const mount= document.getElementById('snip3');
         if (tc && mount){
           const cont = tc.cloneNode(true);
-          cont.className='t3-container';
+          cont.className = 't3-container';
           mount.innerHTML=''; mount.appendChild(cont);
+        } else {
+          mount.textContent='Не удалось загрузить вопросы.';
         }
       }catch{ document.getElementById('snip3').textContent='Не удалось загрузить вопросы.'; }
     })();
 
-    // ==== Аудио-вклейка + волны ====
+    // ==== Вклейка аудио + волны ====
     const rows = [
       { key:'oge1', a:'a1', s:'s1', w:'w1' },
       { key:'oge2', a:'a2', s:'s2', w:'w2' },
@@ -406,7 +407,7 @@
     document.getElementById('repeatExam').addEventListener('click',(e)=>{
       e.preventDefault();
       try{
-        // чистим хвосты заданий, НО сохраняем exam_flow/exam_variant (перезапуск текущего варианта)
+        // чистим только хвосты заданий, сохраняем exam_flow/exam_variant
         ['oge1_','oge2_','oge3_'].forEach(prefix=>{
           Object.keys(sessionStorage).forEach(k=>{ if(k.startsWith(prefix)) sessionStorage.removeItem(k); });
         });
@@ -415,17 +416,16 @@
       navigateOnce(`./task1/variants/variant${v}/oge1_var${v}_1_prepare.html?exam=1&variant=${encodeURIComponent(v)}`);
     });
 
-    // На все «уходящие» ссылки — сброс режима экзамена
-    [['toVariants','./exams.html'], ['toFormat','./oge.html'], ['toHome','../index.html']]
-      .forEach(([id,href])=>{
-        const a = document.getElementById(id);
-        if (!a) return;
-        a.addEventListener('click',(e)=>{
-          e.preventDefault();
-          clearExamState();
-          navigateOnce(href);
-        });
+    // На «уходящие» ссылки — полный сброс режима экзамена
+    [['toVariants','./exams.html'], ['toFormat','./oge.html'], ['toHome','../index.html']].forEach(([id,href])=>{
+      const a = document.getElementById(id);
+      if (!a) return;
+      a.addEventListener('click',(e)=>{
+        e.preventDefault();
+        clearExamState();
+        navigateOnce(href);
       });
+    });
 
     window.addEventListener('pageshow', ()=>{ navigateOnce.lock=false; });
   </script>

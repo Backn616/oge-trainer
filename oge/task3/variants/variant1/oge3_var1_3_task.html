@@ -36,6 +36,7 @@
       line-height:1.7;
       max-width:1200px;
       margin:0 auto 18px;
+      display:none; /* покажем после отсчёта */
     }
     .reading-box ul{ margin: 12px 0 0 22px; }
     .reading-box li{ margin: 6px 0; }
@@ -45,11 +46,8 @@
       font-family: Inter, system-ui, Segoe UI, Roboto, Arial, sans-serif;
       color: var(--muted-fg);
       font-size: 14px;
+      display:none; /* минималистично: показываем только в процессе/ошибке */
     }
-
-    .controls{ text-align:center; margin:18px 0 8px; }
-    .controls .button{ display:inline-block; min-width:220px; }
-    .small{ font-size: 13px; color: var(--muted-fg); margin-top: 6px; }
 
     /* Иконка записи */
     .rec-dot{
@@ -61,6 +59,26 @@
       0%{ box-shadow:0 0 0 0 rgba(239,68,68,.6); }
       70%{ box-shadow:0 0 0 10px rgba(239,68,68,0); }
       100%{ box-shadow:0 0 0 0 rgba(239,68,68,0); }
+    }
+
+    /* Оверлей 3-2-1-0 */
+    .countdown{
+      position:fixed; inset:0; display:flex; align-items:center; justify-content:center;
+      background:rgba(0,0,0,.6); color:#fff; z-index:9999; user-select:none;
+    }
+    .countdown .num{
+      font-family: Inter, system-ui, Segoe UI, Roboto, Arial, sans-serif;
+      font-weight:800; font-size: clamp(64px, 14vw, 180px);
+      line-height:1; letter-spacing:.02em;
+      text-shadow: 0 8px 40px rgba(0,0,0,.45);
+      transform: scale(1); opacity:1;
+      animation: pop 1s ease forwards;
+    }
+    @keyframes pop{
+      0%{ transform:scale(0.7); opacity:.2; }
+      35%{ transform:scale(1.08); opacity:1; }
+      70%{ transform:scale(1); opacity:1; }
+      100%{ transform:scale(0.98); opacity:.92; }
     }
   </style>
 </head>
@@ -76,7 +94,7 @@
     </div>
 
     <!-- План монолога (без "Topic:") -->
-    <section class="reading-box" aria-label="План монолога">
+    <section id="readingBox" class="reading-box" aria-label="План монолога">
       <p>You are going to give a talk about animals. You will have to start in 1.5 minutes and speak for not more than 2 minutes (10–12 sentences). Remember to say:</p>
       <ul>
         <li>what wild animals live in your region;</li>
@@ -87,24 +105,22 @@
       <p>You have to talk continuously.</p>
     </section>
 
-    <!-- Контроль записи -->
-    <div class="controls">
-      <button id="startBtn" class="button" type="button" aria-label="Начать запись" hidden>Начать запись</button>
-      <button id="stopBtn" class="button danger" type="button" aria-label="Остановить запись" hidden>Остановить запись</button>
-      <div class="small" id="hint">Если запись не началась автоматически, нажмите «Начать запись».</div>
-    </div>
-
-    <!-- Статус -->
-    <div class="status" id="status">Ожидание разрешения на доступ к микрофону…</div>
+    <!-- Статус (без инструкций про кнопки) -->
+    <div class="status" id="status" aria-live="polite" aria-atomic="true"></div>
   </div>
 
   <div style="height: calc(var(--footer-h) + 24px);"></div>
 
   <!-- Фиксированный прогресс-бар ответа (2:00) -->
-  <div id="progressContainerFixed" role="timer" aria-live="polite" aria-atomic="true" aria-label="Оставшееся время ответа">
+  <div id="progressContainerFixed" role="timer" aria-live="polite" aria-atomic="true" aria-label="Оставшееся время ответа" style="visibility:hidden;">
     <div id="progressBarFixed" class="rAF">
       <span id="progressTime" class="progress-time">02:00</span>
     </div>
+  </div>
+
+  <!-- Оверлей отсчёта 3-2-1-0 -->
+  <div id="countdown" class="countdown" aria-hidden="true">
+    <div id="countNum" class="num">3</div>
   </div>
 
   <script type="module">
@@ -112,64 +128,91 @@
 
     toggleThemeInit();
 
-    // === Константы ===
-    const TOTAL_MS = 120_000; // 2:00
-    const NEXT_URL = /_3_task\.html$/i.test(location.pathname)
-      ? location.pathname.replace(/_3_task\.html$/i, '_4_result.html')
-      : location.pathname.replace(/\.html$/i, '_4_result.html');
+    // === Навигация после записи: одиночное/экзамен полностью ===
+    function getVariantFromUrlOrState() {
+      const q = new URLSearchParams(location.search);
+      const vQ = (q.get('variant') || '').replace(/\D+/g,'');
+      const vS = (sessionStorage.getItem('exam_variant') || '').replace(/\D+/g,'');
+      return vQ || vS || '1';
+    }
+    function inExamFlow() {
+      const q = new URLSearchParams(location.search);
+      return q.get('exam') === '1' || sessionStorage.getItem('exam_flow') === '1';
+    }
+    function examsResultUrl() {
+      const root = location.pathname.replace(/\/task3\/.*/i, '/');
+      const variant = getVariantFromUrlOrState();
+      return `${root}exams_result.html?variant=${encodeURIComponent(variant)}`;
+    }
+    function standaloneResultUrl() {
+      return /_3_task\.html$/i.test(location.pathname)
+        ? location.pathname.replace(/_3_task\.html$/i, '_4_result.html')
+        : location.pathname.replace(/\.html$/i, '_4_result.html');
+    }
+    const NEXT_URL = inExamFlow() ? examsResultUrl() : standaloneResultUrl();
+    try {
+      if (new URLSearchParams(location.search).get('exam') === '1') {
+        sessionStorage.setItem('exam_flow', '1');
+        sessionStorage.setItem('exam_variant', getVariantFromUrlOrState());
+      }
+    } catch {}
 
     // === DOM ===
+    const boxEl   = document.getElementById('readingBox');
     const barEl   = document.getElementById('progressBarFixed');
     const timeEl  = document.getElementById('progressTime');
     const statusEl= document.getElementById('status');
-    const startBtn= document.getElementById('startBtn');
-    const stopBtn = document.getElementById('stopBtn');
-    const hintEl  = document.getElementById('hint');
+    const cdWrap  = document.getElementById('countdown');
+    const cdNum   = document.getElementById('countNum');
+    const progWrap= document.getElementById('progressContainerFixed');
 
     // === Состояние ===
+    const TOTAL_MS = 120_000; // 2:00
     let mediaStream = null;
     let mediaRec    = null;
     let chunks      = [];
-    let timerId     = null;
-    let startTs     = 0;
+    let rafId       = null;
     let stopped     = false;
 
-    // Обновление прогресса (rAF)
-    function startTimer() {
-      try { cancelAnimationFrame(timerId); } catch {}
-      startTs = performance.now();
-      const endTs = startTs + TOTAL_MS;
-
-      function tick(now){
-        const left = Math.max(0, endTs - now);
-        timeEl.textContent = fmtTime(left);
-        const pct = (left / TOTAL_MS) * 100;
-        barEl.style.width = Math.max(0, pct) + '%';
-
-        if (left <= 0) {
-          stopRecording('Время ответа закончилось.');
-          return;
-        }
-        timerId = requestAnimationFrame(tick);
-      }
-      timerId = requestAnimationFrame(tick);
-    }
-
-    async function getMic(){
+    // Аудио-сигнал короткий
+    function beep(freq=880, dur=140, vol=0.25) {
       try{
-        return await navigator.mediaDevices.getUserMedia({ audio: true });
-      }catch(err){
-        status('Не удалось получить доступ к микрофону. Разрешите доступ и перезагрузите страницу.', true);
-        startBtn.hidden = false; // позволим попробовать ещё раз
-        return null;
-      }
+        const AC = window.AudioContext || window.webkitAudioContext;
+        const a = new AC(), o = a.createOscillator(), g = a.createGain();
+        o.type='sine'; o.frequency.value=freq; g.gain.value=vol;
+        o.connect(g); g.connect(a.destination); o.start();
+        setTimeout(()=>{ o.stop(); a.close(); }, dur);
+      }catch{}
     }
 
-    function status(text, warn=false){
+    function setStatus(text, warn=false){
+      statusEl.style.display = text ? 'block' : 'none';
       statusEl.innerHTML = (mediaRec && mediaRec.state === 'recording')
         ? `<span class="rec-dot" aria-hidden="true"></span>${text}`
         : text;
       statusEl.style.color = warn ? 'var(--danger)' : 'var(--muted-fg)';
+    }
+
+    function startTimer() {
+      try { cancelAnimationFrame(rafId); } catch {}
+      const startTs = performance.now();
+      const endTs = startTs + TOTAL_MS;
+      timeEl.textContent = '02:00';
+      barEl.style.width = '100%';
+      progWrap.style.visibility = 'visible';
+
+      const tick = (now) => {
+        const left = Math.max(0, endTs - now);
+        timeEl.textContent = fmtTime(left);
+        const pct = (left / TOTAL_MS) * 100;
+        barEl.style.width = Math.max(0, pct) + '%';
+        if (left <= 0) {
+          stopRecording('Время ответа закончилось.');
+          return;
+        }
+        rafId = requestAnimationFrame(tick);
+      };
+      rafId = requestAnimationFrame(tick);
     }
 
     function saveToSession(blob){
@@ -181,17 +224,22 @@
           sessionStorage.setItem('oge3_audio_mime', blob.type || 'audio/webm');
           const meta = JSON.parse(sessionStorage.getItem('oge3_meta') || '{}');
           meta.recordedAt = Date.now();
-          meta.durationMs = Math.min(TOTAL_MS, Date.now() - (meta.startedAt || Date.now()));
           sessionStorage.setItem('oge3_meta', JSON.stringify(meta));
         }catch{}
       };
       reader.readAsDataURL(blob);
     }
 
+    async function getMic(){
+      try{ return await navigator.mediaDevices.getUserMedia({ audio: true }); }
+      catch{
+        setStatus('Не удалось получить доступ к микрофону. Разрешите доступ и перезагрузите страницу.', true);
+        return null;
+      }
+    }
+
     async function startRecording() {
       if (mediaRec && mediaRec.state === 'recording') return;
-      status('Запись началась. Говорите чётко и по плану.');
-
       mediaStream = mediaStream || await getMic();
       if (!mediaStream) return;
 
@@ -204,65 +252,58 @@
           saveToSession(blob);
         }catch{}
       };
-
-      // Метаданные
       try{
         const meta = JSON.parse(sessionStorage.getItem('oge3_meta') || '{}');
         meta.startedAt = Date.now();
         sessionStorage.setItem('oge3_meta', JSON.stringify(meta));
       }catch{}
 
-      mediaRec.start(250); // буферизация
+      mediaRec.start(250);
+      setStatus('Запись идёт. У вас 2 минуты.');
       startTimer();
-
-      // UI
-      startBtn.hidden = true;
-      stopBtn.hidden  = false;
-      hintEl.textContent = 'Остановите запись по необходимости. Иначе запись остановится автоматически через 2:00.';
     }
 
     function stopRecording(reason='Запись остановлена.'){
       if (stopped) return;
       stopped = true;
-
-      try { cancelAnimationFrame(timerId); } catch {}
+      try { cancelAnimationFrame(rafId); } catch {}
       try { mediaRec && mediaRec.state === 'recording' && mediaRec.stop(); } catch {}
       try { mediaStream && mediaStream.getTracks().forEach(t=>t.stop()); } catch {}
-
-      stopBtn.hidden = true;
-      status(reason);
-      // Переход к результату с защитой
-      setTimeout(()=> navigateOnce(NEXT_URL), 800);
+      setStatus(reason);
+      setTimeout(()=> navigateOnce(NEXT_URL), 600);
     }
 
-    // Кнопки
-    startBtn.addEventListener('click', startRecording);
-    stopBtn.addEventListener('click', ()=> stopRecording('Вы остановили запись.'));
+    // Отсчёт 3-2-1-0 с автостартом
+    async function runCountdownAndStart(){
+      const seq = ['3','2','1','0'];
+      let i = 0;
+      const step = () => {
+        if (i >= seq.length){
+          // скрываем оверлей, показываем задание, запускаем запись
+          cdWrap.style.display = 'none';
+          boxEl.style.display = 'block';
+          // чистим флаг автозапуска (если пришли из mic)
+          try { sessionStorage.removeItem('t3_autostart'); } catch {}
+          startRecording();
+          return;
+        }
+        cdNum.textContent = seq[i++];
+        beep(880, 130, 0.25);
+        setTimeout(step, 1000);
+      };
+      step();
+    }
 
-    // Автозапуск, если пришли с mic-страницы
-    window.addEventListener('load', async ()=>{
-      timeEl.textContent = '02:00';
-      barEl.style.width = '100%';
-      const auto = (sessionStorage.getItem('t3_autostart') === '1');
-
-      // Пытаемся стартовать автоматически
-      if (auto) {
-        await startRecording();
-        // Сбросим флаг, чтобы не зацикливалось
-        try { sessionStorage.removeItem('t3_autostart'); } catch {}
-      }
-
-      // Если автозапуск не удался — покажем кнопку Старт
-      if (!mediaRec || mediaRec.state !== 'recording') {
-        startBtn.hidden = false;
-        status('Нажмите «Начать запись», чтобы приступить к ответу.');
-      } else {
-        status('Запись идёт. У вас 2 минуты.');
-      }
+    // Автозапуск всего процесса
+    window.addEventListener('load', ()=>{
+      // Прячем текстовую панель до старта
+      boxEl.style.display = 'none';
+      setStatus('Подготовка…');
+      runCountdownAndStart();
     });
 
     // BFCache unlock
-    window.addEventListener('pageshow', () => { navigateOnce.lock = false; });
+    window.addEventListener('pageshow', ()=>{ navigateOnce.lock = false; });
 
     // Безопасность: уход со страницы — останавливаем запись
     window.addEventListener('beforeunload', ()=>{ try{ if(mediaRec && mediaRec.state==='recording') mediaRec.stop(); }catch{} });

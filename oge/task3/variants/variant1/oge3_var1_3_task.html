@@ -24,7 +24,7 @@
   </script>
 
   <style>
-    /* Таймер-цифры 3-2-1-0 — как в Task 1 */
+    /* Таймер-цифры 3-2-1-0 */
     .timer{
       font-size:70px; margin:30px 0; font-weight:700; color:var(--primary);
       letter-spacing:4px; text-shadow:0 4px 12px rgba(0,0,0,.25);
@@ -32,7 +32,7 @@
     }
     @media (prefers-reduced-motion: reduce) { .timer{ transition:none; } }
 
-    /* План монолога — компактная рамка как в Task 1 */
+    /* План монолога — компактная рамка */
     .reading-box{
       background:var(--card);
       border:1px solid #ccc;
@@ -53,7 +53,7 @@
       .reading-box{ font-size:18px; padding:18px 16px; max-width:100%; }
     }
 
-    /* Кнопка завершения — как в Task 1 */
+    /* Кнопка завершения */
     .btn{
       display:inline-block; padding:16px 32px; margin:12px;
       font-size:20px; font-weight:600; color:#fff; text-decoration:none; cursor:pointer;
@@ -71,14 +71,9 @@
   <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
 
   <div class="content-wrapper">
-    <!-- Короткая формулировка — будет показана после отсчёта вместе с планом -->
-    <div class="task-container" id="instructionBox" style="display:none" aria-labelledby="taskTitle" aria-describedby="inst">
-      <b id="taskTitle">Task 3. You are going to give a talk.</b>
-      You must speak for not more than <b>2 minutes</b> (10–12 sentences).
-      <div class="instruction" id="inst">Speak continuously; follow the plan.</div>
-    </div>
+    <!-- УБРАНО: instructionBox -->
 
-    <!-- Отсчёт 3-2-1-0 (как в Task 1) -->
+    <!-- Отсчёт 3-2-1-0 -->
     <div id="timer" class="timer" aria-live="polite">3</div>
 
     <!-- План монолога (без Topic:) -->
@@ -93,7 +88,7 @@
       <p>You have to talk continuously.</p>
     </div>
 
-    <!-- Кнопка завершения (можно нажать раньше 2:00) -->
+    <!-- Кнопка завершения -->
     <div style="text-align:center; margin-bottom:30px;">
       <button class="btn" id="endBtn" type="button" aria-label="Закончить запись" style="display:none">✅ Закончить</button>
     </div>
@@ -102,7 +97,7 @@
   <!-- Проставка над фикс-баром -->
   <div style="height: calc(var(--footer-h) + 24px);"></div>
 
-  <!-- Фиксированный прогресс-бар времени ответа (2:00) — как в Task 1 -->
+  <!-- Фиксированный прогресс-бар времени ответа (2:00) -->
   <div id="progressContainerFixed" role="timer" aria-live="polite" aria-atomic="true"
        aria-label="Оставшееся время ответа" style="display:none">
     <div id="progressBarFixed" class="rAF">
@@ -115,13 +110,12 @@
 
     toggleThemeInit();
 
-    const timerEl        = document.getElementById('timer');
-    const instructionBox = document.getElementById('instructionBox');
-    const textBox        = document.getElementById('textBox');
-    const endBtn         = document.getElementById('endBtn');
-    const progressWrap   = document.getElementById('progressContainerFixed');
-    const progressBar    = document.getElementById('progressBarFixed');
-    const progressTime   = document.getElementById('progressTime');
+    const timerEl      = document.getElementById('timer');
+    const textBox      = document.getElementById('textBox');
+    const endBtn       = document.getElementById('endBtn');
+    const progressWrap = document.getElementById('progressContainerFixed');
+    const progressBar  = document.getElementById('progressBarFixed');
+    const progressTime = document.getElementById('progressTime');
 
     // ==== Куда переходим после записи ====
     function getVariantFromUrlOrState(){
@@ -166,7 +160,6 @@
     }
 
     async function initMic(){
-      // Сразу просим доступ, как в твоём Task 1
       try{
         const stream = await navigator.mediaDevices.getUserMedia({ audio:true });
         streamRef = stream;
@@ -183,7 +176,6 @@
           const reader = new FileReader();
           reader.onloadend = () => {
             try{
-              // Сохраняем как Data URL — именно так ожидает exams_result.html
               sessionStorage.setItem('oge3_audio_base64', reader.result);
               sessionStorage.setItem('oge3_audio_mime', blobType);
               const meta = JSON.parse(sessionStorage.getItem('oge3_meta') || '{}');
@@ -195,15 +187,14 @@
           reader.readAsDataURL(audioBlob);
         };
 
-        startCountdown(); // после готовности микрофона — старт отсчёта
+        startCountdown();
       }catch(err){
-        // Даже если доступа нет — не блокируем процесс (как у тебя в Task 1)
         alert('❌ Не удалось получить доступ к микрофону: ' + (err?.message || err));
         startCountdown();
       }
     }
 
-    /* === Отсчёт 3-2-1-0 — как в Task 1 === */
+    /* === Отсчёт 3-2-1-0 === */
     let countdown = 3;
     let cdInterval = 0;
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -226,19 +217,18 @@
       },1000);
     }
 
-    /* === Таймер ответа 2:00 на rAF — как в Task 1 === */
+    /* === Таймер ответа 2:00 === */
     const TOTAL_MS = 120_000;
     let endTs = 0, rafId = 0, lastAnnounce = 0;
 
     function startTask(){
-      instructionBox.style.display = 'block';
-      textBox.style.display        = 'block';
-      endBtn.style.display         = 'inline-block';
-      progressWrap.style.display   = 'block';
-      timerEl.style.display        = 'none';
+      // instructionBox удалён — ничего не трогаем
+      if (textBox) textBox.style.display = 'block';
+      endBtn.style.display       = 'inline-block';
+      progressWrap.style.display = 'block';
+      timerEl.style.display      = 'none';
 
       audioChunks = [];
-      // отметим старт в метаданных
       try{
         const meta = JSON.parse(sessionStorage.getItem('oge3_meta') || '{}');
         meta.startedAt = Date.now();
@@ -288,7 +278,7 @@
       try{ streamRef?.getTracks()?.forEach(t=>t.stop()); }catch{}
     });
 
-    /* === BFCache: возврат → рестарт как в Task 1 === */
+    /* === BFCache: возврат → рестарт === */
     function isBackForwardNav(){
       try{
         const nav = performance.getEntriesByType('navigation')[0];
@@ -301,14 +291,13 @@
       try { if (mediaRecorder?.state === 'recording') mediaRecorder.stop(); } catch {}
       try { streamRef?.getTracks()?.forEach(t=>t.stop()); } catch {}
 
-      timerEl.style.display        = 'block';
-      timerEl.textContent          = '3';
-      instructionBox.style.display = 'none';
-      textBox.style.display        = 'none';
-      endBtn.style.display         = 'none';
-      progressWrap.style.display   = 'none';
-      progressBar.style.width      = '100%';
-      progressTime.textContent     = fmtTime(TOTAL_MS);
+      timerEl.style.display   = 'block';
+      timerEl.textContent     = '3';
+      if (textBox) textBox.style.display = 'none';
+      endBtn.style.display    = 'none';
+      progressWrap.style.display = 'none';
+      progressBar.style.width = '100%';
+      progressTime.textContent= fmtTime(TOTAL_MS);
 
       audioChunks = [];
       hasStopped  = false;

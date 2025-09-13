@@ -70,6 +70,14 @@
   <!-- Тумблер темы -->
   <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
 
+  <div class="content-wrapper">
+    <!-- Короткая формулировка — будет показана после отсчёта вместе с планом -->
+    <div class="task-container" id="instructionBox" style="display:none" aria-labelledby="taskTitle" aria-describedby="inst">
+      <b id="taskTitle">Task 3. You are going to give a talk.</b>
+      You must speak for not more than <b>2 minutes</b> (10–12 sentences).
+      <div class="instruction" id="inst">Speak continuously; follow the plan.</div>
+    </div>
+
     <!-- Отсчёт 3-2-1-0 (как в Task 1) -->
     <div id="timer" class="timer" aria-live="polite">3</div>
 

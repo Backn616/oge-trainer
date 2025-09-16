@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Task 1 — Preparation</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Шрифт Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <!-- Общие стили -->
+  <link rel="stylesheet" href="../../../style_common.css" />
+
+  <!-- Анти-мигание темы -->
+  <script>
+    (function(){
+      try{
+        const saved = localStorage.getItem('pref-theme') || 'light';
+        if (saved === 'dark') document.documentElement.classList.add('dark');
+      }catch(_){}
+    })();
+  </script>
+
+  <style>
+    /* Рамка текста */
+    .reading-box{
+      background:var(--card);
+      border:1px solid #ccc;
+      border-radius:12px;
+      box-shadow:var(--shadow);
+      padding:24px 28px;
+      text-align:left;
+      font-family: Inter, system-ui, Segoe UI, Roboto, Arial, sans-serif;
+      font-size:25px;
+      line-height:1.7;
+      max-width:1200px;
+      margin:0 auto 24px;
+      white-space:pre-line;
+    }
+    @media (max-width:900px){
+      .reading-box{ font-size:18px; padding:18px 16px; max-width:100%; }
+    }
+
+    /* Подсказка-рамка — компактная */
+    .helper-box{
+      border:1px solid #ccc;          
+      border-radius:8px;              
+      padding:14px 18px;              
+      background:var(--card);
+      max-width:800px;                
+      margin:16px auto;               
+      font-family: Inter, system-ui, Segoe UI, Roboto, Arial, sans-serif;
+      font-size:18px;
+      line-height:1.5;
+      box-shadow:0 2px 6px rgba(0,0,0,0.08); 
+    }
+    @media (max-width:900px){
+      .helper-box{ font-size:16px; padding:12px 14px; max-width:100%; }
+    }
+
+    /* Компактная таблица слов */
+    .wordlist{
+      width:100%;
+      border-collapse: collapse;
+      font-size:18px;
+      table-layout: fixed;
+    }
+    .wordlist th, .wordlist td{
+      padding:6px 4px;
+      border-bottom:1px solid #e4e7ef;
+      vertical-align: middle;
+    }
+    .dark .wordlist th, .wordlist td{
+      border-bottom:1px solid rgba(255,255,255,.12);
+    }
+    .wordlist th{ text-align:left; font-weight:600; }
+    .wordlist td:nth-child(1){ width:35%; }
+    .wordlist td:nth-child(2){ width:45%; }
+    .wordlist td:nth-child(3){ width:20%; text-align:center; }
+    .wordlist th:nth-child(3){ text-align:center; }
+
+    /* Кнопка озвучки компактнее */
+    .wordlist button.play{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      line-height:1;
+      min-width:36px;
+      height:28px;
+
+      border:none;
+      background:linear-gradient(135deg, var(--primary), var(--primary-600));
+      color:#fff;
+      border-radius:6px;
+      padding:4px 8px;
+      font-size:14px;
+      cursor:pointer;
+      box-shadow:0 3px 8px rgba(43,108,255,.25);
+      transition:transform .08s ease, filter .2s ease;
+    }
+    .wordlist button.play:hover{ transform:translateY(-1px); filter:brightness(1.05); }
+  </style>
+</head>
+<body>
+  <!-- Тумблер темы -->
+  <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
+
+  <div class="content-wrapper">
+    <!-- Инструкция -->
+    <div class="task-container" role="region" aria-labelledby="taskTitle">
+      <p id="taskTitle" style="margin-top:0;">
+        <strong>Task 1.</strong> Imagine that you are preparing a project with your friend.
+        You have found some interesting material for the presentation and you want to read this text to your friend.
+        You have <strong>1.5 minutes</strong> to read the text silently, then be ready to read it out loud.
+        You will not have more than <strong>1.5 minutes</strong> to read it.
+      </p>
+    </div>
+
+    <!-- Текст -->
+    <div class="reading-box" id="readingBox">New Zealand is one of the most popular travel destinations for nature lovers and adventure seekers. This country consists of two main islands and is located in the southwestern Pacific Ocean. It is known for its breathtaking landscapes, including mountains, volcanoes, beaches, and lakes.
+
+Many tourists come to New Zealand to try activities like hiking, kayaking, and bungee jumping. The country is also famous for its unique wildlife and strong traditions of protecting the environment. Visitors often say that the air feels fresher and the views are unforgettable.
+
+Apart from nature, New Zealand has a rich culture. The Maori people, who were the first inhabitants of the islands, have kept many of their customs and language. Travellers can visit museums, attend cultural shows, or even try traditional food. Whether you want to relax or explore, New Zealand offers a memorable and rewarding experience.</div>
+
+    <!-- Сложные слова -->
+    <div class="task-container helper-box" role="region" aria-labelledby="hardWordsTitle">
+      <details>
+        <summary id="hardWordsTitle" style="cursor:pointer; font-weight:700;">
+          🔎 Сложные слова (подсказка) — нажмите, чтобы открыть
+        </summary>
+        <div class="wordlist-wrap" style="margin-top:14px;">
+          <table class="wordlist" aria-label="Список сложных слов с транскрипцией и озвучкой">
+            <thead>
+              <tr>
+                <th>Word</th>
+                <th>IPA</th>
+                <th>Audio</th>
+              </tr>
+            </thead>
+            <tbody id="hardWordsTbody"></tbody>
+          </table>
+        </div>
+      </details>
+    </div>
+
+    <div style="text-align:center; margin:22px 0 30px;">
+      <button id="goBtn" class="button" type="button" aria-label="Перейти к выполнению">Перейти к выполнению</button>
+    </div>
+  </div>
+
+  <!-- Проставка -->
+  <div style="height: calc(var(--footer-h) + 24px);"></div>
+
+  <!-- Прогресс-бар -->
+  <div id="progressContainerFixed" role="timer" aria-live="polite" aria-atomic="true" aria-label="Оставшееся время подготовки">
+    <div id="progressBarFixed" class="rAF">
+      <span id="progressTime" class="progress-time">01:30</span>
+    </div>
+  </div>
+
+  <!-- Логика -->
+  <script type="module">
+    import { toggleThemeInit, navigateOnce, startPrepareTimer, fmtTime } from "../../../common.js";
+
+    // Тема
+    toggleThemeInit();
+
+    // Навигация
+    const NEXT_URL = location.pathname.replace(/_1_prepare\.html$/i, '_2_mic.html');
+    document.getElementById('goBtn')?.addEventListener('click', () => navigateOnce(NEXT_URL));
+
+    // Метаданные
+    try{
+      sessionStorage.removeItem('ege1_audio_base64');
+      sessionStorage.removeItem('ege1_audio_mime');
+      sessionStorage.setItem('ege1_prepared', '1');
+      sessionStorage.setItem('ege1_meta', JSON.stringify({
+        preparedAt: Date.now(),
+        prepareDurationSec: 90
+      }));
+    }catch{}
+
+    // Таймер
+    const TOTAL_MS = 90_000;
+    const barEl  = document.getElementById('progressBarFixed');
+    const timeEl = document.getElementById('progressTime');
+    let stopTimer = null;
+
+    function startTimerFresh(){
+      timeEl.textContent = fmtTime(TOTAL_MS);
+      barEl.style.width  = '100%';
+      try { stopTimer?.(); } catch {}
+      stopTimer = startPrepareTimer({
+        barEl,
+        timeEl,
+        totalMs: TOTAL_MS,
+        nextUrl: NEXT_URL,
+        key: 'ege1_prepare_end',
+        persist: false,
+        textEveryMs: 250,
+        useRAF: true
+      });
+    }
+    startTimerFresh();
+
+    window.addEventListener('pageshow', (e)=>{
+      try { navigateOnce.lock = false; } catch {}
+      if (e.persisted) startTimerFresh();
+    });
+
+    // Сложные слова (обновлено)
+    const HARD_WORDS = [
+      { w: 'New Zealand',     ipa: '/njuː ˈziːlənd/' },
+      { w: 'destinations',    ipa: '/ˌdɛstɪˈneɪʃənz/' },
+      { w: 'southwestern',    ipa: '/ˌsaʊθˈwɛstən/' },
+      { w: 'Pacific Ocean',   ipa: '/pəˈsɪfɪk ˈəʊʃən/' },
+      { w: 'breathtaking',    ipa: '/ˈbrɛθˌteɪkɪŋ/' },
+      { w: 'volcanoes',       ipa: '/vɒlˈkeɪnəʊz/' },
+      { w: 'kayaking',        ipa: '/ˈkaɪækɪŋ/' },
+      { w: 'traditions',      ipa: '/trəˈdɪʃənz/' },
+      { w: 'unforgettable',   ipa: '/ˌʌnfəˈɡetəbl/' },
+      { w: 'inhabitants',     ipa: '/ɪnˈhæbɪtənts/' }
+    ];
+
+    (function renderHardWords(){
+      const tbody = document.getElementById('hardWordsTbody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+      HARD_WORDS.forEach((item) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${item.w}</td>
+          <td>${item.ipa}</td>
+          <td><button class="play" type="button" aria-label="Прослушать ${item.w}"><span aria-hidden="true">▶︎</span></button></td>
+        `;
+        tr.querySelector('button').addEventListener('click', () => speakWord(item.w));
+        tbody.appendChild(tr);
+      });
+    })();
+
+    // Озвучка
+    let voices = [];
+    function loadVoices(){ voices = window.speechSynthesis?.getVoices?.() || []; }
+    loadVoices();
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.addEventListener('voiceschanged', loadVoices);
+    }
+
+    function pickEnglishVoice(){
+      if (!voices || !voices.length) return null;
+      const byLang = (substr) => voices.find(v => (v.lang || '').toLowerCase().startsWith(substr));
+      return (byLang('en-gb')) || (byLang('en-us')) || voices.find(v => (v.lang || '').toLowerCase().startsWith('en')) || null;
+    }
+
+    function speakWord(word){
+      try{
+        if (!('speechSynthesis' in window)) return;
+        const u = new SpeechSynthesisUtterance(word);
+        const v = pickEnglishVoice();
+        if (v) u.voice = v;
+        u.rate = 0.95;
+        u.lang = (v?.lang) || 'en-GB';
+        window.speechSynthesis.cancel();
+        window.speechSynthesis.speak(u);
+      }catch(e){ console.warn('Speech error:', e); }
+    }
+  </script>
+</body>
+</html>

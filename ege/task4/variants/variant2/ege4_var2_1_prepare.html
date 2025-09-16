@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Task 4 — Preparation</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+
+  <!-- Анти-мигание темы -->
+  <script>
+    (function(){
+      try{
+        const saved = localStorage.getItem('pref-theme') || 'light';
+        if(saved === 'dark') document.documentElement.classList.add('dark');
+      }catch(_){}
+    })();
+  </script>
+
+  <style>
+    :root{
+      --bg: #f7f9ff;
+      --card: #ffffff;
+      --text: #0b1020;
+      --muted: #5a6475;
+      --primary: #2b6cff;
+      --primary-600: #1f58d9;
+      --ring: #bfd3ff;
+      --success: #25c26e;
+      --shadow: 0 10px 25px rgba(17,24,39,.08);
+    }
+    .dark{
+      --bg: #0b1020;
+      --card: rgba(255,255,255,0.08);
+      --text: #eaf0ff;
+      --muted: #b9c2d3;
+      --primary: #6aa3ff;
+      --primary-600: #4b8dff;
+      --ring: #a9c6ff;
+      --success: #5ee397;
+      --shadow: 0 10px 35px rgba(0,0,0,.35);
+    }
+
+    body {
+      font-family: 'Roboto', system-ui, sans-serif;
+      margin: 0;
+      padding: 40px 30px 80px;
+      color: var(--text);
+      background:
+        radial-gradient(1200px 600px at 70% -10%, #29417a40, transparent),
+        radial-gradient(900px 500px at -10% 10%, #344b9340, transparent),
+        var(--bg);
+      display: flex;
+      justify-content: center;
+    }
+
+    .content-wrapper { max-width: 1500px; width: 100%; }
+
+    .task-container {
+      background: var(--card);
+      border-left: 5px solid var(--primary);
+      padding: 20px 30px 10px 30px;
+      margin-bottom: 30px;
+      font-size: 20px;
+      line-height: 1.7;
+      text-align: left;
+      box-sizing: border-box;
+      box-shadow: var(--shadow);
+      border-radius: 12px;
+    }
+    .task-container ul { margin:10px 0 15px 20px; }
+    .task-container li { margin-bottom:8px; }
+    .task-container .instruction { font-weight:700; margin-top:10px; }
+
+    .images {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      gap: 30px;
+      margin-bottom: 30px;
+    }
+    .images img {
+      max-width: 100%;
+      height: auto;
+      width: 48%;
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+    }
+
+    .button {
+      font-size: 20px;
+      padding: 16px 32px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-600));
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: 0 10px 22px rgba(43,108,255,.3);
+      transition: transform .06s ease, box-shadow .2s ease, filter .2s ease;
+    }
+    .button:hover { transform: scale(1.05); filter: brightness(1.03); }
+
+    #progressContainerFixed {
+      position: fixed; bottom: 0; left: 0; width: 100%; height: 32px;
+      background: #eee; z-index: 9999;
+    }
+    .dark #progressContainerFixed { background:#222; }
+    #progressBarFixed {
+      height: 100%; width: 0%;
+      background: linear-gradient(to right, #0066ff, #00cfff);
+      position: relative; transition: width .5s linear;
+    }
+    .progress-time {
+      position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+      color: #fff; font-weight: 700; font-size: 20px; user-select: none;
+      text-shadow: 0 1px 2px rgba(0,0,0,.35);
+    }
+
+    .theme-toggle{
+      position: fixed; top:16px; right:16px; z-index:10000;
+      border:1px solid #ffffff22; background:transparent; color:var(--text);
+      padding:10px 14px; border-radius:10px; cursor:pointer; backdrop-filter: blur(6px);
+      transition: transform .08s ease, filter .2s ease;
+    }
+    .theme-toggle:hover{ transform: translateY(-1px); filter: brightness(1.03); }
+
+    @media (max-width: 800px) {
+      .images { flex-direction: column; align-items: center; }
+      .images img { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Переключатель темы -->
+  <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
+
+  <div class="content-wrapper">
+    <div class="task-container">
+      <b>4 Task. Imagine that you and your friend are doing a school project “Spending holidays: in the city or in the countryside”.</b>
+      You have found some photos to illustrate it but for technical reasons you cannot send them now. Leave a voice message to your friend explaining your choice of the photos and sharing some ideas about the project. In 2.5 minutes be ready to:
+      <ul>
+        <li>explain the choice of the illustrations for the project by briefly describing them and noting the differences;</li>
+        <li>mention the advantages (1–2) of the two ways of spending holidays;</li>
+        <li>mention the disadvantages (1–2) of the two ways of spending holidays;</li>
+        <li>express your opinion on the subject of the project – which way of spending holidays presented in the pictures you prefer and why.</li>
+      </ul>
+      <div class="instruction">
+        You will speak for not more than 3 minutes (12–15 sentences). You have to talk continuously.
+      </div>
+    </div>
+
+    <div class="images">
+      <img src="1.jpg" alt="City holidays">
+      <img src="2.jpg" alt="Countryside holidays">
+    </div>
+
+    <div style="text-align:center; margin-bottom:30px;">
+      <button class="button" id="goBtn">Перейти к выполнению</button>
+    </div>
+  </div>
+
+  <div id="progressContainerFixed" role="timer" aria-live="polite">
+    <div id="progressBarFixed">
+      <span id="progressTime" class="progress-time">02:30</span>
+    </div>
+  </div>
+
+  <script>
+    // == Очистка прошлых данных и маркер подготовки ==
+    try {
+      sessionStorage.removeItem('ege4_audio_base64');
+      sessionStorage.setItem('ege4_prepared', '1');
+    } catch (_) {}
+
+    // == Переключатель темы ==
+    (function(){
+      const btn = document.getElementById('themeBtn');
+      const key = 'pref-theme';
+      const root = document.documentElement;
+      function apply(mode){
+        root.classList.toggle('dark', mode === 'dark');
+        localStorage.setItem(key, mode);
+      }
+      apply(localStorage.getItem(key) || 'light');
+      btn.addEventListener('click', () => {
+        const curr = localStorage.getItem(key) || 'light';
+        apply(curr === 'dark' ? 'light' : 'dark');
+      });
+    })();
+
+    // == Таймер 2:30 и прогресс ==
+    const progressBar = document.getElementById('progressBarFixed');
+    const progressTime = document.getElementById('progressTime');
+    const totalTime = 150000; // 2.5 минуты в мс
+    const endTime = Date.now() + totalTime;
+
+    // ✅ Решение "через n": просто меняем окончание файла
+    // .../variantN/ege4_varN_1_prepare.html  →  .../variantN/ege4_varN_2_mic.html
+    const NEXT_URL = location.pathname.replace(/_1_prepare\.html$/i, '_2_mic.html');
+
+    function formatLeft(ms){
+      const s = Math.max(0, Math.floor(ms / 1000));
+      const m = String(Math.floor(s/60)).padStart(2, '0');
+      const r = String(s%60).padStart(2, '0');
+      return `${m}:${r}`;
+    }
+
+    function updateTimer() {
+      const now = Date.now();
+      const left = Math.max(0, endTime - now);
+      progressTime.textContent = formatLeft(left);
+      progressBar.style.width = `${(left / totalTime) * 100}%`;
+      if (left <= 0) {
+        clearInterval(timerInterval);
+        window.location.href = NEXT_URL;
+      }
+    }
+    updateTimer();
+    const timerInterval = setInterval(updateTimer, 500);
+
+    // == Кнопка «Перейти к выполнению» ==
+    document.getElementById('goBtn').addEventListener('click', () => {
+      window.location.href = NEXT_URL;
+    });
+
+    // == Страховка: при уходе руками обнулим интервал ==
+    window.addEventListener('beforeunload', () => {
+      try { clearInterval(timerInterval); } catch(_) {}
+    });
+  </script>
+</body>
+</html>

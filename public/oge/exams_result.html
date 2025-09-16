@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ОГЭ — Экзамен полностью: общий результат</title>
+
+  <!-- Шрифты -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <!-- Общие стили проекта -->
+  <link rel="stylesheet" href="./style_common.css" />
+
+  <!-- Анти-мигание темы -->
+  <script>
+    (function(){ try{
+      const saved = localStorage.getItem('pref-theme') || 'light';
+      if (saved === 'dark') document.documentElement.classList.add('dark');
+    }catch{}})();
+  </script>
+
+  <style>
+    .wrap{ max-width:1400px; margin:0 auto; padding:20px; }
+    h1{ color:var(--primary); font-size:34px; margin:12px 0 22px; text-align:center; }
+
+    .block{
+      background:var(--card); border-left:5px solid var(--primary);
+      border-radius:12px; box-shadow:var(--shadow); padding:18px 24px; margin-bottom:26px;
+    }
+    .block h2{ margin:0 0 8px; font-size:22px; }
+    .desc{ font-size:14px; color:var(--muted); margin:0 0 10px; }
+
+    audio{ margin:10px 0 8px; width:100%; display:block; }
+    .wave-wrap{ width:100%; margin:0 auto 10px; display:none; }
+    .wave{ width:100%; height:56px; display:block; background:#e9edf7; border-radius:10px; box-shadow:var(--shadow); }
+    .dark .wave{ background:#1f2a3d; }
+
+    /* Цвета волн */
+    :root{
+      --wave-base: rgba(0,0,0,.28);
+      --wave-prog: var(--primary);
+      --wave-glow: rgba(43,108,255,.45);
+    }
+    html.dark{
+      --wave-base: rgba(255,255,255,.52);
+      --wave-prog: #5bb8ff;
+      --wave-glow: rgba(91,184,255,.65);
+    }
+
+    .status{ font-size:14px; color:var(--muted); margin-bottom:4px; }
+
+    .task-snippet{ margin-top:12px; padding:14px 16px; border:1px dashed var(--border); border-radius:12px; background:var(--card); }
+    .task-snippet--plain{ border:none; padding:0; background:transparent; }
+
+    /* Task 1 — рамка текста */
+    .reading-box{
+      background:var(--card);
+      border:1px solid #ccc;
+      border-radius:12px;
+      box-shadow:var(--shadow);
+      padding:24px 28px;
+      text-align:left;
+      font-family: Inter, system-ui, Segoe UI, Roboto, Arial, sans-serif;
+      font-size:20px;
+      line-height:1.6;
+      max-width:1200px;
+      margin:0 auto 24px;
+      white-space:pre-line;
+    }
+    @media (max-width:900px){
+      .reading-box{ font-size:18px; line-height:1.55; padding:18px 16px; max-width:100%; }
+    }
+
+    /* Task 2 — макет объявки (если попадёт из сниппета) */
+    .ad-layout{
+      display:grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap:28px 36px;
+      align-items:start;
+      max-width:1500px;
+      margin:18px auto 0;
+    }
+    .task-header.card{
+      background:var(--card);
+      border-left:5px solid var(--primary);
+      box-shadow:var(--shadow);
+      border-radius:12px;
+      padding:20px 24px;
+      grid-column:1 / -1;
+      text-align:center;
+      font-size:20px; line-height:1.7;
+    }
+    .task-header b{ display:block; }
+    .left-free{ font-size:20px; line-height:1.6; text-align:left; }
+    .plain-list{ list-style:none; margin:0 0 24px 0; padding:0; }
+    .plain-list li{ margin:10px 0; }
+    .ad-title{ font-weight:800; font-size:30px; margin:6px 0 12px; text-align:center; }
+
+    .ad-figure{ width:100%; aspect-ratio:3/2; border-radius:12px; overflow:hidden; box-shadow:var(--shadow); background:#ddd; }
+    .ad-figure>img{ width:100%; height:100%; object-fit:cover; object-position:center; display:block; }
+
+    @media (max-width:1100px){
+      .ad-layout{ grid-template-columns:1fr; gap:22px; }
+      .left-free{ font-size:18px; line-height:1.55; }
+    }
+
+    /* Task 3 — карточка плана */
+    .t3-container{
+      background:var(--card);
+      border-left:5px solid var(--primary);
+      padding:20px 28px;
+      margin:0 auto 30px;
+      font-family: Inter, system-ui, Segoe UI, Roboto, Arial, sans-serif;
+      font-size:20px;
+      line-height:1.6;
+      text-align:left;
+      box-shadow:var(--shadow); border-radius:12px;
+    }
+    @media (max-width:900px){
+      .t3-container{ font-size:18px; line-height:1.55; padding:16px 18px; }
+    }
+
+    /* Навигация */
+    .navs{ text-align:center; margin-top:22px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+    .btn{
+      display:inline-block; padding:12px 18px; font-weight:600; color:#fff;
+      background:linear-gradient(135deg, var(--primary), var(--primary-600));
+      border:none; border-radius:10px; box-shadow:0 10px 22px rgba(43,108,255,.30);
+      cursor:pointer; text-decoration:none;
+    }
+  </style>
+</head>
+<body>
+  <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
+
+  <div class="wrap">
+    <h1>ОГЭ — общий результат по варианту</h1>
+
+    <!-- Task 1 -->
+    <section class="block" id="t1">
+      <h2>Task 1 — Reading the text aloud</h2>
+      <p class="desc">Вы прочитали текст вслух (до ~1.5 минуты).</p>
+      <div class="status" id="s1">Загрузка записи…</div>
+      <audio id="a1" controls></audio>
+      <div class="wave-wrap"><canvas id="w1" class="wave"></canvas></div>
+      <div class="task-snippet task-snippet--plain" id="snip1">Загрузка текста…</div>
+    </section>
+
+    <!-- Task 2 -->
+    <section class="block" id="t2">
+      <h2>Task 2 — Questions to advertisement</h2>
+      <p class="desc">Вы задали вопросы по объявлению (на каждый ограничение по времени).</p>
+      <div class="status" id="s2">Загрузка записи…</div>
+      <audio id="a2" controls></audio>
+      <div class="wave-wrap"><canvas id="w2" class="wave"></canvas></div>
+      <div class="task-snippet" id="snip2">Загрузка объявления…</div>
+    </section>
+
+    <!-- Task 3 -->
+    <section class="block" id="t3">
+      <h2>Task 3 — Interview</h2>
+      <p class="desc">Диалог-интервью из нескольких вопросов (лимит времени на ответ).</p>
+      <div class="status" id="s3">Загрузка записи…</div>
+      <audio id="a3" controls></audio>
+      <div class="wave-wrap"><canvas id="w3" class="wave"></canvas></div>
+      <div class="task-snippet task-snippet--plain" id="snip3">Загрузка вопросов…</div>
+    </section>
+
+    <div class="navs">
+      <a id="repeatExam" class="btn" href="#" role="button">🔁 Пройти этот вариант заново</a>
+      <a id="toVariants" class="btn" href="./exams.html" role="button">← К выбору варианта</a>
+      <a id="toFormat"   class="btn" href="./oge.html" role="button">← К выбору режима</a>
+      <a id="toHome"     class="btn" href="../index.html" role="button">← На главную</a>
+    </div>
+  </div>
+
+  <script type="module">
+    import { toggleThemeInit, navigateOnce } from './common.js';
+    toggleThemeInit();
+
+    // ==== Безопасный разбор номера варианта ====
+    const q = new URLSearchParams(location.search);
+    const variant = (q.get('variant') || sessionStorage.getItem('exam_variant') || '1').replace(/\D+/g,'');
+
+    // ==== Утилиты ====
+    function clearExamState(){
+      try{
+        ['exam_flow','exam_variant','exam_started_at','exams_payload','exams_state']
+          .forEach(k => sessionStorage.removeItem(k));
+        ['oge1_','oge2_','oge3_'].forEach(prefix=>{
+          Object.keys(sessionStorage).forEach(k=>{ if(k.startsWith(prefix)) sessionStorage.removeItem(k); });
+        });
+      }catch{}
+    }
+
+    function dataURLtoBlob(dataURL){
+      const parts = (dataURL || '').split(',');
+      if (parts.length < 2) return null;
+      const header = parts[0], b64 = parts[1];
+      const type = (header.match(/data:(.*?);base64/) || [,'application/octet-stream'])[1];
+      const bin  = atob(b64);
+      const bytes= new Uint8Array(bin.length);
+      for (let i=0;i<bin.length;i++) bytes[i] = bin.charCodeAt(i);
+      return new Blob([bytes], { type });
+    }
+
+    async function renderWaveTo(canvas, audioEl, arrayBuffer){
+      const AC = window.AudioContext || window.webkitAudioContext;
+      const ctxA = new AC();
+      const buf = await ctxA.decodeAudioData(arrayBuffer);
+
+      const peaks = buildPeaks(buf, 1000);
+      const wrap = canvas.parentElement;
+      drawWave(canvas, peaks, 0);
+      wrap.style.display = 'block';
+
+      let raf=0;
+      const tick = ()=>{
+        const p = audioEl.currentTime / (buf.duration || 1);
+        drawWave(canvas, peaks, p);
+        raf = requestAnimationFrame(tick);
+      };
+      audioEl.addEventListener('play', ()=>{ cancelAnimationFrame(raf); tick(); });
+      audioEl.addEventListener('pause', ()=>{ cancelAnimationFrame(raf); drawWave(canvas, peaks, audioEl.currentTime/(buf.duration||1)); });
+      audioEl.addEventListener('ended', ()=>{ cancelAnimationFrame(raf); drawWave(canvas, peaks, 1); });
+    }
+
+    function buildPeaks(buf, width){
+      const ch0 = buf.getChannelData(0);
+      const ch1 = buf.numberOfChannels>1 ? buf.getChannelData(1) : null;
+      const total = ch0.length;
+      const block = Math.floor(total / width) || 1;
+      const arr = new Array(width);
+      for (let i=0;i<width;i++){
+        const start = i*block, end = Math.min(total, start+block);
+        let min=1, max=-1;
+        for (let j=start;j<end;j++){
+          const s = ch1 ? (ch0[j]+ch1[j])*0.5 : ch0[j];
+          if (s<min) min=s; if (s>max) max=s;
+        }
+        arr[i] = [min,max];
+      }
+      return arr;
+    }
+
+    function drawWave(c, peaks, progress){
+      const dpr = Math.max(1, Math.floor(window.devicePixelRatio || 1));
+      const cssW = c.clientWidth || 600;
+      const cssH = c.clientHeight || 56;
+      if (c.width !== cssW*dpr) c.width = cssW*dpr;
+      if (c.height!== cssH*dpr) c.height= cssH*dpr;
+      const ctx = c.getContext('2d');
+      ctx.setTransform(dpr,0,0,dpr,0,0);
+
+      const rs = getComputedStyle(document.documentElement);
+      const waveBase = (rs.getPropertyValue('--wave-base') || 'rgba(0,0,0,.28)').trim();
+      const waveProg = (rs.getPropertyValue('--wave-prog') || '#2b6cff').trim();
+      const waveGlow = (rs.getPropertyValue('--wave-glow') || 'rgba(43,108,255,.45)').trim();
+      const bg = getComputedStyle(c).backgroundColor;
+
+      ctx.clearRect(0,0,cssW,cssH);
+      ctx.fillStyle = bg; ctx.fillRect(0,0,cssW,cssH);
+
+      const mid = cssH/2;
+      ctx.fillStyle = waveBase;
+      for (let i=0;i<peaks.length;i++){
+        const x = i/peaks.length*cssW;
+        const [min,max] = peaks[i];
+        const hTop = Math.abs(max)*mid;
+        const hBot = Math.abs(min)*mid;
+        ctx.fillRect(x, mid-hTop, 1, hTop+hBot || 1);
+      }
+
+      const progW = Math.max(0, Math.min(cssW, progress*cssW));
+      ctx.save(); ctx.beginPath(); ctx.rect(0,0,progW,cssH); ctx.clip();
+      ctx.fillStyle = waveProg; ctx.shadowColor = waveGlow; ctx.shadowBlur = 8;
+      for (let i=0;i<peaks.length;i++){
+        const x = i/peaks.length*cssW;
+        const [min,max] = peaks[i];
+        const hTop = Math.abs(max)*mid;
+        const hBot = Math.abs(min)*mid;
+        ctx.fillRect(x, mid-hTop, 1, hTop+hBot || 1);
+      }
+      ctx.restore();
+    }
+
+    async function setupRow({key, a, s, w}){
+      const audioEl = document.getElementById(a);
+      const status  = document.getElementById(s);
+      const canvas  = document.getElementById(w);
+
+      const base64     = sessionStorage.getItem(`${key}_audio_base64`);
+      const mimeStored = (sessionStorage.getItem(`${key}_audio_mime`) || 'audio/webm').toLowerCase();
+
+      if (!base64){
+        status.textContent = '⚠️ Запись не найдена.';
+        return;
+      }
+      try{
+        const blob = dataURLtoBlob(base64);
+        if (blob){
+          const url = URL.createObjectURL(blob);
+          audioEl.src  = url;
+          audioEl.type = blob.type || mimeStored;
+          const arr = await blob.arrayBuffer();
+          await renderWaveTo(canvas, audioEl, arr);
+          status.textContent = 'Готово.';
+          window.addEventListener('pagehide', ()=> URL.revokeObjectURL(url));
+          window.addEventListener('beforeunload', ()=> URL.revokeObjectURL(url));
+        }else{
+          audioEl.src  = base64; // data: URL
+          audioEl.type = mimeStored;
+          const resp = await fetch(base64);
+          const arr  = await resp.arrayBuffer();
+          await renderWaveTo(canvas, audioEl, arr);
+          status.textContent = 'Готово.';
+        }
+      }catch{
+        audioEl.src  = base64;
+        audioEl.type = mimeStored;
+        status.textContent = 'Готово.';
+      }
+    }
+
+    // ==== Подгрузка сниппетов из отдельных результатов ====
+    const domParse = (html, baseUrl='.')=>{
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+      doc.querySelectorAll('[src]').forEach(el=>{
+        const src = el.getAttribute('src');
+        if (src && !/^([a-z]+:|\/)/i.test(src)){
+          el.setAttribute('src', (baseUrl + '/' + src).replace(/\/{2,}/g,'/').replace(':/','://'));
+        }
+      });
+      return doc;
+    };
+
+    // Task 1 — берём .reading-box
+    (async ()=>{
+      try{
+        const url  = `./task1/variants/variant${variant}/oge1_var${variant}_4_result.html`;
+        const html = await (await fetch(url)).text();
+        const doc  = domParse(html, `./task1/variants/variant${variant}`);
+        const rb   = doc.querySelector('.reading-box');
+        const mount= document.getElementById('snip1');
+        if (rb && mount){ mount.innerHTML=''; mount.appendChild(rb.cloneNode(true)); }
+        else { mount.textContent = 'Не удалось загрузить текст.'; }
+      }catch{ document.getElementById('snip1').textContent='Не удалось загрузить текст.'; }
+    })();
+
+    // Task 2 — поддержка .ad-layout и .task-container (и запасных селекторов)
+    (async ()=>{
+      const mount = document.getElementById('snip2');
+      try{
+        const url  = `./task2/variants/variant${variant}/oge2_var${variant}_4_result.html`;
+        const html = await (await fetch(url)).text();
+        const doc  = domParse(html, `./task2/variants/variant${variant}`);
+
+        const el =
+          doc.querySelector('.ad-layout') ||
+          doc.querySelector('.task-container') ||
+          doc.querySelector('#adRoot') ||
+          doc.querySelector('.task-header.card');
+
+        if (el && mount){
+          const clone = el.cloneNode(true);
+          mount.innerHTML = '';
+          mount.appendChild(clone);
+        } else {
+          mount.textContent='Не удалось загрузить объявление.';
+        }
+      }catch{
+        mount.textContent='Не удалось загрузить объявление.';
+      }
+    })();
+
+    // Task 3 — берём .task-container и стилизуем
+    (async ()=>{
+      try{
+        const url  = `./task3/variants/variant${variant}/oge3_var${variant}_4_result.html`;
+        const html = await (await fetch(url)).text();
+        const doc  = domParse(html, `./task3/variants/variant${variant}`);
+        const tc   = doc.querySelector('.task-container');
+        const mount= document.getElementById('snip3');
+        if (tc && mount){
+          const cont = tc.cloneNode(true);
+          cont.className = 't3-container';
+          mount.innerHTML=''; mount.appendChild(cont);
+        } else {
+          mount.textContent='Не удалось загрузить вопросы.';
+        }
+      }catch{ document.getElementById('snip3').textContent='Не удалось загрузить вопросы.'; }
+    })();
+
+    // ==== Вклейка аудио + волны ====
+    const rows = [
+      { key:'oge1', a:'a1', s:'s1', w:'w1' },
+      { key:'oge2', a:'a2', s:'s2', w:'w2' },
+      { key:'oge3', a:'a3', s:'s3', w:'w3' },
+    ];
+    rows.reduce((p,row)=> p.then(()=>setupRow(row)), Promise.resolve());
+
+    // ==== Кнопки ====
+    document.getElementById('repeatExam').addEventListener('click',(e)=>{
+      e.preventDefault();
+      try{
+        // чистим только хвосты заданий, сохраняем exam_flow/exam_variant
+        ['oge1_','oge2_','oge3_'].forEach(prefix=>{
+          Object.keys(sessionStorage).forEach(k=>{ if(k.startsWith(prefix)) sessionStorage.removeItem(k); });
+        });
+      }catch{}
+      const v = (sessionStorage.getItem('exam_variant') || variant || '1').replace(/\D+/g,'') || '1';
+      navigateOnce(`./task1/variants/variant${v}/oge1_var${v}_1_prepare.html?exam=1&variant=${encodeURIComponent(v)}`);
+    });
+
+    // На «уходящие» ссылки — полный сброс режима экзамена
+    [['toVariants','./exams.html'], ['toFormat','./oge.html'], ['toHome','../index.html']].forEach(([id,href])=>{
+      const a = document.getElementById(id);
+      if (!a) return;
+      a.addEventListener('click',(e)=>{
+        e.preventDefault();
+        clearExamState();
+        navigateOnce(href);
+      });
+    });
+
+    window.addEventListener('pageshow', ()=>{ navigateOnce.lock=false; });
+  </script>
+</body>
+</html>

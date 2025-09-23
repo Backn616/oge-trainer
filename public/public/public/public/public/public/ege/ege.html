@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ЕГЭ — Начало</title>
+
+  <!-- Шрифты + preconnect -->
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <!-- Анти-мигание темы -->
+  <script>
+    (function () {
+      try {
+        const saved = localStorage.getItem('pref-theme') || 'light';
+        if (saved === 'dark') document.documentElement.classList.add('dark');
+      } catch (_) {}
+    })();
+  </script>
+
+  <style>
+    :root {
+      --bg:#f7f9ff; --card:#ffffff; --text:#0b1020; --muted:#5a6475;
+      --primary:#2b6cff; --primary-600:#1f58d9; --ring:#bfd3ff;
+      --shadow: 0 10px 25px rgba(17,24,39,.08);
+    }
+    .dark {
+      --bg:#0b1020; --card:rgba(255,255,255,0.08); --text:#eaf0ff; --muted:#b9c2d3;
+      --primary:#6aa3ff; --primary-600:#4b8dff; --ring:#a9c6ff;
+      --shadow: 0 10px 35px rgba(0,0,0,.35);
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; font-family:Inter, system-ui, Segoe UI, Roboto, Arial, sans-serif; color:var(--text);
+      background:
+        radial-gradient(1200px 600px at 70% -10%, #29417a40, transparent),
+        radial-gradient(900px 500px at -10% 10%, #344b9340, transparent),
+        var(--bg);
+      display:flex; flex-direction:column;
+    }
+
+    a{color:inherit; text-decoration:none}
+
+    .wrap{max-width:1040px; margin:0 auto; padding:24px; flex:1; display:flex; flex-direction:column}
+
+    header{display:flex; justify-content:space-between; align-items:center; gap:16px; padding:8px 0}
+    .brand{display:flex; align-items:center; gap:12px}
+    .logo{
+      width:42px; height:42px; border-radius:12px;
+      background: linear-gradient(135deg, var(--primary), #9bd0ff);
+      box-shadow: 0 6px 18px rgba(0,0,0,.25), inset 0 0 12px #ffffff33;
+      display:grid; place-items:center; color:#001133; font-weight:800;
+    }
+    .brand-title{font-weight:700; letter-spacing:.2px}
+    .badge{font-size:12px; color:var(--muted)}
+
+    .theme-toggle{
+      border:1px solid #ffffff22; background:transparent; color:var(--text);
+      padding:10px 14px; border-radius:10px; cursor:pointer; transition:transform .08s ease;
+    }
+    .theme-toggle:active{transform:scale(.98)}
+    .theme-toggle:focus-visible{ box-shadow:0 0 0 4px var(--ring); outline:none }
+
+    .back{
+      border:1px dashed #ffffff28;
+      background:#ffffff08;
+      padding:10px 14px;
+      border-radius:10px;
+      text-decoration:none;
+      transition:background .2s ease, filter .2s ease;
+      color:var(--text);
+    }
+    .back:hover{ background:#ffffff14; filter: brightness(1.02) }
+    .back:focus-visible{ box-shadow:0 0 0 4px var(--ring); outline:none }
+
+    main{flex:1; display:flex; justify-content:center; align-items:center}
+    .card{
+      background:var(--card);
+      border:1px solid #ffffff1f;
+      border-radius:20px;
+      padding:40px;
+      box-shadow:var(--shadow);
+      backdrop-filter: blur(10px);
+      text-align:center;
+      max-width:500px; width:100%;
+    }
+
+    h1{font-size:clamp(26px,5vw,36px); margin-bottom:32px}
+
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center;
+      font-size:22px; font-weight:600;
+      padding:20px 26px; min-height:64px; width:100%;
+      border-radius:14px; border:1px solid rgba(255,255,255,.18);
+      background: linear-gradient(135deg, var(--primary), var(--primary-600));
+      color:#ffffff; text-shadow:0 1px 0 rgba(0,0,0,.15);
+      box-shadow: 0 12px 24px rgba(75,141,255,.28);
+      text-decoration:none; margin-bottom:20px;
+      transition: transform .06s ease, filter .2s ease;
+    }
+    .btn:last-child{margin-bottom:0}
+    .btn:hover{transform:translateY(-2px); filter:brightness(1.03)}
+    .btn:active{transform:translateY(0)}
+    .btn:focus-visible{box-shadow:0 0 0 4px var(--ring); outline:none }
+
+    footer{padding:20px 0 10px; color:var(--muted); font-size:13px; text-align:center}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <a class="brand" href="../index.html" aria-label="На главную">
+        <div class="logo">A</div>
+        <div>
+          <div class="brand-title">Онлайн-тренажёр «Говорение»</div>
+          <div class="badge">ЕГЭ по английскому</div>
+        </div>
+      </a>
+      <div style="display:flex; gap:10px; align-items:center">
+        <a class="back" href="../index.html">← На главную</a>
+        <button class="theme-toggle" id="themeBtn" aria-label="Переключить тему">🌓 Тема</button>
+      </div>
+    </header>
+
+    <main>
+      <div class="card" role="region" aria-labelledby="title">
+        <h1 id="title">📝 Выберите формат тренировки</h1>
+        <nav aria-label="Выбор режима">
+          <a href="exams.html" class="btn" aria-label="Экзамен полностью">Экзамен полностью</a>
+          <a href="ege_menu.html" class="btn" aria-label="По заданиям">По заданиям</a>
+        </nav>
+      </div>
+    </main>
+
+    <footer>© 2025 — Демо-версия тренажёра ЕГЭ.</footer>
+  </div>
+
+  <script type="module">
+    import { toggleThemeInit, navigateOnce } from './common.js';
+
+    // Тема
+    toggleThemeInit();
+
+    // 🔧 Сброс exam_flow при входе (чтобы «по заданиям» не подхватывали режим экзамена)
+    try {
+      sessionStorage.removeItem('exam_flow');
+      sessionStorage.removeItem('exam_variant');
+    } catch {}
+
+    // Переходы: логотип и "На главную"
+    document.querySelectorAll('.brand, .back').forEach(a=>{
+      const url = a.getAttribute('href') || '../index.html';
+      a.addEventListener('click', (e)=>{ e.preventDefault(); navigateOnce(url); });
+    });
+
+    // Кнопки выбора режима — через navigateOnce
+    document.querySelectorAll('.card .btn').forEach(a=>{
+      const url = a.getAttribute('href');
+      a.addEventListener('click', (e)=>{ e.preventDefault(); navigateOnce(url); });
+    });
+
+    // BFCache: снимаем «замок» при возврате
+    window.addEventListener('pageshow', ()=>{ navigateOnce.lock = false; });
+  </script>
+</body>
+</html>

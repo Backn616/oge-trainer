@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Task 1 — Reading</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Шрифт -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <!-- Общие стили проекта -->
+  <link rel="stylesheet" href="../../../style_common.css" />
+
+  <!-- Анти-мигание темы -->
+  <script>
+    (function(){
+      try{
+        const saved = localStorage.getItem('pref-theme') || 'light';
+        if (saved === 'dark') document.documentElement.classList.add('dark');
+      }catch(_){}
+    })();
+  </script>
+
+  <style>
+    /* Таймер-цифры 3-2-1 */
+    .timer{
+      font-size:70px; margin:30px 0; font-weight:700; color:var(--primary);
+      letter-spacing:4px; text-shadow:0 4px 12px rgba(0,0,0,.25);
+      transition:transform .25s ease; will-change:transform; text-align:center;
+    }
+    @media (prefers-reduced-motion: reduce) { .timer{ transition:none; } }
+
+    /* Текст для чтения — как в prepare (компактная рамка) */
+    .reading-box{
+      background:var(--card);
+      border:1px solid #ccc;
+      border-radius:12px;
+      box-shadow:var(--shadow);
+      padding:24px 28px;                 /* было 40px */
+      text-align:left;
+      font-family: Inter, system-ui, Segoe UI, Roboto, Arial, sans-serif;
+      font-size:25px;                     /* было 32px */
+      line-height:1.7;
+      max-width:1200px;                   /* было 2500px */
+      margin:0 auto 24px;
+      white-space:pre-line;               /* переносы строк как абзацы */
+    }
+    @media (max-width:900px){
+      .reading-box{ font-size:18px; padding:18px 16px; max-width:100%; }
+    }
+
+    /* Кнопка завершения */
+    .btn{
+      display:inline-block; padding:16px 32px; margin:12px;
+      font-size:20px; font-weight:600; color:#fff; text-decoration:none; cursor:pointer;
+      border:none; border-radius:12px;
+      background:linear-gradient(135deg, var(--primary), var(--primary-600));
+      box-shadow:0 10px 22px rgba(43,108,255,.3);
+      transition: transform .06s ease, filter .2s ease, box-shadow .2s ease;
+    }
+    .btn:hover{ transform: translateY(-1px); filter: brightness(1.03); }
+    .btn:disabled{ opacity:.6; cursor:not-allowed; transform:none; }
+  </style>
+</head>
+<body>
+  <!-- Тумблер темы -->
+  <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
+
+  <div class="content-wrapper">
+    <!-- Формулировка задания: скрыта до конца отсчёта -->
+    <div class="task-container" id="instructionBox" style="display:none" aria-labelledby="taskTitle" aria-describedby="inst">
+      <b id="taskTitle">Task 1. Imagine that you are preparing a project with your friend.</b>
+      You have found some interesting material for the presentation and you want to read this text to your friend.
+      You have 1.5 minutes to read the text silently, then be ready to read it out loud. You will not have more than 1.5 minutes to read it.
+      <div class="instruction" id="inst">You will read the text aloud for not more than 1.5 minutes.</div>
+    </div>
+
+    <!-- Отсчёт -->
+    <div id="timer" class="timer" aria-live="polite">3</div>
+
+    <!-- Текст для чтения: скрыт до конца отсчёта -->
+    <div class="reading-box" id="textBox" style="display:none">Cardiff is the capital of Wales and one of the most important cities in the United Kingdom. It became a city in 1905 and was made the capital in 1955. In the past, Cardiff was a small town, but it grew rapidly during the 19th century because of coal mining and trade. Its port became one of the busiest in the world.
+
+Today, Cardiff is a modern and multicultural city. It has a population of over 350,000 people. The city is known for Cardiff Castle, which shows parts of Roman and medieval history. Visitors also enjoy the Millennium Stadium and the Wales Millennium Centre, which hosts concerts and theatre performances.
+
+Cardiff is home to several universities and is considered a centre of education and culture in Wales. It’s a place where old traditions meet new ideas. Thanks to its rich history and active present, Cardiff attracts thousands of tourists and students every year.
+    </div>
+
+    <!-- Кнопка завершения -->
+    <div style="text-align:center; margin-bottom:30px;">
+      <button class="btn" id="endBtn" type="button" aria-label="Закончить запись" style="display:none">✅ Закончить</button>
+    </div>
+  </div>
+
+  <!-- Проставка над фикс-баром -->
+  <div style="height: calc(var(--footer-h) + 24px);"></div>
+
+  <!-- Фиксированный прогресс-бар времени ответа -->
+  <div id="progressContainerFixed" role="timer" aria-live="polite" aria-atomic="true"
+       aria-label="Оставшееся время ответа" style="display:none">
+    <div id="progressBarFixed">
+      <span id="progressTime" class="progress-time">01:30</span>
+    </div>
+  </div>
+
+  <script type="module">
+    import { toggleThemeInit, navigateOnce, fmtTime } from '../../../common.js';
+
+    toggleThemeInit();
+
+    const timerEl        = document.getElementById('timer');
+    const instructionBox = document.getElementById('instructionBox');
+    const textBox        = document.getElementById('textBox');
+    const endBtn         = document.getElementById('endBtn');
+    const progressWrap   = document.getElementById('progressContainerFixed');
+    const progressBar    = document.getElementById('progressBarFixed');
+    const progressTime   = document.getElementById('progressTime');
+
+    const RESULT_URL = location.pathname.replace(/_3_task\.html$/i, '_4_result.html');
+
+    const inExam      = (sessionStorage.getItem('exam_flow') === '1');
+    const varFromSS   = sessionStorage.getItem('exam_variant') || '';
+    const varFromURL  = (location.pathname.match(/variant(\d+)/i) || [,''])[1];
+    const EXAM_VARIANT= varFromSS || varFromURL || '';
+    const EXAM_NEXT_URL = `../../../exams_countdown.html?next=2&variant=${encodeURIComponent(EXAM_VARIANT)}`;
+
+    /* === Микрофон и запись === */
+    let mediaRecorder = null, audioChunks = [], streamRef = null;
+    let chosenMime = '', hasStopped = false;
+
+    function pickMimeType(){
+      const candidates = [
+        'audio/webm;codecs=opus','audio/webm','audio/mp4',
+        'audio/ogg;codecs=opus','audio/ogg'
+      ];
+      for (const t of candidates){ if (window.MediaRecorder?.isTypeSupported?.(t)) return t; }
+      return '';
+    }
+
+    async function initMic(){
+      try{
+        const stream = await navigator.mediaDevices.getUserMedia({ audio:true });
+        streamRef = stream;
+
+        chosenMime = pickMimeType();
+        mediaRecorder = chosenMime ? new MediaRecorder(stream, { mimeType: chosenMime }) : new MediaRecorder(stream);
+
+        mediaRecorder.ondataavailable = (e)=>{ if (e.data?.size) audioChunks.push(e.data); };
+        mediaRecorder.onstop = () => {
+          if (hasStopped) return;
+          hasStopped = true;
+          try{ streamRef?.getTracks()?.forEach(t=>t.stop()); }catch{}
+          const blobType = chosenMime || mediaRecorder.mimeType || 'audio/webm';
+          const audioBlob = new Blob(audioChunks, { type: blobType });
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            try{
+              sessionStorage.setItem('ege1_audio_base64', reader.result);
+              sessionStorage.setItem('ege1_audio_mime', blobType);
+            }catch{}
+            navigateOnce(inExam ? EXAM_NEXT_URL : RESULT_URL);
+          };
+          reader.readAsDataURL(audioBlob);
+        };
+
+        startCountdown();
+      }catch(err){
+        alert('❌ Не удалось получить доступ к микрофону: ' + (err?.message || err));
+        startCountdown(); // не блокируем сценарий
+      }
+    }
+
+    /* === Отсчёт 3-2-1 === */
+    let countdown = 3;
+    let cdInterval = 0;
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function startCountdown(){
+      timerEl.style.display = 'block';
+      timerEl.textContent = countdown;
+      cdInterval = setInterval(()=>{
+        timerEl.style.color = (countdown > 1) ? '#2b6cff' : '#b30000';
+        timerEl.textContent = countdown;
+        if (!reduceMotion){
+          timerEl.style.transform = 'scale(1.2)';
+          setTimeout(()=>{ timerEl.style.transform = 'scale(1)'; }, 200);
+        }
+        countdown--;
+        if (countdown < 0){
+          clearInterval(cdInterval);
+          startTask();
+        }
+      },1000);
+    }
+
+    /* === Таймер ответа 1:30 на rAF === */
+    const TOTAL_MS = 90_000;
+    let endTs = 0, rafId = 0, lastAnnounce = 0;
+
+    function startTask(){
+      instructionBox.style.display = 'block';
+      textBox.style.display        = 'block';
+      endBtn.style.display         = 'inline-block';
+      progressWrap.style.display   = 'block';
+      timerEl.style.display        = 'none';
+
+      audioChunks = [];
+      try{ if (mediaRecorder && mediaRecorder.state !== 'recording') mediaRecorder.start(); }catch{}
+
+      progressBar.classList.add('rAF');
+      endTs = performance.now() + TOTAL_MS;
+      progressTime.textContent = fmtTime(TOTAL_MS);
+      progressBar.style.width  = '100%';
+
+      tick();
+      endBtn.onclick = ()=> safeStopOrFinish();
+    }
+
+    function tick(){
+      const left = Math.max(0, endTs - performance.now());
+      progressBar.style.width = `${(left / TOTAL_MS) * 100}%`;
+      if (!lastAnnounce || performance.now() - lastAnnounce > 250){
+        progressTime.textContent = fmtTime(left);
+        lastAnnounce = performance.now();
+      }
+      if (left <= 0){ safeStopOrFinish(); }
+      else { rafId = requestAnimationFrame(tick); }
+    }
+
+    function safeStopOrFinish(){
+      try{ cancelAnimationFrame(rafId); }catch{}
+      if (hasStopped){ navigateOnce(inExam ? EXAM_NEXT_URL : RESULT_URL); return; }
+      try{
+        if (mediaRecorder?.state === 'recording'){ mediaRecorder.stop(); }
+        else {
+          try{ streamRef?.getTracks()?.forEach(t=>t.stop()); }catch{}
+          navigateOnce(inExam ? EXAM_NEXT_URL : RESULT_URL);
+        }
+      }catch{
+        try{ streamRef?.getTracks()?.forEach(t=>t.stop()); }catch{}
+        navigateOnce(inExam ? EXAM_NEXT_URL : RESULT_URL);
+      }
+    }
+
+    window.addEventListener('beforeunload', ()=>{
+      try{ cancelAnimationFrame(rafId); }catch{}
+      try{ if (mediaRecorder?.state === 'recording') mediaRecorder.stop(); }catch{}
+      try{ streamRef?.getTracks()?.forEach(t=>t.stop()); }catch{}
+    });
+
+    /* === BFCache: возврат со следующего шага → рестарт === */
+    function isBackForwardNav(){
+      try{
+        const nav = performance.getEntriesByType('navigation')[0];
+        return nav && nav.type === 'back_forward';
+      }catch{ return false; }
+    }
+    function resetAndRestart(){
+      try { cancelAnimationFrame(rafId); } catch {}
+      try { clearInterval(cdInterval); } catch {}
+      try { if (mediaRecorder?.state === 'recording') mediaRecorder.stop(); } catch {}
+      try { streamRef?.getTracks()?.forEach(t=>t.stop()); } catch {}
+
+      timerEl.style.display        = 'block';
+      timerEl.textContent          = '3';
+      instructionBox.style.display = 'none';
+      textBox.style.display        = 'none';
+      endBtn.style.display         = 'none';
+      progressWrap.style.display   = 'none';
+      progressBar.style.width      = '100%';
+      progressTime.textContent     = fmtTime(TOTAL_MS);
+
+      audioChunks = [];
+      hasStopped  = false;
+      countdown   = 3;
+
+      initMic();
+    }
+    window.addEventListener('pageshow', (e)=>{
+      try { navigateOnce.lock = false; } catch {}
+      if (e.persisted || isBackForwardNav()) resetAndRestart();
+    });
+
+    window.onload = initMic;
+  </script>
+</body>
+</html>

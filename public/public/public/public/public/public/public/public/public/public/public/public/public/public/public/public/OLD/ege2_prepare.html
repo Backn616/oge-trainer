@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Подготовка — Задание 2</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #ffffff;
+      text-align: center;
+      padding: 40px;
+    }
+    .task-wrapper {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 40px;
+      max-width: 1600px;
+      margin: 0 auto;
+      text-align: left;
+    }
+    .task-left {
+      flex: 1.5;
+    }
+    .task-number {
+      float: left;
+      font-size: 40px;
+      background-color: #009fe3;
+      color: white;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      line-height: 50px;
+      text-align: center;
+      margin-right: 15px;
+      font-weight: bold;
+    }
+    .task-text {
+      overflow: hidden;
+      font-size: 20px;
+      line-height: 1.6;
+    }
+    .task-text b {
+      font-weight: bold;
+    }
+    .image-block {
+      flex: 1;
+      text-align: right;
+    }
+    .image-block img {
+      max-width: 100%;
+      max-height: 400px;
+      height: auto;
+      border: 1px solid #ccc;
+    }
+    .reading-timer {
+      font-size: 56px;
+      color: #b30000;
+      margin-top: 20px;
+    }
+    .progress-container {
+      width: 90%;
+      background-color: #eee;
+      border-radius: 25px;
+      margin: 30px auto 20px;
+      height: 30px;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,.2);
+    }
+    .progress-bar {
+      height: 100%;
+      width: 100%;
+      background: linear-gradient(to right, #4facfe, #00f2fe);
+      transition: width 1s linear;
+      border-radius: 25px 0 0 25px;
+    }
+    .button {
+      margin-top: 30px;
+      padding: 16px 32px;
+      font-size: 20px;
+      border: none;
+      border-radius: 8px;
+      background-color: #0077cc;
+      color: white;
+      cursor: pointer;
+    }
+    .button:hover {
+      background-color: #005fa3;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="task-wrapper">
+    <div class="task-left">
+      <div class="task-number">2</div>
+      <div class="task-text">
+        <b>Task 2.</b> Study the advertisement.<br/>
+        You are considering joining the photo club and now you’d like to get more information.
+        In 1.5 minutes you are to ask four direct questions to find out about the following:<br/><br/>
+        1) location;<br/>
+        2) activities offered;<br/>
+        3) photo contests;<br/>
+        4) membership fee.<br/><br/>
+        <b>You have 20 seconds to ask each question.</b><br/><br/>
+        <b>Join our photo club!</b><br/>
+        Learn to take stunning pictures and meet fellow photo lovers.<br/>
+        Exciting activities, contests, and masterclasses every month!
+      </div>
+    </div>
+    <div class="image-block">
+      <img src="photo_club.png" alt="Join our photo club">
+    </div>
+  </div>
+
+  <div class="reading-timer" id="reading-timer">01:30</div>
+  <div class="progress-container">
+    <div class="progress-bar" id="progress-bar"></div>
+  </div>
+
+  <button class="button" onclick="window.location.href='ege2_read2_q1.html'">Приступить к выполнению</button>
+
+  <script>
+    let totalSeconds = 90;
+    const progressBar = document.getElementById("progress-bar");
+    const timerEl = document.getElementById("reading-timer");
+
+    function updateTimer() {
+      const minutes = String(Math.floor(totalSeconds / 60)).padStart(2, '0');
+      const seconds = String(totalSeconds % 60).padStart(2, '0');
+      timerEl.textContent = `${minutes}:${seconds}`;
+      progressBar.style.width = (totalSeconds / 90 * 100) + "%";
+    }
+
+    const interval = setInterval(() => {
+      totalSeconds--;
+      updateTimer();
+      if (totalSeconds <= 0) {
+        clearInterval(interval);
+        window.location.href = "ege2_read2_q1.html";
+      }
+    }, 1000);
+
+    updateTimer();
+  </script>
+</body>
+</html>

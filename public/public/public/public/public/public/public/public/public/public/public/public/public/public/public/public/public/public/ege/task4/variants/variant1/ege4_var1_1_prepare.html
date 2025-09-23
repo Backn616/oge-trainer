@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Task 4 — Preparation</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Шрифт: ускорение загрузки -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+
+  <!-- Общие стили (фон, карточка, кнопка, фикс-бар) -->
+  <link rel="stylesheet" href="../../../style_common.css" />
+  <!-- ^^^ правильно: три уровня вверх до папки ege -->
+
+  <!-- Анти-мигание темы -->
+  <script>
+    (function(){
+      try{
+        const saved = localStorage.getItem('pref-theme') || 'light';
+        if (saved === 'dark') document.documentElement.classList.add('dark');
+      }catch(_){}
+    })();
+  </script>
+</head>
+<body>
+  <!-- Тумблер темы -->
+  <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
+
+  <div class="content-wrapper">
+    <div class="task-container" aria-labelledby="taskTitle" aria-describedby="inst">
+      <b id="taskTitle">4 Task. Imagine that you and your friend are doing a school project “Healthy lifestyle”.</b>
+      You have found some photos to illustrate it but for technical reasons you cannot send them now. Leave a voice message to your friend explaining your choice of the photos and sharing some ideas about the project. <strong>In 2.5 minutes</strong> be ready to:
+      <ul>
+        <li>explain the choice of the illustrations for the project by briefly describing them and noting the differences;</li>
+        <li>mention the advantages (1–2) of the two ways of keeping fit;</li>
+        <li>mention the disadvantages (1–2) of the two ways of keeping fit;</li>
+        <li>express your opinion on the subject of the project – which way of keeping fit you’d prefer and why.</li>
+      </ul>
+      <div class="instruction" id="inst">
+        You will speak for not more than 3 minutes (12–15 sentences). You have to talk continuously.
+      </div>
+    </div>
+
+    <div class="images" aria-label="Project illustrations">
+      <img src="1.jpg" alt="City holidays" loading="lazy">
+      <img src="2.jpg" alt="Countryside holidays" loading="lazy">
+    </div>
+
+    <div style="text-align:center; margin-bottom:30px;">
+      <button id="goBtn" class="button" type="button" aria-label="Перейти к выполнению">Перейти к выполнению</button>
+    </div>
+  </div>
+
+  <!-- Фиксированный прогресс-бар снизу -->
+  <div id="progressContainerFixed" role="timer" aria-live="polite" aria-label="Оставшееся время подготовки">
+    <div id="progressBarFixed">
+      <span id="progressTime" class="progress-time">02:30</span>
+    </div>
+  </div>
+
+  <!-- Логика страницы -->
+  <script type="module">
+    import { toggleThemeInit, navigateOnce, startPrepareTimer, fmtTime } from "../../../common.js";
+    // ^^^ правильно: три уровня вверх до ege/common.js
+
+    // === Тема ===
+    toggleThemeInit();
+
+    // Служебные метки — не влияют на таймер
+    try{
+      sessionStorage.removeItem('ege4_audio_base64');
+      sessionStorage.setItem('ege4_prepared','1');
+      const meta = { preparedAt: Date.now(), prepareDurationSec: 150 };
+      sessionStorage.setItem('ege4_meta', JSON.stringify(meta));
+    }catch{}
+
+    // URL следующего шага (mic)
+    const NEXT_URL = /_1_prepare\.html$/i.test(location.pathname)
+      ? location.pathname.replace(/_1_prepare\.html$/i, '_2_mic.html')
+      : location.pathname.replace(/\.html$/i, '_2_mic.html');
+
+    // Кнопка "Перейти"
+    document.getElementById('goBtn')?.addEventListener('click', () => {
+      navigateOnce(NEXT_URL);
+    });
+
+    // === Таймер 2:30 через унифицированный rAF-таймер ===
+    const TOTAL_MS = 150_000;
+    const barEl  = document.getElementById('progressBarFixed');
+    const timeEl = document.getElementById('progressTime');
+    barEl.classList.add('rAF');
+
+    let stopTimer = null;
+
+    function startTimerFresh(){
+      timeEl.textContent = fmtTime(TOTAL_MS);
+      barEl.style.width = '100%';
+
+      stopTimer?.();
+      stopTimer = startPrepareTimer({
+        barEl,
+        timeEl,
+        totalMs: TOTAL_MS,
+        nextUrl: NEXT_URL,
+        key: 'ege4_prepare_end',
+        persist: false,
+        textEveryMs: 250,
+        useRAF: true
+      });
+    }
+
+    startTimerFresh();
+
+    // Перезапуск при возврате назад / BFCache
+    function isBackForwardNav(){
+      try {
+        const nav = performance.getEntriesByType('navigation')[0];
+        return nav && nav.type === 'back_forward';
+      } catch { return false; }
+    }
+
+    window.addEventListener('pageshow', (e) => {
+      navigateOnce.lock = false;
+      if (e.persisted || isBackForwardNav()) {
+        startTimerFresh();
+      }
+    });
+  </script>
+</body>
+</html>

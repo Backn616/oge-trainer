@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Task 2 — Preparation</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Шрифты -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+
+  <!-- Общие стили -->
+  <link rel="stylesheet" href="../../../style_common.css" />
+
+  <style>
+    /* Сетка страницы */
+    .ad-layout{
+      display:grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap:28px 36px;
+      align-items:start;
+      max-width:1500px;
+      margin-inline:auto;
+    }
+
+    /* Вытянутая карточка «шапка» */
+    .header-card{
+      grid-column: 1 / -1;
+      margin:0;
+    }
+    #taskTitle{ display:block; margin-bottom:8px; font-size:24px; }
+
+    /* Левая колонка второго ряда (без рамки) */
+    .left-free{
+      font-size:22px;
+      line-height:1.55;
+      text-align:left;
+      margin-top:6px;
+    }
+    .plain-list{
+      list-style:none; margin:0 0 24px 0; padding:0;
+    }
+    .plain-list li{ margin:10px 0; }
+
+    /* Правая колонка второго ряда */
+    .ad-title{
+      font-weight:800; font-size:30px;
+      margin:6px 0 12px; text-align:center;
+    }
+    .ad-figure{
+      width:100%;
+      aspect-ratio: 3 / 2;
+      border-radius:12px; overflow:hidden;
+      box-shadow:var(--shadow); background:#ddd;
+    }
+    .ad-figure>img{
+      width:100%; height:100%; object-fit:cover; object-position:center; display:block;
+    }
+
+    /* Кнопка по центру */
+    .actions{
+      grid-column:1 / -1;
+      text-align:center;
+      margin-top:8px;
+      margin-bottom:6px;
+    }
+
+    @media (max-width:1100px){
+      .ad-layout{ grid-template-columns: 1fr; gap:22px; }
+    }
+  </style>
+
+  <!-- Анти-мигание темы -->
+  <script>
+    (function(){
+      try{
+        const saved = localStorage.getItem('pref-theme') || 'light';
+        if (saved === 'dark') document.documentElement.classList.add('dark');
+      }catch(_){}
+    })();
+  </script>
+</head>
+<body>
+  <!-- Тумблер темы -->
+  <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
+
+  <div class="content-wrapper ad-layout">
+    <!-- Ряд 1: вытянутая карточка -->
+    <div class="task-container header-card" aria-labelledby="taskTitle">
+      <b id="taskTitle">Task 2. Study the advertisement.</b>
+      <b>
+        You are considering taking part in a mountain trip and now you’d like to get more information.
+        In 1.5 minutes you are to ask four direct questions to find out about the following:
+      </b>
+    </div>
+
+    <!-- Ряд 2: слева список -->
+    <div class="left-free">
+      <ol class="plain-list">
+        <li>1) duration of the trip;</li>
+        <li>2) accommodation;</li>
+        <li>3) special equipment;</li>
+        <li>4) student discounts;</li>
+      </ol>
+      <p><b>You have 20 seconds to ask each question.</b></p>
+    </div>
+
+    <!-- Ряд 2: справа фото -->
+    <aside aria-label="Advertisement">
+      <h2 class="ad-title">Weekend trip to the mountains!</h2>
+      <figure class="ad-figure">
+        <img src="1.jpg" alt="image" loading="lazy">
+      </figure>
+    </aside>
+
+    <!-- Кнопка -->
+    <div class="actions">
+      <button id="goBtn" class="button" type="button">Перейти к выполнению</button>
+    </div>
+  </div>
+
+  <!-- Прогресс-бар -->
+  <div id="progressContainerFixed" role="timer" aria-live="polite" aria-label="Оставшееся время подготовки">
+    <div id="progressBarFixed">
+      <span id="progressTime" class="progress-time">01:30</span>
+    </div>
+  </div>
+
+  <!-- Логика -->
+  <script type="module">
+    import { toggleThemeInit, navigateOnce, startPrepareTimer, fmtTime } from "../../../common.js";
+    toggleThemeInit();
+
+    try{
+      sessionStorage.removeItem('ege2_audio_base64');
+      sessionStorage.setItem('ege2_prepared','1');
+      const meta = { preparedAt: Date.now(), prepareDurationSec: 90 };
+      sessionStorage.setItem('ege2_meta', JSON.stringify(meta));
+    }catch{}
+
+    const NEXT_URL = /_1_prepare\.html$/i.test(location.pathname)
+      ? location.pathname.replace(/_1_prepare\.html$/i, '_2_mic.html')
+      : location.pathname.replace(/\.html$/i, '_2_mic.html');
+
+    document.getElementById('goBtn')?.addEventListener('click', () => {
+      navigateOnce(NEXT_URL);
+    });
+
+    const TOTAL_MS = 90_000;
+    const barEl  = document.getElementById('progressBarFixed');
+    const timeEl = document.getElementById('progressTime');
+    barEl.classList.add('rAF');
+
+    let stopTimer = null;
+    function startTimerFresh(){
+      timeEl.textContent = fmtTime(TOTAL_MS);
+      barEl.style.width = '100%';
+      stopTimer?.();
+      stopTimer = startPrepareTimer({
+        barEl, timeEl,
+        totalMs: TOTAL_MS,
+        nextUrl: NEXT_URL,
+        key: 'ege2_prepare_end',
+        persist: false,
+        textEveryMs: 250,
+        useRAF: true
+      });
+    }
+    startTimerFresh();
+
+    function isBackForwardNav(){
+      try {
+        const nav = performance.getEntriesByType('navigation')[0];
+        return nav && nav.type === 'back_forward';
+      } catch { return false; }
+    }
+    window.addEventListener('pageshow', (e) => {
+      navigateOnce.lock = false;
+      if (e.persisted || isBackForwardNav()) startTimerFresh();
+    });
+  </script>
+</body>
+</html>

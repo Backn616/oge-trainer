@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Экзамен полностью — переход к следующему заданию</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./style_common.css" />
+
+  <script>
+    (function(){ try{
+      const saved = localStorage.getItem('pref-theme') || 'light';
+      if (saved === 'dark') document.documentElement.classList.add('dark');
+    }catch{}})();
+  </script>
+
+  <style>
+    .wrap{ max-width:1100px; margin:0 auto; padding:40px 20px; text-align:center; }
+    .title{ font-size:42px; font-weight:800; margin:0 0 20px; color:var(--primary); }
+    .timer{
+      font-size:100px; font-weight:800; color:var(--primary);
+      text-shadow:0 4px 12px rgba(0,0,0,.25); margin:30px 0;
+    }
+  </style>
+</head>
+<body>
+  <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
+
+  <div class="wrap">
+    <div id="title" class="title">Task</div>
+    <div id="timer" class="timer" aria-live="polite">3</div>
+  </div>
+
+  <script type="module">
+    import { toggleThemeInit, navigateOnce } from './common.js';
+    toggleThemeInit();
+
+    const params   = new URLSearchParams(location.search);
+    const nextRaw  = Number(params.get('next') || '2');          // ожидаем 2..4
+    const next     = Math.max(2, Math.min(4, nextRaw));          // страховка
+    const vQ       = (params.get('variant') || '').replace(/\D+/g,'');
+    const vS       = (sessionStorage.getItem('exam_variant') || '').replace(/\D+/g,'');
+    const variant  = vQ || vS || '1';
+
+    // 🔒 Всегда фиксируем флаги экзамена и вариант — это "шарнир" всего флоу
+    try {
+      sessionStorage.setItem('exam_flow', '1');
+      sessionStorage.setItem('exam_variant', variant);
+    } catch {}
+
+    const examFlowOn = sessionStorage.getItem('exam_flow') === '1';
+    if (!examFlowOn) {
+      // Если каким-то образом сюда попали не из "экзамен полностью" — отправим к выбору
+      navigateOnce('./exams.html');
+    }
+
+    // Заголовки
+    document.getElementById('title').textContent = `Task ${next}`;
+    try { document.title = `Экзамен полностью — Task ${next}`; } catch {}
+
+    // Куда идти после отсчёта (всегда прокидываем ?exam=1&variant=)
+    function nextPrepareUrl(){
+      if (next > 4) {
+        return `./exams_result.html?exam=1&variant=${encodeURIComponent(variant)}`;
+      }
+      return `./task${next}/variants/variant${variant}/ege${next}_var${variant}_1_prepare.html?exam=1&variant=${encodeURIComponent(variant)}`
+        .replace(/\/{2,}/g,'/').replace(':/','://');
+    }
+
+    // Отсчёт 3-2-1
+    const timerEl = document.getElementById('timer');
+    let n = 3;
+    timerEl.textContent = n;
+    const id = setInterval(()=>{
+      timerEl.textContent = n;
+      n--;
+      if (n < 0){
+        clearInterval(id);
+        navigateOnce(nextPrepareUrl());
+      }
+    },1000);
+
+    // Сброс блокировки навигации и очистка интервала на всякий
+    window.addEventListener('beforeunload', ()=>{ try{ clearInterval(id); }catch{} });
+    window.addEventListener('pageshow', ()=>{ navigateOnce.lock = false; });
+  </script>
+</body>
+</html>

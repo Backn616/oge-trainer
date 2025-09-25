@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Задание 2 — Результат</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f7f7f7;
+      margin: 0;
+      padding: 30px;
+      text-align: center;
+    }
+    .status {
+      font-size: 24px;
+      color: #333;
+      margin-bottom: 20px;
+    }
+    .audio-controls {
+      margin: 20px auto;
+    }
+    audio {
+      width: 80%;
+      margin-bottom: 10px;
+    }
+    .download-btn {
+      display: inline-block;
+      background-color: #009933;
+      color: white;
+      padding: 10px 24px;
+      border: none;
+      border-radius: 8px;
+      font-size: 18px;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .download-btn:hover {
+      background-color: #007a29;
+    }
+    .nav-container {
+      margin: 20px 0;
+    }
+    .nav-button {
+      background-color: #0077cc;
+      color: white;
+      padding: 12px 24px;
+      margin: 6px;
+      border: none;
+      border-radius: 8px;
+      font-size: 18px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .nav-button:hover {
+      background-color: #005fa3;
+    }
+    .main-content {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      gap: 20px;
+      margin-top: 30px;
+      flex-wrap: wrap;
+    }
+    .questions-list {
+      flex: 1;
+      min-width: 260px;
+      text-align: left;
+      font-size: 20px;
+      line-height: 1.6;
+    }
+    .ad-section {
+      flex: 1;
+      min-width: 260px;
+      text-align: center;
+    }
+    .ad-title {
+      font-size: 22px;
+      font-weight: bold;
+      margin-bottom: 12px;
+    }
+    .ad-img {
+      max-width: 250px;
+      width: 100%;
+      height: auto;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      margin-bottom: 12px;
+    }
+    .ad-text {
+      font-size: 18px;
+      line-height: 1.4;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="status">
+    🎉 Поздравляем! Ваш тест закончен. Вы можете прослушать запись внизу страницы.
+  </div>
+
+  <div class="audio-controls">
+    <audio id="audio" controls></audio><br>
+    <button class="download-btn" onclick="downloadAudio()">⬇️ Скачать запись</button>
+  </div>
+
+  <div class="nav-container">
+<<<<<<<< Updated upstream:ege/task2/variants/variant1/ege2_result.html
+    <a href="../ege2.html" class="nav-button">Перейти к выбору варианта</a>
+    <a href="../../../ege.html" class="nav-button">Перейти к выбору задания</a>
+    <a href="../../../ege_menu.html" class="nav-button">Перейти к выбору режима</a>
+    <a href="/oge-trainer/index.html" class="nav-button">Перейти на главную</a>
+========
+    <a href="ege2.html" class="nav-button">К выбору варианта</a>
+    <a href="ege_menu.html" class="nav-button">К выбору задания</a>
+    <a href="ege.html" class="nav-button">К выбору режима</a>
+    <a href="index.html" class="nav-button">На главную</a>
+>>>>>>>> Stashed changes:ege/ege2_result.html
+  </div>
+
+  <div class="main-content">
+    <div class="questions-list">
+      <b>Task 2.</b> Study the advertisement.<br>
+      You are considering joining the photo club and now you’d like to get more information.<br>
+      In 1.5 minutes you are to ask four direct questions to find out about the following:<br><br>
+      1) location;<br>
+      2) activities offered;<br>
+      3) photo contests;<br>
+      4) membership fee.<br><br>
+      <b>You have 20 seconds to ask each question.</b>
+    </div>
+    <div class="ad-section">
+      <div class="ad-title">Join our photo club!</div>
+      <img src="photo_club.png" alt="Photo Club" class="ad-img">
+      <div class="ad-text">
+        Learn to take stunning pictures and meet fellow photo lovers.<br>
+        Exciting activities, contests, and masterclasses every month!
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const audio = document.getElementById("audio");
+    const base64 = sessionStorage.getItem("ege1_audio_base64");
+    if (base64) {
+      audio.src = base64;
+    } else {
+      document.querySelector(".audio-controls").innerHTML += 
+        "<p style='color:red'>❌ Запись не найдена.</p>";
+    }
+
+    function downloadAudio() {
+      if (!base64) return alert("Запись не найдена.");
+      const a = document.createElement("a");
+      a.href = base64;
+      a.download = "task2_recording.webm";
+      a.click();
+    }
+  </script>
+
+</body>
+</html>

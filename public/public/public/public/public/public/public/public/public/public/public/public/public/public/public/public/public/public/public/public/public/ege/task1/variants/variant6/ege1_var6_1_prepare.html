@@ -45,16 +45,16 @@
 
     /* Подсказка-рамка — компактная */
     .helper-box{
-      border:1px solid #ccc;          
-      border-radius:8px;              
-      padding:14px 18px;              
+      border:1px solid #ccc;
+      border-radius:8px;
+      padding:14px 18px;
       background:var(--card);
-      max-width:800px;                
-      margin:16px auto;               
+      max-width:800px;
+      margin:16px auto;
       font-family: Inter, system-ui, Segoe UI, Roboto, Arial, sans-serif;
       font-size:18px;
       line-height:1.5;
-      box-shadow:0 2px 6px rgba(0,0,0,0.08); 
+      box-shadow:0 2px 6px rgba(0,0,0,0.08);
     }
     @media (max-width:900px){
       .helper-box{ font-size:16px; padding:12px 14px; max-width:100%; }
@@ -119,11 +119,11 @@
     </div>
 
     <!-- Текст -->
-    <div class="reading-box" id="readingBox">New Zealand is one of the most popular travel destinations for nature lovers and adventure seekers. This country consists of two main islands and is located in the southwestern Pacific Ocean. It is known for its breathtaking landscapes, including mountains, volcanoes, beaches, and lakes.
+    <div class="reading-box" id="readingBox">Family life is not always peaceful, and conflicts are an inevitable part of human relationships. Arguments may arise from differences in opinions, responsibilities, or financial problems. For example, teenagers often complain about strict rules, while parents worry about academic performance and future careers. Such disagreements, if not handled carefully, can damage trust and emotional closeness.
 
-Many tourists come to New Zealand to try activities like hiking, kayaking, and bungee jumping. The country is also famous for its unique wildlife and strong traditions of protecting the environment. Visitors often say that the air feels fresher and the views are unforgettable.
+However, psychologists emphasize that conflicts are not always destructive. On the contrary, they can help families learn negotiation skills and strengthen mutual understanding. The key is to remain respectful and avoid aggressive behavior. Family councils, open discussions, and even professional counseling are effective methods of conflict resolution.
 
-Apart from nature, New Zealand has a rich culture. The Maori people, who were the first inhabitants of the islands, have kept many of their customs and language. Travellers can visit museums, attend cultural shows, or even try traditional food. Whether you want to relax or explore, New Zealand offers a memorable and rewarding experience.</div>
+In recent decades, researchers have discovered that children from families where conflicts are solved constructively usually demonstrate higher levels of tolerance and cooperation. Although quarrels may be painful, they are a unique chance for growth and emotional maturity.</div>
 
     <!-- Сложные слова -->
     <div class="task-container helper-box" role="region" aria-labelledby="hardWordsTitle">
@@ -211,18 +211,18 @@ Apart from nature, New Zealand has a rich culture. The Maori people, who were th
       if (e.persisted) startTimerFresh();
     });
 
-    // Сложные слова (обновлено)
+    // Сложные слова
     const HARD_WORDS = [
-      { w: 'New Zealand',     ipa: '/njuː ˈziːlənd/' },
-      { w: 'destinations',    ipa: '/ˌdɛstɪˈneɪʃənz/' },
-      { w: 'southwestern',    ipa: '/ˌsaʊθˈwɛstən/' },
-      { w: 'Pacific Ocean',   ipa: '/pəˈsɪfɪk ˈəʊʃən/' },
-      { w: 'breathtaking',    ipa: '/ˈbrɛθˌteɪkɪŋ/' },
-      { w: 'volcanoes',       ipa: '/vɒlˈkeɪnəʊz/' },
-      { w: 'kayaking',        ipa: '/ˈkaɪækɪŋ/' },
-      { w: 'traditions',      ipa: '/trəˈdɪʃənz/' },
-      { w: 'unforgettable',   ipa: '/ˌʌnfəˈɡetəbl/' },
-      { w: 'inhabitants',     ipa: '/ɪnˈhæbɪtənts/' }
+      { w: 'inevitable',        ipa: '/ɪnˈevɪtəbl/' },
+      { w: 'responsibilities',  ipa: '/rɪˌspɒnsəˈbɪlɪtiz/' },
+      { w: 'psychologists',     ipa: '/saɪˈkɒlədʒɪsts/' },
+      { w: 'negotiation',       ipa: '/nɪˌɡəʊʃiˈeɪʃn/' },
+      { w: 'professional',      ipa: '/prəˈfeʃənl/' },
+      { w: 'researchers',       ipa: '/rɪˈsɜːtʃəz/' },
+      { w: 'tolerance',         ipa: '/ˈtɒlərəns/' },
+      { w: 'maturity',          ipa: '/məˈtʊərəti/' },
+      { w: 'although',          ipa: '/ɔːlˈðəʊ/' },
+      { w: 'unique',            ipa: '/juːˈniːk/' }
     ];
 
     (function renderHardWords(){

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Предупреждение — доступ к микрофону</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Шрифт -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+
+  <!-- Общие стили -->
+  <link rel="stylesheet" href="../../../style_common.css" />
+
+  <!-- Анти-мигание темы -->
+  <script>
+    (function(){
+      try{
+        const saved = localStorage.getItem('pref-theme') || 'light';
+        if (saved === 'dark') document.documentElement.classList.add('dark');
+      }catch(_){}
+    })();
+  </script>
+</head>
+<body>
+  <!-- Тумблер темы -->
+  <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
+
+  <main class="page-center">
+    <section class="card mic-card"
+             role="alertdialog"
+             aria-labelledby="warnTitle"
+             aria-describedby="warnText">
+      <h1 id="warnTitle">Внимание</h1>
+      <p id="warnText">
+        На следующем этапе тренажёр попытается получить доступ к микрофону.<br><br>
+        Браузер покажет системный запрос на использование микрофона.<br><br>
+        Если вы готовы выполнить устную часть <strong>задания 3</strong>, пожалуйста,<br>
+        <strong>разрешите сайту использовать микрофон</strong>, чтобы начать запись ответа.
+      </p>
+
+      <!-- Ставим href (fallback без JS) и дублируем переход через JS с защитой -->
+      <a id="nextLink"
+         class="button"
+         type="button"
+         href="#"
+         role="button"
+         aria-label="Перейти к заданию с запросом доступа к микрофону"
+         autofocus>
+        ОК
+      </a>
+    </section>
+  </main>
+
+  <script type="module">
+    import { toggleThemeInit, navigateOnce } from '../../../common.js';
+
+    // Тема
+    toggleThemeInit();
+
+    // Следующая страница (task)
+    const NEXT_URL = /_2_mic\.html$/i.test(location.pathname)
+      ? location.pathname.replace(/_2_mic\.html$/i, '_3_task.html')
+      : location.pathname.replace(/\.html$/i, '_3_task.html');
+
+    // Подготовка sessionStorage для задания 3
+    try {
+      sessionStorage.removeItem('ege3_audio_base64');
+      sessionStorage.removeItem('ege3_audio_mime');
+      sessionStorage.setItem('ege3_warned', '1');
+      const meta = JSON.parse(sessionStorage.getItem('ege3_meta') || '{}');
+      meta.warnedAt = Date.now();
+      sessionStorage.setItem('ege3_meta', JSON.stringify(meta));
+    } catch {}
+
+    // Кнопка «ОК» — единственная точка перехода
+    const a = document.getElementById('nextLink');
+    a.href = NEXT_URL; // fallback, если JS отключён
+    a.addEventListener('click', (e) => {
+      e.preventDefault();
+      navigateOnce(NEXT_URL);
+    });
+
+    // BFCache: снять замок при возврате
+    window.addEventListener('pageshow', () => { navigateOnce.lock = false; });
+  </script>
+</body>
+</html>

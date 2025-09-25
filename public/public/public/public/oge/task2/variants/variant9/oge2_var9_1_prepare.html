@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Task 2 — Preparation</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Шрифт -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+
+  <!-- Общие стили проекта -->
+  <link rel="stylesheet" href="../../../style_common.css" />
+
+  <!-- Анти-мигание темы -->
+  <script>
+    (function(){
+      try{
+        const saved = localStorage.getItem('pref-theme') || 'light';
+        if (saved === 'dark') document.documentElement.classList.add('dark');
+      }catch(_){}
+    })();
+  </script>
+</head>
+<body>
+  <!-- Тумблер темы -->
+  <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
+
+  <div class="content-wrapper">
+    <div class="task-container" aria-labelledby="taskTitle" aria-describedby="inst">
+      <b id="taskTitle">Task 2. You are going to take part in a telephone survey.</b>
+      You have to answer six questions. Give full answers to the questions.
+      <div class="instruction" id="inst" style="margin-top:12px;">
+        Remember that you have 40 seconds to answer each question.
+      </div>
+    </div>
+
+    <!-- Кнопка: перейти к выполнению -->
+    <div style="text-align:center; margin: 120px 0 30px;">
+      <button id="goBtn" class="button" type="button" aria-label="Перейти к выполнению (Electronic assistant)">
+        Перейти к выполнению
+      </button>
+      <div style="margin-top:10px; font-size:14px; opacity:.8;">
+        Следующая страница: <i>Electronic assistant</i>
+      </div>
+    </div>
+  </div>
+
+  <!-- Фиксированный прогресс-бар снизу (подготовка не требуется для Task 2) -->
+  <div id="progressContainerFixed" role="timer" aria-live="polite" aria-label="Подготовка не требуется для Task 2">
+    <div id="progressBarFixed" class="rAF" style="width:0%;">
+      <span id="progressTime" class="progress-time">—</span>
+    </div>
+  </div>
+
+  <!-- Логика -->
+  <script type="module">
+    import { toggleThemeInit, navigateOnce } from "../../../common.js";
+
+    // Тема
+    toggleThemeInit();
+
+    // Сброс и метаданные для ОГЭ-2
+    try{
+      sessionStorage.removeItem('oge2_audio_base64');
+      sessionStorage.setItem('oge2_prepared','1');
+      const meta = {
+        preparedAt: Date.now(),
+        prepareDurationSec: 0,
+        task: 'OGE-2',
+        questionsPlanned: 6,
+        perQuestionSec: 40
+      };
+      sessionStorage.setItem('oge2_meta', JSON.stringify(meta));
+    }catch{}
+
+    // Переход на страницу с микрофоном/вопросами (Electronic assistant)
+    const NEXT_URL = /_1_prepare\.html$/i.test(location.pathname)
+      ? location.pathname.replace(/_1_prepare\.html$/i, '_2_mic.html')
+      : location.pathname.replace(/\.html$/i, '_2_mic.html');
+
+    document.getElementById('goBtn')?.addEventListener('click', () => {
+      navigateOnce(NEXT_URL);
+    });
+  </script>
+</body>
+</html>

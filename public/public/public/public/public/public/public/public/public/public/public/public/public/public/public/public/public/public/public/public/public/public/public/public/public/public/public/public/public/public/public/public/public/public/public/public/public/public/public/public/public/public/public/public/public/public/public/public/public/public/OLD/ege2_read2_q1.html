@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Task 2 — Question 1</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #fff;
+      margin: 0;
+      padding: 40px;
+      text-align: center;
+    }
+    h1 {
+      font-size: 28px;
+      margin-bottom: 20px;
+    }
+    .countdown {
+      font-size: 56px;
+      color: #b30000;
+      margin: 30px auto;
+    }
+    .question-block {
+      display: none;
+      margin-top: 30px;
+    }
+    .question-text {
+      font-size: 22px;
+      margin-bottom: 10px;
+    }
+    .image-block img {
+      max-width: 100%;
+      max-height: 400px;
+      margin-top: 20px;
+      border: 1px solid #ccc;
+    }
+    .timer {
+      font-size: 40px;
+      color: #b30000;
+      margin-top: 20px;
+    }
+    .progress-container {
+      width: 90%;
+      background-color: #eee;
+      border-radius: 25px;
+      margin: 10px auto 30px;
+      height: 30px;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,.2);
+    }
+    .progress-bar {
+      height: 100%;
+      width: 100%;
+      background: linear-gradient(to right, #4facfe, #00f2fe);
+      transition: width 1s linear;
+      border-radius: 25px 0 0 25px;
+    }
+    .next-btn {
+      margin-top: 30px;
+      font-size: 20px;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      background-color: #0077cc;
+      color: white;
+      cursor: pointer;
+      display: inline-block;
+    }
+    .next-btn:hover {
+      background-color: #005fa3;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Task 2. Get ready to ask your question.</h1>
+  <div class="countdown" id="countdown">5</div>
+
+  <div class="question-block" id="questionBlock">
+    <div class="question-text"><b>Question 1:</b> Ask a direct question about the following: <b>minimum age</b>.</div>
+    <div class="image-block">
+      <img src="photo_club.png" alt="Join our photo club">
+    </div>
+    <div class="timer" id="questionTimer">20</div>
+    <div class="progress-container" id="progressContainer">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+    <button class="next-btn" id="nextBtn" onclick="window.location.href='ege2_read2_q2.html'">Следующий вопрос</button>
+  </div>
+
+  <script>
+    let countdownSeconds = 5;
+    const countdownEl = document.getElementById("countdown");
+    const questionBlock = document.getElementById("questionBlock");
+    const progressContainer = document.getElementById("progressContainer");
+    const progressBar = document.getElementById("progressBar");
+    const questionTimer = document.getElementById("questionTimer");
+    const nextBtn = document.getElementById("nextBtn");
+
+    const countdownInterval = setInterval(() => {
+      countdownSeconds--;
+      countdownEl.textContent = countdownSeconds;
+      if (countdownSeconds <= 0) {
+        clearInterval(countdownInterval);
+        countdownEl.style.display = "none";
+        questionBlock.style.display = "block";
+        progressContainer.style.display = "block";
+        speakQuestionNumber("Question one");
+        startProgressTimer();
+      }
+    }, 1000);
+
+    function startProgressTimer() {
+  let totalSeconds = 20;
+  const fullWidth = 100;
+  const step = fullWidth / totalSeconds;
+  const interval = setInterval(() => {
+    totalSeconds--;
+    questionTimer.textContent = totalSeconds;
+    progressBar.style.width = (totalSeconds / 20 * 100) + "%";
+    if (totalSeconds <= 0) {
+      clearInterval(interval);
+      window.location.href = 'ege2_read2_q2.html';  // автоматический переход
+    }
+  }, 1000);
+}
+
+
+    function speakQuestionNumber(text) {
+      if ('speechSynthesis' in window) {
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = "en-US";
+        window.speechSynthesis.speak(utterance);
+      }
+    }
+  </script>
+
+</body>
+</html>

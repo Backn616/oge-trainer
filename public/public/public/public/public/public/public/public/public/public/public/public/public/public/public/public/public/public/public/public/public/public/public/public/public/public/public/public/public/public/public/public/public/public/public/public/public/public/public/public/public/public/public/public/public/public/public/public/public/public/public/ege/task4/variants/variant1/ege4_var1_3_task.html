@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Task 4 — Выполнение</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Шрифт: ускорение загрузки -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+
+  <!-- Общие стили -->
+  <link rel="stylesheet" href="../../../style_common.css" />
+
+  <!-- Анти-мигание темы -->
+  <script>
+    (function(){
+      try{
+        const saved = localStorage.getItem('pref-theme') || 'light';
+        if (saved === 'dark') document.documentElement.classList.add('dark');
+      }catch(_){}
+    })();
+  </script>
+
+  <style>
+    .timer{
+      font-size:70px;
+      margin:30px 0;
+      font-weight:700;
+      color:var(--primary);
+      letter-spacing:4px;
+      text-shadow:0 4px 12px rgba(0,0,0,.25);
+      transition:transform .25s ease;
+      will-change:transform;
+      text-align:center;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .timer{ transition:none; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Тумблер темы -->
+  <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
+
+  <div class="content-wrapper">
+    <div class="task-container" id="taskContainer" aria-labelledby="taskTitle" aria-describedby="inst" style="display:none">
+      <b id="taskTitle">4 Task. Imagine that you and your friend are doing a school project “Healthy lifestyle”.</b>
+      You have found some photos to illustrate it but for technical reasons you cannot send them now. Leave a voice message to your friend explaining your choice of the photos and sharing some ideas about the project. In 3 minutes be ready to:
+      <ul>
+        <li>explain the choice of the illustrations for the project by briefly describing them and noting the differences;</li>
+        <li>mention the advantages (1–2) of the two ways of keeping fit;</li>
+        <li>mention the disadvantages (1–2) of the two ways of keeping fit;</li>
+        <li>express your opinion on the subject of the project – which way of keeping fit you’d prefer and why.</li>
+      </ul>
+      <div class="instruction" id="inst">You will speak for not more than 3 minutes (12–15 sentences). You have to talk continuously.</div>
+    </div>
+
+    <div id="timer" class="timer" aria-live="polite">3</div>
+
+    <div class="images" id="imageContainer" aria-label="Project illustrations" style="display:none">
+      <img src="1.jpg" alt="City holidays" loading="lazy">
+      <img src="2.jpg" alt="Countryside holidays" loading="lazy">
+    </div>
+
+    <button class="button" id="endBtn" type="button" aria-label="Закончить запись" style="display:none">✅ Закончить</button>
+  </div>
+
+  <!-- Проставка над фикс-баром -->
+  <div style="height: calc(var(--footer-h) + 24px);"></div>
+
+  <!-- Фиксированный прогресс-бар снизу -->
+  <div id="progressContainerFixed" role="timer" aria-live="polite" aria-label="Оставшееся время ответа" style="display:none">
+    <div id="progressBarFixed">
+      <span id="progressTime" class="progress-time">03:00</span>
+    </div>
+  </div>
+
+  <script type="module">
+    import { toggleThemeInit, navigateOnce, fmtTime } from '../../../common.js';
+
+    // Тема
+    toggleThemeInit();
+
+    // DOM
+    const timerEl        = document.getElementById('timer');
+    const taskContainer  = document.getElementById('taskContainer');
+    const imageContainer = document.getElementById('imageContainer');
+    const endBtn         = document.getElementById('endBtn');
+    const progressWrap   = document.getElementById('progressContainerFixed');
+    const progressBar    = document.getElementById('progressBarFixed');
+    const progressTime   = document.getElementById('progressTime');
+
+    // Навигация: обычный локальный result (для режима «по заданиям»)
+    const RESULT_URL = /_3_task\.html$/i.test(location.pathname)
+      ? location.pathname.replace(/_3_task\.html$/i, '_4_result.html')
+      : location.pathname.replace(/\.html$/i, '_4_result.html');
+
+    // Режим «экзамен полностью»
+    const inExam         = (sessionStorage.getItem('exam_flow') === '1');
+    const varFromSS      = sessionStorage.getItem('exam_variant') || '';
+    const varFromURL     = (location.pathname.match(/variant(\d+)/i) || [,''])[1];
+    const EXAM_VARIANT   = varFromSS || varFromURL || '';
+    // exams_result.html лежит в /ege/, отсюда относительный путь = ../../../
+    const EXAM_RESULT_URL = `../../../exams_result.html?variant=${encodeURIComponent(EXAM_VARIANT)}`;
+
+    // Снимаем «замок» для кнопок при возврате из BFCache; если вернулись с result — перезапуск
+    window.addEventListener('pageshow', (e) => {
+      navigateOnce.lock = false;
+      if (e.persisted) location.reload();
+    });
+
+    // ====== Микрофон и запись ======
+    let mediaRecorder = null;
+    let audioChunks   = [];
+    let streamRef     = null;
+    let chosenMime    = '';
+    let hasStopped    = false;
+
+    function pickMimeType(){
+      const candidates = [
+        'audio/webm;codecs=opus',
+        'audio/webm',
+        'audio/mp4',
+        'audio/ogg;codecs=opus',
+        'audio/ogg'
+      ];
+      for (const t of candidates){
+        if (window.MediaRecorder?.isTypeSupported?.(t)) return t;
+      }
+      return '';
+    }
+
+    async function initMic(){
+      try{
+        const stream = await navigator.mediaDevices.getUserMedia({ audio:true });
+        streamRef = stream;
+
+        chosenMime = pickMimeType();
+        try{
+          mediaRecorder = chosenMime ? new MediaRecorder(stream, { mimeType: chosenMime })
+                                     : new MediaRecorder(stream);
+        }catch{
+          mediaRecorder = new MediaRecorder(stream);
+          chosenMime = mediaRecorder.mimeType || '';
+        }
+
+        mediaRecorder.ondataavailable = (e)=>{ if (e.data && e.data.size) audioChunks.push(e.data); };
+        mediaRecorder.onstop = () => {
+          if (hasStopped) return;
+          hasStopped = true;
+          try{ streamRef?.getTracks()?.forEach(t=>t.stop()); }catch{}
+          const blobType = chosenMime || mediaRecorder?.mimeType || 'audio/webm';
+          const audioBlob = new Blob(audioChunks, { type: blobType });
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            try{
+              sessionStorage.setItem('ege4_audio_base64', reader.result);
+              sessionStorage.setItem('ege4_audio_mime', blobType);
+            }catch{}
+            navigateOnce(inExam ? EXAM_RESULT_URL : RESULT_URL);
+          };
+          reader.readAsDataURL(audioBlob);
+        };
+
+        startCountdown();
+      }catch(err){
+        alert('❌ Не удалось получить доступ к микрофону: ' + (err?.message || err));
+        mediaRecorder = null; // продолжим без записи
+        startCountdown();
+      }
+    }
+
+    // ====== Отсчёт 3-2-1 и запуск задания ======
+    let countdown = 3;
+    let cdInterval = 0;
+    const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function startCountdown(){
+      timerEl.style.display = 'block';
+      timerEl.textContent = countdown;
+
+      cdInterval = setInterval(()=>{
+        timerEl.style.color = (countdown > 1) ? '#2b6cff' : '#b30000';
+        timerEl.textContent = countdown;
+
+        if (!reduceMotion) {
+          timerEl.style.transform = 'scale(1.2)';
+          setTimeout(()=>{ timerEl.style.transform = 'scale(1)'; }, 200);
+        }
+
+        countdown--;
+        if (countdown < 0){
+          clearInterval(cdInterval);
+          startTask();
+        }
+      }, 1000);
+    }
+
+    // ====== Таймер 3:00 ======
+    const TOTAL_MS = 180_000;
+    let endTs = 0;
+    let rafId = 0;
+    let lastAnnounceTs = 0;
+    const ANNOUNCE_EVERY = 250;
+
+    function startTask(){
+      taskContainer.style.display  = 'block';
+      imageContainer.style.display = 'flex';
+      endBtn.style.display         = 'inline-block';
+      progressWrap.style.display   = 'block';
+      timerEl.style.display        = 'none';
+
+      progressBar.classList.add('rAF');
+
+      audioChunks = [];
+      try{ if (mediaRecorder && mediaRecorder.state !== 'recording') mediaRecorder.start(); }catch{}
+
+      endTs = performance.now() + TOTAL_MS;
+      progressTime.textContent = fmtTime(TOTAL_MS);
+      progressBar.style.width  = '100%';
+      tick();
+
+      endBtn.onclick = () => safeStopOrFinish();
+    }
+
+    function tick(){
+      const left = Math.max(0, endTs - performance.now());
+      progressBar.style.width  = `${(left / TOTAL_MS) * 100}%`;
+
+      if (!lastAnnounceTs || (performance.now() - lastAnnounceTs) >= ANNOUNCE_EVERY) {
+        progressTime.textContent = fmtTime(left);
+        lastAnnounceTs = performance.now();
+      }
+
+      if (left <= 0){
+        safeStopOrFinish();
+      }else{
+        rafId = requestAnimationFrame(tick);
+      }
+    }
+
+    function safeStopOrFinish(){
+      try{ cancelAnimationFrame(rafId); }catch{}
+      if (hasStopped) { navigateOnce(inExam ? EXAM_RESULT_URL : RESULT_URL); return; }
+
+      try{
+        if (mediaRecorder && mediaRecorder.state === 'recording') {
+          mediaRecorder.stop();
+        } else {
+          try{ streamRef?.getTracks()?.forEach(t=>t.stop()); }catch{}
+          navigateOnce(inExam ? EXAM_RESULT_URL : RESULT_URL);
+        }
+      }catch{
+        try{ streamRef?.getTracks()?.forEach(t=>t.stop()); }catch{}
+        navigateOnce(inExam ? EXAM_RESULT_URL : RESULT_URL);
+      }
+    }
+
+    // Очистка при уходе
+    window.addEventListener('beforeunload', ()=>{
+      try{ cancelAnimationFrame(rafId); }catch{}
+      try{ if (mediaRecorder && mediaRecorder.state === 'recording') mediaRecorder.stop(); }catch{}
+      try{ streamRef?.getTracks()?.forEach(t=>t.stop()); }catch{}
+    });
+
+    // Старт
+    window.onload = initMic;
+  </script>
+</body>
+</html>

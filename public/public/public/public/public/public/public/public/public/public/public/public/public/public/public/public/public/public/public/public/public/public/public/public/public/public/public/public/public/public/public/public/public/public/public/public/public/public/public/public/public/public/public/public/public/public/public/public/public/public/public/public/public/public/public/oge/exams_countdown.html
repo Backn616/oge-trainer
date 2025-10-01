@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ОГЭ — Экзамен полностью: переход к следующему заданию</title>
+
+  <!-- Шрифты -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+
+  <!-- ЕГЭ-палитра и базовые стили проекта -->
+  <link rel="stylesheet" href="./style_common.css" />
+
+  <!-- Анти-мигание темы -->
+  <script>
+    (function(){try{
+      const saved = localStorage.getItem('pref-theme') || 'light';
+      if (saved === 'dark') document.documentElement.classList.add('dark');
+    }catch{}})();
+  </script>
+
+  <style>
+    .wrap{ max-width:1100px; margin:0 auto; padding:40px 20px; text-align:center; }
+    .title{ font-size:42px; font-weight:800; margin:0 0 20px; color:var(--primary); }
+    .timer{
+      font-size:100px; font-weight:800; color:var(--primary);
+      text-shadow:0 4px 12px rgba(0,0,0,.25); margin:30px 0;
+    }
+  </style>
+</head>
+<body>
+  <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
+
+  <div class="wrap">
+    <div id="title" class="title">Задание</div>
+    <div id="timer" class="timer" aria-live="polite">3</div>
+  </div>
+
+  <script type="module">
+    import { toggleThemeInit, navigateOnce } from './common.js';
+    toggleThemeInit();
+
+    // Параметры
+    const params   = new URLSearchParams(location.search);
+    const nextRaw  = Number(params.get('next') || '2');   // ожидаем 2..3
+    const next     = Math.max(2, Math.min(3, nextRaw));   // для ОГЭ всего 3 задания
+    const vQ       = (params.get('variant') || '').replace(/\D+/g,'');
+    const vS       = (sessionStorage.getItem('exam_variant') || '').replace(/\D+/g,'');
+    const variant  = vQ || vS || '1';
+
+    // Фиксируем режим экзамена и вариант
+    try {
+      sessionStorage.setItem('exam_type', 'oge');
+      sessionStorage.setItem('exam_flow', '1');
+      sessionStorage.setItem('exam_variant', variant);
+    } catch {}
+
+    // Если сюда попали вне режима «экзамен полностью» — вернём к выбору
+    if (sessionStorage.getItem('exam_flow') !== '1') {
+      navigateOnce('./exams.html');
+    }
+
+    // Заголовки
+    document.getElementById('title').textContent = `Задание ${next}`;
+    try { document.title = `ОГЭ — Экзамен полностью: Задание ${next}`; } catch {}
+
+    // Куда идти после отсчёта (всегда прокидываем ?exam=1&variant=)
+    function nextPrepareUrl(){
+      if (next > 3) {
+        return `./exams_result.html?exam=1&variant=${encodeURIComponent(variant)}`
+          .replace(/\/{2,}/g,'/').replace(':/','://');
+      }
+      return `./task${next}/variants/variant${variant}/oge${next}_var${variant}_1_prepare.html?exam=1&variant=${encodeURIComponent(variant)}`
+        .replace(/\/{2,}/g,'/').replace(':/','://');
+    }
+
+    // Отсчёт 3-2-1
+    const timerEl = document.getElementById('timer');
+    let n = 3;
+    timerEl.textContent = n;
+    const id = setInterval(()=>{
+      timerEl.textContent = n;
+      n--;
+      if (n < 0){
+        clearInterval(id);
+        navigateOnce(nextPrepareUrl());
+      }
+    },1000);
+
+    // Очистки и снятие «замка»
+    window.addEventListener('beforeunload', ()=>{ try{ clearInterval(id); }catch{} });
+    window.addEventListener('pageshow', ()=>{ navigateOnce.lock = false; });
+  </script>
+</body>
+</html>

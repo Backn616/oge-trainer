@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Предупреждение — доступ к микрофону</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <!-- Анти-мигание темы -->
+  <script>
+    (function(){
+      try{
+        const saved = localStorage.getItem('pref-theme') || 'light';
+        if(saved === 'dark') document.documentElement.classList.add('dark');
+      }catch(_){}
+    })();
+  </script>
+
+  <style>
+    :root{
+      --bg:#f7f9ff;
+      --card:#ffffff;
+      --text:#0b1020;
+      --primary:#2b6cff;
+      --primary-600:#1f58d9;
+      --danger:#b30000;
+      --shadow:0 10px 25px rgba(17,24,39,.08);
+    }
+    .dark{
+      --bg:#0b1020;
+      --card:rgba(255,255,255,.08);
+      --text:#eaf0ff;
+      --primary:#6aa3ff;
+      --primary-600:#4b8dff;
+      --danger:#ff6b6b;
+      --shadow:0 10px 35px rgba(0,0,0,.35);
+    }
+
+    body{
+      font-family: Inter, system-ui, sans-serif;
+      margin:0;
+      padding:40px 20px;
+      background:
+        radial-gradient(1200px 600px at 70% -10%, #29417a40, transparent),
+        radial-gradient(900px 500px at -10% 10%, #344b9340, transparent),
+        var(--bg);
+      color:var(--text);
+      display:flex; justify-content:center; align-items:center;
+      min-height:100vh;
+    }
+    .card{
+      background:var(--card);
+      border-radius:16px;
+      padding:40px;
+      max-width:800px; width:100%;
+      box-shadow:var(--shadow);
+      text-align:center;
+    }
+    h1{ font-size:32px; color:var(--danger); margin-bottom:20px; }
+    p{ font-size:20px; line-height:1.6; margin-bottom:40px; }
+
+    .button{
+      display:inline-block;
+      padding:16px 32px;
+      font-size:20px; font-weight:600;
+      color:#fff; text-decoration:none;
+      background:linear-gradient(135deg, var(--primary), var(--primary-600));
+      border:none; border-radius:12px; cursor:pointer;
+      box-shadow:0 10px 22px rgba(43,108,255,.3);
+      transition:transform .06s ease, box-shadow .2s ease;
+    }
+    .button:hover{ transform:scale(1.05); }
+
+    .theme-toggle{
+      position:fixed; top:16px; right:16px; z-index:10000;
+      border:1px solid #ffffff22; background:transparent; color:var(--text);
+      padding:10px 14px; border-radius:10px; cursor:pointer; backdrop-filter: blur(6px);
+      transition:transform .08s ease, filter .2s ease;
+    }
+    .theme-toggle:hover{ transform:translateY(-1px); filter:brightness(1.03); }
+  </style>
+</head>
+<body>
+  <!-- Тумблер темы -->
+  <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
+
+  <main class="card" role="dialog" aria-labelledby="warnTitle" aria-describedby="warnText">
+    <h1 id="warnTitle">Внимание</h1>
+    <p id="warnText">
+      На следующем этапе тренажёр попытается получить доступ к микрофону.<br><br>
+      Браузер покажет системный запрос на использование микрофона.<br><br>
+      Если вы готовы выполнить устную часть задания 4, пожалуйста,<br>
+      <strong>разрешите сайту использовать микрофон</strong>, чтобы начать запись ответа.
+    </p>
+    <a id="nextLink"
+       href="#"
+       class="button"
+       role="button"
+       aria-label="Перейти к заданию с запросом доступа к микрофону">
+      ОК
+    </a>
+  </main>
+
+  <script>
+    // ===== База /ege/ и номер варианта из пути (как в Task 1, но для task4) =====
+    function getEgeBase(){
+      const parts = location.pathname.split('/');
+      const i = parts.indexOf('ege');
+      return i !== -1 ? parts.slice(0, i + 1).join('/') + '/' : '/ege/';
+    }
+    function getVariantFromPath(){
+      // ожидаем .../task4/variants/variant{n}/ege4_var{n}_2_mic.html
+      const m = location.pathname.match(/variant(\d+)\/ege4_var\1_2_mic\.html$/);
+      return m ? Number(m[1]) : null;
+    }
+    const EGE_BASE = getEgeBase();
+    const VAR_N = getVariantFromPath();
+
+    // Сброс прошлой записи и маркер предупреждения
+    try{
+      sessionStorage.removeItem('ege4_audio_base64');
+      sessionStorage.setItem('ege4_warned','1');
+    }catch(_){}
+
+    // Динамическая ссылка "ОК" → на шаг task
+    (function(){
+      const a = document.getElementById('nextLink');
+      const url = VAR_N
+        ? `${EGE_BASE}task4/variants/variant${VAR_N}/ege4_var${VAR_N}_3_task.html`
+        : 'ege4_var1_3_task.html'; // фолбэк, если путь нетипичный
+      a.href = url;
+    })();
+
+    // Переключатель темы
+    (function(){
+      const btn = document.getElementById('themeBtn');
+      const key = 'pref-theme';
+      const root = document.documentElement;
+      function apply(mode){
+        root.classList.toggle('dark', mode === 'dark');
+        localStorage.setItem(key, mode);
+      }
+      apply(localStorage.getItem(key) || 'light');
+      btn.addEventListener('click', ()=>{
+        const curr = localStorage.getItem(key) || 'light';
+        apply(curr === 'dark' ? 'light' : 'dark');
+      });
+    })();
+  </script>
+</body>
+</html>

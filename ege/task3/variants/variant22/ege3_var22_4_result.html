@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title id="pageTitle">Результат — Задание 3</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Шрифт -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+
+  <!-- Общие стили -->
+  <link rel="stylesheet" href="../../../style_common.css" />
+
+  <!-- Анти-мигание темы -->
+  <script>
+    (function(){
+      try{
+        const saved = localStorage.getItem('pref-theme') || 'light';
+        if (saved === 'dark') document.documentElement.classList.add('dark');
+      }catch(_){}
+    })();
+  </script>
+
+  <style>
+    .wrap{ max-width:1500px; margin:0 auto; }
+    h1{ color:var(--primary); font-size:36px; margin:12px 0 6px; text-align:center; }
+    .status{ font-size:22px; color:#1f7a2e; text-align:center; margin:10px 0 26px; }
+    .dark .status{ color:#5ee397; }
+
+    /* Плеер + волна */
+    audio{ margin:20px auto 10px; width:min(900px, 90%); display:block; }
+    .wave-wrap{ width:min(900px,90%); margin:0 auto 18px; display:none; }
+    .wave{ width:100%; height:48px; display:block; background:#e9edf7; border-radius:10px; box-shadow:var(--shadow); }
+    .dark .wave{ background:#1f2a3d; }
+
+    /* Цвета волны */
+    :root{
+      --wave-base: rgba(0,0,0,.28);
+      --wave-prog: var(--primary);
+      --wave-glow: rgba(43,108,255,.45);
+    }
+    html.dark{
+      --wave-base: rgba(255,255,255,.52);
+      --wave-prog: #5bb8ff;
+      --wave-glow: rgba(91,184,255,.65);
+    }
+
+    .btn{
+      display:inline-block; padding:16px 32px; margin:12px;
+      font-size:20px; font-weight:600; color:#fff; text-decoration:none; cursor:pointer;
+      border:none; border-radius:12px;
+      background:linear-gradient(135deg, var(--primary), var(--primary-600));
+      box-shadow:0 10px 22px rgba(43,108,255,.3);
+      transition: transform .06s ease, filter .2s ease, box-shadow .2s ease;
+    }
+    .btn:hover{ transform: scale(1.05); filter: brightness(1.03); }
+    .btn:disabled{ opacity:.6; cursor:not-allowed; transform:none; }
+
+    .task-container{
+      background:var(--card);
+      border-left:5px solid var(--primary);
+      padding:20px 30px 10px 30px;
+      margin:0 auto 30px;
+      font-size:20px; line-height:1.7; text-align:left;
+      box-shadow:var(--shadow); border-radius:12px;
+    }
+    .task-container ul{ margin:12px 0 0 22px; }
+    .task-container li{ margin:6px 0; }
+  </style>
+</head>
+<body>
+  <button id="themeBtn" class="theme-toggle" aria-label="Переключить тему">🌓 Тема</button>
+
+  <div class="wrap">
+    <h1 id="h1">Результат — Вариант <span id="varNum">?</span></h1>
+    <div class="status" id="statusText" aria-live="polite">
+      ✅ Вы успешно завершили задание. Вы можете прослушать или скачать запись ниже.
+    </div>
+
+    <audio id="audio" controls></audio>
+    <!-- Волна -->
+    <div id="waveWrap" class="wave-wrap">
+      <canvas id="wave" class="wave"></canvas>
+    </div>
+
+    <div style="text-align:center;">
+      <button class="btn" id="playBtn" type="button" aria-label="Проиграть запись" disabled>▶️ Прослушать</button>
+      <button class="btn" id="downloadBtn" type="button" aria-label="Скачать запись" disabled>⬇️ Скачать запись</button>
+      <a class="btn" id="repeatBtn" href="#" role="button" aria-label="Повторить этот вариант">🔁 Повторить этот вариант</a>
+    </div>
+
+    <!-- Карточка с условием и вопросами Task 3 -->
+    <div class="task-container" aria-labelledby="taskTitle">
+      <b id="taskTitle">Task 3. You are going to give an interview.</b>
+      <div style="margin-top:10px;">
+        You have to answer five questions. Give full answers to the questions (2–3 sentences).
+        Remember that you have 40 seconds to answer each question.
+      </div>
+      <ul>
+        <li>1. What famous Russian scientists do you know?</li>
+<li>2. Which of them do you find the most interesting? Why?</li>
+<li>3. Do you think Russian scientists have made important contributions to the world? Why?</li>
+<li>4. Would you like to learn more about the life of any Russian scientist? Why?</li>
+<li>5. Do you agree that young people should know more about Russian scientists? Why or why not?</li>
+      </ul>
+    </div>
+
+    <div style="text-align:center;">
+      <a class="btn nav-btn" id="toVariants" href="#" role="button" aria-label="Перейти к выбору варианта">Перейти к выбору варианта</a>
+      <a class="btn nav-btn" id="toModeMenu" href="#" role="button" aria-label="Перейти к выбору задания">Перейти к выбору задания</a>
+      <a class="btn nav-btn" id="toTaskMenu" href="#" role="button" aria-label="Перейти к выбору режима">Перейти к выбору режима</a>
+      <a class="btn nav-btn" id="toHome" href="#" role="button" aria-label="Перейти на главную">Перейти на главную</a>
+    </div>
+  </div>
+
+  <script type="module">
+    import { toggleThemeInit, navigateOnce, examModeInit } from '../../../common.js';
+    toggleThemeInit();
+    examModeInit(); // синхронизирует exam_flow по ?exam=1 (или сбросит, если параметра нет)
+
+    /* === Экзамен полностью: после Task 3 → отсчёт перед Task 4 === */
+    try {
+      const qs = new URLSearchParams(location.search);
+      const inExam = qs.get('exam') === '1' || sessionStorage.getItem('exam_flow') === '1';
+      if (inExam) {
+        const vSS  = (sessionStorage.getItem('exam_variant') || '').replace(/\D+/g,'');
+        const vURL = (location.pathname.match(/variant(\d+)/i) || [,''])[1] || '';
+        const v    = vSS || vURL || '';
+        // На всякий — выставим флаги, чтобы downstream-страницы их точно увидели
+        try {
+          sessionStorage.setItem('exam_flow','1');
+          if (v) sessionStorage.setItem('exam_variant', v);
+        } catch {}
+        if (v) {
+          navigateOnce(`../../../exams_countdown.html?exam=1&next=4&variant=${encodeURIComponent(v)}`);
+          throw new Error('redirected'); // прерываем локальную инициализацию
+        }
+      }
+    } catch {}
+
+    // ===== Заголовок/номер варианта =====
+    const path = location.pathname;
+    const m = path.match(/variant(\d+)/i);
+    const varNum = m ? m[1] : '?';
+    document.getElementById('varNum').textContent = varNum;
+    document.title = `Результат — Задание 3 · Вариант ${varNum}`;
+
+    // ===== Базы путей =====
+    function getBases(p){
+      const i = p.indexOf('/ege/');
+      if (i >= 0){
+        const ROOT_BASE = p.slice(0, i + 1);
+        const EGE_BASE  = p.slice(0, i + 5);
+        return { ROOT_BASE, EGE_BASE };
+      }
+      return { ROOT_BASE: '/', EGE_BASE: '/ege/' };
+    }
+    const { ROOT_BASE, EGE_BASE } = getBases(path);
+
+    // Навигация
+    const toVariants = document.getElementById('toVariants');
+    if (toVariants){
+      // /variants/variantX/_4_result.html → /variants/ege3.html
+      toVariants.href = path.replace(/\/variants\/variant\d+\/[^/]+$/i, '/variants/ege3.html');
+    }
+    document.getElementById('toModeMenu').href = `${EGE_BASE}ege_menu.html`;
+    document.getElementById('toTaskMenu').href = `${EGE_BASE}ege.html`;
+    document.getElementById('toHome').href     = `${ROOT_BASE}index.html`;
+
+    function clearTask3State(){
+      try{
+        Object.keys(sessionStorage).forEach(k => { if (k.startsWith('ege3_')) sessionStorage.removeItem(k); });
+        if (varNum && /^\d+$/.test(varNum)) sessionStorage.removeItem(`ege3_var${varNum}_prepare_endtime`);
+      }catch{}
+    }
+    function clearAndGo(url){ clearTask3State(); navigateOnce(url); }
+
+    const repeat = document.getElementById('repeatBtn');
+    if (repeat){
+      const repeatHref = path.replace(/_4_result\.html$/i, '_1_prepare.html');
+      repeat.href = repeatHref;
+      repeat.addEventListener('click', (e)=>{ e.preventDefault(); clearAndGo(repeatHref); });
+    }
+    document.querySelectorAll('.nav-btn').forEach(a=>{
+      a.addEventListener('click', (e)=>{ e.preventDefault(); clearAndGo(a.href); });
+    });
+    window.addEventListener('pageshow', ()=>{ navigateOnce.lock = false; });
+
+    // ===== Аудио + волна (берём запись из Task 3)
+    const audioEl     = document.getElementById('audio');
+    const playBtn     = document.getElementById('playBtn');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const statusText  = document.getElementById('statusText');
+
+    const waveWrap    = document.getElementById('waveWrap');
+    const waveCanvas  = document.getElementById('wave');
+
+    const base64     = sessionStorage.getItem('ege3_audio_base64');
+    const mimeStored = (sessionStorage.getItem('ege3_audio_mime') || 'audio/webm').toLowerCase();
+
+    let objectURL = null;
+    const extByMime = {
+      'audio/webm':'webm','audio/webm;codecs=opus':'webm',
+      'audio/ogg':'ogg','audio/ogg;codecs=opus':'ogg',
+      'audio/mp4':'m4a','audio/mpeg':'mp3','audio/wav':'wav'
+    };
+    const fileExt  = extByMime[mimeStored] || 'webm';
+    const fileName = `ege3_variant${varNum}.${fileExt}`;
+
+    function dataURLtoBlob(dataURL){
+      const parts = (dataURL || '').split(',');
+      if (parts.length < 2) return null;
+      const header = parts[0], b64 = parts[1];
+      const type = (header.match(/data:(.*?);base64/) || [,'application/octet-stream'])[1];
+      const bin  = atob(b64);
+      const bytes= new Uint8Array(bin.length);
+      for (let i=0;i<bin.length;i++) bytes[i] = bin.charCodeAt(i);
+      return new Blob([bytes], { type });
+    }
+    function setButtonsEnabled(en){ playBtn.disabled = !en; downloadBtn.disabled = !en; }
+
+    (async function initAudio(){
+      if (!base64){
+        statusText.textContent = '⚠️ Запись не найдена. Возможно, вы запретили доступ к микрофону или страница была закрыта до завершения.';
+        setButtonsEnabled(false);
+        return;
+      }
+      try{
+        const blob = dataURLtoBlob(base64);
+        if (blob){
+          objectURL   = URL.createObjectURL(blob);
+          audioEl.src = objectURL;
+          audioEl.type= blob.type || mimeStored;
+          await initWaveformFromBlob(blob);
+        }else{
+          audioEl.src = base64;
+          audioEl.type= mimeStored;
+          await initWaveformFromURL(base64);
+        }
+        setButtonsEnabled(true);
+      }catch{
+        audioEl.src = base64;
+        audioEl.type= mimeStored;
+        setButtonsEnabled(true);
+      }
+    })();
+
+    playBtn.addEventListener('click', ()=>{ if (audioEl.src) audioEl.play(); });
+    downloadBtn.addEventListener('click', ()=>{
+      if (!audioEl.src) return;
+      const a = document.createElement('a');
+      a.href = objectURL || base64;
+      a.download = fileName;
+      a.click();
+    });
+
+    window.addEventListener('pagehide', ()=>{ if (objectURL) URL.revokeObjectURL(objectURL); });
+    window.addEventListener('beforeunload', ()=>{ if (objectURL) URL.revokeObjectURL(objectURL); });
+
+    // ===== Волна
+    async function initWaveformFromBlob(blob){
+      const arr = await blob.arrayBuffer();
+      await renderWave(arr);
+    }
+    async function initWaveformFromURL(url){
+      const resp = await fetch(url);
+      const arr  = await resp.arrayBuffer();
+      await renderWave(arr);
+    }
+    async function renderWave(arrayBuffer){
+      const AC   = window.AudioContext || window.webkitAudioContext;
+      const ctxA = new AC();
+      const audioBuf = await ctxA.decodeAudioData(arrayBuffer);
+
+      const peaks = buildPeaks(audioBuf, 1000);
+      drawWave(peaks, 0);
+      waveWrap.style.display = 'block';
+
+      let raf;
+      const tick = ()=>{
+        const p = audioEl.currentTime / (audioBuf.duration || 1);
+        drawWave(peaks, p);
+        raf = requestAnimationFrame(tick);
+      };
+      audioEl.addEventListener('play', ()=>{ cancelAnimationFrame(raf); tick(); });
+      audioEl.addEventListener('pause', ()=>{ cancelAnimationFrame(raf); drawWave(peaks, audioEl.currentTime/(audioBuf.duration||1)); });
+      audioEl.addEventListener('ended', ()=>{ cancelAnimationFrame(raf); drawWave(peaks, 1); });
+
+      waveCanvas.addEventListener('pointerdown', (e)=>{
+        const r = waveCanvas.getBoundingClientRect();
+        const x = Math.max(0, Math.min(1, (e.clientX - r.left)/r.width));
+        audioEl.currentTime = x * audioBuf.duration;
+        drawWave(peaks, x);
+      }, {passive:true});
+    }
+
+    function buildPeaks(audioBuf, width){
+      const ch0 = audioBuf.getChannelData(0);
+      const ch1 = audioBuf.numberOfChannels>1 ? audioBuf.getChannelData(1) : null;
+      const total = ch0.length;
+      const block = Math.floor(total / width) || 1;
+      const peaks = new Array(width);
+      for (let i=0;i<width;i++){
+        const start = i*block, end = Math.min(total, start+block);
+        let min=1, max=-1;
+        for (let j=start;j<end;j++){
+          const s = ch1 ? (ch0[j]+ch1[j])*0.5 : ch0[j];
+          if (s<min) min=s; if (s>max) max=s;
+        }
+        peaks[i] = [min,max];
+      }
+      return peaks;
+    }
+
+    function drawWave(peaks, progress){
+      const c = waveCanvas;
+      const dpr = Math.max(1, Math.floor(window.devicePixelRatio || 1));
+      const cssW = c.clientWidth || 600;
+      const cssH = c.clientHeight || 48;
+      if (c.width !== cssW*dpr) c.width = cssW*dpr;
+      if (c.height!== cssH*dpr) c.height= cssH*dpr;
+      const ctx = c.getContext('2d');
+      ctx.setTransform(dpr,0,0,dpr,0,0);
+
+      const rs = getComputedStyle(document.documentElement);
+      const waveBase = (rs.getPropertyValue('--wave-base') || 'rgba(0,0,0,.28)').trim();
+      const waveProg = (rs.getPropertyValue('--wave-prog') || '#2b6cff').trim();
+      const waveGlow = (rs.getPropertyValue('--wave-glow') || 'rgba(43,108,255,.45)').trim();
+      const bg = getComputedStyle(c).backgroundColor;
+
+      ctx.clearRect(0,0,cssW,cssH);
+      ctx.fillStyle = bg; ctx.fillRect(0,0,cssW,cssH);
+
+      const mid = cssH/2;
+      ctx.fillStyle = waveBase;
+      for (let i=0;i<peaks.length;i++){
+        const x = i/peaks.length*cssW;
+        const [min,max] = peaks[i];
+        const hTop = Math.abs(max)*mid;
+        const hBot = Math.abs(min)*mid;
+        ctx.fillRect(x, mid-hTop, 1, hTop+hBot || 1);
+      }
+
+      const progW = Math.max(0, Math.min(cssW, progress*cssW));
+      ctx.save(); ctx.beginPath(); ctx.rect(0,0,progW,cssH); ctx.clip();
+      ctx.fillStyle = waveProg; ctx.shadowColor = waveGlow; ctx.shadowBlur = 8;
+      for (let i=0;i<peaks.length;i++){
+        const x = i/peaks.length*cssW;
+        const [min,max] = peaks[i];
+        const hTop = Math.abs(max)*mid;
+        const hBot = Math.abs(min)*mid;
+        ctx.fillRect(x, mid-hTop, 1, hTop+hBot || 1);
+      }
+      ctx.restore();
+    }
+  </script>
+</body>
+</html>
